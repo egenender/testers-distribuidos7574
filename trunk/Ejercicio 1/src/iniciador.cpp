@@ -14,9 +14,9 @@
 
 #include "ipc/Semaphore.h"
 #include "logger/Logger.h"
-#include "AtendedorDispositivos.h"
-#include "Planilla.h"
-#include "DespachadorTecnicos.h"
+#include "common/AtendedorDispositivos.h"
+#include "common/Planilla.h"
+#include "common/DespachadorTecnicos.h"
 
 /*
  * 
