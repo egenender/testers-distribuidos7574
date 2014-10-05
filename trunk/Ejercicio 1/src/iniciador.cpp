@@ -93,6 +93,13 @@ void createSystemProcesses() {
         }
     }
     
+    // Creo al tecnico
+    pid_t tecPid = fork();
+    if(tecPid == 0) {
+        execlp("./tecnico", "tecnico", (char*)0);
+        Logger::error("Error al ejecutar el programa tecnico", __FILE__);
+    }
+    
     Logger::debug("Programas iniciados correctamente...", __FILE__);
     
 }
