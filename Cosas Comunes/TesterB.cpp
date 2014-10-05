@@ -23,6 +23,6 @@ void TesterB::atenderDispositivos(){
 		}else{
 			atendedor.enviarOrdenReinicio(dispositivo);
 		}
-		this.planilla.terminoProcesarResultado();//llama a planilla local para ver cuantos le quedan asignados
+		this.planilla.terminoProcesarResultado(dispositivo);//llama a planilla local para ver cuantos le quedan asignados
 	}
 }
