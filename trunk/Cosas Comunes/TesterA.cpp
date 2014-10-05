@@ -12,7 +12,7 @@ TesterA::TesterA(AtendedorDispositivos atendedor, int numTester){
 void TesterA::atenderDispositivos(){
 	while (true){ //ponerle una signal de finalizacion? o lo dejamos corriendo para siempre?
 		Dispositivo dispositivo = this.atendedor.obtenerDipositivo();
-		if (!this.planilla.agregar()){ //es un test&set, que registra en la planilla local y ademas llama al procesarNuevoDispositivo
+		if (!this.planilla.agregar(Dispositivo)){ 
 			this.atendedor.noHayLugarPara(dispositivo);
 			continue;
 		}
