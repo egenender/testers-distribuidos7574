@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
         // Dispositivo envia requerimiento
         atendedor.enviarRequerimiento(id);
         // Recibe programa, verificando que no sea un rechazo por parte del sistema
-        int program = atendedor.recibirPrograma();
+        int program = atendedor.recibirPrograma(id);
         if (program == -1) {
             // Si no hay programa -> no hay lugar -> Duermo y envio otro req mas tarde
             sleep(rand() % 60 + 60);
@@ -42,10 +42,10 @@ int main(int argc, char** argv) {
         }
     
         // Le envio resultado del programa de testeo
-        atendedor.enviarResultado(rand() % 2);
+        atendedor.enviarResultado(id, rand() % 2);
         
         // Recibo la orden a seguir
-        int orden = atendedor.recibirOrden();
+        int orden = atendedor.recibirOrden(id);
         
         if (orden == ORDEN_APAGADO) {
             // TODO: Log

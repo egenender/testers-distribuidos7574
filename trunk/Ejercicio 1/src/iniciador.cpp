@@ -30,7 +30,12 @@ int main(int argc, char** argv) {
     Logger::initialize(logFileName.c_str(), Logger::LOG_NOTICE);
     Logger::debug("Logger inicializado. Inicializando IPCs...", __FILE__);
 
-    createIPCObjects();
+    try {
+        createIPCObjects();
+    } catch(std::string err) {
+        Logger::error("Error al crear los objetos activos...", __FILE__);
+        return 1;
+    }
     Logger::debug("Objetos IPC inicializados correctamente. Iniciando procesos...", __FILE__);
     
     createSystemProcesses();
@@ -49,7 +54,6 @@ void createIPCObjects() {
     
     // Cola de mensajes entre dispositivo y testers
     AtendedorDispositivos atendedor;
-    atendedor.crearQueue();
     
     // Creo semaforo para la shmem de la planilla
     Semaphore semPlanilla(SHMEM_PLANILLA);
@@ -57,11 +61,9 @@ void createIPCObjects() {
     
     // Creo la shmem de la planilla
     Planilla planilla;
-    planilla.crearShMem();
     
     // Creo la cola de mensajes entre tester y tecnico
     DespachadorTecnicos despachador;
-    despachador.crearQueue();
     
 }
 
