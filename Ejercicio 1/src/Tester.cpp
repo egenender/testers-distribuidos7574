@@ -39,18 +39,18 @@ int main(int argc, char** argv) {
         
         if(!planilla.hayLugar()) {
             // Si no hay lugar se le avisa con un -1 en vez de programa
-            atendedor.enviarPrograma(-1);
+            atendedor.enviarPrograma(idDispositivo, -1);
             continue;
         }
         
-        atendedor.enviarPrograma(Programa::getPrograma());
-        int resultado = atendedor.recibirResultado();
+        atendedor.enviarPrograma(idDispositivo, Programa::getPrograma());
+        int resultado = atendedor.recibirResultado(idDispositivo);
         
         if(Resultado::esGrave(resultado)) {
             despachador.enviarOrden(idDispositivo);
-            atendedor.enviarOrden(ORDEN_APAGADO);
+            atendedor.enviarOrden(idDispositivo, ORDEN_APAGADO);
         } else {
-            atendedor.enviarOrden(ORDEN_REINICIO);
+            atendedor.enviarOrden(idDispositivo, ORDEN_REINICIO);
         }
         
         planilla.eliminarDispositivo();

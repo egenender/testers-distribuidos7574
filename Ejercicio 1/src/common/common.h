@@ -18,6 +18,7 @@ const int CANT_DISPOSITIVOS = 20;
 const int CANT_TESTERS = 5;
 const int ID_DISPOSITIVO_START = 2;
 const int ID_TESTER_START = 2;
+const int MAX_DISPOSITIVOS_EN_SISTEMA = 100;
 
 // IDs de los IPC
 
@@ -25,6 +26,8 @@ const int MSG_QUEUE_ATENDEDOR = 0;
 const int SEM_PLANILLA = 1;
 const int SHMEM_PLANILLA = 2;
 const int MSG_QUEUE_DESPACHADOR = 3;
+
+const int MTYPE_REQUERIMIENTO = 1;
 
 const int ORDEN_APAGADO = 0;
 const int ORDEN_REINICIO = 1;

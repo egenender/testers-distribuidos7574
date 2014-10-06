@@ -1,3 +1,6 @@
+#ifndef _SEMAPHORE_
+#define _SEMAPHORE_
+
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
@@ -20,3 +23,5 @@ private:
     key_t key; // la clave para obtener el semaforo
     bool existe; // si ha sido creado
 };
+
+#endif
