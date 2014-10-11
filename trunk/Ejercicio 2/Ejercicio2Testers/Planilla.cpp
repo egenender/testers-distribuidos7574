@@ -1,19 +1,8 @@
 #include <cstdlib>
 #include "ipc/Semaphore.h"
+#include "common/planilla_local.h"
 
 using namespace std;
-
-const int LIBRE = 0;
-const int OCUPADO = 1;
-const int ESPERANDO = 2;
-
-typedef struct struct_planilla_local{
-    int cantidad;
-    int resultados;
-    int estadoA;
-    int estadoB;
-}planilla_local_t;
-
 
 class Planilla{
 private:
@@ -82,12 +71,27 @@ public:
     
     void iniciarProcesamientoResultados(){
         mutex_planilla_local.p();
-        int cantidad = shm_planilla_local->resultados;
-        mutex_planilla_local.v();
-        if (cantidad == 0){
+        if (shm_planilla_local->resultados == 0){
+            shm_planilla_local->estadoB = LIBRE;
+            mutex_planilla_local.v();
             sem_tester_B.p();
+        }else{
+            shm_planilla_local->estadoB = OCUPADO;
+            mutex_planilla_local.v();
         }
+        mutex_planilla_local.p();
+        shm_planilla_local->resultados--;
+        mutex_planilla_local.v();
+    }
+    
+    void eliminar(){
+        mutex_planilla_local.p();
+        shm_planilla_local->cantidad--;
+        mutex_planilla_local.v();
         
+        mutex_planilla_general.p();
+        *shm_planilla_general--;
+        mutex_planilla_general.v();
     }
 };
 
@@ -97,8 +101,24 @@ int main(int argc, char** argv) {
     while (true){
         //TODO leer de la cola (struct c)
         int tipo_req; //TODO: esto se saca del struct
-        
-        
+        switch(tipo_req){
+            case REQUERIMIENTO_AGREGAR:
+                planilla.agregar();
+                break;
+            case REQUERIMIENTO_ELIMINAR_DISPOSITIVO:
+                planilla.eliminar();
+                break;
+            case REQUERIMIENTO_INICIAR_PROC_RESULTADOS:
+                planilla.iniciarProcesamientoResultados();
+                break;
+            case REQUERIMIENTO_PROCESAR_SIGUIENTE:
+                planilla.procesarSiguiente();
+                break;
+            case REQUERIMIENTO_TERMINO_PENDIENTE_REQ:
+                planilla.terminadoRequerimientoPendiente();
+                break;
+        }
+              
     }
     
     return 0;
