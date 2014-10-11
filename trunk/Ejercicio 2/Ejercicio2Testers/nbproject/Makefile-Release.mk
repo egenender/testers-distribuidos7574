@@ -35,7 +35,20 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/main.o
+	${OBJECTDIR}/Dispositivo.o \
+	${OBJECTDIR}/Tecnico.o \
+	${OBJECTDIR}/TesterA.o \
+	${OBJECTDIR}/TesterB.o \
+	${OBJECTDIR}/common/AtendedorDispositivos.o \
+	${OBJECTDIR}/common/DespachadorTecnicos.o \
+	${OBJECTDIR}/common/Planilla.o \
+	${OBJECTDIR}/common/PlanillaCoordinacion.o \
+	${OBJECTDIR}/common/Programa.o \
+	${OBJECTDIR}/common/Resultado.o \
+	${OBJECTDIR}/iniciador.o \
+	${OBJECTDIR}/ipc/Semaphore.o \
+	${OBJECTDIR}/logger/Logger.o \
+	${OBJECTDIR}/sync/LockFile.o
 
 
 # C Compiler Flags
@@ -62,10 +75,75 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/ejercicio2testers: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/ejercicio2testers ${OBJECTFILES} ${LDLIBSOPTIONS}
 
-${OBJECTDIR}/main.o: main.cpp 
+${OBJECTDIR}/Dispositivo.o: Dispositivo.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Dispositivo.o Dispositivo.cpp
+
+${OBJECTDIR}/Tecnico.o: Tecnico.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Tecnico.o Tecnico.cpp
+
+${OBJECTDIR}/TesterA.o: TesterA.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/TesterA.o TesterA.cpp
+
+${OBJECTDIR}/TesterB.o: TesterB.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/TesterB.o TesterB.cpp
+
+${OBJECTDIR}/common/AtendedorDispositivos.o: common/AtendedorDispositivos.cpp 
+	${MKDIR} -p ${OBJECTDIR}/common
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/common/AtendedorDispositivos.o common/AtendedorDispositivos.cpp
+
+${OBJECTDIR}/common/DespachadorTecnicos.o: common/DespachadorTecnicos.cpp 
+	${MKDIR} -p ${OBJECTDIR}/common
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/common/DespachadorTecnicos.o common/DespachadorTecnicos.cpp
+
+${OBJECTDIR}/common/Planilla.o: common/Planilla.cpp 
+	${MKDIR} -p ${OBJECTDIR}/common
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/common/Planilla.o common/Planilla.cpp
+
+${OBJECTDIR}/common/PlanillaCoordinacion.o: common/PlanillaCoordinacion.cpp 
+	${MKDIR} -p ${OBJECTDIR}/common
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/common/PlanillaCoordinacion.o common/PlanillaCoordinacion.cpp
+
+${OBJECTDIR}/common/Programa.o: common/Programa.cpp 
+	${MKDIR} -p ${OBJECTDIR}/common
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/common/Programa.o common/Programa.cpp
+
+${OBJECTDIR}/common/Resultado.o: common/Resultado.cpp 
+	${MKDIR} -p ${OBJECTDIR}/common
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/common/Resultado.o common/Resultado.cpp
+
+${OBJECTDIR}/iniciador.o: iniciador.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/iniciador.o iniciador.cpp
+
+${OBJECTDIR}/ipc/Semaphore.o: ipc/Semaphore.cpp 
+	${MKDIR} -p ${OBJECTDIR}/ipc
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ipc/Semaphore.o ipc/Semaphore.cpp
+
+${OBJECTDIR}/logger/Logger.o: logger/Logger.cpp 
+	${MKDIR} -p ${OBJECTDIR}/logger
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/logger/Logger.o logger/Logger.cpp
+
+${OBJECTDIR}/sync/LockFile.o: sync/LockFile.cpp 
+	${MKDIR} -p ${OBJECTDIR}/sync
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/sync/LockFile.o sync/LockFile.cpp
 
 # Subprojects
 .build-subprojects:

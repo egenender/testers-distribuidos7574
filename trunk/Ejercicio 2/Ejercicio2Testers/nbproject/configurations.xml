@@ -12,7 +12,38 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>main.cpp</itemPath>
+      <logicalFolder name="common" displayName="common" projectFiles="true">
+        <itemPath>common/AtendedorDispositivos.cpp</itemPath>
+        <itemPath>common/AtendedorDispositivos.h</itemPath>
+        <itemPath>common/DespachadorTecnicos.cpp</itemPath>
+        <itemPath>common/DespachadorTecnicos.h</itemPath>
+        <itemPath>common/Planilla.cpp</itemPath>
+        <itemPath>common/Planilla.h</itemPath>
+        <itemPath>common/PlanillaCoordinacion.cpp</itemPath>
+        <itemPath>common/PlanillaCoordinacion.h</itemPath>
+        <itemPath>common/Programa.cpp</itemPath>
+        <itemPath>common/Programa.h</itemPath>
+        <itemPath>common/Resultado.cpp</itemPath>
+        <itemPath>common/Resultado.h</itemPath>
+        <itemPath>common/common.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="ipc" displayName="ipc" projectFiles="true">
+        <itemPath>ipc/Semaphore.cpp</itemPath>
+        <itemPath>ipc/Semaphore.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="logger" displayName="logger" projectFiles="true">
+        <itemPath>logger/Logger.cpp</itemPath>
+        <itemPath>logger/Logger.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="sync" displayName="sync" projectFiles="true">
+        <itemPath>sync/LockFile.cpp</itemPath>
+        <itemPath>sync/LockFile.h</itemPath>
+      </logicalFolder>
+      <itemPath>Dispositivo.cpp</itemPath>
+      <itemPath>Tecnico.cpp</itemPath>
+      <itemPath>TesterA.cpp</itemPath>
+      <itemPath>TesterB.cpp</itemPath>
+      <itemPath>iniciador.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -26,6 +57,12 @@
       <itemPath>Makefile</itemPath>
     </logicalFolder>
   </logicalFolder>
+  <sourceRootList>
+    <Elem>common</Elem>
+    <Elem>ipc</Elem>
+    <Elem>logger</Elem>
+    <Elem>sync</Elem>
+  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="Debug" type="1">
@@ -36,7 +73,53 @@
       </toolsSet>
       <compileType>
       </compileType>
-      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      <item path="Dispositivo.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Tecnico.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="TesterA.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="TesterB.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="common/AtendedorDispositivos.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="common/AtendedorDispositivos.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="common/DespachadorTecnicos.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="common/DespachadorTecnicos.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="common/Planilla.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="common/Planilla.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="common/PlanillaCoordinacion.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="common/PlanillaCoordinacion.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="common/Programa.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="common/Programa.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="common/Resultado.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="common/Resultado.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="common/common.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="iniciador.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ipc/Semaphore.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ipc/Semaphore.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="logger/Logger.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="logger/Logger.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="sync/LockFile.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="sync/LockFile.h" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -59,7 +142,53 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
-      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      <item path="Dispositivo.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Tecnico.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="TesterA.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="TesterB.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="common/AtendedorDispositivos.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="common/AtendedorDispositivos.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="common/DespachadorTecnicos.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="common/DespachadorTecnicos.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="common/Planilla.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="common/Planilla.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="common/PlanillaCoordinacion.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="common/PlanillaCoordinacion.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="common/Programa.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="common/Programa.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="common/Resultado.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="common/Resultado.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="common/common.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="iniciador.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ipc/Semaphore.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ipc/Semaphore.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="logger/Logger.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="logger/Logger.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="sync/LockFile.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="sync/LockFile.h" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
   </confs>
