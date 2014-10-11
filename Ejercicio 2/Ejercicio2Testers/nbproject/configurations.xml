@@ -28,6 +28,7 @@
         <itemPath>common/iPlanillaTesterA.h</itemPath>
         <itemPath>common/iPlanillaTesterB.cpp</itemPath>
         <itemPath>common/iPlanillaTesterB.h</itemPath>
+        <itemPath>common/planilla_local.h</itemPath>
       </logicalFolder>
       <logicalFolder name="ipc" displayName="ipc" projectFiles="true">
         <itemPath>ipc/Semaphore.cpp</itemPath>
@@ -41,6 +42,7 @@
         <itemPath>sync/LockFile.cpp</itemPath>
         <itemPath>sync/LockFile.h</itemPath>
       </logicalFolder>
+      <itemPath>ArriboDeResultados.cpp</itemPath>
       <itemPath>Dispositivo.cpp</itemPath>
       <itemPath>Planilla.cpp</itemPath>
       <itemPath>Tecnico.cpp</itemPath>
@@ -76,6 +78,8 @@
       </toolsSet>
       <compileType>
       </compileType>
+      <item path="ArriboDeResultados.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="Dispositivo.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="Planilla.cpp" ex="false" tool="1" flavor2="0">
@@ -115,6 +119,8 @@
       <item path="common/iPlanillaTesterB.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="common/iPlanillaTesterB.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="common/planilla_local.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="iniciador.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -151,6 +157,8 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
+      <item path="ArriboDeResultados.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="Dispositivo.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="Planilla.cpp" ex="false" tool="1" flavor2="0">
@@ -190,6 +198,8 @@
       <item path="common/iPlanillaTesterB.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="common/iPlanillaTesterB.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="common/planilla_local.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="iniciador.cpp" ex="false" tool="1" flavor2="0">
       </item>

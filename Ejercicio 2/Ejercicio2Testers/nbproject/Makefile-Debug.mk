@@ -35,6 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/ArriboDeResultados.o \
 	${OBJECTDIR}/Dispositivo.o \
 	${OBJECTDIR}/Planilla.o \
 	${OBJECTDIR}/Tecnico.o \
@@ -76,6 +77,11 @@ LDLIBSOPTIONS=
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/ejercicio2testers: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/ejercicio2testers ${OBJECTFILES} ${LDLIBSOPTIONS}
+
+${OBJECTDIR}/ArriboDeResultados.o: ArriboDeResultados.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ArriboDeResultados.o ArriboDeResultados.cpp
 
 ${OBJECTDIR}/Dispositivo.o: Dispositivo.cpp 
 	${MKDIR} -p ${OBJECTDIR}
