@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
     // Obtengo comunicacion con los dispositivos
     AtendedorDispositivos atendedor;
     // Obtengo planilla general de sync con otros tester
-    Planilla planilla(id);
+    iPlanillaTesterB planilla(id);
     // Obtengo comunicacion con los tecnicos
     DespachadorTecnicos despachador;
     
@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
         }
         atendedor.enviarOrden(idDispositivo,orden);
         
-        planilla.eliminarDispositivo(iDdispositivo);
+        planilla.eliminarDispositivo(idDispositivo);
         planilla.procesarSiguiente();
     }
 
