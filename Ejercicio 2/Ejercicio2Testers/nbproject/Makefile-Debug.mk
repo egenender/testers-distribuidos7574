@@ -45,6 +45,8 @@ OBJECTFILES= \
 	${OBJECTDIR}/common/PlanillaCoordinacion.o \
 	${OBJECTDIR}/common/Programa.o \
 	${OBJECTDIR}/common/Resultado.o \
+	${OBJECTDIR}/common/iPlanillaTesterA.o \
+	${OBJECTDIR}/common/iPlanillaTesterB.o \
 	${OBJECTDIR}/iniciador.o \
 	${OBJECTDIR}/ipc/Semaphore.o \
 	${OBJECTDIR}/logger/Logger.o \
@@ -124,6 +126,16 @@ ${OBJECTDIR}/common/Resultado.o: common/Resultado.cpp
 	${MKDIR} -p ${OBJECTDIR}/common
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/common/Resultado.o common/Resultado.cpp
+
+${OBJECTDIR}/common/iPlanillaTesterA.o: common/iPlanillaTesterA.cpp 
+	${MKDIR} -p ${OBJECTDIR}/common
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/common/iPlanillaTesterA.o common/iPlanillaTesterA.cpp
+
+${OBJECTDIR}/common/iPlanillaTesterB.o: common/iPlanillaTesterB.cpp 
+	${MKDIR} -p ${OBJECTDIR}/common
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/common/iPlanillaTesterB.o common/iPlanillaTesterB.cpp
 
 ${OBJECTDIR}/iniciador.o: iniciador.cpp 
 	${MKDIR} -p ${OBJECTDIR}

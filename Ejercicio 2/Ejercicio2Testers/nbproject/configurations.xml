@@ -17,8 +17,6 @@
         <itemPath>common/AtendedorDispositivos.h</itemPath>
         <itemPath>common/DespachadorTecnicos.cpp</itemPath>
         <itemPath>common/DespachadorTecnicos.h</itemPath>
-        <itemPath>common/Planilla.cpp</itemPath>
-        <itemPath>common/Planilla.h</itemPath>
         <itemPath>common/PlanillaCoordinacion.cpp</itemPath>
         <itemPath>common/PlanillaCoordinacion.h</itemPath>
         <itemPath>common/Programa.cpp</itemPath>
@@ -26,6 +24,10 @@
         <itemPath>common/Resultado.cpp</itemPath>
         <itemPath>common/Resultado.h</itemPath>
         <itemPath>common/common.h</itemPath>
+        <itemPath>common/iPlanillaTesterA.cpp</itemPath>
+        <itemPath>common/iPlanillaTesterA.h</itemPath>
+        <itemPath>common/iPlanillaTesterB.cpp</itemPath>
+        <itemPath>common/iPlanillaTesterB.h</itemPath>
       </logicalFolder>
       <logicalFolder name="ipc" displayName="ipc" projectFiles="true">
         <itemPath>ipc/Semaphore.cpp</itemPath>
@@ -40,6 +42,7 @@
         <itemPath>sync/LockFile.h</itemPath>
       </logicalFolder>
       <itemPath>Dispositivo.cpp</itemPath>
+      <itemPath>common/Planilla.cpp</itemPath>
       <itemPath>Tecnico.cpp</itemPath>
       <itemPath>TesterA.cpp</itemPath>
       <itemPath>TesterB.cpp</itemPath>
@@ -91,8 +94,6 @@
       </item>
       <item path="common/Planilla.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="common/Planilla.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="common/PlanillaCoordinacion.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="common/PlanillaCoordinacion.h" ex="false" tool="3" flavor2="0">
@@ -106,6 +107,14 @@
       <item path="common/Resultado.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="common/common.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="common/iPlanillaTesterA.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="common/iPlanillaTesterA.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="common/iPlanillaTesterB.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="common/iPlanillaTesterB.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="iniciador.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -160,8 +169,6 @@
       </item>
       <item path="common/Planilla.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="common/Planilla.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="common/PlanillaCoordinacion.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="common/PlanillaCoordinacion.h" ex="false" tool="3" flavor2="0">
@@ -175,6 +182,14 @@
       <item path="common/Resultado.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="common/common.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="common/iPlanillaTesterA.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="common/iPlanillaTesterA.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="common/iPlanillaTesterB.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="common/iPlanillaTesterB.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="iniciador.cpp" ex="false" tool="1" flavor2="0">
       </item>
