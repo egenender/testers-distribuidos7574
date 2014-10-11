@@ -42,7 +42,7 @@
         <itemPath>sync/LockFile.h</itemPath>
       </logicalFolder>
       <itemPath>Dispositivo.cpp</itemPath>
-      <itemPath>common/Planilla.cpp</itemPath>
+      <itemPath>Planilla.cpp</itemPath>
       <itemPath>Tecnico.cpp</itemPath>
       <itemPath>TesterA.cpp</itemPath>
       <itemPath>TesterB.cpp</itemPath>
@@ -78,6 +78,8 @@
       </compileType>
       <item path="Dispositivo.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="Planilla.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="Tecnico.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="TesterA.cpp" ex="false" tool="1" flavor2="0">
@@ -91,8 +93,6 @@
       <item path="common/DespachadorTecnicos.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="common/DespachadorTecnicos.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="common/Planilla.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="common/PlanillaCoordinacion.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -153,6 +153,8 @@
       </compileType>
       <item path="Dispositivo.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="Planilla.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="Tecnico.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="TesterA.cpp" ex="false" tool="1" flavor2="0">
@@ -166,8 +168,6 @@
       <item path="common/DespachadorTecnicos.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="common/DespachadorTecnicos.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="common/Planilla.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="common/PlanillaCoordinacion.cpp" ex="false" tool="1" flavor2="0">
       </item>
