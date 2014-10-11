@@ -36,12 +36,12 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/Dispositivo.o \
+	${OBJECTDIR}/Planilla.o \
 	${OBJECTDIR}/Tecnico.o \
 	${OBJECTDIR}/TesterA.o \
 	${OBJECTDIR}/TesterB.o \
 	${OBJECTDIR}/common/AtendedorDispositivos.o \
 	${OBJECTDIR}/common/DespachadorTecnicos.o \
-	${OBJECTDIR}/common/Planilla.o \
 	${OBJECTDIR}/common/PlanillaCoordinacion.o \
 	${OBJECTDIR}/common/Programa.o \
 	${OBJECTDIR}/common/Resultado.o \
@@ -82,6 +82,11 @@ ${OBJECTDIR}/Dispositivo.o: Dispositivo.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Dispositivo.o Dispositivo.cpp
 
+${OBJECTDIR}/Planilla.o: Planilla.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Planilla.o Planilla.cpp
+
 ${OBJECTDIR}/Tecnico.o: Tecnico.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
@@ -106,11 +111,6 @@ ${OBJECTDIR}/common/DespachadorTecnicos.o: common/DespachadorTecnicos.cpp
 	${MKDIR} -p ${OBJECTDIR}/common
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/common/DespachadorTecnicos.o common/DespachadorTecnicos.cpp
-
-${OBJECTDIR}/common/Planilla.o: common/Planilla.cpp 
-	${MKDIR} -p ${OBJECTDIR}/common
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/common/Planilla.o common/Planilla.cpp
 
 ${OBJECTDIR}/common/PlanillaCoordinacion.o: common/PlanillaCoordinacion.cpp 
 	${MKDIR} -p ${OBJECTDIR}/common
