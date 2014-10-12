@@ -48,15 +48,15 @@ int main(int argc, char** argv) {
         int orden = atendedor.recibirOrden(id);
         
         if (orden == ORDEN_APAGADO) {
-            // TODO: Log
+            Logger::notice("Al dispositivo le ha llegado una orden de apagado", __FILE__);
             break;
         } else {
-            // TODO: Log
+            Logger::notice("Al dispositivo le ha llegado una orden de reinicio", __FILE__);
             break;
         }
     }
     
-    // TODO: Log
+    Logger::notice("El dispositivo ha terminado el testeo", __FILE__);
     
     return 0;
 }

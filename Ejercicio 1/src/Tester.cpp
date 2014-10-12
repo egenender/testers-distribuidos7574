@@ -7,7 +7,7 @@
 
 #include <cstdlib>
 
-#include "common/AtendedorDispositivos.h"
+#include "common/AtendedorTesters.h"
 #include "common/Planilla.h"
 #include "common/Programa.h"
 #include "common/Resultado.h"
@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
     // int id = atoi(argv[1]);
     
     // Obtengo comunicacion con los dispositivos
-    AtendedorDispositivos atendedor;
+    AtendedorTesters atendedor;
     // Obtengo planilla general de sync con otros tester
     Planilla planilla;
     // Obtengo comunicacion con los tecnicos
