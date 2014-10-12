@@ -28,7 +28,7 @@ void createSystemProcesses();
 int main(int argc, char** argv) {
     
     Logger::initialize(logFileName.c_str(), Logger::LOG_NOTICE);
-    Logger::debug("Logger inicializado. Inicializando IPCs...", __FILE__);
+    Logger::error("Logger inicializado. Inicializando IPCs...", __FILE__);
 
     try {
         createIPCObjects();
