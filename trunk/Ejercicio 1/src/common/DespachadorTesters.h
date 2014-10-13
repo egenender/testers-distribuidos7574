@@ -1,12 +1,12 @@
 /* 
- * File:   DespachadorTecnicos.h
+ * File:   DespachadorTesters.h
  * Author: knoppix
  *
  * Created on October 4, 2014, 10:30 PM
  */
 
-#ifndef DESPACHADORTECNICOS_H
-#define	DESPACHADORTECNICOS_H
+#ifndef DESPACHADORTESTERS_H
+#define	DESPACHADORTESTERS_H
 
 #include <string>
 #include <cstring>
@@ -16,7 +16,7 @@
 #include "common/common.h"
 #include "logger/Logger.h"
 
-class DespachadorTecnicos {
+class DespachadorTesters {
 private:
     int msgQueueId;
     key_t key;
@@ -28,15 +28,13 @@ private:
     
 public:
     
-    DespachadorTecnicos();
-    DespachadorTecnicos(const DespachadorTecnicos& orig);
-    virtual ~DespachadorTecnicos();
+    DespachadorTesters();
+    DespachadorTesters(const DespachadorTesters& orig);
+    virtual ~DespachadorTesters();
     
-    int recibirOrden();
-
-    bool destruirComunicacion();
+    void enviarOrden(int idDispositivo);
 
 };
 
-#endif	/* DESPACHADORTECNICOS_H */
+#endif	/* DESPACHADORTESTERS_H */
 

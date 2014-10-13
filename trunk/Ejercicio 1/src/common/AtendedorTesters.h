@@ -8,6 +8,7 @@
 #ifndef ATENDEDORTESTERS_H
 #define	ATENDEDORTESTERS_H
 
+#include <cstring>
 #include <sys/msg.h>
 #include "errno.h"
 
@@ -34,6 +35,8 @@ public:
     void enviarPrograma(int idDispositivo, int idPrograma);  // Tester -> Disp
     int recibirResultado(int idDispositivo);
     void enviarOrden(int idDispositivo, int orden); // Tester -> Disp: Reinicio o apagado
+
+    bool destruirComunicacion();
 
 };
 
