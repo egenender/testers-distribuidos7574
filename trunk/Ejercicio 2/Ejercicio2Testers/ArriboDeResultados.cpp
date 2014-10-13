@@ -12,9 +12,18 @@
 using namespace std;
 
 int main(int argc, char** argv) {
-    Semaphore mutex_planilla_local;
+    int idTester = 
+    Semaphore mutex_planilla_local(SEM_PLANILLA_LOCAL + atoi(argv[0]));
+    mutex_planilla_local.creaSem();
+    
+    key_t key = ftok(ipcFileName.c_str(), SHM_PLANILLA_LOCAL + atoi);
+    int shmlocalid = shmget(key, sizeof(planilla_local_t), 0660);
+    shm_planilla_local = shmat(shmlocalid, NULL, 0);
+    
     planilla_local_t* shm_planilla_local;
-    Semaphore sem_tester_B;
+    Semaphore sem_tester_B(SEM_TESTER_B);
+    
+    
     
     while (true){
         //TODO: leer de la cola
