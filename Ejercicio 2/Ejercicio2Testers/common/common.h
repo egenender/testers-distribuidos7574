@@ -22,11 +22,15 @@ const int MAX_DISPOSITIVOS_EN_SISTEMA = 100;
 
 
 // IDs de los IPC
+const int SEM_PLANILLA_GENERAL = 1;
+const int SHM_PLANILLA_GENERAL = 2;
+const int SEM_TESTER_A = 3;
+const int SEM_TESTER_B = 4;
+const int MSGQUEUE_PLANILLA = 5;
 
-const int MSG_QUEUE_ATENDEDOR = 0;
-const int SEM_PLANILLA = 1;
-const int SHMEM_PLANILLA = 2;
-const int MSG_QUEUE_DESPACHADOR = 3;
+const int CANTIDAD_TESTERS_MAXIMA = 5;
+const int SEM_PLANILLA_LOCAL = 10;
+const int SHM_PLANILLA_LOCAL = SEM_PLANILLA_LOCAL + CANTIDAD_TESTERS_MAXIMA;
 
 const int MTYPE_REQUERIMIENTO = 1;
 
@@ -50,6 +54,18 @@ const std::string ipcFileName = "/tmp/buchwald-ipcs";
 
 const std::string logFileName = "log.txt";
 
+
+//Estructuras communes:
+typedef struct requerimiento_planilla{
+    long mtype;//cual se lee?
+    int tipoReq;
+    int idDispositivo;
+}requerimiento_planilla_t;
+
+typedef struct respuesta_lugar{
+    long mtype;
+    bool respuesta;
+}respuesta_lugar_t;
 
 #endif	/* COMMON_H */
 
