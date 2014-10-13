@@ -15,14 +15,41 @@ private:
     Semaphore sem_tester_A;
     Semaphore sem_tester_B;
     
-public:
-    Planilla(int idTester);
+    int cola;
     
-    void agregar(/*Struct*/){
+public:
+    Planilla(int idTester): mutex_planilla_general(SEM_PLANILLA_GENERAL), mutex_planilla_local(SEM_PLANILLA_LOCAL + idTester), sem_tester_A(SEM_TESTER_A), sem_tester_B(SEM_TESTER_B) {
+        mutex_planilla_general.getSem();
+        mutex_planilla_local.getSem();
+        sem_tester_A.getSem();
+        sem_tester_B.getSem();
+        
+        key_t key = ftok(ipcFileName.c_str(), SHM_PLANILLA_LOCAL + idTester);
+        int shmlocalid = shmget(key, sizeof(planilla_local_t), 0660);
+        //verificacion de errores
+        shm_planilla_local = shmat(shmlocalid, NULL, 0);
+        
+        key = ftok(ipcFileName.c_str(), SHM_PLANILLA_GENERAL);
+        int shmlocalid = shmget(key, sizeof(int), 0660);
+        //verificacion de errores
+        shm_planilla_general = shmat(shmlocalid, NULL, 0);
+        
+        key = ftok(ipcFileName.c_str(), MSGQUEUE_PLANILLA);
+        cola = msgget(key, IPC_CREAT);
+    }
+    
+    int queue(){
+        return cola;
+    }
+    
+    void agregar(int aQuien){
+        respuesta_lugar_t respuesta;
+        respuesta.mtype = aQuien;
         mutex_planilla_general.p();
         if (*shm_planilla_general == MAX_DISPOSITIVOS_EN_SISTEMA){
             mutex_planilla_general.v();
-            //TODO:enviar a la cola el 'no hay lugar'
+            respuesta.respuesta = false;           
+            msgsnd(cola, &respuesta, sizeof(respuesta_lugar_t) - sizeof(long), 0);
             return;
         }            
         *shm_planilla_general++;
@@ -41,8 +68,8 @@ public:
             sem_tester_A.p();
         }
         
-        //TODO:enviar a la cola el 'si hay lugar'
-        return;
+        respuesta.respuesta = true;
+        msgsnd(cola, &respuesta, sizeof(respuesta_lugar_t) - sizeof(long), 0);
     }
     
     void terminadoRequerimientoPendiente(){        
@@ -96,14 +123,13 @@ public:
 };
 
 int main(int argc, char** argv) {
-    int cantidad_dispositivos; //TODO: memoria compartida
-    Planilla planilla;
+    Planilla planilla(atoi(argv[0]));
+    requerimiento_planilla_t requerimiento;
     while (true){
-        //TODO leer de la cola (struct c)
-        int tipo_req; //TODO: esto se saca del struct
-        switch(tipo_req){
+        msgrcv(planilla.queue(), &requerimiento, sizeof(requerimiento_planilla_t) - sizeof(long), 0 /*cual leer?*/, 0 );
+        switch(requerimiento.tipoReq){
             case REQUERIMIENTO_AGREGAR:
-                planilla.agregar();
+                planilla.agregar(requerimiento.idDispositivo);
                 break;
             case REQUERIMIENTO_ELIMINAR_DISPOSITIVO:
                 planilla.eliminar();
