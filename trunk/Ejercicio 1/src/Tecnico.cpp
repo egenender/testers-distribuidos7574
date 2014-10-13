@@ -27,6 +27,8 @@ int main(int argc, char** argv) {
         Logger::notice("Tecnicos recibieron orden para reparar dispositivo" + idDispositivo, __FILE__);
     }
     
+    Logger::destroy();
+    
     return 0;
 }
 

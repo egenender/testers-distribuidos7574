@@ -12,13 +12,13 @@ Planilla::Planilla() : semShMem(SEM_PLANILLA) {
     
     this->shMemKey = ftok(ipcFileName.c_str(), SHMEM_PLANILLA);
     if(this->shMemKey == -1) {
-        std::string err("Error al conseguir la key de la shmem de la planilla. Error: " + errno);
+        std::string err("Error al conseguir la key de la shmem de la planilla. Error: " + std::string(strerror(errno)));
         Logger::error(err.c_str(), __FILE__);
         throw err;
     }
     this->shMemId = shmget(this->shMemKey, sizeof(int), IPC_CREAT);
     if(this->shMemId == -1) {
-        std::string err("Error al conseguir la memoria compartida de la planilla. Error: " + errno);
+        std::string err("Error al conseguir la memoria compartida de la planilla. Error: " + std::string(strerror(errno)));
         Logger::error(err.c_str(), __FILE__);
         throw err;
     }

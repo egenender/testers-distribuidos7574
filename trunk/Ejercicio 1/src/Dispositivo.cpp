@@ -58,6 +58,8 @@ int main(int argc, char** argv) {
     
     Logger::notice("El dispositivo ha terminado el testeo", __FILE__);
     
+    Logger::destroy();
+    
     return 0;
 }
 
