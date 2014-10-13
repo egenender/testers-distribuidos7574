@@ -8,7 +8,7 @@
 #include "AtendedorDispositivos.h"
 
 AtendedorDispositivos::AtendedorDispositivos() { 
-    this->key = ftok(ipcFileName.c_str(), MSG_QUEUE_DESPACHADOR);
+    this->key = ftok(ipcFileName.c_str(), MSG_QUEUE_ATENDEDOR);
     this->msgQueueId = msgget(key, 0666 | IPC_CREAT);
     if(this->msgQueueId == -1) {
         throw std::string("Error al obtener la cola del atendedor de dispositivos. Errno: " + errno);
@@ -24,6 +24,7 @@ AtendedorDispositivos::~AtendedorDispositivos() {
 void AtendedorDispositivos::enviarRequerimiento(int idDispositivo) {
 
     TMessageAtendedor msg;
+	msg.mtype = MTYPE_REQUERIMIENTO;
     msg.idDispositivo = idDispositivo;
     
     int ret = msgsnd(this->msgQueueId, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);

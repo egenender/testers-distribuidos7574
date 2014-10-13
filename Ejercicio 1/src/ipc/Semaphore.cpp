@@ -61,5 +61,5 @@ bool Semaphore::p() {
 
 // eliminar el semáforo del sistema
 bool Semaphore::eliSem() {
-    return(semctl(semid,0,IPC_RMID,(struct semid_ds*)0) == -1);
+    return(semctl(semid,0,IPC_RMID) != -1);
 }

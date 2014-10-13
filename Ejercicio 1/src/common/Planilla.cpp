@@ -32,6 +32,14 @@ Planilla::Planilla() : semShMem(SEM_PLANILLA) {
         Logger::error(err, __FILE__);
         throw err;
     }
+
+    // Por ultimo, luego de creado, obtengo el semaforo correspondiente
+    if (!this->semShMem.getSem()) {
+	std::string err = std::string("Error al obtener el semaforo de la planilla. Error: ") + std::string(strerror(errno));
+	Logger::error(err, __FILE__);
+	throw err;
+    }
+
 }
 
 Planilla::Planilla(const Planilla& orig) : semShMem(SEM_PLANILLA) {
@@ -67,4 +75,14 @@ int Planilla::cantProcesosUsandoPlanilla() {
         Logger::error(err, __FILE__);
     }
 	return estado.shm_nattch;
+}
+
+bool Planilla::destruirMemoria() {
+
+    return (shmctl(this->shMemId, IPC_RMID, NULL) != -1);
+}
+
+bool Planilla::destruirSemaforo() {
+
+    return (this->semShMem.eliSem());
 }

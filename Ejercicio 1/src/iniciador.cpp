@@ -11,6 +11,7 @@
 #include <fstream>
 #include <common/common.h>
 #include "unistd.h"
+#include <errno.h>
 
 #include "ipc/Semaphore.h"
 #include "logger/Logger.h"
@@ -52,9 +53,9 @@ int main(int argc, char** argv) {
 void createIPCObjects() {
 
     // Creo el archivo que se usara para obtener las keys
-    std::fstream ipcFile(ipcFileName.c_str(), std::ios_base::in | std::ios_base::out);
+    std::fstream ipcFile(ipcFileName.c_str(), std::ios::out);
     if (ipcFile.bad() || ipcFile.fail()) {
-        std::string err("Error creando el archivo de IPCs...");
+	std::string err = std::string("Error creando el archivo de IPCs. Error: ") + std::string(strerror(errno));
         Logger::error(err.c_str(), __FILE__);
         throw err;
     }
@@ -64,8 +65,9 @@ void createIPCObjects() {
     AtendedorDispositivos atendedor;
     
     // Creo semaforo para la shmem de la planilla
-    Semaphore semPlanilla(SHMEM_PLANILLA);
+    Semaphore semPlanilla(SEM_PLANILLA);
     semPlanilla.creaSem();
+    semPlanilla.iniSem(1); // Inicializa el semaforo en 1
     
     // Creo la shmem de la planilla
     Planilla planilla;

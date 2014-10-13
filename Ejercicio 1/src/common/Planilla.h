@@ -34,6 +34,9 @@ public:
     bool hayLugar();    // Si hay menos de 100 -> incrementa en 1 al contador
     void eliminarDispositivo(); // Simplemente decrementa en 1 el contador en la shmem
 
+    bool destruirMemoria();
+    bool destruirSemaforo();
+
 };
 
 #endif	/* PLANILLA_H */
