@@ -55,6 +55,8 @@ int main(int argc, char** argv) {
         
         planilla.eliminarDispositivo();
     }
+    
+    Logger::destroy();
 
     return 0;
 }

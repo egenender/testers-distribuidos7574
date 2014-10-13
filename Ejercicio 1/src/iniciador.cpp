@@ -27,13 +27,14 @@ void createSystemProcesses();
 
 int main(int argc, char** argv) {
     
-    Logger::initialize(logFileName.c_str(), Logger::LOG_NOTICE);
+    Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
     Logger::error("Logger inicializado. Inicializando IPCs...", __FILE__);
-
+    
     try {
         createIPCObjects();
     } catch(std::string err) {
         Logger::error("Error al crear los objetos activos...", __FILE__);
+        Logger::destroy();
         return 1;
     }
     Logger::debug("Objetos IPC inicializados correctamente. Iniciando procesos...", __FILE__);
@@ -43,6 +44,8 @@ int main(int argc, char** argv) {
     
     Logger::notice("Sistema inicializado correctamente...", __FILE__);
     
+    Logger::destroy();
+    
     return 0;
 }
 
@@ -50,6 +53,11 @@ void createIPCObjects() {
 
     // Creo el archivo que se usara para obtener las keys
     std::fstream ipcFile(ipcFileName.c_str(), std::ios_base::in | std::ios_base::out);
+    if (ipcFile.bad() || ipcFile.fail()) {
+        std::string err("Error creando el archivo de IPCs...");
+        Logger::error(err.c_str(), __FILE__);
+        throw err;
+    }
     ipcFile.close();
     
     // Cola de mensajes entre dispositivo y testers
