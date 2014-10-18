@@ -16,8 +16,10 @@
 
 class AtendedorDispositivos {
 private:
-    int msgQueueId;
-    key_t key;
+    int cola_requerimiento;
+    int cola_tests;
+    
+    int ultimoTester;
     
     typedef struct message {
         long mtype;

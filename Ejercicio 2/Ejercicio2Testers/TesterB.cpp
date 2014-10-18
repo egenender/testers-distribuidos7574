@@ -13,6 +13,7 @@
 #include "common/Resultado.h"
 #include "common/DespachadorTecnicos.h"
 #include "logger/Logger.h"
+#include "common/DespachadorTesters.h"
 
 using namespace std;
 
@@ -26,26 +27,26 @@ int main(int argc, char** argv) {
     int id = atoi(argv[1]);
     
     // Obtengo comunicacion con los dispositivos
-    AtendedorDispositivos atendedor;
+    AtendedorTesters atendedor;
     // Obtengo planilla general de sync con otros tester
     iPlanillaTesterB planilla(id);
     // Obtengo comunicacion con los tecnicos
-    DespachadorTecnicos despachador;
+    DespachadorTesters despachador;
     
     while(true) {
         planilla.iniciarProcesamientoDeResultados();
         
-        int resultado = atendedor.recibirResultado(); //TODO: tambien debe darnos el id del dispositivo
+        resultado_test_t resultado = atendedor.recibirResultado(id);
         int orden;
         if(Resultado::esGrave(resultado)) {
-            despachador.enviarOrden(idDispositivo);
+            despachador.enviarOrden(resultado.dispositivo);
             orden = ORDEN_APAGADO;
         } else {
             orden = ORDEN_REINICIO;
         }
-        atendedor.enviarOrden(idDispositivo,orden);
+        atendedor.enviarOrden(resultado.dispositivo,orden);
         
-        planilla.eliminarDispositivo(idDispositivo);
+        planilla.eliminarDispositivo(resultado.dispositivo);
         planilla.procesarSiguiente();
     }
 

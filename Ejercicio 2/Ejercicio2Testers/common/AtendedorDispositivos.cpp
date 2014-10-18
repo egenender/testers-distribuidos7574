@@ -8,9 +8,16 @@
 #include "AtendedorDispositivos.h"
 
 AtendedorDispositivos::AtendedorDispositivos() { 
-    this->key = ftok(ipcFileName.c_str(), MSG_QUEUE_ATENDEDOR);
-    this->msgQueueId = msgget(key, 0666 | IPC_CREAT);
-    if(this->msgQueueId == -1) {
+    key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_NUEVO_REQUERIMIENTO);
+    this->cola_requerimiento = msgget(key, 0666 | IPC_CREAT);
+    if(this->cola_requerimiento == -1) {
+        throw std::string("Error al obtener la cola del atendedor de dispositivos. Errno: " + errno);
+    }
+    
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_ESCRITURA_RESULTADOS);
+    this->cola_tests = msgget(key, 0666 | IPC_CREAT);
+    if(this->cola_tests == -1) {
+        msgctl(this->cola_requerimiento, IPC_RMID, (struct msqid_ds*)0);
         throw std::string("Error al obtener la cola del atendedor de dispositivos. Errno: " + errno);
     }
 }
@@ -24,10 +31,10 @@ AtendedorDispositivos::~AtendedorDispositivos() {
 void AtendedorDispositivos::enviarRequerimiento(int idDispositivo) {
 
     TMessageAtendedor msg;
-	msg.mtype = MTYPE_REQUERIMIENTO;
+    msg.mtype = MTYPE_REQUERIMIENTO;
     msg.idDispositivo = idDispositivo;
     
-    int ret = msgsnd(this->msgQueueId, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    int ret = msgsnd(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
         std::string error("Error al enviar mensaje al atendedor. Error: " + errno);
         Logger::error(error.c_str(), __FILE__);
@@ -36,25 +43,25 @@ void AtendedorDispositivos::enviarRequerimiento(int idDispositivo) {
 }
 
 int AtendedorDispositivos::recibirPrograma(int idDispositivo) {
-
     TMessageAtendedor msg;
-    int ret = msgrcv(this->msgQueueId, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
+    int ret = msgrcv(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
     if(ret == -1) {
         std::string error("Error al recibir programa del atendedor. Error: " + errno);
         Logger::error(error.c_str(), __FILE__);
         throw error;
     }
+    this->ultimoTester = msg.idDispositivo; //HACE DE TESTER EN ESTE CASO.. FIXME?
     return msg.value;
 
 }
 void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {
 
     TMessageAtendedor msg;
-    msg.mtype = idDispositivo;
+    msg.mtype = this->ultimoTester;
     msg.idDispositivo = idDispositivo;
     msg.value = resultado;
     
-    int ret = msgsnd(this->msgQueueId, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    int ret = msgsnd(this->cola_tests, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
         std::string error("Error al enviar resultado al atendedor. Error: " + errno);
         Logger::error(error.c_str(), __FILE__);
@@ -66,7 +73,7 @@ void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {
 int AtendedorDispositivos::recibirOrden(int idDispositivo) {
 
     TMessageAtendedor msg;
-    int ret = msgrcv(this->msgQueueId, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
+    int ret = msgrcv(this->cola_tests, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
     if(ret == -1) {
         std::string error("Error al recibir orden del atendedor. Error: " + errno);
         Logger::error(error.c_str(), __FILE__);
