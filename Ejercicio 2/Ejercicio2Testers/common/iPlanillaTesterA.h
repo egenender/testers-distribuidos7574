@@ -10,9 +10,10 @@
 
 class iPlanillaTesterA {
 private:
-        
+    int idTester;
+    int cola;
 public:
-    iPlanillaTesterA(int idTester);
+    iPlanillaTesterA(int id);
     iPlanillaTesterA(const iPlanillaTesterA& orig);
     virtual ~iPlanillaTesterA();
     bool agregar(int idDispositivo);

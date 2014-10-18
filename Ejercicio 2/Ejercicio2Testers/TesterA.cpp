@@ -15,9 +15,6 @@
 
 using namespace std;
 
-/*
- * 
- */
 int main(int argc, char** argv) {
     
     Logger::initialize(logFileName.c_str(), Logger::LOG_NOTICE);
