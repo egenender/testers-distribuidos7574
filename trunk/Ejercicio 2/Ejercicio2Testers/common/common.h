@@ -29,6 +29,7 @@ const int SEM_TESTER_B = 4;
 const int MSGQUEUE_PLANILLA = 5;
 const int MSGQUEUE_ESCRITURA_RESULTADOS = 6;
 const int MSGQUEUE_LECTURA_RESULTADOS = 7;
+const int MSGQUEUE_NUEVO_REQUERIMIENTO = 8;
 
 const int CANTIDAD_TESTERS_MAXIMA = 5;
 const int SEM_PLANILLA_LOCAL = 10;
@@ -68,6 +69,12 @@ typedef struct respuesta_lugar{
     long mtype;
     bool respuesta;
 }respuesta_lugar_t;
+
+typedef struct resultado_test{
+    long tester;
+    int result;
+    int dispositivo;
+}resultado_test_t;
 
 #endif	/* COMMON_H */
 
