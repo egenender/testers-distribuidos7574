@@ -15,10 +15,12 @@
       <logicalFolder name="common" displayName="common" projectFiles="true">
         <itemPath>common/AtendedorDispositivos.cpp</itemPath>
         <itemPath>common/AtendedorDispositivos.h</itemPath>
+        <itemPath>common/AtendedorTesters.cpp</itemPath>
+        <itemPath>common/AtendedorTesters.h</itemPath>
         <itemPath>common/DespachadorTecnicos.cpp</itemPath>
         <itemPath>common/DespachadorTecnicos.h</itemPath>
-        <itemPath>common/PlanillaCoordinacion.cpp</itemPath>
-        <itemPath>common/PlanillaCoordinacion.h</itemPath>
+        <itemPath>common/DespachadorTesters.cpp</itemPath>
+        <itemPath>common/DespachadorTesters.h</itemPath>
         <itemPath>common/Programa.cpp</itemPath>
         <itemPath>common/Programa.h</itemPath>
         <itemPath>common/Resultado.cpp</itemPath>
@@ -94,13 +96,17 @@
       </item>
       <item path="common/AtendedorDispositivos.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="common/AtendedorTesters.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="common/AtendedorTesters.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="common/DespachadorTecnicos.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="common/DespachadorTecnicos.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="common/PlanillaCoordinacion.cpp" ex="false" tool="1" flavor2="0">
+      <item path="common/DespachadorTesters.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="common/PlanillaCoordinacion.h" ex="false" tool="3" flavor2="0">
+      <item path="common/DespachadorTesters.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="common/Programa.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -173,13 +179,17 @@
       </item>
       <item path="common/AtendedorDispositivos.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="common/AtendedorTesters.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="common/AtendedorTesters.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="common/DespachadorTecnicos.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="common/DespachadorTecnicos.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="common/PlanillaCoordinacion.cpp" ex="false" tool="1" flavor2="0">
+      <item path="common/DespachadorTesters.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="common/PlanillaCoordinacion.h" ex="false" tool="3" flavor2="0">
+      <item path="common/DespachadorTesters.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="common/Programa.cpp" ex="false" tool="1" flavor2="0">
       </item>
