@@ -8,7 +8,6 @@
 #include <cstdlib>
 
 #include "common/AtendedorDispositivos.h"
-#include "common/Planilla.h"
 #include "common/Programa.h"
 #include "common/Resultado.h"
 #include "common/DespachadorTecnicos.h"
@@ -29,9 +28,7 @@ int main(int argc, char** argv) {
     AtendedorDispositivos atendedor;
     // Obtengo planilla general de sync con otros tester
     iPlanillaTesterA planilla(id);
-    // Obtengo comunicacion con los tecnicos
-    DespachadorTecnicos despachador;
-    
+        
     while(true) {
         
         // Espero un requerimiento

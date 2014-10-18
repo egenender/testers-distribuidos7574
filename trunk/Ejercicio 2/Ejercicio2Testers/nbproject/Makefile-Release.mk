@@ -42,8 +42,9 @@ OBJECTFILES= \
 	${OBJECTDIR}/TesterA.o \
 	${OBJECTDIR}/TesterB.o \
 	${OBJECTDIR}/common/AtendedorDispositivos.o \
+	${OBJECTDIR}/common/AtendedorTesters.o \
 	${OBJECTDIR}/common/DespachadorTecnicos.o \
-	${OBJECTDIR}/common/PlanillaCoordinacion.o \
+	${OBJECTDIR}/common/DespachadorTesters.o \
 	${OBJECTDIR}/common/Programa.o \
 	${OBJECTDIR}/common/Resultado.o \
 	${OBJECTDIR}/common/iPlanillaTesterA.o \
@@ -113,15 +114,20 @@ ${OBJECTDIR}/common/AtendedorDispositivos.o: common/AtendedorDispositivos.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/common/AtendedorDispositivos.o common/AtendedorDispositivos.cpp
 
+${OBJECTDIR}/common/AtendedorTesters.o: common/AtendedorTesters.cpp 
+	${MKDIR} -p ${OBJECTDIR}/common
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/common/AtendedorTesters.o common/AtendedorTesters.cpp
+
 ${OBJECTDIR}/common/DespachadorTecnicos.o: common/DespachadorTecnicos.cpp 
 	${MKDIR} -p ${OBJECTDIR}/common
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/common/DespachadorTecnicos.o common/DespachadorTecnicos.cpp
 
-${OBJECTDIR}/common/PlanillaCoordinacion.o: common/PlanillaCoordinacion.cpp 
+${OBJECTDIR}/common/DespachadorTesters.o: common/DespachadorTesters.cpp 
 	${MKDIR} -p ${OBJECTDIR}/common
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/common/PlanillaCoordinacion.o common/PlanillaCoordinacion.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/common/DespachadorTesters.o common/DespachadorTesters.cpp
 
 ${OBJECTDIR}/common/Programa.o: common/Programa.cpp 
 	${MKDIR} -p ${OBJECTDIR}/common

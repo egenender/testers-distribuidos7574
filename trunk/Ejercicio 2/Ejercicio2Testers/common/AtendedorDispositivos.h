@@ -30,14 +30,10 @@ public:
     AtendedorDispositivos();
     AtendedorDispositivos(const AtendedorDispositivos& orig);    
     virtual ~AtendedorDispositivos();
-    
+        
     void enviarRequerimiento(int idDispositivo); // Disp -> Tester
-    int recibirRequerimiento();
-    void enviarPrograma(int idDispositivo, int idPrograma);  // Tester -> Disp
     int recibirPrograma(int idDispositivo);
     void enviarResultado(int idDispositivo, int resultado); // Disp -> Tester: Grave o no grave
-    int recibirResultado(int idDispositivo);
-    void enviarOrden(int idDispositivo, int orden); // Tester -> Disp: Reinicio o apagado
     int recibirOrden(int idDispositivo);
 };
 

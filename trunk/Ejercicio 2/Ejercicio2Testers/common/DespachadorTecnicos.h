@@ -9,6 +9,7 @@
 #define	DESPACHADORTECNICOS_H
 
 #include <string>
+#include <cstring>
 #include <sys/msg.h>
 #include "errno.h"
 
@@ -31,8 +32,9 @@ public:
     DespachadorTecnicos(const DespachadorTecnicos& orig);
     virtual ~DespachadorTecnicos();
     
-    void enviarOrden(int idDispositivo);
     int recibirOrden();
+
+    bool destruirComunicacion();
 
 };
 
