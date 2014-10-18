@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
     int id = atoi(argv[1]);
     
     // Obtengo comunicacion con los dispositivos
-    AtendedorDispositivos atendedor;
+    AtendedorTesters atendedor;
     // Obtengo planilla general de sync con otros tester
     iPlanillaTesterA planilla(id);
         
@@ -36,11 +36,11 @@ int main(int argc, char** argv) {
         
         if(!planilla.agregar()) {
             // Si no hay lugar se le avisa con un -1 en vez de programa
-            atendedor.enviarPrograma(idDispositivo, SIN_LUGAR);
+            atendedor.enviarPrograma(idDispositivo, id,SIN_LUGAR);
             continue;
         }
         
-        atendedor.enviarPrograma(idDispositivo, Programa::getPrograma());
+        atendedor.enviarPrograma(idDispositivo, id, Programa::getPrograma());
         planilla.terminoRequerimientoPendiente();
     }
 

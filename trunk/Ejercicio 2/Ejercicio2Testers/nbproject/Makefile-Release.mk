@@ -52,7 +52,8 @@ OBJECTFILES= \
 	${OBJECTDIR}/iniciador.o \
 	${OBJECTDIR}/ipc/Semaphore.o \
 	${OBJECTDIR}/logger/Logger.o \
-	${OBJECTDIR}/sync/LockFile.o
+	${OBJECTDIR}/sync/LockFile.o \
+	${OBJECTDIR}/terminador.o
 
 
 # C Compiler Flags
@@ -168,6 +169,11 @@ ${OBJECTDIR}/sync/LockFile.o: sync/LockFile.cpp
 	${MKDIR} -p ${OBJECTDIR}/sync
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/sync/LockFile.o sync/LockFile.cpp
+
+${OBJECTDIR}/terminador.o: terminador.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/terminador.o terminador.cpp
 
 # Subprojects
 .build-subprojects:

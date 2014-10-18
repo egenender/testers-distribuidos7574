@@ -51,6 +51,7 @@
       <itemPath>TesterA.cpp</itemPath>
       <itemPath>TesterB.cpp</itemPath>
       <itemPath>iniciador.cpp</itemPath>
+      <itemPath>terminador.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -142,6 +143,8 @@
       </item>
       <item path="sync/LockFile.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="terminador.cpp" ex="false" tool="1" flavor2="0">
+      </item>
     </conf>
     <conf name="Release" type="1">
       <toolsSet>
@@ -224,6 +227,8 @@
       <item path="sync/LockFile.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="sync/LockFile.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="terminador.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
   </confs>

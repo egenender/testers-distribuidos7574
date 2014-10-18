@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
     
     // TODO: Log
     
-    while(1) {
+    while(true) {
 	try {
         // Dispositivo envia requerimiento
 	ss << "El dispositivo " << id << " envia un requerimiento al sistema de testeo";
