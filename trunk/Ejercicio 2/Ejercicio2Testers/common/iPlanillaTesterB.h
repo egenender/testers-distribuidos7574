@@ -10,9 +10,10 @@
 
 class iPlanillaTesterB {
 private:
-    
+    int idTester;
+    int cola;
 public:
-    iPlanillaTesterB();
+    iPlanillaTesterB(int id);
     iPlanillaTesterB(const iPlanillaTesterB& orig);
     virtual ~iPlanillaTesterB();
     void eliminarDispositivo(int iDdispositivo);

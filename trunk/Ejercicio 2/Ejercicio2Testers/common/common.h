@@ -61,7 +61,7 @@ const std::string logFileName = "log.txt";
 
 //Estructuras communes:
 typedef struct requerimiento_planilla{
-    long mtype;//cual se lee?
+    long tester;
     int tipoReq;
     int idDispositivo;
 }requerimiento_planilla_t;
