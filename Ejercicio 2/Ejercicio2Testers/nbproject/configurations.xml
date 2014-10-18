@@ -21,6 +21,8 @@
         <itemPath>common/DespachadorTecnicos.h</itemPath>
         <itemPath>common/DespachadorTesters.cpp</itemPath>
         <itemPath>common/DespachadorTesters.h</itemPath>
+        <itemPath>common/Planilla.cpp</itemPath>
+        <itemPath>common/Planilla.h</itemPath>
         <itemPath>common/Programa.cpp</itemPath>
         <itemPath>common/Programa.h</itemPath>
         <itemPath>common/Resultado.cpp</itemPath>
@@ -46,7 +48,8 @@
       </logicalFolder>
       <itemPath>ArriboDeResultados.cpp</itemPath>
       <itemPath>Dispositivo.cpp</itemPath>
-      <itemPath>Planilla.cpp</itemPath>
+      <itemPath>PlanillaTesterA.cpp</itemPath>
+      <itemPath>PlanillaTesterB.cpp</itemPath>
       <itemPath>Tecnico.cpp</itemPath>
       <itemPath>TesterA.cpp</itemPath>
       <itemPath>TesterB.cpp</itemPath>
@@ -85,7 +88,9 @@
       </item>
       <item path="Dispositivo.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="Planilla.cpp" ex="false" tool="1" flavor2="0">
+      <item path="PlanillaTesterA.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="PlanillaTesterB.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="Tecnico.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -108,6 +113,10 @@
       <item path="common/DespachadorTesters.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="common/DespachadorTesters.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="common/Planilla.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="common/Planilla.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="common/Programa.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -170,7 +179,9 @@
       </item>
       <item path="Dispositivo.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="Planilla.cpp" ex="false" tool="1" flavor2="0">
+      <item path="PlanillaTesterA.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="PlanillaTesterB.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="Tecnico.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -193,6 +204,10 @@
       <item path="common/DespachadorTesters.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="common/DespachadorTesters.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="common/Planilla.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="common/Planilla.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="common/Programa.cpp" ex="false" tool="1" flavor2="0">
       </item>

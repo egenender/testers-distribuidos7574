@@ -37,7 +37,8 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 OBJECTFILES= \
 	${OBJECTDIR}/ArriboDeResultados.o \
 	${OBJECTDIR}/Dispositivo.o \
-	${OBJECTDIR}/Planilla.o \
+	${OBJECTDIR}/PlanillaTesterA.o \
+	${OBJECTDIR}/PlanillaTesterB.o \
 	${OBJECTDIR}/Tecnico.o \
 	${OBJECTDIR}/TesterA.o \
 	${OBJECTDIR}/TesterB.o \
@@ -45,6 +46,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/common/AtendedorTesters.o \
 	${OBJECTDIR}/common/DespachadorTecnicos.o \
 	${OBJECTDIR}/common/DespachadorTesters.o \
+	${OBJECTDIR}/common/Planilla.o \
 	${OBJECTDIR}/common/Programa.o \
 	${OBJECTDIR}/common/Resultado.o \
 	${OBJECTDIR}/common/iPlanillaTesterA.o \
@@ -90,10 +92,15 @@ ${OBJECTDIR}/Dispositivo.o: Dispositivo.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Dispositivo.o Dispositivo.cpp
 
-${OBJECTDIR}/Planilla.o: Planilla.cpp 
+${OBJECTDIR}/PlanillaTesterA.o: PlanillaTesterA.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Planilla.o Planilla.cpp
+	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/PlanillaTesterA.o PlanillaTesterA.cpp
+
+${OBJECTDIR}/PlanillaTesterB.o: PlanillaTesterB.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/PlanillaTesterB.o PlanillaTesterB.cpp
 
 ${OBJECTDIR}/Tecnico.o: Tecnico.cpp 
 	${MKDIR} -p ${OBJECTDIR}
@@ -129,6 +136,11 @@ ${OBJECTDIR}/common/DespachadorTesters.o: common/DespachadorTesters.cpp
 	${MKDIR} -p ${OBJECTDIR}/common
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/common/DespachadorTesters.o common/DespachadorTesters.cpp
+
+${OBJECTDIR}/common/Planilla.o: common/Planilla.cpp 
+	${MKDIR} -p ${OBJECTDIR}/common
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/common/Planilla.o common/Planilla.cpp
 
 ${OBJECTDIR}/common/Programa.o: common/Programa.cpp 
 	${MKDIR} -p ${OBJECTDIR}/common
