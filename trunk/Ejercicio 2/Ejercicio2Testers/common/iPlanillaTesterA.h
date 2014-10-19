@@ -17,7 +17,7 @@ public:
     iPlanillaTesterA(const iPlanillaTesterA& orig);
     virtual ~iPlanillaTesterA();
     bool agregar(int idDispositivo);
-    void terminoRequerimientoPendiente();
+    void terminoRequerimientoPendiente(int idDispositivo);
     
 };
 

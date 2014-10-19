@@ -13,8 +13,8 @@
 #include <sys/msg.h>
 #include "errno.h"
 
-#include "common/common.h"
-#include "logger/Logger.h"
+#include "common.h"
+#include "../logger/Logger.h"
 
 class DespachadorTecnicos {
 private:

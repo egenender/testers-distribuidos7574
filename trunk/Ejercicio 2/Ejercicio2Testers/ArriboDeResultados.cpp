@@ -8,15 +8,19 @@
 #include <cstdlib>
 #include "ipc/Semaphore.h"
 #include "common/planilla_local.h"
+#include <sys/msg.h>
+#include "errno.h"
+#include <sys/ipc.h>
+#include <sys/shm.h>
 
 using namespace std;
 
 int main(int argc, char** argv) {
-    int idTester = argv[0];
+    int idTester = atoi(argv[0]);
     Semaphore mutex_planilla_local(SEM_PLANILLA_LOCAL + atoi(argv[0]));
     mutex_planilla_local.creaSem();
     
-    key_t key = ftok(ipcFileName.c_str(), SHM_PLANILLA_LOCAL + atoi);
+    key_t key = ftok(ipcFileName.c_str(), SHM_PLANILLA_LOCAL + idTester);
     int shmlocalid = shmget(key, sizeof(planilla_local_t), 0660);
     planilla_local_t* shm_planilla_local = (planilla_local_t*)shmat(shmlocalid, NULL, 0);
     

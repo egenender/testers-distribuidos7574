@@ -7,10 +7,11 @@
 
 #include <cstdlib>
 
-#include "common/AtendedorDispositivos.h"
+#include "common/AtendedorTesters.h"
 #include "common/Programa.h"
 #include "common/Resultado.h"
-#include "common/DespachadorTecnicos.h"
+#include "common/DespachadorTesters.h"
+#include "common/iPlanillaTesterA.h"
 #include "logger/Logger.h"
 
 using namespace std;
@@ -31,14 +32,14 @@ int main(int argc, char** argv) {
         // Espero un requerimiento
         int idDispositivo = atendedor.recibirRequerimiento();
         
-        if(!planilla.agregar()) {
+        if(!planilla.agregar(idDispositivo)) {
             // Si no hay lugar se le avisa con un -1 en vez de programa
             atendedor.enviarPrograma(idDispositivo, id,SIN_LUGAR);
             continue;
         }
         
         atendedor.enviarPrograma(idDispositivo, id, Programa::getPrograma());
-        planilla.terminoRequerimientoPendiente();
+        planilla.terminoRequerimientoPendiente(idDispositivo);
     }
 
     return 0;

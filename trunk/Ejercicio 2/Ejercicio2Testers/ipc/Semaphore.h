@@ -5,7 +5,7 @@
 #include <sys/ipc.h>
 #include <sys/sem.h>
 
-#include "common/common.h"
+#include "../common/common.h"
 
 class Semaphore {
 public:
