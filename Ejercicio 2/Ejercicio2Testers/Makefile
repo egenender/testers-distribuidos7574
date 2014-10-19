@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-Wall -pedantic -pedantic-errors -g -ggdb -DDEBUG
 
-all: dispositivo tecnico arriboResul testerA testerB planillaA planillaB
+all: dispositivo tecnico arriboResul testerA testerB planillaA planillaB iniciador cleanO
 
 lockfile:
 	$(CC) $(CFLAGS) -c sync/LockFile.cpp
@@ -60,6 +60,8 @@ planillaA: planilla
 planillaB: planilla
 	$(CC) $(CFLAGS) Semaphore.o Planilla.o PlanillaTesterB.cpp -o PlanillaTesterB
 
+iniciador: semaphore logger lockfile atendedorDisp despachadorTec
+	$(CC) $(CFLAGS) Semaphore.o LockFile.o Logger.o AtendedorDispositivos.o DespachadorTecnicos.o iniciador.cpp -o Iniciador
 
 cleanO:
 	rm -f *.o

@@ -22,8 +22,8 @@ private:
     
 public:
 
-    Planilla(int idTester): mutex_planilla_general(SEM_PLANILLA_GENERAL), mutex_planilla_local(SEM_PLANILLA_LOCAL + idTester), sem_tester_A(SEM_TESTER_A), sem_tester_B(SEM_TESTER_B) {
-		this->mutex_planilla_general.getSem();
+    Planilla(int idTester): mutex_planilla_general(SEM_PLANILLA_GENERAL), mutex_planilla_local(SEM_PLANILLA_LOCAL + idTester), sem_tester_A(SEM_TESTER_A + idTester), sem_tester_B(SEM_TESTER_B + idTester) {
+	this->mutex_planilla_general.getSem();
         this->mutex_planilla_local.getSem();
         this->sem_tester_A.getSem();
         this->sem_tester_B.getSem();

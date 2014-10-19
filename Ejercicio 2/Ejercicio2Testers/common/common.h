@@ -16,16 +16,16 @@
 
 const int CANT_DISPOSITIVOS = 20;
 const int CANT_TESTERS = 5;
-const int ID_DISPOSITIVO_START = 2;
-const int ID_TESTER_START = 2;
+const int ID_DISPOSITIVO_START = 50;
+const int ID_TESTER_START = 1;
 const int MAX_DISPOSITIVOS_EN_SISTEMA = 100;
 
 
 // IDs de los IPC
 const int SEM_PLANILLA_GENERAL = 1;
 const int SHM_PLANILLA_GENERAL = 2;
-const int SEM_TESTER_A = 3;
-const int SEM_TESTER_B = 4;
+const int SEM_TESTER_A = 30;
+const int SEM_TESTER_B = 40;
 const int MSGQUEUE_PLANILLA = 5;
 const int MSGQUEUE_ESCRITURA_RESULTADOS = 6;
 const int MSGQUEUE_LECTURA_RESULTADOS = 7;
