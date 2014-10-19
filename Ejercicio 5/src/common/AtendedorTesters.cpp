@@ -66,7 +66,6 @@ resultado_test_t AtendedorTesters::recibirResultado(int idTester) {
     rsp.tester = msg.mtype;
     rsp.dispositivo = msg.idDispositivo;
     rsp.result = msg.value;
-    
     return rsp;
 
 }

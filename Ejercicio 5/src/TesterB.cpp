@@ -6,6 +6,7 @@
  */
 
 #include <cstdlib>
+#include <list>
 
 #include "common/AtendedorDispositivos.h"
 #include "common/Planilla.h"
@@ -29,11 +30,25 @@ int main(int argc, char** argv) {
     iPlanillaTesterB planilla(id);
     // Obtengo comunicacion con los tecnicos
     DespachadorTesters despachador;
+    //Obtengo comunicacion con testers especiales
+    iAsignadorTestersEspeciales asignadorEsp(id);
     
     while(true) {
         planilla.iniciarProcesamientoDeResultados();
         
         resultado_test_t resultado = atendedor.recibirResultado(id);
+
+        if (Resultado::requiereMasPruebas(resultado)) {
+        	//Cuando se detecta que requiere mas pruebas, se puede asignar a varios
+        	//testers especiales para que realicen N pruebas cada uno
+        	list<int> tiposDeTestEspeciales = Resultado::getTiposDeTestEspeciales(resultado);
+        	asignadorEsp.asignar(tiposDeTestEspeciales);
+
+        	//Me bloqueo hasta obtene todos los diagnosticos
+   	        list<int> diagnosticos = asignadorEsp.getTodosLosDiagnosticos();
+   	        resultado = Resultado::getDiagnosticoFinal(diagnosticos);
+        }
+
         int orden;
         if(Resultado::esGrave(resultado)) {
             despachador.enviarOrden(resultado.dispositivo);
