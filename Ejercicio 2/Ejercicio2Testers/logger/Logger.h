@@ -13,7 +13,7 @@
 #include <ctime>
 #include <sstream>
 #include <iomanip>
-#include "sync/LockFile.h"
+#include "../sync/LockFile.h"
 
 class Logger {
 

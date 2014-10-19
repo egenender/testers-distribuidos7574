@@ -5,8 +5,8 @@
 #include <sys/msg.h>
 #include "errno.h"
 
-#include "logger/Logger.h"
-#include "common/common.h"
+#include "../logger/Logger.h"
+#include "common.h"
 
 class AtendedorTesters {
 private:
@@ -25,7 +25,7 @@ public:
     virtual ~AtendedorTesters();
     
     int recibirRequerimiento();
-    void enviarPrograma(int idDispositivo, int idPrograma);  // Tester -> Disp
+    void enviarPrograma(int idDispositivo, int tester, int idPrograma);  // Tester -> Disp
     resultado_test_t recibirResultado(int idTester);
     void enviarOrden(int idDispositivo, int orden); // Tester -> Disp: Reinicio o apagado
 

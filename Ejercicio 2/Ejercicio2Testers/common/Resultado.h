@@ -8,7 +8,7 @@
 #ifndef RESULTADO_H
 #define	RESULTADO_H
 
-#include "common/common.h"
+#include "common.h"
 
 class Resultado {
 public:

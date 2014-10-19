@@ -7,13 +7,12 @@
 
 #include <cstdlib>
 
-#include "common/AtendedorDispositivos.h"
-#include "common/Planilla.h"
+#include "common/AtendedorTesters.h"
+#include "common/iPlanillaTesterB.h"
 #include "common/Programa.h"
 #include "common/Resultado.h"
-#include "common/DespachadorTecnicos.h"
-#include "logger/Logger.h"
 #include "common/DespachadorTesters.h"
+#include "logger/Logger.h"
 
 using namespace std;
 
@@ -35,7 +34,7 @@ int main(int argc, char** argv) {
         
         resultado_test_t resultado = atendedor.recibirResultado(id);
         int orden;
-        if(Resultado::esGrave(resultado)) {
+        if(Resultado::esGrave(resultado.result)) {
             despachador.enviarOrden(resultado.dispositivo);
             orden = ORDEN_APAGADO;
         } else {

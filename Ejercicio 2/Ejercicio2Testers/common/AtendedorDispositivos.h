@@ -11,8 +11,8 @@
 #include <sys/msg.h>
 #include "errno.h"
 
-#include "logger/Logger.h"
-#include "common/common.h"
+#include "../logger/Logger.h"
+#include "common.h"
 
 class AtendedorDispositivos {
 private:

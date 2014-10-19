@@ -1,6 +1,8 @@
 #include "iPlanillaTesterA.h"
 #include "common.h"
 #include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/msg.h>
 
 iPlanillaTesterA::iPlanillaTesterA(int id) {
     idTester = id;
@@ -28,7 +30,7 @@ bool iPlanillaTesterA::agregar(int idDispositivo){
     return hayLugar.respuesta;
 }
 
-void iPlanillaTesterA::terminoRequerimientoPendiente(){
+void iPlanillaTesterA::terminoRequerimientoPendiente(int idDispositivo){
     requerimiento_planilla_t requerimiento;
     requerimiento.tester = idTester;
     requerimiento.tipoReq = REQUERIMIENTO_TERMINO_PENDIENTE_REQ;
