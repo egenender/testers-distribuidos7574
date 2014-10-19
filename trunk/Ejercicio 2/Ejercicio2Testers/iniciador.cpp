@@ -9,19 +9,17 @@
 
 #include <cstdlib>
 #include <fstream>
-#include <common/common.h>
-#include "unistd.h"
+#include <unistd.h>
 #include <errno.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
 
+#include "common/common.h"
 #include "ipc/Semaphore.h"
 #include "logger/Logger.h"
+#include "common/planilla_local.h"
 #include "common/AtendedorDispositivos.h"
-#include "common/Planilla.h"
 #include "common/DespachadorTecnicos.h"
-
-/*
- * 
- */
 
 void createIPCObjects();
 void createSystemProcesses();
@@ -65,13 +63,38 @@ void createIPCObjects() {
     AtendedorDispositivos atendedor;
     
     // Creo semaforo para la shmem de la planilla
-    Semaphore semPlanilla(SEM_PLANILLA);
-    semPlanilla.creaSem();
-    semPlanilla.iniSem(1); // Inicializa el semaforo en 1
-    
-    // Creo la shmem de la planilla
-    Planilla planilla;
-    
+    Semaphore semPlanillaGeneral(SEM_PLANILLA_GENERAL);
+    semPlanillaGeneral.creaSem();
+    semPlanillaGeneral.iniSem(1); // Inicializa el semaforo en 1
+
+    key_t key = ftok(ipcFileName.c_str(), SHM_PLANILLA_GENERAL);
+    int shmgeneralid = shmget(key, sizeof(int), 0660);
+    int* general = (int*)shmat(shmgeneralid, NULL, 0);
+    *general = 0;
+    shmdt(general);
+
+    for (int i = 0; i < CANT_TESTERS; i++){
+        Semaphore semtesterA(SEM_TESTER_A + i);
+        Semaphore semtesterB(SEM_TESTER_B + i);
+        Semaphore semlocal(SEM_PLANILLA_LOCAL + i);
+        semtesterA.creaSem();
+	    semtesterA.iniSem(1);
+	    semtesterB.creaSem();
+	    semtesterB.iniSem(1);
+	    semlocal.creaSem();
+	    semlocal.iniSem(1);
+
+        key_t key = ftok(ipcFileName.c_str(), SHM_PLANILLA_LOCAL + i);
+        int shmlocalid = shmget(key, sizeof(planilla_local_t), 0660);
+        //verificacion de errores
+        planilla_local_t *shm_planilla_local = (planilla_local_t*)shmat(shmlocalid, NULL, 0);
+        shm_planilla_local->cantidad = 0;
+        shm_planilla_local->resultados = 0;
+        shm_planilla_local->estadoA = LIBRE;
+        shm_planilla_local->estadoB = LIBRE;
+        shmdt(shm_planilla_local);
+    }
+         
     // Creo la cola de mensajes entre tester y tecnico
     DespachadorTecnicos despachador;
     
@@ -87,7 +110,7 @@ void createSystemProcesses() {
         pid_t newPid = fork();
         if(newPid == 0) {
             // Inicio el programa correspondiente
-            execlp("./dispositivo", "dispositivo", param, (char*)0);
+            execlp("./Dispositivo", "Dispositivo", param, (char*)0);
             Logger::error("Error al ejecutar el programa dispositivo de ID" + idDispositivo, __FILE__);
         }
     }
@@ -99,16 +122,44 @@ void createSystemProcesses() {
         sprintf(param, "%d\n", idTester++);
         pid_t newPid = fork();
         if(newPid == 0) {
-            // Inicio el programa correspondiente
-            execlp("./tester", "tester", param, (char*)0);
-            Logger::error("Error al ejecutar el programa tester de ID" + idTester, __FILE__);
+	    pid_t otherPid = fork();
+            if (otherPid == 0){
+                pid_t planilla = fork();
+               	if (planilla == 0){
+	            // Inicio el programa correspondiente
+                    execlp("./TesterA", "TesterA", param, (char*)0);
+                    Logger::error("Error al ejecutar el programa testerA de ID" + idTester, __FILE__);
+                }else{
+                    // Inicio el programa correspondiente
+                    execlp("./PlanillaTesterA", "PlanillaTesterA", param, (char*)0);
+                    Logger::error("Error al ejecutar el programa PlanillaTesterA de ID" + idTester, __FILE__);
+                }
+            }else{
+                pid_t planilla = fork();
+                if (planilla == 0){
+	            // Inicio el programa correspondiente
+                    execlp("./TesterB", "TesterB", param, (char*)0);
+                    Logger::error("Error al ejecutar el programa testerB de ID" + idTester, __FILE__);
+                }else{
+                    // Inicio el programa correspondiente
+                    execlp("./PlanillaTesterB", "PlanillaTesterB", param, (char*)0);
+                    Logger::error("Error al ejecutar el programa PlanillaTesterB de ID" + idTester, __FILE__);
+                }
+			}
+        }else{
+            pid_t arribos = fork();
+            if (arribos == 0){
+                 // Inicio el programa correspondiente
+                 execlp("./ArriboDeResultados", "ArriboDeResultados", param, (char*)0);
+                 Logger::error("Error al ejecutar el programa ArriboDeResultados de ID" + idTester, __FILE__);
+            }       
         }
     }
     
     // Creo al tecnico
     pid_t tecPid = fork();
     if(tecPid == 0) {
-        execlp("./tecnico", "tecnico", (char*)0);
+        execlp("./Tecnico", "Tecnico", (char*)0);
         Logger::error("Error al ejecutar el programa tecnico", __FILE__);
     }
     
