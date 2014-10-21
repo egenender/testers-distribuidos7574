@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-Wall -pedantic -pedantic-errors -g -ggdb -DDEBUG
 
-all: dispositivo tecnico arriboResul testerA testerB planillaA planillaB iniciador cleanO
+all: dispositivo tecnico arriboResul testerA testerB planillaA planillaB iniciador terminador cleanO
 
 lockfile:
 	$(CC) $(CFLAGS) -c sync/LockFile.cpp
@@ -25,10 +25,10 @@ logger:
 	$(CC) $(CFLAGS) -c logger/Logger.cpp
 
 dispositivo: lockfile logger atendedorDisp
-	$(CC) $(CFLAGS) LockFile.o Logger.o AtendedorDispositivos.o Dispositivo.cpp -o Dispositivo
+	$(CC) $(CFLAGS) LockFile.o logger/Logger.o AtendedorDispositivos.o Dispositivo.cpp -o Dispositivo
 
 tecnico: lockfile logger despachadorTec
-	$(CC) $(CFLAGS) LockFile.o Logger.o DespachadorTecnicos.o Tecnico.cpp -o Tecnico
+	$(CC) $(CFLAGS) LockFile.o logger/Logger.o DespachadorTecnicos.o Tecnico.cpp -o Tecnico
 
 arriboResul: semaphore
 	$(CC) $(CFLAGS) Semaphore.o ArriboDeResultados.cpp -o ArriboDeResultados
@@ -46,10 +46,10 @@ iPlanillaB:
 	$(CC) $(CFLAGS) -c common/iPlanillaTesterB.cpp	
 
 testerA: programa lockfile logger despachadorTester atendedorTest iPlanillaA
-	$(CC) $(CFLAGS) Programa.o LockFile.o Logger.o AtendedorTesters.o iPlanillaTesterA.o TesterA.cpp -o TesterA	
+	$(CC) $(CFLAGS) Programa.o LockFile.o logger/Logger.o AtendedorTesters.o iPlanillaTesterA.o TesterA.cpp -o TesterA	
 	
 testerB: resultado lockfile logger despachadorTester atendedorTest iPlanillaB
-	$(CC) $(CFLAGS) Resultado.o LockFile.o Logger.o DespachadorTesters.o AtendedorTesters.o iPlanillaTesterB.o TesterB.cpp -o TesterB
+	$(CC) $(CFLAGS) Resultado.o LockFile.o logger/Logger.o DespachadorTesters.o AtendedorTesters.o iPlanillaTesterB.o TesterB.cpp -o TesterB
 
 planilla: semaphore
 	$(CC) $(CFLAGS) -c common/Planilla.cpp	
@@ -61,8 +61,10 @@ planillaB: planilla
 	$(CC) $(CFLAGS) Semaphore.o Planilla.o PlanillaTesterB.cpp -o PlanillaTesterB
 
 iniciador: semaphore logger lockfile atendedorDisp despachadorTec
-	$(CC) $(CFLAGS) Semaphore.o LockFile.o Logger.o AtendedorDispositivos.o DespachadorTecnicos.o iniciador.cpp -o Iniciador
+	$(CC) $(CFLAGS) Semaphore.o LockFile.o logger/Logger.o AtendedorDispositivos.o DespachadorTecnicos.o iniciador.cpp -o Iniciador
 
+terminador: semaphore lockfile logger
+	$(CC) $(CFLAGS) Semaphore.o LockFile.o logger/Logger.o terminador.cpp -o terminador
 cleanO:
 	rm -f *.o
 
@@ -74,3 +76,5 @@ clean: cleanO
 	rm TesterB
 	rm PlanillaTesterA
 	rm PlanillaTesterB
+	rm Iniciador
+	rm terminador
