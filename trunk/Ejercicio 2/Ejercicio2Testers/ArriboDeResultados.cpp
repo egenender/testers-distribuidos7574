@@ -35,10 +35,16 @@ int main(int argc, char** argv) {
     
     while (true){
         resultado_test_t resultado;
-        msgrcv(cola_lectura, &resultado, sizeof(resultado_test_t) - sizeof(long), idTester, 0);
+        int ok_read = msgrcv(cola_lectura, &resultado, sizeof(resultado_test_t) - sizeof(long), idTester, 0);
+        if (ok_read == -1){
+			exit(0);
+		}
         mutex_planilla_local.p();
         shm_planilla_local->resultados++;
-        msgsnd(cola_escritura, &resultado, sizeof(resultado_test_t) - sizeof(long), 0);
+        int ok = msgsnd(cola_escritura, &resultado, sizeof(resultado_test_t) - sizeof(long), 0);
+        if (ok == -1){
+			exit(0);
+		}	
         if (shm_planilla_local->estadoB == LIBRE ){
             if (shm_planilla_local->estadoA == OCUPADO){
                 shm_planilla_local->estadoB = ESPERANDO;

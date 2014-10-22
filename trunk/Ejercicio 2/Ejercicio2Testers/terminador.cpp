@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
     //Destruccion de colas
     for (int q = MSGQUEUE_PLANILLA; q <= MSGQUEUE_DESPACHADOR; q++){
 		key = ftok(ipcFileName.c_str(), q);
-		int cola = msgget(key, 0666 | IPC_CREAT);
+		int cola = msgget(key, 0666);
 		msgctl(cola ,IPC_RMID, NULL);
 	}
        

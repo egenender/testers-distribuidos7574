@@ -91,7 +91,17 @@ void createIPCObjects() {
         shm_planilla_local->estadoB = LIBRE;
         shmdt(shm_planilla_local);
     }
-            
+    
+    
+    //creacion de colas
+    for (int q = MSGQUEUE_PLANILLA; q <= MSGQUEUE_DESPACHADOR; q++){
+		key = ftok(ipcFileName.c_str(), q);
+		std::cout << " Q " << q << " KEY " << key << std::endl;
+		if (msgget(key, 0660 | IPC_CREAT | IPC_EXCL) == -1){
+			std::cout << "No se pudo crear una cola: " << strerror(errno)<< std::endl;
+		}
+	}
+          
 }
 
 void createSystemProcesses() {
