@@ -26,11 +26,11 @@ const int SEM_PLANILLA_GENERAL = 1;
 const int SHM_PLANILLA_GENERAL = 2;
 const int SEM_TESTER_A = 30;
 const int SEM_TESTER_B = 40;
-const int MSGQUEUE_PLANILLA = 5;
-const int MSGQUEUE_ESCRITURA_RESULTADOS = 6;
-const int MSGQUEUE_LECTURA_RESULTADOS = 7;
-const int MSGQUEUE_NUEVO_REQUERIMIENTO = 8;
-const int MSGQUEUE_DESPACHADOR = 9;
+const int MSGQUEUE_PLANILLA = 105;
+const int MSGQUEUE_ESCRITURA_RESULTADOS = 106;
+const int MSGQUEUE_LECTURA_RESULTADOS = 107;
+const int MSGQUEUE_NUEVO_REQUERIMIENTO = 108;
+const int MSGQUEUE_DESPACHADOR = 109;
 
 const int CANTIDAD_TESTERS_MAXIMA = 5;
 const int SEM_PLANILLA_LOCAL = 10;
@@ -54,7 +54,7 @@ const int REQUERIMIENTO_PROCESAR_SIGUIENTE = 4;
 
 // Archivos necesarios
 
-const std::string ipcFileName = "/tmp/buchwald-ipcs";
+const std::string ipcFileName = "tmp/buchwaldipcs";
 
 const std::string logFileName = "log.txt";
 

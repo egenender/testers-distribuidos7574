@@ -5,7 +5,7 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <sys/msg.h>
-
+#include <cstdlib>
 
 class Planilla{
 private:
@@ -53,7 +53,8 @@ public:
 		if (*this->shm_planilla_general == MAX_DISPOSITIVOS_EN_SISTEMA){
 			mutex_planilla_general.v();
 			respuesta.respuesta = false;           
-			msgsnd(cola, &respuesta, sizeof(respuesta_lugar_t) - sizeof(long), 0);
+			if (msgsnd(cola, &respuesta, sizeof(respuesta_lugar_t) - sizeof(long), 0) == -1) 
+				exit(0);
 			return;
 		}            
 		(*this->shm_planilla_general)++;
@@ -73,7 +74,8 @@ public:
 		}    
         
 		respuesta.respuesta = true;
-		msgsnd(this->cola, &respuesta, sizeof(respuesta_lugar_t) - sizeof(long), 0);  
+		if (msgsnd(this->cola, &respuesta, sizeof(respuesta_lugar_t) - sizeof(long), 0) == -1)
+			exit(0);
 	};
 	
     void terminadoRequerimientoPendiente(){

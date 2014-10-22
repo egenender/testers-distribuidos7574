@@ -9,7 +9,8 @@ int main(int argc, char** argv) {
     Planilla planilla(id);
     requerimiento_planilla_t requerimiento;
     while (true){
-        msgrcv(planilla.queue(), &requerimiento, sizeof(requerimiento_planilla_t) - sizeof(long), id, 0 );
+        if (msgrcv(planilla.queue(), &requerimiento, sizeof(requerimiento_planilla_t) - sizeof(long), id, 0 ) == -1)
+			exit(0);
         switch(requerimiento.tipoReq){
             case REQUERIMIENTO_AGREGAR:
                 planilla.agregar(requerimiento.idDispositivo);
