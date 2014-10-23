@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
     semPlanillaGeneral.eliSem();
     
     //Semaforos de Tester A y B, y planillas Locales
-    for (int i = 0; i < CANT_TESTERS; i++){
+    for (int i = 1; i <= CANT_TESTERS; i++){
         Semaphore semtesterA(SEM_TESTER_A + i);
         Semaphore semtesterB(SEM_TESTER_B + i);
         Semaphore semlocal(SEM_PLANILLA_LOCAL + i);
@@ -52,14 +52,14 @@ int main(int argc, char** argv) {
         semlocal.eliSem();
         
         key_t key = ftok(ipcFileName.c_str(), SHM_PLANILLA_LOCAL + i);
-        int shmlocalid = shmget(key, sizeof(planilla_local_t), IPC_CREAT | 0660);
+        int shmlocalid = shmget(key, sizeof(planilla_local_t), 0660);
         shmctl(shmlocalid, IPC_RMID, NULL);
     }
     
     //Destruccion de colas
-    for (int q = MSGQUEUE_PLANILLA; q <= MSGQUEUE_DESPACHADOR; q++){
+    for (int q = MSGQUEUE_ESCRITURA_RESULTADOS; q <= MSGQUEUE_PLANILLA + 1; q++){
 		key = ftok(ipcFileName.c_str(), q);
-		int cola = msgget(key, 0666);
+		int cola = msgget(key, 0660);
 		msgctl(cola ,IPC_RMID, NULL);
 	}
        

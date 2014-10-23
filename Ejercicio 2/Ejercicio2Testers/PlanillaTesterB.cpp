@@ -6,8 +6,8 @@
 using namespace std;
 
 int main(int argc, char** argv) {
-    int id = atoi(argv[0]);
-    Planilla planilla(id);
+    int id = atoi(argv[1]);
+    Planilla planilla(id, TIPO_B);
     requerimiento_planilla_t requerimiento;
     while (true){
         if(msgrcv(planilla.queue(), &requerimiento, sizeof(requerimiento_planilla_t) - sizeof(long), id, 0 ) == -1)

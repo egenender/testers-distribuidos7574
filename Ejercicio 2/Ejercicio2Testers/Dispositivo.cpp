@@ -33,15 +33,14 @@ int main(int argc, char** argv) {
     
     // Comunicacion con el sistema de testeo
     AtendedorDispositivos atendedor;
-    
     // TODO: Log
     
     while(true) {
 	try {
         // Dispositivo envia requerimiento
-	ss << "El dispositivo " << id << " envia un requerimiento al sistema de testeo";
-	Logger::debug(ss.str().c_str(), __FILE__);
-	ss.str("");
+		ss << "El dispositivo " << id << " envia un requerimiento al sistema de testeo";
+		Logger::debug(ss.str().c_str(), __FILE__);
+		ss.str("");
         atendedor.enviarRequerimiento(id);
         // Recibe programa, verificando que no sea un rechazo por parte del sistema
         int program = atendedor.recibirPrograma(id);
@@ -54,16 +53,16 @@ int main(int argc, char** argv) {
             continue;
         }
     
-	ss << "El dispositivo " << id << " recibe el programa numero " << program << ". Enviando resultados...";
-	Logger::debug(ss.str().c_str(), __FILE__);;
-	ss.str("");
+		ss << "El dispositivo " << id << " recibe el programa numero " << program << ". Enviando resultados...";
+		Logger::debug(ss.str().c_str(), __FILE__);;
+		ss.str("");
 
         // Le envio resultado del programa de testeo
         atendedor.enviarResultado(id, rand() % 2);
         
-	ss << "El dispositivo " << id << " espera la orden del sistema de testeo...";
-	Logger::debug(ss.str().c_str(), __FILE__);
-	ss.str("");
+		ss << "El dispositivo " << id << " espera la orden del sistema de testeo...";
+		Logger::debug(ss.str().c_str(), __FILE__);
+		ss.str("");
 
         // Recibo la orden a seguir
         int orden = atendedor.recibirOrden(id);

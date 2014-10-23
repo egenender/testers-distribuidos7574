@@ -70,14 +70,14 @@ void createIPCObjects() {
     *general = 0;
     shmdt(general);
 
-    for (int i = 0; i < CANT_TESTERS; i++){
+    for (int i = 1; i <= CANT_TESTERS; i++){
         Semaphore semtesterA(SEM_TESTER_A + i);
         Semaphore semtesterB(SEM_TESTER_B + i);
         Semaphore semlocal(SEM_PLANILLA_LOCAL + i);
         semtesterA.creaSem();
 	    semtesterA.iniSem(1);
 	    semtesterB.creaSem();
-	    semtesterB.iniSem(1);
+	    semtesterB.iniSem(0);
 	    semlocal.creaSem();
 	    semlocal.iniSem(1);
 
@@ -90,13 +90,14 @@ void createIPCObjects() {
         shm_planilla_local->estadoA = LIBRE;
         shm_planilla_local->estadoB = LIBRE;
         shmdt(shm_planilla_local);
+        
+        key = ftok(ipcFileName.c_str(), 2*(MSGQUEUE_PLANILLA+i));
     }
     
     
     //creacion de colas
-    for (int q = MSGQUEUE_PLANILLA; q <= MSGQUEUE_DESPACHADOR; q++){
+    for (int q = MSGQUEUE_ESCRITURA_RESULTADOS; q <= MSGQUEUE_PLANILLA + 1; q++){
 		key = ftok(ipcFileName.c_str(), q);
-		std::cout << " Q " << q << " KEY " << key << std::endl;
 		if (msgget(key, 0660 | IPC_CREAT | IPC_EXCL) == -1){
 			std::cout << "No se pudo crear una cola: " << strerror(errno)<< std::endl;
 		}
@@ -105,7 +106,6 @@ void createIPCObjects() {
 }
 
 void createSystemProcesses() {
-	
     // Creo dispositivos
     /*for(int i = 0; i < CANT_DISPOSITIVOS; i++) {
         char param[3];
@@ -121,10 +121,10 @@ void createSystemProcesses() {
     }*/
     
     // Creo testers
-    for(int i = 0; i < CANT_TESTERS; i++) {
+    int idTester = ID_TESTER_START;
+    for(int i = 0; i < CANT_TESTERS; i++, idTester++) {
         char param[3];
-        int idTester = ID_TESTER_START;
-        sprintf(param, "%d\n", idTester++);
+        sprintf(param, "%d", idTester);
         pid_t newPid = fork();
         if(newPid == 0) {
 	    pid_t otherPid = fork();

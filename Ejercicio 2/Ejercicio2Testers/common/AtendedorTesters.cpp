@@ -6,16 +6,14 @@ AtendedorTesters::AtendedorTesters() {
     key = ftok(ipcFileName.c_str(), MSGQUEUE_NUEVO_REQUERIMIENTO);
     this->cola_requerimiento = msgget(key, 0666);
     if(this->cola_requerimiento == -1) {
-		std::string err = std::string("Error al obtener la cola de requerimientos del atendedor de testers. Errno: ") + std::string(strerror(errno));
-		std::cout << "PIFIA " + err << std::endl;
+		//std::string err = std::string("Error al obtener la cola de requerimientos del atendedor de testers. Errno: ") + std::string(strerror(errno));
         exit(1);
     }
     
     key = ftok(ipcFileName.c_str(), MSGQUEUE_LECTURA_RESULTADOS);
     this->cola_recibos_tests = msgget(key, 0666);
     if(this->cola_recibos_tests == -1) {
-        std::string err = std::string("Error al obtener la cola de lectura de resultados del atendedor de testers. Errno: ") + std::string(strerror(errno));
-		std::cout << "PIFIA " + err << std::endl;
+        //std::string err = std::string("Error al obtener la cola de lectura de resultados del atendedor de testers. Errno: ") + std::string(strerror(errno));
         exit(1);
     }
     
@@ -34,7 +32,7 @@ int AtendedorTesters::recibirRequerimiento() {
     if(ret == -1) {
         std::string error = std::string("Error al recibir requerimiento del atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
-        throw error;
+        exit(0);
     }
     return msg.idDispositivo;
 }
@@ -50,25 +48,20 @@ void AtendedorTesters::enviarPrograma(int idDispositivo, int tester, int idProgr
     if(ret == -1) {
         std::string error = std::string("Error al enviar programa al atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
-        throw error;
+        exit(0);
     }
 
 }
 
 resultado_test_t AtendedorTesters::recibirResultado(int idTester) {
-
     resultado_test_t rsp;
-    TMessageAtendedor msg;
-    int ret = msgrcv(this->cola_recibos_tests, &msg, sizeof(resultado_test_t) - sizeof(long), idTester, 0);
+    int ret = msgrcv(this->cola_recibos_tests, &rsp, sizeof(resultado_test_t) - sizeof(long), idTester, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir resultado del atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
-        throw error;
+        exit(0);
     }
-    rsp.tester = msg.mtype;
-    rsp.dispositivo = msg.idDispositivo;
-    rsp.result = msg.value;
-    
+        
     return rsp;
 
 }
@@ -83,9 +76,8 @@ void AtendedorTesters::enviarOrden(int idDispositivo, int orden) {
     if(ret == -1) {
         std::string error = std::string("Error al enviar orden al atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
-        throw error;
+        exit(0);
     }
-
 }
 
 bool AtendedorTesters::destruirComunicacion() {
