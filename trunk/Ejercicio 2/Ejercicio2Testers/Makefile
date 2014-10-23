@@ -39,10 +39,10 @@ resultado:
 programa:
 	$(CC) $(CFLAGS) -c common/Programa.cpp	
 	
-iPlanillaA:
+iPlanillaA: logger lockfile
 	$(CC) $(CFLAGS) -c common/iPlanillaTesterA.cpp	
 	
-iPlanillaB:
+iPlanillaB: logger lockfile
 	$(CC) $(CFLAGS) -c common/iPlanillaTesterB.cpp	
 
 testerA: programa lockfile logger despachadorTester atendedorTest iPlanillaA
@@ -60,8 +60,8 @@ planillaA: planilla
 planillaB: planilla
 	$(CC) $(CFLAGS) Semaphore.o Planilla.o PlanillaTesterB.cpp -o PlanillaTesterB
 
-iniciador: semaphore logger lockfile atendedorDisp despachadorTec
-	$(CC) $(CFLAGS) Semaphore.o LockFile.o logger/Logger.o AtendedorDispositivos.o DespachadorTecnicos.o iniciador.cpp -o Iniciador
+iniciador: semaphore logger lockfile
+	$(CC) $(CFLAGS) Semaphore.o LockFile.o logger/Logger.o iniciador.cpp -o iniciador
 
 terminador: semaphore lockfile logger
 	$(CC) $(CFLAGS) Semaphore.o LockFile.o logger/Logger.o terminador.cpp -o terminador
@@ -76,5 +76,5 @@ clean: cleanO
 	rm TesterB
 	rm PlanillaTesterA
 	rm PlanillaTesterB
-	rm Iniciador
+	rm iniciador
 	rm terminador

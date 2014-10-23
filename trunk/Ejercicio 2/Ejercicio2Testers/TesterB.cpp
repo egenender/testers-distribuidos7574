@@ -31,7 +31,6 @@ int main(int argc, char** argv) {
     
     while(true) {
         planilla.iniciarProcesamientoDeResultados();
-        
         resultado_test_t resultado = atendedor.recibirResultado(id);
         int orden;
         if(Resultado::esGrave(resultado.result)) {

@@ -6,6 +6,7 @@
 #include <sys/shm.h>
 #include <sys/msg.h>
 #include <cstdlib>
+#include <iostream>
 
 class Planilla{
 private:
@@ -22,7 +23,7 @@ private:
     
 public:
 
-    Planilla(int idTester): mutex_planilla_general(SEM_PLANILLA_GENERAL), mutex_planilla_local(SEM_PLANILLA_LOCAL + idTester), sem_tester_A(SEM_TESTER_A + idTester), sem_tester_B(SEM_TESTER_B + idTester) {
+    Planilla(int idTester, int tipo): mutex_planilla_general(SEM_PLANILLA_GENERAL), mutex_planilla_local(SEM_PLANILLA_LOCAL + idTester), sem_tester_A(SEM_TESTER_A + idTester), sem_tester_B(SEM_TESTER_B + idTester) {
 	this->mutex_planilla_general.getSem();
         this->mutex_planilla_local.getSem();
         this->sem_tester_A.getSem();
@@ -38,8 +39,8 @@ public:
         //verificacion de errores
         this->shm_planilla_general = (int*)shmat(shmgeneralid, NULL, 0);
         
-        key = ftok(ipcFileName.c_str(), MSGQUEUE_PLANILLA);
-        this->cola = msgget(key, IPC_CREAT);
+        key = ftok(ipcFileName.c_str(), MSGQUEUE_PLANILLA + tipo);        
+        this->cola = msgget(key, 0660);
 	};
 	
     int queue(){
@@ -47,6 +48,7 @@ public:
 	};
 	
     void agregar(int idDispositivo){
+		std::cout << "Voy a agregar dispositivo " << std::endl;
 		respuesta_lugar_t respuesta;
 		respuesta.mtype = idDispositivo;
 		this->mutex_planilla_general.p();
@@ -56,15 +58,14 @@ public:
 			if (msgsnd(cola, &respuesta, sizeof(respuesta_lugar_t) - sizeof(long), 0) == -1) 
 				exit(0);
 			return;
-		}            
+		}
 		(*this->shm_planilla_general)++;
 		this->mutex_planilla_general.v();
-		
-		this->mutex_planilla_local.p();
-			
+		this->mutex_planilla_local.p();		
 		this->shm_planilla_local->cantidad++;
-       
+		std::cout << "Agregue dispositivo " << std::endl;
 		if (this->shm_planilla_local->estadoB == LIBRE){
+			std::cout << "B esta libre, asi que puedo actuar " << std::endl;
 			this->shm_planilla_local->estadoA = OCUPADO;
 			this->mutex_planilla_local.v();
 		}else{
@@ -74,6 +75,7 @@ public:
 		}    
         
 		respuesta.respuesta = true;
+		std::cout << "Mando que hay lugar " << std::endl;
 		if (msgsnd(this->cola, &respuesta, sizeof(respuesta_lugar_t) - sizeof(long), 0) == -1)
 			exit(0);
 	};
@@ -103,12 +105,14 @@ public:
 	};
 	
     void iniciarProcesamientoResultados(){
+		std::cout << "TesterB va a procesar Resultado" << std::endl;
 		this->mutex_planilla_local.p();
         if (this->shm_planilla_local->resultados == 0){
             this->shm_planilla_local->estadoB = LIBRE;
             this->mutex_planilla_local.v();
             this->sem_tester_B.p();
         }else{
+			std::cout << "Habia algun resultado, asi que lo proceso" << std::endl;
             this->shm_planilla_local->estadoB = OCUPADO;
             this->mutex_planilla_local.v();
         }

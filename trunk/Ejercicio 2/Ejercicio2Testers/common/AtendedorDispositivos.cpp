@@ -6,6 +6,7 @@
  */
 #include "AtendedorDispositivos.h"
 #include <cstdlib>
+#include "../common/common.h"
 
 AtendedorDispositivos::AtendedorDispositivos() { 
     key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_NUEVO_REQUERIMIENTO);
@@ -19,7 +20,6 @@ AtendedorDispositivos::AtendedorDispositivos() {
     key = ftok(ipcFileName.c_str(), MSGQUEUE_ESCRITURA_RESULTADOS);
     this->cola_tests = msgget(key, 0666);
     if(this->cola_tests == -1) {
-        msgctl(this->cola_requerimiento, IPC_RMID, (struct msqid_ds*)0);
         std::cout << "PIFIA Error al obtener la cola del atendedor de dispositivos. Errno: " + errno << std::endl;
         exit(1);
     }
@@ -51,24 +51,25 @@ int AtendedorDispositivos::recibirPrograma(int idDispositivo) {
     if(ret == -1) {
         std::string error("Error al recibir programa del atendedor. Error: " + errno);
         Logger::error(error.c_str(), __FILE__);
-        throw error;
+        exit(0);
     }
-    this->ultimoTester = msg.idDispositivo; //HACE DE TESTER EN ESTE CASO.. FIXME?
+    this->ultimoTester = msg.idDispositivo;
     return msg.value;
 
 }
 void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {
 
-    TMessageAtendedor msg;
-    msg.mtype = this->ultimoTester;
-    msg.idDispositivo = idDispositivo;
-    msg.value = resultado;
+    resultado_test_t resultado_test;
     
-    int ret = msgsnd(this->cola_tests, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    resultado_test.tester = (long)this->ultimoTester;
+    resultado_test.result = resultado;
+    resultado_test.dispositivo = idDispositivo;
+            
+    int ret = msgsnd(this->cola_tests, &resultado_test, sizeof(resultado_test_t) - sizeof(long), 0);
     if(ret == -1) {
         std::string error("Error al enviar resultado al atendedor. Error: " + errno);
         Logger::error(error.c_str(), __FILE__);
-        throw error;
+        exit(0);
     }
 
 }
@@ -76,11 +77,11 @@ void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {
 int AtendedorDispositivos::recibirOrden(int idDispositivo) {
 
     TMessageAtendedor msg;
-    int ret = msgrcv(this->cola_tests, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
+    int ret = msgrcv(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
     if(ret == -1) {
         std::string error("Error al recibir orden del atendedor. Error: " + errno);
         Logger::error(error.c_str(), __FILE__);
-        throw error;
+        exit(0);
     }
     return msg.value;
 
