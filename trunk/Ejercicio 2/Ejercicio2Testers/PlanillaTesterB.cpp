@@ -12,11 +12,13 @@ int main(int argc, char** argv) {
     while (true){
         if(msgrcv(planilla.queue(), &requerimiento, sizeof(requerimiento_planilla_t) - sizeof(long), id, 0 ) == -1)
 			exit(0);
+		std::cout << "PlanillaTesterB: llego un pedido" << std::endl;
         switch(requerimiento.tipoReq){
             case REQUERIMIENTO_ELIMINAR_DISPOSITIVO:
                 planilla.eliminar(requerimiento.idDispositivo);
                 break;
             case REQUERIMIENTO_INICIAR_PROC_RESULTADOS:
+				std::cout << "PlanillaTesterB: El tester B me pide procesar resultados" << std::endl;
                 planilla.iniciarProcesamientoResultados();
                 break;
             case REQUERIMIENTO_PROCESAR_SIGUIENTE:

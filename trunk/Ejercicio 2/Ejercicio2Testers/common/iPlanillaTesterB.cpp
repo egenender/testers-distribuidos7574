@@ -3,10 +3,11 @@
 #include <sys/shm.h>
 #include <sys/msg.h>
 #include "common.h"
+#include <iostream>
 
 iPlanillaTesterB::iPlanillaTesterB(int id) {
     idTester = id;
-    key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_PLANILLA);
+    key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_PLANILLA + TIPO_B);
     this->cola = msgget(key, IPC_CREAT);
 }
 
@@ -29,16 +30,17 @@ void iPlanillaTesterB::eliminarDispositivo(int idDispositivo){
 void iPlanillaTesterB::iniciarProcesamientoDeResultados(){
     requerimiento_planilla_t requerimiento;
     requerimiento.tester = idTester;
-    requerimiento.tipoReq = REQUERIMIENTO_ELIMINAR_DISPOSITIVO;
+    requerimiento.tipoReq = REQUERIMIENTO_INICIAR_PROC_RESULTADOS;
     requerimiento.idDispositivo = 0;
     
+    std::cout << "iPlanillaTesterB: El tester B quiere procesar resultados" << std::endl;
     msgsnd(cola,&requerimiento, sizeof(requerimiento_planilla_t) - sizeof(long),0);
 }
 
 void iPlanillaTesterB::procesarSiguiente(){
     requerimiento_planilla_t requerimiento;
     requerimiento.tester = idTester;
-    requerimiento.tipoReq = REQUERIMIENTO_ELIMINAR_DISPOSITIVO;
+    requerimiento.tipoReq = REQUERIMIENTO_PROCESAR_SIGUIENTE;
     requerimiento.idDispositivo = 0;
     
     msgsnd(cola,&requerimiento, sizeof(requerimiento_planilla_t) - sizeof(long),0);

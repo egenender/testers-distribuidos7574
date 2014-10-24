@@ -109,10 +109,11 @@ public:
 		this->mutex_planilla_local.p();
         if (this->shm_planilla_local->resultados == 0){
             this->shm_planilla_local->estadoB = LIBRE;
+            std::cout << "El Tester B esta libre, asi que espero a que llegue un resultado" << std::endl;
             this->mutex_planilla_local.v();
             this->sem_tester_B.p();
+            std::cout << "El Tester B despierta, a laburar!" << std::endl;
         }else{
-			std::cout << "Habia algun resultado, asi que lo proceso" << std::endl;
             this->shm_planilla_local->estadoB = OCUPADO;
             this->mutex_planilla_local.v();
         }
