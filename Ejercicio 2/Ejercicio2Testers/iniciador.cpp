@@ -107,10 +107,11 @@ void createIPCObjects() {
 
 void createSystemProcesses() {
     // Creo dispositivos
-    /*for(int i = 0; i < CANT_DISPOSITIVOS; i++) {
+    int idDispositivo = ID_DISPOSITIVO_START;
+    for(int i = 1; i <= CANT_DISPOSITIVOS; i++) {
         char param[3];
-        int idDispositivo = ID_DISPOSITIVO_START;
-        sprintf(param, "%d\n", idDispositivo++);
+        sprintf(param, "%d", idDispositivo);
+        idDispositivo++;
         pid_t newPid = fork();
         if(newPid == 0) {
             // Inicio el programa correspondiente
@@ -118,7 +119,7 @@ void createSystemProcesses() {
             Logger::error("Error al ejecutar el programa dispositivo de ID" + idDispositivo, __FILE__);
             exit(1);
         }
-    }*/
+    }
     
     // Creo testers
     int idTester = ID_TESTER_START;
