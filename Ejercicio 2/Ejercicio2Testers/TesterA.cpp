@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
         Logger::error(mensaje + ss.str(), nombre);
         output = nombre + string(": ") + mensaje + ss.str() + string("\n");
         write(1, output.c_str(), output.size());
-        
+	
         atendedor.enviarPrograma(idDispositivo, id, Programa::getPrograma());
         
         mensaje = "Se envia el programa";

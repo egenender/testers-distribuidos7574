@@ -30,6 +30,7 @@ int main(int argc, char** argv) {
     DespachadorTesters despachador;
     
     while(true) {
+		std::cout << "Soy el tester B y quiero poder procesar resultados" << std::endl;
         planilla.iniciarProcesamientoDeResultados();
         resultado_test_t resultado = atendedor.recibirResultado(id);
         int orden;

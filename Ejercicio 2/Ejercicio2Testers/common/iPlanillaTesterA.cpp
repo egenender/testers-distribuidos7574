@@ -8,7 +8,7 @@
 
 iPlanillaTesterA::iPlanillaTesterA(int id) {
     idTester = id;
-    key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_PLANILLA);
+    key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_PLANILLA + TIPO_A);
     this->cola = msgget(key, IPC_CREAT);
 }
 
