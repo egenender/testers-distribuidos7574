@@ -6,7 +6,6 @@
  */
 
 #include <cstdlib>
-
 #include "common/AtendedorTesters.h"
 #include "common/iPlanillaTesterB.h"
 #include "common/Programa.h"
@@ -17,10 +16,12 @@
 using namespace std;
 
 int main(int argc, char** argv) {
-    
-    Logger::initialize(logFileName.c_str(), Logger::LOG_NOTICE);
-    // El primer parametro es el id del tester
+	//El primer parametro es el id del tester
     int id = atoi(argv[1]);
+    Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
+	std::stringstream nombre;
+	nombre << __FILE__ << " " << id;
+	Logger::notice("Inicia el procesamiento, cargo el atendedor y mi iPlanilla" , nombre.str().c_str());
     
     // Obtengo comunicacion con los dispositivos
     AtendedorTesters atendedor;
@@ -30,19 +31,28 @@ int main(int argc, char** argv) {
     DespachadorTesters despachador;
     
     while(true) {
-		std::cout << "Soy el tester B y quiero poder procesar resultados" << std::endl;
-        planilla.iniciarProcesamientoDeResultados();
+		Logger::notice("Espero la llegada de un nuevo resultado" , nombre.str().c_str());
+		planilla.iniciarProcesamientoDeResultados();
         resultado_test_t resultado = atendedor.recibirResultado(id);
+        std::stringstream ss;
+        ss << resultado.dispositivo;
+        
+        Logger::notice(std::string("Llega un nuevo resultado del dispositivo id ") + ss.str() , nombre.str().c_str());
+        
         int orden;
         if(Resultado::esGrave(resultado.result)) {
             despachador.enviarOrden(resultado.dispositivo);
             orden = ORDEN_APAGADO;
+            Logger::notice("El resultado es grave, debe apagarse el dispositivo" , nombre.str().c_str());
         } else {
             orden = ORDEN_REINICIO;
+            Logger::notice("El resultado no es grave, solo debe reiniciarse el dispositivo" , nombre.str().c_str());
         }
         atendedor.enviarOrden(resultado.dispositivo,orden);
+        Logger::notice("Envie orden correspondiente al dispositivo" , nombre.str().c_str());
         
         planilla.eliminarDispositivo(resultado.dispositivo);
+        Logger::notice("Elimine el dispositivo de mi iplanilla" , nombre.str().c_str());
         planilla.procesarSiguiente();
     }
 

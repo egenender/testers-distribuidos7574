@@ -6,14 +6,16 @@ AtendedorTesters::AtendedorTesters() {
     key = ftok(ipcFileName.c_str(), MSGQUEUE_NUEVO_REQUERIMIENTO);
     this->cola_requerimiento = msgget(key, 0666);
     if(this->cola_requerimiento == -1) {
-		//std::string err = std::string("Error al obtener la cola de requerimientos del atendedor de testers. Errno: ") + std::string(strerror(errno));
+		std::string err = std::string("Error al obtener la cola de requerimientos del atendedor de testers. Errno: ") + std::string(strerror(errno));
+		Logger::error(err, __FILE__);
         exit(1);
     }
     
     key = ftok(ipcFileName.c_str(), MSGQUEUE_LECTURA_RESULTADOS);
     this->cola_recibos_tests = msgget(key, 0666);
     if(this->cola_recibos_tests == -1) {
-        //std::string err = std::string("Error al obtener la cola de lectura de resultados del atendedor de testers. Errno: ") + std::string(strerror(errno));
+        std::string err = std::string("Error al obtener la cola de lectura de resultados del atendedor de testers. Errno: ") + std::string(strerror(errno));
+        Logger::error(err, __FILE__);
         exit(1);
     }
     

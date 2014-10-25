@@ -6,7 +6,6 @@
 #include <sys/shm.h>
 #include <sys/msg.h>
 #include <cstdlib>
-#include <iostream>
 
 class Planilla{
 private:
@@ -48,7 +47,6 @@ public:
 	};
 	
     void agregar(int idDispositivo){
-		std::cout << "Voy a agregar dispositivo " << std::endl;
 		respuesta_lugar_t respuesta;
 		respuesta.mtype = idDispositivo;
 		this->mutex_planilla_general.p();
@@ -63,9 +61,7 @@ public:
 		this->mutex_planilla_general.v();
 		this->mutex_planilla_local.p();		
 		this->shm_planilla_local->cantidad++;
-		std::cout << "Agregue dispositivo " << std::endl;
 		if (this->shm_planilla_local->estadoB == LIBRE){
-			std::cout << "B esta libre, asi que puedo actuar " << std::endl;
 			this->shm_planilla_local->estadoA = OCUPADO;
 			this->mutex_planilla_local.v();
 		}else{
@@ -75,7 +71,6 @@ public:
 		}    
         
 		respuesta.respuesta = true;
-		std::cout << "Mando que hay lugar " << std::endl;
 		if (msgsnd(this->cola, &respuesta, sizeof(respuesta_lugar_t) - sizeof(long), 0) == -1)
 			exit(0);
 	};
@@ -105,14 +100,11 @@ public:
 	};
 	
     void iniciarProcesamientoResultados(){
-		std::cout << "TesterB va a procesar Resultado" << std::endl;
 		this->mutex_planilla_local.p();
         if (this->shm_planilla_local->resultados == 0){
             this->shm_planilla_local->estadoB = LIBRE;
-            std::cout << "El Tester B esta libre, asi que espero a que llegue un resultado" << std::endl;
             this->mutex_planilla_local.v();
             this->sem_tester_B.p();
-            std::cout << "El Tester B despierta, a laburar!" << std::endl;
         }else{
             this->shm_planilla_local->estadoB = OCUPADO;
             this->mutex_planilla_local.v();

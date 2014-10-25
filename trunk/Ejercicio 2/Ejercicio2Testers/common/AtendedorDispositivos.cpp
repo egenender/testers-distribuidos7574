@@ -5,22 +5,19 @@
  * Created on October 4, 2014, 8:04 PM
  */
 #include "AtendedorDispositivos.h"
-#include <cstdlib>
 #include "../common/common.h"
+#include <cstdlib>
 
 AtendedorDispositivos::AtendedorDispositivos() { 
     key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_NUEVO_REQUERIMIENTO);
     this->cola_requerimiento = msgget(key, 0666);
     if(this->cola_requerimiento == -1) {
-		std::cout << "PIFIA Error al obtener la cola del atendedor de dispositivos. Errno: ";
-		std::cout << errno << std::endl;
-        exit(1);
+		exit(1);
     }
     
     key = ftok(ipcFileName.c_str(), MSGQUEUE_ESCRITURA_RESULTADOS);
     this->cola_tests = msgget(key, 0666);
     if(this->cola_tests == -1) {
-        std::cout << "PIFIA Error al obtener la cola del atendedor de dispositivos. Errno: " + errno << std::endl;
         exit(1);
     }
 }

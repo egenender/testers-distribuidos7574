@@ -7,8 +7,6 @@
 
 #include "Logger.h"
 
-#include <iostream>
-
 Logger* Logger::_logger = NULL;
 
 void Logger::log(const std::string& msg, unsigned short int logLevel) {
@@ -28,7 +26,7 @@ void Logger::log(const std::string& msg, unsigned short int logLevel) {
 		_logger->_output.tomarLock();
 		_logger->_output.escribir((const void*)oss.str().c_str(), (long int)oss.str().size());
 		// Comentar esto cuando haga falta
-		std::cout << oss.str() << std::flush;
+		write(1, (const void*)oss.str().c_str(), oss.str().size());
 		_logger->_output.liberarLock();
 	}
 }

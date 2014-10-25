@@ -12,12 +12,18 @@
 #include "errno.h"
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#include <iostream>
+#include "logger/Logger.h"
+
 
 using namespace std;
 
 int main(int argc, char** argv) {
-    int idTester = atoi(argv[1]);
+	int idTester = atoi(argv[1]);
+	Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
+	std::stringstream nombre;
+	nombre << __FILE__ << " " << idTester;
+	Logger::notice("Inicia el procesamiento, cargando IPCS" , nombre.str().c_str());
+	
     Semaphore mutex_planilla_local(SEM_PLANILLA_LOCAL + idTester);
     mutex_planilla_local.creaSem();
     
@@ -34,30 +40,37 @@ int main(int argc, char** argv) {
     int cola_lectura = msgget(key, 0660);
     key = ftok(ipcFileName.c_str(), MSGQUEUE_LECTURA_RESULTADOS);
     int cola_escritura = msgget(key, 0660);
-    
+   
+   Logger::notice("Procesamiento inicial completo, ejecutando ciclo principal" , nombre.str().c_str());
+   
     while (true){
         resultado_test_t resultado;
         int ok_read = msgrcv(cola_lectura, &resultado, sizeof(resultado_test_t) - sizeof(long), idTester, 0);
         if (ok_read == -1){
 			exit(0);
 		}
-		std::cout << "RECIBI RESULTADO DEL DIPOSITIVO " << resultado.dispositivo << std::endl;
-		
+		std::stringstream ss;
+		ss << "Se recibe resultado de testeo desde el dispositivo " << resultado.dispositivo;
+		Logger::notice(ss.str() , nombre.str().c_str());
+				
 		int ok = msgsnd(cola_escritura, &resultado, sizeof(resultado_test_t) - sizeof(long), 0);
         if (ok == -1){
 			exit(0);
 		}	
-		std::cout << "Escribi RESULTADO Al TesterB " << resultado.dispositivo << std::endl;
+		Logger::notice("Puse el resultado en la cola correcta para que lo lea el tester B correspondiente", nombre.str().c_str());
 		
         mutex_planilla_local.p();
         shm_planilla_local->resultados++;
+        Logger::notice("Aumente la cantidad de resultados pendientes de procesar para este tester", nombre.str().c_str());
         if (shm_planilla_local->estadoB == LIBRE ){
+			Logger::notice("El tester B esta libre, asi que reviso la activida del tester A", nombre.str().c_str());
             if (shm_planilla_local->estadoA == OCUPADO){
+				Logger::notice("El tester A esta ocupado, asi que el Tester B estara esperando para que el A lo despierte", nombre.str().c_str());
                 shm_planilla_local->estadoB = ESPERANDO;
             }else{
+				Logger::notice("El tester A NO esta ocupad, Asi que el Tester B ya puede actuar", nombre.str().c_str());
                 shm_planilla_local->estadoB = OCUPADO;
                 sem_tester_B.v();
-                std::cout << "El tester B va a poder actuar" << std::endl;
             }
         }
         mutex_planilla_local.v();
