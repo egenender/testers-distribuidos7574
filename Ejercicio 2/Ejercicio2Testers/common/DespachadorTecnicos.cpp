@@ -6,14 +6,17 @@
  */
 
 #include "DespachadorTecnicos.h"
+#include <cstdlib>
+#include "../logger/Logger.h"
 
 DespachadorTecnicos::DespachadorTecnicos() {
     
     key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_DESPACHADOR);
     this->msgQueueId = msgget(key, 0666 | IPC_CREAT); 
     if(this->msgQueueId == -1) {
-	std::string error = std::string("Error creando la cola de mensajes del despachador. Errno = ") + std::string(strerror(errno));
-        throw error;
+		std::string error = std::string("Error creando la cola de mensajes del despachador. Errno = ") + std::string(strerror(errno));
+        Logger::error(error, __FILE__);
+        exit(1);
     }
     
 }
@@ -31,7 +34,7 @@ int DespachadorTecnicos::recibirOrden() {
     if(ret == -1) {
         std::string error = std::string("Error al recibir requerimiento del atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
-        throw error;
+        exit(0);
     }
     return msg.idDispositivo;
 

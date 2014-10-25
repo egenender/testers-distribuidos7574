@@ -30,8 +30,8 @@ dispositivo: lockfile logger atendedorDisp
 tecnico: lockfile logger despachadorTec
 	$(CC) $(CFLAGS) LockFile.o logger/Logger.o DespachadorTecnicos.o Tecnico.cpp -o Tecnico
 
-arriboResul: semaphore
-	$(CC) $(CFLAGS) Semaphore.o ArriboDeResultados.cpp -o ArriboDeResultados
+arriboResul: semaphore lockfile logger
+	$(CC) $(CFLAGS) Semaphore.o LockFile.o logger/Logger.o ArriboDeResultados.cpp -o ArriboDeResultados
 
 resultado:
 	$(CC) $(CFLAGS) -c common/Resultado.cpp
@@ -39,10 +39,10 @@ resultado:
 programa:
 	$(CC) $(CFLAGS) -c common/Programa.cpp	
 	
-iPlanillaA: logger lockfile
+iPlanillaA:
 	$(CC) $(CFLAGS) -c common/iPlanillaTesterA.cpp	
 	
-iPlanillaB: logger lockfile
+iPlanillaB:
 	$(CC) $(CFLAGS) -c common/iPlanillaTesterB.cpp	
 
 testerA: programa lockfile logger despachadorTester atendedorTest iPlanillaA
@@ -54,11 +54,11 @@ testerB: resultado lockfile logger despachadorTester atendedorTest iPlanillaB
 planilla: semaphore
 	$(CC) $(CFLAGS) -c common/Planilla.cpp	
 
-planillaA: planilla
-	$(CC) $(CFLAGS) Semaphore.o Planilla.o PlanillaTesterA.cpp -o PlanillaTesterA
+planillaA: planilla lockfile logger
+	$(CC) $(CFLAGS) Semaphore.o Planilla.o LockFile.o logger/Logger.o PlanillaTesterA.cpp -o PlanillaTesterA
 
-planillaB: planilla
-	$(CC) $(CFLAGS) Semaphore.o Planilla.o PlanillaTesterB.cpp -o PlanillaTesterB
+planillaB: planilla lockfile logger
+	$(CC) $(CFLAGS) Semaphore.o Planilla.o LockFile.o logger/Logger.o PlanillaTesterB.cpp -o PlanillaTesterB
 
 iniciador: semaphore logger lockfile
 	$(CC) $(CFLAGS) Semaphore.o LockFile.o logger/Logger.o iniciador.cpp -o iniciador

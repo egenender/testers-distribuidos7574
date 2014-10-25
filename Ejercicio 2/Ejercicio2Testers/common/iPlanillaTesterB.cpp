@@ -3,7 +3,6 @@
 #include <sys/shm.h>
 #include <sys/msg.h>
 #include "common.h"
-#include <iostream>
 
 iPlanillaTesterB::iPlanillaTesterB(int id) {
     idTester = id;
@@ -33,7 +32,6 @@ void iPlanillaTesterB::iniciarProcesamientoDeResultados(){
     requerimiento.tipoReq = REQUERIMIENTO_INICIAR_PROC_RESULTADOS;
     requerimiento.idDispositivo = 0;
     
-    std::cout << "iPlanillaTesterB: El tester B quiere procesar resultados" << std::endl;
     msgsnd(cola,&requerimiento, sizeof(requerimiento_planilla_t) - sizeof(long),0);
 }
 

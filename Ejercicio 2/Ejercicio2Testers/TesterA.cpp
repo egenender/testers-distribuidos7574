@@ -6,7 +6,6 @@
  */
 
 #include <cstdlib>
-
 #include "common/AtendedorTesters.h"
 #include "common/Programa.h"
 #include "common/Resultado.h"
@@ -17,56 +16,41 @@
 
 using namespace std;
 
-int main(int argc, char** argv) {
-    string nombre = "TesterA ";
-    
-    Logger::initialize(logFileName.c_str(), Logger::LOG_NOTICE);
+int main(int argc, char** argv) {    
     // El primer parametro es el id del tester
     int id = atoi(argv[1]);
-    stringstream ss;
-	ss << id;
-    nombre += ss.str();
+    Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
+	std::stringstream nombre;
+	nombre << __FILE__ << " " << id;
+	Logger::notice("Inicia el procesamiento, cargo el atendedor y mi iPlanilla" , nombre.str().c_str());
     
     // Obtengo comunicacion con los dispositivos
     AtendedorTesters atendedor;
     // Obtengo planilla general de sync con otros tester
     iPlanillaTesterA planilla(id);
-        
+    
     while(true) {
-        
+		Logger::notice("Espero por un nuevo requerimiento de testeo" , nombre.str().c_str());
         // Espero un requerimiento
         int idDispositivo = atendedor.recibirRequerimiento();
         stringstream ss;
 		ss << idDispositivo;
 		string mensaje = "Recibido requerimiento desde dispositivo id ";
-        Logger::error(mensaje + ss.str(),nombre);
-        
-        string output = nombre + string(": ") + mensaje + ss.str() + string("\n");
-        write(1, output.c_str(), output.size());
-        
+        Logger::notice(mensaje + ss.str() , nombre.str().c_str());
+               
         if(!planilla.agregar(idDispositivo)) {
             // Si no hay lugar se le avisa con un -1 en vez de programa
-            mensaje = "Tester A: No hay lugar para atender a dispositivo id ";
-            Logger::error(mensaje + ss.str(), nombre);
-            output = nombre + string(": ") + mensaje + ss.str() + string("\n");
-			write(1, output.c_str(), output.size());
+            Logger::notice("No hay lugar para atender al dispositivo!" , nombre.str().c_str());
             atendedor.enviarPrograma(idDispositivo, id,SIN_LUGAR);
             continue;
         }
         
         mensaje = "HAY lugar para atender a dispositivo id ";
-        Logger::error(mensaje + ss.str(), nombre);
-        output = nombre + string(": ") + mensaje + ss.str() + string("\n");
-        write(1, output.c_str(), output.size());
-	
+        Logger::notice(mensaje + ss.str() , nombre.str().c_str());
+        	
         atendedor.enviarPrograma(idDispositivo, id, Programa::getPrograma());
         
-        mensaje = "Se envia el programa";
-        
-        Logger::error(mensaje, nombre);
-        output = nombre + string(": ") + mensaje + ss.str() + string("\n");
-        write(1, output.c_str(), output.size());
-        
+        Logger::notice("Se envio el programa voy a marcarle a mi iplanilla que termine de procesar el requerimiento" , nombre.str().c_str());       
         planilla.terminoRequerimientoPendiente(idDispositivo);
     }
 
