@@ -17,6 +17,45 @@
 
 using namespace std;
 
+int ordenAEnviar(){
+	int resul = rand() % 10;
+    if (resul >= 4){
+		return SEGUIR_TESTEANDO;
+	}else if (resul >= 2){
+		return RESULTADO_GRAVE;
+	}else{
+		return RESULTADO_NO_GRAVE;
+	}
+}
+
+void seguirTesteando(int id, AtendedorDispositivos* atendedor,int cantidad){
+	std::stringstream ss;
+	for (int i = 0; i < cantidad; i++){
+		int program = atendedor->recibirPrograma(id);
+		ss << "El dispositivo " << id << " recibe el programa especial numero " << program << ". Enviando resultados...";
+		Logger::debug(ss.str().c_str(), __FILE__);;
+		ss.str("");
+		atendedor->enviarResultado(id, rand() % 2);
+	}
+	int orden = atendedor->recibirOrden(id, &cantidad);
+		
+	if (orden == ORDEN_APAGADO) {
+		ss << "El dispositivo " << id << " recibe la orden de apagado (" << orden << "). Byebye!";
+		Logger::notice(ss.str().c_str(), __FILE__);
+		ss.str("");
+	} else if (orden == ORDEN_REINICIO){
+		ss << "El dispositivo " << id << " recibe la orden de reinicio (" << orden << "). Vuelvo pronto!";
+		Logger::notice(ss.str().c_str(), __FILE__);
+		ss.str("");
+	} else {
+		//Debo seguir testeando en este ejercicio
+		ss << "El dispositivo " << id << " recibe la orden de seguir testeando (seguramente se encontro algun error)";
+		Logger::notice(ss.str().c_str(), __FILE__);
+		ss.str("");
+		seguirTesteando(id, atendedor, cantidad);
+	}
+}
+
 int main(int argc, char** argv) {
 	srand(time(NULL));
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
@@ -55,16 +94,8 @@ int main(int argc, char** argv) {
 		ss.str("");
 
         // Le envio resultado del primer programa de testeo
-        int resul = rand() % 10;
-        if (resul >= 4){
-			atendedor.enviarResultado(id, SEGUIR_TESTEANDO);
-		}else if (resul >= 2){
-			atendedor.enviarResultado(id, RESULTADO_GRAVE);
-		}else{
-			atendedor.enviarResultado(id, RESULTADO_NO_GRAVE);
-		}
-        
-        
+        atendedor.enviarResultado(id, ordenAEnviar());
+                     
 		ss << "El dispositivo " << id << " espera la orden del sistema de testeo...";
 		Logger::debug(ss.str().c_str(), __FILE__);
 		ss.str("");
@@ -88,31 +119,7 @@ int main(int argc, char** argv) {
             Logger::notice(ss.str().c_str(), __FILE__);
             ss.str("");
 			
-			for (int i = 0; i < cantidad; i++){
-				program = atendedor.recibirPrograma(id);
-				ss << "El dispositivo " << id << " recibe el programa especial numero " << program << ". Enviando resultados...";
-				Logger::debug(ss.str().c_str(), __FILE__);;
-				ss.str("");
-				atendedor.enviarResultado(id, rand() % 2);
-			}
-			orden = atendedor.recibirOrden(id, &cantidad);
-			
-			if (orden == ORDEN_APAGADO) {
-				ss << "El dispositivo " << id << " recibe la orden de apagado (" << orden << "). Byebye!";
-				Logger::notice(ss.str().c_str(), __FILE__);
-				ss.str("");
-				break;
-			} else if (orden == ORDEN_REINICIO){
-				ss << "El dispositivo " << id << " recibe la orden de reinicio (" << orden << "). Vuelvo pronto!";
-				Logger::notice(ss.str().c_str(), __FILE__);
-				ss.str("");
-				break;
-			} else {
-				ss << "El dispositivo " << id << " recibe orden final desconocida!!";
-				Logger::notice(ss.str().c_str(), __FILE__);
-				ss.str("");
-				break;
-			}
+			seguirTesteando(id, &atendedor, cantidad);
 		}
 	} catch(std::string exception) {
 		Logger::error("Error en el dispositivo...", __FILE__);
