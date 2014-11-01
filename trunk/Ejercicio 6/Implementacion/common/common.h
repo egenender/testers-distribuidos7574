@@ -15,7 +15,7 @@
 
 // Constantes del sistema
 
-const int CANT_DISPOSITIVOS = 10;
+const int CANT_DISPOSITIVOS = 100;
 const int CANT_TESTERS_COMUNES = 3;
 const int CANT_TESTERS_ESPECIALES = 5;
 const int ID_DISPOSITIVO_START = 50;
