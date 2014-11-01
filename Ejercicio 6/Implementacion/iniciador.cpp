@@ -90,7 +90,7 @@ void createSystemProcesses() {
         char param[3];
         sprintf(param, "%d", idDispositivo);
         idDispositivo++;
-        sleep(1);
+        usleep(10);
         pid_t newPid = fork();
         if(newPid == 0) {
             // Inicio el programa correspondiente
@@ -105,6 +105,7 @@ void createSystemProcesses() {
     for(int i = 0; i < CANT_TESTERS_COMUNES; i++, idTester++) {
         char param[3];
         sprintf(param, "%d", idTester);
+        usleep(10);
         pid_t newPid = fork();
         if(newPid == 0) {
 			// Inicio el programa correspondiente
@@ -117,6 +118,7 @@ void createSystemProcesses() {
     for(int i = 0; i < CANT_TESTERS_ESPECIALES; i++, idTester++) {
         char param[3];
         sprintf(param, "%d", idTester);
+        usleep(10);
         pid_t newPid = fork();
         if(newPid == 0) {
 			// Inicio el programa correspondiente

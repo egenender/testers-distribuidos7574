@@ -17,9 +17,6 @@
 
 using namespace std;
 
-/*
- * 
- */
 int main(int argc, char** argv) {
 	srand(time(NULL));
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
