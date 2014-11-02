@@ -19,6 +19,13 @@ AtendedorTesters::AtendedorTesters() {
         exit(1);
     }
     
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_TESTERS_ESPECIALES);
+    this->cola_testers_especiales = msgget(key, 0666);
+    if(this->cola_testers_especiales == -1) {
+        std::string err = std::string("Error al obtener la cola para enviar a los testers especiales. Errno: ") + std::string(strerror(errno));
+        Logger::error(err, __FILE__);
+        exit(1);
+    }
 }
 
 AtendedorTesters::AtendedorTesters(const AtendedorTesters& orig) {
@@ -86,9 +93,9 @@ void AtendedorTesters::enviarOrden(int idDispositivo, int orden, int cantidad) {
 void AtendedorTesters::enviarAEspeciales(int cantidad, int posicion){
 	for (int i = 0; i < cantidad; i++){
 		posicion_en_shm_t pos;
-		pos.mtype = MTYPE_REQUERIMIENTO; //No debe haber tester con id 1
+		pos.mtype = MTYPE_REQUERIMIENTO;
 		pos.lugar = posicion;
-		int ret = msgsnd(this->cola_recibos_tests, &pos, sizeof(posicion_en_shm_t) - sizeof(long), 0);
+		int ret = msgsnd(this->cola_testers_especiales, &pos, sizeof(posicion_en_shm_t) - sizeof(long), 0);
 		if(ret == -1) {
 			std::string error = std::string("Error al enviar orden al atendedor. Error: ") + std::string(strerror(errno));
 			Logger::error(error.c_str(), __FILE__);
@@ -100,7 +107,7 @@ void AtendedorTesters::enviarAEspeciales(int cantidad, int posicion){
 int AtendedorTesters::recibirRequerimientoEspecial() {
 
     posicion_en_shm_t pos;
-    int ret = msgrcv(this->cola_recibos_tests, &pos, sizeof(posicion_en_shm_t) - sizeof(long), MTYPE_REQUERIMIENTO, 0);
+    int ret = msgrcv(this->cola_testers_especiales, &pos, sizeof(posicion_en_shm_t) - sizeof(long), MTYPE_REQUERIMIENTO, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir requerimiento del atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);

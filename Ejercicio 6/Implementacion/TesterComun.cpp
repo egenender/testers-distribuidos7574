@@ -41,10 +41,12 @@ int main(int argc, char** argv) {
 		ss << idDispositivo;
 		string mensaje = "Recibido requerimiento desde dispositivo id ";
         Logger::notice(mensaje + ss.str() , nombre.str().c_str());
-                          	
-        atendedor.enviarPrograma(idDispositivo, id, Programa::getPrograma());
-        Logger::notice(string("Envie programa a dispositivo ") + ss.str(), nombre.str().c_str());
         
+        Logger::notice(string("Envio programa a dispositivo ") + ss.str(), nombre.str().c_str());                  	
+        atendedor.enviarPrograma(idDispositivo, id, Programa::getPrograma());
+        
+        Logger::notice(string("Espero resultado de dispositivo ") + ss.str(), nombre.str().c_str());                  	    
+  
         resultado_test_t resul = atendedor.recibirResultado(id);
         Logger::notice(string("Recibi resultado del dispositivo ") + ss.str(), nombre.str().c_str());
         
