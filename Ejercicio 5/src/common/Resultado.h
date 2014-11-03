@@ -24,12 +24,24 @@ public:
 
     static list<int> getTestersEspecialesIds(int resultado) {
     	list<int> ids;
-    	int cant_testers = rand() % (MAX_TESTERS_ESP - MIN_TESTERS_ESP) + MIN_TESTERS_ESP;
+    	unsigned int cant_testers = rand() % (MAX_TESTERS_ESP - MIN_TESTERS_ESP) + MIN_TESTERS_ESP;
     	while ( ids.size() == cant_testers ) {
     		ids.push_back( rand() % CANT_TESTERS_ESPECIALES );
     		ids.unique();
     	}
     	return ids;
+    }
+
+    static int getSiguientePrueba(int res) {
+    	return rand() % 2; // CONTINUAR TESTEO O FIN TESTEO ESPECIAL
+    }
+
+    static resultado_test_t getResultadoFinal(int testerId, int dispositivo, list<resultado_test_t> resultados) {
+    	resultado_test_t resFinal;
+    	resFinal.tester = testerId;
+    	resFinal.result = rand() % 2; //Resultado Grave o No Grave
+    	resFinal.dispositivo = dispositivo;
+    	return resFinal;
     }
 };
 

@@ -7,10 +7,11 @@
 
 #include <cstdlib>
 #include "common/AtendedorTesters.h"
+#include "common/DespachadorTesters.h"
 #include "common/iPlanillaTesterB.h"
 #include "common/Programa.h"
 #include "common/Resultado.h"
-#include "common/DespachadorTesters.h"
+#include "common/AsignadorTestersEspeciales.h"
 #include "logger/Logger.h"
 
 using namespace std;
@@ -29,7 +30,10 @@ int main(int argc, char** argv) {
     iPlanillaTesterB planilla(id);
     // Obtengo comunicacion con los tecnicos
     DespachadorTesters despachador;
+    // Obtengo comunicacion con los testers especiales
+    AsignadorTestersEspeciales asignador;
     
+
     while(true) {
 		Logger::notice("Espero la llegada de un nuevo resultado" , nombre.str().c_str());
 		planilla.iniciarProcesamientoDeResultados();
@@ -39,9 +43,13 @@ int main(int argc, char** argv) {
         
         Logger::notice(std::string("Llega un nuevo resultado del dispositivo id ") + ss.str() , nombre.str().c_str());
         
-        if (resultado.result == SEGUIR_TESTEANDO) {
-        	list<int> ids = Resultado::getTestersEspecialesIds(resultado.resultado);
+        if (resultado.result == RESULTADO_INCOMPLETO) {
+        	list<int> ids = Resultado::getTestersEspecialesIds(resultado.result);
+        	int dispositivo = resultado.dispositivo;
 
+        	// Se bloquea aquí esperando todos los resultados
+        	list<resultado_test_t> resultados = asignador.asignar(id, resultado.dispositivo, ids);
+        	resultado = Resultado::getResultadoFinal(id, dispositivo, resultados);
         }
 
         int orden;

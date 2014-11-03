@@ -33,6 +33,7 @@ const int MSGQUEUE_LECTURA_RESULTADOS = 81;
 const int MSGQUEUE_NUEVO_REQUERIMIENTO = 82;
 const int MSGQUEUE_DESPACHADOR = 83;
 const int MSGQUEUE_PLANILLA = 84;
+const int MSGQUEUE_ESPECIALES = 85;
 const int TIPO_A = 0;
 const int TIPO_B = 1;
 
@@ -48,7 +49,12 @@ const int SIN_LUGAR = -1;
 
 const int RESULTADO_GRAVE = 0;
 const int RESULTADO_NO_GRAVE = 1;
-const int ORDEN_SEGUIR_TESTEANDO = 2;
+const int RESULTADO_INCOMPLETO = 2;
+
+const int PROGRAMA_FIN_PRUEBAS_ESPECIALES = -2;
+
+const int SEGUIR_TESTEANDO = 0;
+const int FIN_SEGUIR_TESTEANDO = 1;
 
 const int REQUERIMIENTO_AGREGAR = 0;
 const int REQUERIMIENTO_TERMINO_PENDIENTE_REQ = 1;
@@ -58,6 +64,9 @@ const int REQUERIMIENTO_PROCESAR_SIGUIENTE = 4;
 
 const int MAX_TESTERS_ESP = 4;
 const int MIN_TESTERS_ESP = 2;
+
+const int VACIO = -1;
+const int FIN_PRUEBAS_ESP = 10;
 
 // Archivos necesarios
 
@@ -83,6 +92,7 @@ typedef struct resultado_test{
     int result;
     int dispositivo;
 }resultado_test_t;
+
 
 #endif	/* COMMON_H */
 

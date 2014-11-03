@@ -9,7 +9,6 @@
 #include "common/AtendedorTesters.h"
 #include "common/Programa.h"
 #include "common/Resultado.h"
-#include "common/DespachadorTesters.h"
 #include "common/iPlanillaTesterA.h"
 #include "logger/Logger.h"
 #include <string>

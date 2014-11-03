@@ -96,7 +96,7 @@ void createIPCObjects() {
     
     
     //creacion de colas
-    for (int q = MSGQUEUE_ESCRITURA_RESULTADOS; q <= MSGQUEUE_PLANILLA + 1; q++){
+    for (int q = MSGQUEUE_ESCRITURA_RESULTADOS; q <= MSGQUEUE_ESPECIALES + 1; q++){
 		key = ftok(ipcFileName.c_str(), q);
 		if (msgget(key, 0660 | IPC_CREAT | IPC_EXCL) == -1){
 			std::cout << "No se pudo crear una cola: " << strerror(errno)<< std::endl;
@@ -115,7 +115,7 @@ void createSystemProcesses() {
         pid_t newPid = fork();
         if(newPid == 0) {
             // Inicio el programa correspondiente
-            execlp("./Dispositivo", "Dispositivo", param, (char*)0);
+            execlp("./dispositivo", "dispositivo", param, (char*)0);
             Logger::error("Error al ejecutar el programa dispositivo de ID" + idDispositivo, __FILE__);
             exit(1);
         }
@@ -133,12 +133,12 @@ void createSystemProcesses() {
                 pid_t planilla = fork();
                	if (planilla == 0){
 	            // Inicio el programa correspondiente
-                    execlp("./TesterA", "TesterA", param, (char*)0);
+                    execlp("./testerA", "testerA", param, (char*)0);
                     Logger::error("Error al ejecutar el programa testerA de ID" + idTester, __FILE__);
                     exit(1);
                 }else{
                     // Inicio el programa correspondiente
-                    execlp("./PlanillaTesterA", "PlanillaTesterA", param, (char*)0);
+                    execlp("./planillaa", "planillaa", param, (char*)0);
                     Logger::error("Error al ejecutar el programa PlanillaTesterA de ID" + idTester, __FILE__);
                     exit(1);
                 }
@@ -146,12 +146,12 @@ void createSystemProcesses() {
                 pid_t planilla = fork();
                 if (planilla == 0){
 	            // Inicio el programa correspondiente
-                    execlp("./TesterB", "TesterB", param, (char*)0);
+                    execlp("./testerB", "testerB", param, (char*)0);
                     Logger::error("Error al ejecutar el programa testerB de ID" + idTester, __FILE__);
                     exit(1);
                 }else{
                     // Inicio el programa correspondiente
-                    execlp("./PlanillaTesterB", "PlanillaTesterB", param, (char*)0);
+                    execlp("./planillab", "planillab", param, (char*)0);
                     Logger::error("Error al ejecutar el programa PlanillaTesterB de ID" + idTester, __FILE__);
                     exit(1);
                 }
@@ -160,17 +160,32 @@ void createSystemProcesses() {
             pid_t arribos = fork();
             if (arribos == 0){
                  // Inicio el programa correspondiente
-                 execlp("./ArriboDeResultados", "ArriboDeResultados", param, (char*)0);
+                 execlp("./arribo", "arribo", param, (char*)0);
                  Logger::error("Error al ejecutar el programa ArriboDeResultados de ID" + idTester, __FILE__);
                  exit(1);
             }       
         }
     }
 
+	for (int i = 0; i < CANT_TESTERS_ESPECIALES; i++, idTester++) {
+		char param[3];
+		sprintf(param, "%d", idTester);
+		usleep(10);
+		pid_t newPid = fork();
+		if (newPid == 0) {
+			// Inicio el programa correspondiente
+			execlp("./testerEspecial", "testerEspecial", param, (char*) 0);
+			Logger::error(
+					"Error al ejecutar el programa TesterEspecial de ID"
+							+ idTester, __FILE__);
+			exit(1);
+		}
+	}
+
     // Creo al tecnico
     pid_t tecPid = fork();
     if(tecPid == 0) {
-        execlp("./Tecnico", "Tecnico", (char*)0);
+        execlp("./tecnico", "tecnico", (char*)0);
         Logger::error("Error al ejecutar el programa tecnico", __FILE__);
         exit(1);
     }

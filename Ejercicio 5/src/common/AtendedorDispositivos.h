@@ -18,6 +18,7 @@ class AtendedorDispositivos {
 private:
     int cola_requerimiento;
     int cola_tests;
+    int cola_pruebasEspeciales;
     
     int ultimoTester;
     
@@ -35,8 +36,11 @@ public:
         
     void enviarRequerimiento(int idDispositivo); // Disp -> Tester
     int recibirPrograma(int idDispositivo);
-    void enviarResultado(int idDispositivo, int resultado); // Disp -> Tester: Grave o no grave
+    void enviarResultado(int idDispositivo, int resultado); // Disp -> Tester: Grave o no grave o masPruebas
     int recibirOrden(int idDispositivo);
+
+    int recibirPruebaEspecial(int idDispositivo);
+    void enviarResultadoPruebaEspecial(int idDispositivo, int resultado);
 };
 
 #endif	/* ATENDEDORDISPOSITIVOS_H */
