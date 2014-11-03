@@ -15,7 +15,7 @@
 // Constantes del sistema
 
 const int CANT_DISPOSITIVOS = 10;
-const int CANT_TESTERS = 1;
+const int CANT_TESTERS = 3;
 const int CANT_TESTERS_ESPECIALES = 5;
 
 const int ID_DISPOSITIVO_START = 50;
@@ -34,6 +34,7 @@ const int MSGQUEUE_NUEVO_REQUERIMIENTO = 82;
 const int MSGQUEUE_DESPACHADOR = 83;
 const int MSGQUEUE_PLANILLA = 84;
 const int MSGQUEUE_ESPECIALES = 85;
+const int MSGQUEUE_B_ESP = 86;
 const int TIPO_A = 0;
 const int TIPO_B = 1;
 

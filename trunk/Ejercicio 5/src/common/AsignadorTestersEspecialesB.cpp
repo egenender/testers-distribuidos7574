@@ -12,7 +12,9 @@
 
 AsignadorTestersEspecialesB::AsignadorTestersEspecialesB() {
 
-    key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_DESPACHADOR);
+	this->testerBEnCurso = -1;
+
+    key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_B_ESP);
     this->msgQueueId = msgget(key, 0666 | IPC_CREAT); 
     if(this->msgQueueId == -1) {
 		std::string error = std::string("Error creando la cola de mensajes del asignador. Errno = ") + std::string(strerror(errno));
@@ -36,13 +38,14 @@ int AsignadorTestersEspecialesB::recibirPedido(int idTesterEspecial) {
 		throw error;
 		return -1;
 	}
+	this->testerBEnCurso = msg.value;
 	return msg.idDispositivo;
 }
 
 void AsignadorTestersEspecialesB::enviarResultadoAlTerminar(int idTesterEspecial, int idDispositivo, int resultado) {
 
 	TMessageAsignador msg;
-	msg.mtype = (long)idTesterEspecial;
+	msg.mtype = testerBEnCurso;
 	msg.idDispositivo = idDispositivo;
 	msg.value = resultado;
 	int ret = msgsnd(this->msgQueueId, &msg, sizeof(TMessageAsignador) - sizeof(long), 0);

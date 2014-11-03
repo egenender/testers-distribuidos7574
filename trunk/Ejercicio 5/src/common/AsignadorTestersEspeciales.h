@@ -23,7 +23,7 @@ class AsignadorTestersEspeciales {
 private:
     int msgQueueId;
     key_t key;
-    
+
     typedef struct message {
         long mtype;
         int idDispositivo;

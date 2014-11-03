@@ -35,16 +35,22 @@ void AtendedorTestersEspeciales::enviarPruebaEspecial(int idDispositivo, int tes
 }
 
 resultado_test_t AtendedorTestersEspeciales::recibirResultadoPruebaEspecial(int idTesterEspecial) {
-    resultado_test_t rsp;
-    int ret = msgrcv(this->cola_pruebasEspeciales, &rsp, sizeof(resultado_test_t) - sizeof(long), idTesterEspecial, 0);
+
+	resultado_test_t respuesta;
+	TMessageAtendedor rsp;
+    int ret = msgrcv(this->cola_pruebasEspeciales, &rsp, sizeof(TMessageAtendedor) - sizeof(long), idTesterEspecial, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir resultado del atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
+        return respuesta;
         exit(0);
     }
-        
-    return rsp;
 
+    respuesta.tester = (long)idTesterEspecial;
+    respuesta.result = rsp.value;
+    respuesta.dispositivo = rsp.idDispositivo;
+
+    return respuesta;
 }
 
 bool AtendedorTestersEspeciales::destruirComunicacion() {

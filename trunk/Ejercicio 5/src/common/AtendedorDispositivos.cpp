@@ -98,19 +98,18 @@ int AtendedorDispositivos::recibirPruebaEspecial(int idDispositivo) {
 		Logger::error(error.c_str(), __FILE__);
 		exit(0);
 	}
-
 	this->ultimoTester = msg.idDispositivo;
 	return msg.value;
 }
 
 void AtendedorDispositivos::enviarResultadoPruebaEspecial(int idDispositivo, int resultado) {
 
-	resultado_test_t resultado_esp;
-	resultado_esp.tester = (long)this->ultimoTester;
-	resultado_esp.result = resultado;
-	resultado_esp.dispositivo = idDispositivo;
+	TMessageAtendedor resultado_esp;
+	resultado_esp.mtype = (long)this->ultimoTester;
+	resultado_esp.value = resultado;
+	resultado_esp.idDispositivo = idDispositivo;
 
-	int ret = msgsnd(this->cola_pruebasEspeciales, &resultado_esp, sizeof(resultado_test_t) - sizeof(long), 0);
+	int ret = msgsnd(this->cola_pruebasEspeciales, &resultado_esp, sizeof(TMessageAtendedor) - sizeof(long), 0);
 	if (ret == -1) {
 		std::string error("Error al enviar resultado al atendedor. Error: " + errno);
 		Logger::error(error.c_str(), __FILE__);

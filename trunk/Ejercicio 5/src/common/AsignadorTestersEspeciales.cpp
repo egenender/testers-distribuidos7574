@@ -11,7 +11,7 @@
 
 AsignadorTestersEspeciales::AsignadorTestersEspeciales() {
 
-    key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_DESPACHADOR);
+    key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_B_ESP);
     this->msgQueueId = msgget(key, 0666 | IPC_CREAT); 
     if(this->msgQueueId == -1) {
 		std::string error = std::string("Error creando la cola de mensajes del asignador. Errno = ") + std::string(strerror(errno));
@@ -36,7 +36,7 @@ list<resultado_test_t> AsignadorTestersEspeciales::asignar(int idTester, int idD
 		TMessageAsignador msg;
 		msg.mtype = *it;
 		msg.idDispositivo = idDispositivo;
-		msg.value = VACIO;
+		msg.value = idTester; //se lo envio para que me lo devuelvan
     
 		int ret = msgsnd(this->msgQueueId, &msg, sizeof(TMessageAsignador) - sizeof(long), 0);
 		if (ret == -1) {
@@ -56,6 +56,7 @@ list<resultado_test_t> AsignadorTestersEspeciales::asignar(int idTester, int idD
 	        exit(0);
 	    }
 		cantidadResultadosAEsperar--;
+
 		resultado_test_t resultParcial;
 		resultParcial.tester = idTester;
 		resultParcial.dispositivo = idDispositivo;

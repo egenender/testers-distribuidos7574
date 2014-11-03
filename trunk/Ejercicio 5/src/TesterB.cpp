@@ -42,13 +42,18 @@ int main(int argc, char** argv) {
         ss << resultado.dispositivo;
         
         Logger::notice(std::string("Llega un nuevo resultado del dispositivo id ") + ss.str() , nombre.str().c_str());
-        
+        ss.str("");
         if (resultado.result == RESULTADO_INCOMPLETO) {
+        	Logger::notice("Recibi el resultado incompleto" , nombre.str().c_str());
         	list<int> ids = Resultado::getTestersEspecialesIds(resultado.result);
         	int dispositivo = resultado.dispositivo;
 
         	// Se bloquea aquí esperando todos los resultados
+        	Logger::notice("Voy a asignar los testers especiales" , nombre.str().c_str());
         	list<resultado_test_t> resultados = asignador.asignar(id, resultado.dispositivo, ids);
+        	ss << resultados.size();
+        	Logger::notice("Ya recibi todos los resultados parciales. Cant:" + ss.str(), nombre.str().c_str());
+        	ss.str("");
         	resultado = Resultado::getResultadoFinal(id, dispositivo, resultados);
         }
 

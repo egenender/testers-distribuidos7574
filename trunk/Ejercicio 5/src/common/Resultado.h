@@ -24,9 +24,9 @@ public:
 
     static list<int> getTestersEspecialesIds(int resultado) {
     	list<int> ids;
-    	unsigned int cant_testers = rand() % (MAX_TESTERS_ESP - MIN_TESTERS_ESP) + MIN_TESTERS_ESP;
-    	while ( ids.size() == cant_testers ) {
-    		ids.push_back( rand() % CANT_TESTERS_ESPECIALES );
+    	unsigned int cant_testers = (rand() % (MAX_TESTERS_ESP - MIN_TESTERS_ESP) + MIN_TESTERS_ESP);
+    	while ( ids.size() != cant_testers ) {
+    		ids.push_back( (rand() % CANT_TESTERS_ESPECIALES) + CANT_TESTERS + ID_TESTER_START );
     		ids.unique();
     	}
     	return ids;

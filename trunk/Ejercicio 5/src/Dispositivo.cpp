@@ -61,11 +61,22 @@ int main(int argc, char** argv) {
 		int resultado = 2;// rand() % 3;
 		ss << "El dispositivo " << id << " envia el resultado " << resultado << "";
 		Logger::debug(ss.str().c_str(), __FILE__);
+		ss.str("");
+
         atendedor.enviarResultado(id, resultado);
 
         if ( resultado == RESULTADO_INCOMPLETO ) {
         	bool finPruebasEsp = false;
+        	ss << "El dispositivo " << id << " va a comenzar las pruebas especiales.";
+        	Logger::debug(ss.str().c_str(), __FILE__);
+        	ss.str("");
+
         	while ( !finPruebasEsp ) {
+
+        		ss << "El dispositivo " << id << " espera una prueba especial ";
+        		Logger::debug(ss.str().c_str(), __FILE__);
+        		ss.str("");
+
         		int program = atendedor.recibirPruebaEspecial(id);
         		ss << "El dispositivo " << id << " recibe la prueba numero " << program << ". Enviando resultados...";
         		Logger::debug(ss.str().c_str(), __FILE__);
