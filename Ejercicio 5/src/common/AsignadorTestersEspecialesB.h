@@ -24,6 +24,8 @@ private:
     int msgQueueId;
     key_t key;
     
+    int testerBEnCurso;
+
     typedef struct message {
         long mtype;
         int idDispositivo;
