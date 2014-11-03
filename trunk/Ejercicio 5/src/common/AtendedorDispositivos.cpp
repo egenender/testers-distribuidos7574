@@ -20,6 +20,12 @@ AtendedorDispositivos::AtendedorDispositivos() {
     if(this->cola_tests == -1) {
         exit(1);
     }
+
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_ESPECIALES);
+    this->cola_pruebasEspeciales = msgget(key, 0666);
+    if(this->cola_pruebasEspeciales == -1) {
+    	exit(1);
+    }
 }
 
 AtendedorDispositivos::AtendedorDispositivos(const AtendedorDispositivos& orig) {
@@ -82,4 +88,32 @@ int AtendedorDispositivos::recibirOrden(int idDispositivo) {
     }
     return msg.value;
 
+}
+
+int AtendedorDispositivos::recibirPruebaEspecial(int idDispositivo) {
+	TMessageAtendedor msg;
+	int ret = msgrcv(this->cola_pruebasEspeciales, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
+	if (ret == -1) {
+		std::string error("Error al recibir orden del atendedor. Error: " + errno);
+		Logger::error(error.c_str(), __FILE__);
+		exit(0);
+	}
+
+	this->ultimoTester = msg.idDispositivo;
+	return msg.value;
+}
+
+void AtendedorDispositivos::enviarResultadoPruebaEspecial(int idDispositivo, int resultado) {
+
+	resultado_test_t resultado_esp;
+	resultado_esp.tester = (long)this->ultimoTester;
+	resultado_esp.result = resultado;
+	resultado_esp.dispositivo = idDispositivo;
+
+	int ret = msgsnd(this->cola_pruebasEspeciales, &resultado_esp, sizeof(resultado_test_t) - sizeof(long), 0);
+	if (ret == -1) {
+		std::string error("Error al enviar resultado al atendedor. Error: " + errno);
+		Logger::error(error.c_str(), __FILE__);
+		exit(0);
+	}
 }

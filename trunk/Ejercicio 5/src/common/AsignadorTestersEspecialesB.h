@@ -5,8 +5,8 @@
  * Created on October 4, 2014, 10:30 PM
  */
 
-#ifndef ASIGNADORTESTERSESPECIALES_H
-#define	ASIGNADORTESTERSESPECIALES_H
+#ifndef ASIGNADORTESTERSESPECIALESB_H
+#define	ASIGNADORTESTERSESPECIALESB_H
 
 #include <string>
 #include <cstring>
@@ -19,7 +19,7 @@
 
 using namespace std;
 
-class AsignadorTestersEspeciales {
+class AsignadorTestersEspecialesB {
 private:
     int msgQueueId;
     key_t key;
@@ -32,13 +32,14 @@ private:
     
 public:
     
-    AsignadorTestersEspeciales();
-    AsignadorTestersEspeciales(const AsignadorTestersEspeciales& orig);
-    virtual ~AsignadorTestersEspeciales();
+    AsignadorTestersEspecialesB();
+    AsignadorTestersEspecialesB(const AsignadorTestersEspecialesB& orig);
+    virtual ~AsignadorTestersEspecialesB();
     
-    list<resultado_test_t> asignar(int idTester, int idDispositivo, list<int> testersEspecialesIds);
+    int recibirPedido(int idTesterEspecial);
+    void enviarResultadoAlTerminar(int idTesterEspecial, int idDispositivo, int resultado);
 
 };
 
-#endif	/* ASIGNADORTESTERSESPECIALES_H */
+#endif	/* ASIGNADORTESTERSESPECIALESB_H */
 

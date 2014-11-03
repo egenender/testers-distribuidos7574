@@ -45,9 +45,9 @@ int main(int argc, char** argv) {
         // Recibe programa, verificando que no sea un rechazo por parte del sistema
         int program = atendedor.recibirPrograma(id);
         if (program == -1) {
-	    ss << "El dispositivo " << id << " recibe indicacion de que no hay lugar en el sistema de testeo. Reintentara luego";
-	    Logger::debug(ss.str().c_str(), __FILE__);
-	    ss.str("");
+        	ss << "El dispositivo " << id << " recibe indicacion de que no hay lugar en el sistema de testeo. Reintentara luego";
+        	Logger::debug(ss.str().c_str(), __FILE__);
+        	ss.str("");
             // Si no hay programa -> no hay lugar -> Duermo y envio otro req mas tarde
             sleep(rand() % 60 + 60);
             continue;
@@ -58,7 +58,29 @@ int main(int argc, char** argv) {
 		ss.str("");
 
         // Le envio resultado del programa de testeo
-        atendedor.enviarResultado(id, rand() % 2);
+		int resultado = 2;// rand() % 3;
+		ss << "El dispositivo " << id << " envia el resultado " << resultado << "";
+		Logger::debug(ss.str().c_str(), __FILE__);
+        atendedor.enviarResultado(id, resultado);
+
+        if ( resultado == RESULTADO_INCOMPLETO ) {
+        	bool finPruebasEsp = false;
+        	while ( !finPruebasEsp ) {
+        		int program = atendedor.recibirPruebaEspecial(id);
+        		ss << "El dispositivo " << id << " recibe la prueba numero " << program << ". Enviando resultados...";
+        		Logger::debug(ss.str().c_str(), __FILE__);
+        		ss.str("");
+
+        		if (program == PROGRAMA_FIN_PRUEBAS_ESPECIALES) {
+        			finPruebasEsp = true;
+        		}
+        		else {
+            		//EJECUTAR PROGRAMA ESPECIAL LALALA
+        			int resultadoEjecucionPrograma = rand() % 3;
+        			atendedor.enviarResultadoPruebaEspecial(id, resultadoEjecucionPrograma);
+        		}
+        	}
+        }
         
 		ss << "El dispositivo " << id << " espera la orden del sistema de testeo...";
 		Logger::debug(ss.str().c_str(), __FILE__);
