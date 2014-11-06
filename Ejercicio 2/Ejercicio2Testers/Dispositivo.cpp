@@ -21,7 +21,7 @@ using namespace std;
  * 
  */
 int main(int argc, char** argv) {
-
+	srand(time(NULL));
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
     // Por parametro se recibe el ID del dispositivo
     int id = atoi(argv[1]);
@@ -53,11 +53,15 @@ int main(int argc, char** argv) {
             continue;
         }
     
-		ss << "El dispositivo " << id << " recibe el programa numero " << program << ". Enviando resultados...";
+		ss << "El dispositivo " << id << " recibe el programa numero " << program;
 		Logger::debug(ss.str().c_str(), __FILE__);;
 		ss.str("");
-
-        // Le envio resultado del programa de testeo
+		
+        usleep(rand() % 1000 + 1000);
+        ss << "El dispositivo " << id << " envia los resultados";
+		Logger::debug(ss.str().c_str(), __FILE__);;
+		ss.str("");
+		
         atendedor.enviarResultado(id, rand() % 2);
         
 		ss << "El dispositivo " << id << " espera la orden del sistema de testeo...";

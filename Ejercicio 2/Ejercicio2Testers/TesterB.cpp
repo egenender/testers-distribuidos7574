@@ -16,7 +16,9 @@
 using namespace std;
 
 int main(int argc, char** argv) {
+	srand(time(NULL));
 	//El primer parametro es el id del tester
+	
     int id = atoi(argv[1]);
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
 	std::stringstream nombre;
@@ -48,6 +50,7 @@ int main(int argc, char** argv) {
             orden = ORDEN_REINICIO;
             Logger::notice("El resultado no es grave, solo debe reiniciarse el dispositivo" , nombre.str().c_str());
         }
+        usleep(rand() % 1000 + 1000);
         atendedor.enviarOrden(resultado.dispositivo,orden);
         Logger::notice("Envie orden correspondiente al dispositivo" , nombre.str().c_str());
         
