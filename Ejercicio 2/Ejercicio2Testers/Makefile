@@ -69,12 +69,13 @@ cleanO:
 	rm -f *.o
 
 clean: cleanO
-	rm Dispositivo
-	rm Tecnico
-	rm ArriboDeResultados
-	rm TesterA
-	rm TesterB
-	rm PlanillaTesterA
-	rm PlanillaTesterB
-	rm iniciador
-	rm terminador
+	rm -f log.txt
+	rm -f Dispositivo
+	rm -f Tecnico
+	rm -f ArriboDeResultados
+	rm -f TesterA
+	rm -f TesterB
+	rm -f PlanillaTesterA
+	rm -f PlanillaTesterB
+	rm -f iniciador
+	rm -f terminador
