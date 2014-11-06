@@ -36,13 +36,14 @@ int main(int argc, char** argv) {
     while(true) {
 		Logger::notice("Espero por un nuevo requerimiento de testeo especial" , nombre.str().c_str());
         // Espero un requerimiento
-        int posicion = atendedor.recibirRequerimientoEspecial();
+        int posicion = atendedor.recibirRequerimientoEspecial(id);
         int idDispositivo = planilla.dispositivoEnLugar(posicion);
         stringstream ss;
 		ss << idDispositivo;
 		string mensaje = "Recibido requerimiento desde dispositivo id ";
         Logger::notice(mensaje + ss.str() , nombre.str().c_str());
-                       
+        usleep( rand() % 1000 + 1000);
+        
         mensaje = "Envio programa de testeo especial al dispositivo id ";
         Logger::notice(mensaje + ss.str() , nombre.str().c_str());
         atendedor.enviarPrograma(idDispositivo, id, Programa::getPrograma());
@@ -54,6 +55,7 @@ int main(int argc, char** argv) {
         Logger::notice(mensaje + ss.str() , nombre.str().c_str());
         
         int seguimiento = planilla.terminarProcesamiento(posicion, resul.result == RESULTADO_GRAVE);
+        usleep( rand() % 1000 + 1000);
         if (seguimiento == NO_CONTESTAR){
 			mensaje = "Aun faltan testeos por hacer, asi que yo sigo con lo mio";
 			Logger::notice(mensaje, nombre.str().c_str());

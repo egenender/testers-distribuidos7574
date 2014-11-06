@@ -30,8 +30,8 @@ public:
     void enviarPrograma(int idDispositivo, int tester, int idPrograma);  // Tester -> Disp
     resultado_test_t recibirResultado(int idTester);
     void enviarOrden(int idDispositivo, int orden, int cant); // Tester -> Disp: Reinicio o apagado
-    void enviarAEspeciales(int cantidad, int posicion);
-	int recibirRequerimientoEspecial();
+    void enviarAEspeciales(bool cuales[], int posicion);
+	int recibirRequerimientoEspecial(int idEsp);
 
     bool destruirComunicacion();
 

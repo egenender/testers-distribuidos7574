@@ -50,10 +50,16 @@ int main(int argc, char** argv) {
             continue;
         }
     
-		ss << "El dispositivo " << id << " recibe el programa numero " << program << ". Enviando resultados...";
+		ss << "El dispositivo " << id << " recibe el programa numero " << program;
 		Logger::debug(ss.str().c_str(), __FILE__);;
 		ss.str("");
-
+		
+		usleep( rand() % 1000 + 1000);
+		
+		ss << "El dispositivo " << id << " envia los resultados";
+		Logger::debug(ss.str().c_str(), __FILE__);;
+		ss.str("");
+		
         // Le envio resultado del primer programa de testeo
         int resul = rand() % 10;
         if (resul >= 4){
