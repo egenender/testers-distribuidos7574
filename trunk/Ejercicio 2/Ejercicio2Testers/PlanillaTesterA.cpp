@@ -2,6 +2,7 @@
 #include "common/common.h"
 #include "common/Planilla.h"
 #include "logger/Logger.h"
+#include <string>
 
 using namespace std;
 
@@ -19,10 +20,12 @@ int main(int argc, char** argv) {
     while (true){
         if (msgrcv(planilla.queue(), &requerimiento, sizeof(requerimiento_planilla_t) - sizeof(long), id, 0 ) == -1){
 			exit(0);
-		}		
+		}
+		stringstream ss;		
         switch(requerimiento.tipoReq){
             case REQUERIMIENTO_AGREGAR:
-				Logger::notice("Recibo un pedido para agregar un dispositivo a la planilla" , nombre.str().c_str());
+				ss << "Recibo un pedido para agregar el dispositivo " << requerimiento.idDispositivo << " a la planilla" ;
+				Logger::notice( ss.str() , nombre.str().c_str());
 				planilla.agregar(requerimiento.idDispositivo);
                 break;
             case REQUERIMIENTO_TERMINO_PENDIENTE_REQ:

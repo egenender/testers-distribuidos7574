@@ -19,6 +19,14 @@ AtendedorTesters::AtendedorTesters() {
         exit(1);
     }
     
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_ORDENES);
+    this->cola_ordenes = msgget(key, 0666);
+    if(this->cola_ordenes == -1) {
+        std::string err = std::string("Error al obtener la cola de lectura de resultados del atendedor de testers. Errno: ") + std::string(strerror(errno));
+        Logger::error(err, __FILE__);
+        exit(1);
+    }
+    
 }
 
 AtendedorTesters::AtendedorTesters(const AtendedorTesters& orig) {
@@ -74,7 +82,7 @@ void AtendedorTesters::enviarOrden(int idDispositivo, int orden) {
     msg.idDispositivo = idDispositivo;
     msg.value = orden;
     
-    int ret = msgsnd(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    int ret = msgsnd(this->cola_ordenes, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
         std::string error = std::string("Error al enviar orden al atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);

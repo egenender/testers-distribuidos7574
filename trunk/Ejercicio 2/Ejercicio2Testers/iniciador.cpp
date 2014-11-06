@@ -106,24 +106,11 @@ void createIPCObjects() {
 }
 
 void createSystemProcesses() {
-    // Creo dispositivos
-    int idDispositivo = ID_DISPOSITIVO_START;
-    for(int i = 1; i <= CANT_DISPOSITIVOS; i++) {
-        char param[3];
-        sprintf(param, "%d", idDispositivo);
-        idDispositivo++;
-        pid_t newPid = fork();
-        if(newPid == 0) {
-            // Inicio el programa correspondiente
-            execlp("./Dispositivo", "Dispositivo", param, (char*)0);
-            Logger::error("Error al ejecutar el programa dispositivo de ID" + idDispositivo, __FILE__);
-            exit(1);
-        }
-    }
-    
+           
     // Creo testers
     int idTester = ID_TESTER_START;
     for(int i = 0; i < CANT_TESTERS; i++, idTester++) {
+		usleep(10);
         char param[3];
         sprintf(param, "%d", idTester);
         pid_t newPid = fork();
@@ -174,6 +161,29 @@ void createSystemProcesses() {
         Logger::error("Error al ejecutar el programa tecnico", __FILE__);
         exit(1);
     }
+    
+    sleep(1);
+    int idDispositivo = ID_DISPOSITIVO_START;
+    int cantidad_lanzada = 0;
+    while (cantidad_lanzada < CANT_DISPOSITIVOS){
+		int cantidad_a_lanzar = MINIMOS_LANZADOS + rand() % (MAXIMOS_LANZADOS - MINIMOS_LANZADOS + 1);
+		if (cantidad_a_lanzar + cantidad_lanzada > CANT_DISPOSITIVOS)
+			cantidad_a_lanzar = CANT_DISPOSITIVOS - cantidad_lanzada;
+		for (int i = 0; i < cantidad_a_lanzar; i++){
+			char param[3];
+			sprintf(param, "%d", idDispositivo);
+			idDispositivo++;
+			pid_t newPid = fork();
+			if(newPid == 0) {
+				// Inicio el programa correspondiente
+				execlp("./Dispositivo", "Dispositivo", param, (char*)0);
+				Logger::error("Error al ejecutar el programa dispositivo de ID" + idDispositivo, __FILE__);
+				exit(1);
+			}
+		}
+		cantidad_lanzada += cantidad_a_lanzar;
+		usleep(1000);
+	}
     
     Logger::debug("Programas iniciados correctamente...", __FILE__);
     

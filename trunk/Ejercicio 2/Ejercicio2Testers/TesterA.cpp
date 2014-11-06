@@ -38,7 +38,9 @@ int main(int argc, char** argv) {
 		ss << idDispositivo;
 		string mensaje = "Recibido requerimiento desde dispositivo id ";
         Logger::notice(mensaje + ss.str() , nombre.str().c_str());
-               
+        
+        mensaje = "Me fijo si hay lugar en la planilla";
+        Logger::notice(mensaje , nombre.str().c_str());       
         if(!planilla.agregar(idDispositivo)) {
             // Si no hay lugar se le avisa con un -1 en vez de programa
             Logger::notice("No hay lugar para atender al dispositivo!" , nombre.str().c_str());

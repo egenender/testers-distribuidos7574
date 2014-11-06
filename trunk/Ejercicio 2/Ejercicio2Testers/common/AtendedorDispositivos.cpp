@@ -20,6 +20,12 @@ AtendedorDispositivos::AtendedorDispositivos() {
     if(this->cola_tests == -1) {
         exit(1);
     }
+    
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_ORDENES);
+    this->cola_ordenes = msgget(key, 0666);
+    if(this->cola_ordenes == -1) {
+        exit(1);
+    }
 }
 
 AtendedorDispositivos::AtendedorDispositivos(const AtendedorDispositivos& orig) {
@@ -74,7 +80,7 @@ void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {
 int AtendedorDispositivos::recibirOrden(int idDispositivo) {
 
     TMessageAtendedor msg;
-    int ret = msgrcv(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
+    int ret = msgrcv(this->cola_ordenes, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
     if(ret == -1) {
         std::string error("Error al recibir orden del atendedor. Error: " + errno);
         Logger::error(error.c_str(), __FILE__);
