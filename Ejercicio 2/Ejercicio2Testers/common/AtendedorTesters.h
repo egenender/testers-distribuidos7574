@@ -12,6 +12,7 @@ class AtendedorTesters {
 private:
     int cola_requerimiento;
     int cola_recibos_tests;
+    int cola_ordenes;
         
     typedef struct message {
         long mtype;

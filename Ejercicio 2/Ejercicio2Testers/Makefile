@@ -68,8 +68,10 @@ terminador: semaphore lockfile logger
 cleanO:
 	rm -f *.o
 
-clean: cleanO
+cleanLog:
 	rm -f log.txt
+
+clean: cleanO cleanLog
 	rm -f Dispositivo
 	rm -f Tecnico
 	rm -f ArriboDeResultados
@@ -79,3 +81,8 @@ clean: cleanO
 	rm -f PlanillaTesterB
 	rm -f iniciador
 	rm -f terminador
+
+reprocesar:
+	./terminador
+	rm -f log.txt
+	./iniciador
