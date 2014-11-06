@@ -17,6 +17,7 @@
 using namespace std;
 
 int main(int argc, char** argv) {    
+	srand(time(NULL));
     // El primer parametro es el id del tester
     int id = atoi(argv[1]);
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
@@ -47,7 +48,8 @@ int main(int argc, char** argv) {
         
         mensaje = "HAY lugar para atender a dispositivo id ";
         Logger::notice(mensaje + ss.str() , nombre.str().c_str());
-        	
+		
+		usleep(rand() % 1000 + 1000);
         atendedor.enviarPrograma(idDispositivo, id, Programa::getPrograma());
         
         Logger::notice("Se envio el programa voy a marcarle a mi iplanilla que termine de procesar el requerimiento" , nombre.str().c_str());       
