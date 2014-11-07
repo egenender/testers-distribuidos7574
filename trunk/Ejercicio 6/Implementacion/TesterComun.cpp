@@ -43,6 +43,13 @@ int main(int argc, char** argv) {
 		string mensaje = "Recibido requerimiento desde dispositivo id ";
         Logger::notice(mensaje + ss.str() , nombre.str().c_str());
         
+        if (! planilla.hayLugar()){
+			string mensaje = "No hay lugar para atender al dispositivo id ";
+			Logger::notice(mensaje + ss.str() , nombre.str().c_str());
+			atendedor.enviarPrograma(idDispositivo, id, SIN_LUGAR);
+			continue;
+		}
+        
         usleep( rand() % 1000 + 1000);
         Logger::notice(string("Envio programa a dispositivo ") + ss.str(), nombre.str().c_str());                  	
         atendedor.enviarPrograma(idDispositivo, id, Programa::getPrograma());
@@ -74,8 +81,12 @@ int main(int argc, char** argv) {
 			Logger::notice(string("Le envio orden de seguir evaluando al dispositivo ") + ss.str(), nombre.str().c_str());
 			atendedor.enviarOrden(idDispositivo, ORDEN_SEGUIR_TESTEANDO, cant_testers);
 			ss.str("");
-			ss << cant_testers;
-			Logger::notice(string("Le envio requerimientos a los ") + ss.str() + string(" testers especiales! ") + ss.str(), nombre.str().c_str());
+			ss << "Le envio los requerimientos a los " << cant_testers << " testers especiales, ";
+			for (int i = 0; i < CANT_TESTERS_ESPECIALES; i++){
+				if(los_testers[i])
+					ss << i+ID_TESTER_ESPECIAL_START << " ";
+			}
+			Logger::notice(ss.str() , nombre.str().c_str());
 			atendedor.enviarAEspeciales(los_testers, planilla.setRequerimiento(idDispositivo, cant_testers));
 		}else{
 			atendedor.enviarOrden(idDispositivo, ORDEN_REINICIO, 0);

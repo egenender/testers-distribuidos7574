@@ -46,7 +46,7 @@ int main(int argc, char** argv) {
 	    Logger::debug(ss.str().c_str(), __FILE__);
 	    ss.str("");
             // Si no hay programa -> no hay lugar -> Duermo y envio otro req mas tarde
-            sleep(rand() % 60 + 60);
+            usleep(rand() % 10000 + 10000);
             continue;
         }
     

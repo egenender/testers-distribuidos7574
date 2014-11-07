@@ -28,6 +28,8 @@ int Planilla::obtenerLugar(){
 		if (lugar_desocupado(resultados[i]))
 			return i;
 	}
+	mutex_resul.v();
+	
 	return -1;
 }
 
@@ -65,4 +67,11 @@ int Planilla::dispositivoEnLugar(int lugar){
 	int idDispositivo = this->resultados[lugar].idDispositivo;
 	mutex_resul.v();
 	return idDispositivo;
+}
+
+bool Planilla::hayLugar(){
+	mutex_resul.p();
+	bool rta = this->obtenerLugar() != -1;
+	mutex_resul.v();
+	return rta;
 }

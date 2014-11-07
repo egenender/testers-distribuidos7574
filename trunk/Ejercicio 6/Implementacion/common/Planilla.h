@@ -20,6 +20,7 @@ public:
     int setRequerimiento(int idDispositivo, int cant_resultados_necesarios); //devuelve el lugar que ocupa en la shm
     int terminarProcesamiento(int req, bool resultado_grave);//devuelve si hay que seguir, o el resultado final
     int dispositivoEnLugar(int lugar);
+    bool hayLugar();
     
 };
 
