@@ -28,7 +28,6 @@ int Planilla::obtenerLugar(){
 		if (lugar_desocupado(resultados[i]))
 			return i;
 	}
-	mutex_resul.v();
 	
 	return -1;
 }
