@@ -15,7 +15,7 @@
 
 // Constantes del sistema
 
-const int CANT_DISPOSITIVOS = 100;
+const int CANT_DISPOSITIVOS = 300;
 const int CANT_TESTERS_COMUNES = 3;
 const int CANT_TESTERS_ESPECIALES = 5;
 const int ID_DISPOSITIVO_START = 50;
@@ -23,6 +23,8 @@ const int ID_TESTER_START = 1;
 const int ID_TESTER_ESPECIAL_START = ID_TESTER_START + CANT_TESTERS_COMUNES;
 const int MAX_DISPOSITIVOS_EN_SISTEMA = 100;
 
+const int MINIMOS_LANZADOS = 20;
+const int MAXIMOS_LANZADOS = 20;
 
 // IDs de los IPC
 const int SEM_PLANILLA_GENERAL = 1;
@@ -40,7 +42,7 @@ const int ORDEN_REINICIO = 1;
 const int ORDEN_SEGUIR_TESTEANDO = 2;
 const int SIN_LUGAR = -1;
 
-const int CANT_RESULTADOS = 100;
+const int CANT_RESULTADOS = MAX_DISPOSITIVOS_EN_SISTEMA;
 const int RESULTADO_GRAVE = 0;
 const int RESULTADO_NO_GRAVE = 1;
 const int SEGUIR_TESTEANDO = 2;
