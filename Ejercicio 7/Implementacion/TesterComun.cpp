@@ -17,6 +17,7 @@
 using namespace std;
 
 int main(int argc, char** argv) {    
+	srand(getpid());
     // El primer parametro es el id del tester
     int id = atoi(argv[1]);
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
@@ -31,8 +32,6 @@ int main(int argc, char** argv) {
     // Obtengo planilla general de sync con otros tester
     Planilla planilla;
     
-    srand(time(NULL));
-    
     while(true) {
 		Logger::notice("Espero por un nuevo requerimiento de testeo" , nombre.str().c_str());
         // Espero un requerimiento
@@ -41,12 +40,23 @@ int main(int argc, char** argv) {
 		ss << idDispositivo;
 		string mensaje = "Recibido requerimiento desde dispositivo id ";
         Logger::notice(mensaje + ss.str() , nombre.str().c_str());
-                          	
-        atendedor.enviarPrograma(idDispositivo, id, Programa::getPrograma());
-        Logger::notice(string("Envie programa a dispositivo ") + ss.str(), nombre.str().c_str());
         
+        if (! planilla.hayLugar()){
+			string mensaje = "No hay lugar para atender al dispositivo id ";
+			Logger::notice(mensaje + ss.str() , nombre.str().c_str());
+			atendedor.enviarPrograma(idDispositivo, id, SIN_LUGAR);
+			continue;
+		}
+        
+        usleep( rand() % 1000 + 1000);
+        Logger::notice(string("Envio programa a dispositivo ") + ss.str(), nombre.str().c_str());                  	
+        atendedor.enviarPrograma(idDispositivo, id, Programa::getPrograma());
+        
+        Logger::notice(string("Espero resultado de dispositivo ") + ss.str(), nombre.str().c_str());                  	    
+  
         resultado_test_t resul = atendedor.recibirResultado(id);
         Logger::notice(string("Recibi resultado del dispositivo ") + ss.str(), nombre.str().c_str());
+        usleep( rand() % 1000 + 1000);
         
         if (resul.result == RESULTADO_GRAVE){
 			Logger::notice(string("Le envio orden de apagado al dispositivo ") + ss.str(), nombre.str().c_str());
@@ -54,13 +64,28 @@ int main(int argc, char** argv) {
 			Logger::notice(string("Le envio al tecnico la notificacion ") + ss.str(), nombre.str().c_str());
 			despachador.enviarOrden(idDispositivo);
 		}else if (resul.result == SEGUIR_TESTEANDO){
-			int cant_testers = rand() % (MAXIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION - MINIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION) + MINIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION;	
+			//int cant_testers = rand() % (MAXIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION - MINIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION) + MINIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION;	
+			int cant_testers = 0;
+			bool los_testers[CANT_TESTERS_ESPECIALES];
+			while (cant_testers < 2 || cant_testers > 4){ //requerimientos
+				cant_testers = 0;
+				for (int i = 0; i < CANT_TESTERS_ESPECIALES; i++){
+					int random = rand() % 2;
+					cant_testers += random;
+					los_testers[i] = random;
+				}
+			}
+			
 			Logger::notice(string("Le envio orden de seguir evaluando al dispositivo ") + ss.str(), nombre.str().c_str());
 			atendedor.enviarOrden(idDispositivo, ORDEN_SEGUIR_TESTEANDO, cant_testers);
 			ss.str("");
-			ss << cant_testers;
-			Logger::notice(string("Le envio requerimientos a los ") + ss.str() + string(" testers especiales! ") + ss.str(), nombre.str().c_str());
-			atendedor.enviarAEspeciales(cant_testers, planilla.setRequerimiento(idDispositivo, cant_testers));
+			ss << "Le envio los requerimientos a los " << cant_testers << " testers especiales, ";
+			for (int i = 0; i < CANT_TESTERS_ESPECIALES; i++){
+				if(los_testers[i])
+					ss << i+ID_TESTER_ESPECIAL_START << " ";
+			}
+			Logger::notice(ss.str() , nombre.str().c_str());
+			atendedor.enviarAEspeciales(los_testers, planilla.setRequerimiento(idDispositivo, los_testers));
 		}else{
 			atendedor.enviarOrden(idDispositivo, ORDEN_REINICIO, 0);
 		}

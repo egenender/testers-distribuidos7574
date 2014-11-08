@@ -66,9 +66,16 @@ void createIPCObjects() {
     key_t key = ftok(ipcFileName.c_str(), SHM_PLANILLA_GENERAL);
     int shmgeneralid = shmget(key, sizeof(resultado_t) * CANT_RESULTADOS, IPC_CREAT | IPC_EXCL | 0660);
     resultado_t* resultados = (resultado_t*)shmat(shmgeneralid, NULL, 0);
-    
+	
+	for (int i = 0; i < CANT_TESTERS_ESPECIALES; i++){
+		Semaphore sem_tester (SEM_TESTERS_ESPECIALES + i);
+		sem_tester.creaSem();
+		sem_tester.iniSem(0);
+	}
+	
     for (int i = 0; i < CANT_RESULTADOS; i++){
 		resultados[i].resultadosPendientes = 0;
+		resultados[i].terminado = true;
     }
     shmdt(resultados);
     
@@ -84,22 +91,6 @@ void createIPCObjects() {
 }
 
 void createSystemProcesses() {
-    // Creo dispositivos
-    int idDispositivo = ID_DISPOSITIVO_START;
-    for(int i = 1; i <= CANT_DISPOSITIVOS; i++) {
-        char param[3];
-        sprintf(param, "%d", idDispositivo);
-        idDispositivo++;
-        usleep(10);
-        pid_t newPid = fork();
-        if(newPid == 0) {
-            // Inicio el programa correspondiente
-            execlp("./Dispositivo", "Dispositivo", param, (char*)0);
-            Logger::error("Error al ejecutar el programa dispositivo de ID" + idDispositivo, __FILE__);
-            exit(1);
-        }
-    }
-    
     // Creo testers
     int idTester = ID_TESTER_START;
     for(int i = 0; i < CANT_TESTERS_COMUNES; i++, idTester++) {
@@ -115,6 +106,7 @@ void createSystemProcesses() {
         }
     }
     
+    idTester = ID_TESTER_ESPECIAL_START;
     for(int i = 0; i < CANT_TESTERS_ESPECIALES; i++, idTester++) {
         char param[3];
         sprintf(param, "%d", idTester);
@@ -136,6 +128,29 @@ void createSystemProcesses() {
         exit(1);
     }
     
+   	//Creo dispositivos
+    sleep(1);
+    int idDispositivo = ID_DISPOSITIVO_START;
+    int cantidad_lanzada = 0;
+    while (cantidad_lanzada < CANT_DISPOSITIVOS){
+		int cantidad_a_lanzar = MINIMOS_LANZADOS + rand() % (MAXIMOS_LANZADOS - MINIMOS_LANZADOS + 1);
+		if (cantidad_a_lanzar + cantidad_lanzada > CANT_DISPOSITIVOS)
+			cantidad_a_lanzar = CANT_DISPOSITIVOS - cantidad_lanzada;
+		for (int i = 0; i < cantidad_a_lanzar; i++){
+			char param[3];
+			sprintf(param, "%d", idDispositivo);
+			idDispositivo++;
+			pid_t newPid = fork();
+			if(newPid == 0) {
+				// Inicio el programa correspondiente
+				execlp("./Dispositivo", "Dispositivo", param, (char*)0);
+				Logger::error("Error al ejecutar el programa dispositivo de ID" + idDispositivo, __FILE__);
+				exit(1);
+			}
+		}
+		cantidad_lanzada += cantidad_a_lanzar;
+		usleep(1000);
+	}
+	    
     Logger::debug("Programas iniciados correctamente...", __FILE__);
-    
 }

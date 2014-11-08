@@ -12,14 +12,8 @@ class AtendedorTesters {
 private:
     int cola_requerimiento;
     int cola_recibos_tests;
-        
-    typedef struct message {
-        long mtype;
-        int idDispositivo;
-        int value; // Este parametro posee el valor del requerimiento, del programa y del resultado
-        int cant_testers;
-    } TMessageAtendedor;
-    
+    int cola_testers_especiales;
+  
 public:
     AtendedorTesters();
     AtendedorTesters(const AtendedorTesters& orig);
@@ -29,8 +23,8 @@ public:
     void enviarPrograma(int idDispositivo, int tester, int idPrograma);  // Tester -> Disp
     resultado_test_t recibirResultado(int idTester);
     void enviarOrden(int idDispositivo, int orden, int cant); // Tester -> Disp: Reinicio o apagado
-    void enviarAEspeciales(int cantidad, int posicion);
-	int recibirRequerimientoEspecial();
+    void enviarAEspeciales(bool cuales[], int posicion);
+	int recibirRequerimientoEspecial(int idEsp);
 
     bool destruirComunicacion();
 
