@@ -19,15 +19,7 @@ private:
     int cola_requerimiento;
     int cola_tests;
     
-    int ultimoTester;
-    
-    typedef struct message {
-        long mtype;
-        int idDispositivo;
-        int value; // Este parametro posee el valor del requerimiento, del programa y del resultado
-        int cant_testers;
-    } TMessageAtendedor;
-    
+    int ultimoTester;    
 public:
 
     AtendedorDispositivos();

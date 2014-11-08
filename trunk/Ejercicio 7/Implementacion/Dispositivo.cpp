@@ -31,13 +31,18 @@ int ordenAEnviar(){
 void seguirTesteando(int id, AtendedorDispositivos* atendedor,int cantidad){
 	std::stringstream ss;
 	for (int i = 0; i < cantidad; i++){
+		ss << "El dispositivo " << id << " espera por un programa especial";
+		Logger::debug(ss.str().c_str(), __FILE__);;
+		ss.str("");
 		int program = atendedor->recibirPrograma(id);
+		usleep(rand() % 1000 + 1000);
 		ss << "El dispositivo " << id << " recibe el programa especial numero " << program << ". Enviando resultados...";
 		Logger::debug(ss.str().c_str(), __FILE__);;
 		ss.str("");
 		atendedor->enviarResultado(id, rand() % 2);
 	}
-	int orden = atendedor->recibirOrden(id, &cantidad);
+	int aux; //no deberia cambiar la cantidad
+	int orden = atendedor->recibirOrden(id, &aux);
 		
 	if (orden == ORDEN_APAGADO) {
 		ss << "El dispositivo " << id << " recibe la orden de apagado (" << orden << "). Byebye!";
@@ -57,7 +62,7 @@ void seguirTesteando(int id, AtendedorDispositivos* atendedor,int cantidad){
 }
 
 int main(int argc, char** argv) {
-	srand(time(NULL));
+	srand(getpid());
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
     // Por parametro se recibe el ID del dispositivo
     int id = atoi(argv[1]);
@@ -81,18 +86,18 @@ int main(int argc, char** argv) {
         // Recibe programa, verificando que no sea un rechazo por parte del sistema
         int program = atendedor.recibirPrograma(id);
         if (program == -1) {
-	    ss << "El dispositivo " << id << " recibe indicacion de que no hay lugar en el sistema de testeo. Reintentara luego";
-	    Logger::debug(ss.str().c_str(), __FILE__);
-	    ss.str("");
+			ss << "El dispositivo " << id << " recibe indicacion de que no hay lugar en el sistema de testeo. Reintentara luego";
+			Logger::debug(ss.str().c_str(), __FILE__);
+			ss.str("");
             // Si no hay programa -> no hay lugar -> Duermo y envio otro req mas tarde
-            sleep(rand() % 60 + 60);
+            sleep(rand() % 10000 + 10000);
             continue;
         }
     
 		ss << "El dispositivo " << id << " recibe el programa numero " << program << ". Enviando resultados...";
 		Logger::debug(ss.str().c_str(), __FILE__);;
 		ss.str("");
-
+		usleep(rand() % 1000 + 1000);
         // Le envio resultado del primer programa de testeo
         atendedor.enviarResultado(id, ordenAEnviar());
                      
@@ -120,6 +125,7 @@ int main(int argc, char** argv) {
             ss.str("");
 			
 			seguirTesteando(id, &atendedor, cantidad);
+			break;
 		}
 	} catch(std::string exception) {
 		Logger::error("Error en el dispositivo...", __FILE__);

@@ -37,6 +37,11 @@ int main(int argc, char** argv) {
 		int cola = msgget(key, 0660);
 		msgctl(cola ,IPC_RMID, NULL);
 	}
-       
+		
+	for (int i = 0; i < CANT_TESTERS_ESPECIALES; i++){
+		Semaphore sem_tester (SEM_TESTERS_ESPECIALES + i);
+		sem_tester.getSem();
+		sem_tester.eliSem();
+	}
     return 0;
 }

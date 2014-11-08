@@ -7,6 +7,8 @@
 #include "AtendedorDispositivos.h"
 #include "../common/common.h"
 #include <cstdlib>
+#include "../logger/Logger.h"
+#include <string>
 
 AtendedorDispositivos::AtendedorDispositivos() { 
     key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_DISPOSITIVOS);
@@ -20,6 +22,7 @@ AtendedorDispositivos::AtendedorDispositivos() {
     if(this->cola_tests == -1) {
         exit(1);
     }
+    this->ultimoTester = 0;
 }
 
 AtendedorDispositivos::AtendedorDispositivos(const AtendedorDispositivos& orig) {
@@ -50,7 +53,10 @@ int AtendedorDispositivos::recibirPrograma(int idDispositivo) {
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
-    this->ultimoTester = msg.idDispositivo;
+    std::stringstream ss;
+    ss << "El dispositivo "<< idDispositivo << " recibe programa desde tester " << msg.tester;
+    Logger::notice(ss.str(), __FILE__);
+    this->ultimoTester = msg.tester;
     return msg.value;
 
 }
@@ -58,7 +64,10 @@ void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {
 
     resultado_test_t resultado_test;
     
-    resultado_test.tester = (long)this->ultimoTester;
+    resultado_test.tester = this->ultimoTester;
+    std::stringstream ss;
+    ss << "El atendedor le manda resultado del dispositivo " << idDispositivo << " al tester " << ultimoTester;
+    Logger::notice(ss.str(), __FILE__);
     resultado_test.result = resultado;
     resultado_test.dispositivo = idDispositivo;
             
