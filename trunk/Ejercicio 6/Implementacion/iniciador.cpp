@@ -62,6 +62,10 @@ void createIPCObjects() {
     Semaphore semPlanillaGeneral(SEM_PLANILLA_GENERAL);
     semPlanillaGeneral.creaSem();
     semPlanillaGeneral.iniSem(1); // Inicializa el semaforo en 1
+    
+    Semaphore sem_cola_especiales(SEM_COLA_ESPECIALES);
+    sem_cola_especiales.creaSem();
+    sem_cola_especiales.iniSem(1);
 
     key_t key = ftok(ipcFileName.c_str(), SHM_PLANILLA_GENERAL);
     int shmgeneralid = shmget(key, sizeof(resultado_t) * CANT_RESULTADOS, IPC_CREAT | IPC_EXCL | 0660);

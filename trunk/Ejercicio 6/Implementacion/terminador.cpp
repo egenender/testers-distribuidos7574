@@ -30,8 +30,12 @@ int main(int argc, char** argv) {
     Semaphore semPlanillaGeneral(SEM_PLANILLA_GENERAL);
     semPlanillaGeneral.getSem();
     semPlanillaGeneral.eliSem();
-    
-        //Destruccion de colas
+		
+	Semaphore sem_cola_especiales(SEM_COLA_ESPECIALES);
+	sem_cola_especiales.getSem();
+	sem_cola_especiales.eliSem();
+	
+    //Destruccion de colas
     for (int q = MSGQUEUE_DISPOSITIVOS; q <= MSGQUEUE_DESPACHADOR; q++){
 		key = ftok(ipcFileName.c_str(), q);
 		int cola = msgget(key, 0660);
