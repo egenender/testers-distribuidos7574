@@ -25,6 +25,8 @@ int main(int argc, char** argv) {
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
     // Por parametro se recibe el ID del dispositivo
     int id = atoi(argv[1]);
+    
+    srand(time(NULL));
 
     std::stringstream ss;
     ss << "El dispositivo " << id << " se crea";
@@ -58,7 +60,7 @@ int main(int argc, char** argv) {
 		ss.str("");
 
         // Le envio resultado del programa de testeo
-		int resultado = 2;// rand() % 3;
+		int resultado = 2; // rand() % 3;
 		ss << "El dispositivo " << id << " envia el resultado " << resultado << "";
 		Logger::debug(ss.str().c_str(), __FILE__);
 		ss.str("");
@@ -87,7 +89,7 @@ int main(int argc, char** argv) {
         		}
         		else {
             		//EJECUTAR PROGRAMA ESPECIAL LALALA
-        			int resultadoEjecucionPrograma = rand() % 3;
+        			int resultadoEjecucionPrograma = rand() % 3 + 1;
         			atendedor.enviarResultadoPruebaEspecial(id, resultadoEjecucionPrograma);
         		}
         	}
