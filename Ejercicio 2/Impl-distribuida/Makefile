@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-Wall -pedantic -pedantic-errors -g -ggdb -DDEBUG
 
-all: dispositivo tecnico arriboResul testerA testerB planillaA planillaB iniciador terminador lectorNuevosReqD lectorNuevosReqT cleanO
+all: dispositivo tecnico arriboResul testerA testerB planillaA planillaB lectorNuevosReqD lectorNuevosReqT lectorProgD lectorProgT iniciador terminador cleanO
 
 lockfile:
 	$(CC) $(CFLAGS) -c sync/LockFile.cpp
@@ -67,10 +67,17 @@ terminador: semaphore lockfile logger
 	$(CC) $(CFLAGS) Semaphore.o LockFile.o logger/Logger.o terminador.cpp -o terminador
 	
 lectorNuevosReqD: lockfile logger
-	$(CC) $(CFLAGS) LockFile.o logger/Logger.o LectorNuevosRequerimientos-Disp.cpp -o LectorNuevosRequerimientos-Disp
+	$(CC) $(CFLAGS) LockFile.o logger/Logger.o ProgramasLectores/LectorNuevosRequerimientos-Disp.cpp -o ProgramasLectores/LectorNuevosRequerimientos-Disp
 
 lectorNuevosReqT: lockfile logger
-	$(CC) $(CFLAGS) LockFile.o logger/Logger.o LectorNuevosRequerimientos-Tester.cpp -o LectorNuevosRequerimientos-Tester
+	$(CC) $(CFLAGS) LockFile.o logger/Logger.o ProgramasLectores/LectorNuevosRequerimientos-Tester.cpp -o ProgramasLectores/LectorNuevosRequerimientos-Tester
+	
+lectorProgD: lockfile logger
+	$(CC) $(CFLAGS) LockFile.o logger/Logger.o ProgramasLectores/LectorProgramas-Disp.cpp -o ProgramasLectores/LectorProgramas-Disp
+
+lectorProgT: lockfile logger
+	$(CC) $(CFLAGS) LockFile.o logger/Logger.o ProgramasLectores/LectorProgramas-Tester.cpp -o ProgramasLectores/LectorProgramas-Tester
+
 
 cleanO:
 	rm -f *.o
@@ -84,8 +91,10 @@ clean: cleanO
 	rm -f TesterB
 	rm -f PlanillaTesterA
 	rm -f PlanillaTesterB
-	rm -f LectorNuevosRequerimientos-Disp
-	rm -f LectorNuevosRequerimientos-Tester
+	rm -f ProgramasLectores/LectorNuevosRequerimientos-Disp
+	rm -f ProgramasLectores/LectorNuevosRequerimientos-Tester
+	rm -f ProgramasLectores/LectorProgramas-Disp
+	rm -f ProgramasLectores/LectorProgramas-Tester
 	rm -f iniciador
 	rm -f terminador
 

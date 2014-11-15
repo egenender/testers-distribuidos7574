@@ -27,7 +27,7 @@ AtendedorTesters::AtendedorTesters() {
         exit(1);
     }
     
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_PROGRAMAS);
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_PROGRAMAS_ENVIO);
     this->cola_programas = msgget(key, 0666);
     if(this->cola_programas == -1) {
         std::string err = std::string("Error al obtener la cola de escritura de programas del atendedor de testers. Errno: ") + std::string(strerror(errno));
