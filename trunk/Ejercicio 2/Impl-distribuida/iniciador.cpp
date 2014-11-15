@@ -163,6 +163,12 @@ void createSystemProcesses() {
 			Logger::error("Error al ejecutar el programa lector de nuevos requerimientos tester", __FILE__);
 			exit(1);
 		}
+		
+		
+		if (fork() == 0){
+			execlp("./ProgramasLectores/LectorOrdenes-Tester", "LectorOrdenes-Tester", param, (char*)0);
+            exit(1);
+		}
     }
 
     // Creo al tecnico
@@ -199,6 +205,11 @@ void createSystemProcesses() {
 			}
 			if (fork() == 0){
 				execlp("./ProgramasLectores/LectorProgramas-Disp", "LectorProgramas-Disp", param, (char*)0);
+				exit(1);
+			}
+			
+			if (fork() == 0){
+				execlp("./ProgramasLectores/LectorOrdenes-Disp", "LectorOrdenes-Disp", param, (char*)0);
 				exit(1);
 			}
 		}

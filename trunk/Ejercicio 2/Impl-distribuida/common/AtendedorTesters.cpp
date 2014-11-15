@@ -19,7 +19,7 @@ AtendedorTesters::AtendedorTesters() {
         exit(1);
     }
     
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_ORDENES);
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_ORDENES_ENVIO);
     this->cola_ordenes = msgget(key, 0666);
     if(this->cola_ordenes == -1) {
         std::string err = std::string("Error al obtener la cola de escritura de Ordenes del atendedor de testers. Errno: ") + std::string(strerror(errno));
