@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-Wall -pedantic -pedantic-errors -g -ggdb -DDEBUG
 
-all: dispositivo tecnico arriboResul testerA testerB planillaA planillaB lectorNuevosReqD lectorNuevosReqT lectorProgD lectorProgT iniciador terminador cleanO
+all: dispositivo tecnico arriboResul testerA testerB planillaA planillaB lectorNuevosReqD lectorNuevosReqT lectorProgD lectorProgT lectorOrdD lectorOrdT iniciador terminador cleanO
 
 lockfile:
 	$(CC) $(CFLAGS) -c sync/LockFile.cpp
@@ -78,6 +78,12 @@ lectorProgD: lockfile logger
 lectorProgT: lockfile logger
 	$(CC) $(CFLAGS) LockFile.o logger/Logger.o ProgramasLectores/LectorProgramas-Tester.cpp -o ProgramasLectores/LectorProgramas-Tester
 
+lectorOrdD: lockfile logger
+	$(CC) $(CFLAGS) LockFile.o logger/Logger.o ProgramasLectores/LectorOrdenes-Disp.cpp -o ProgramasLectores/LectorOrdenes-Disp
+
+lectorOrdT: lockfile logger
+	$(CC) $(CFLAGS) LockFile.o logger/Logger.o ProgramasLectores/LectorOrdenes-Tester.cpp -o ProgramasLectores/LectorOrdenes-Tester
+
 
 cleanO:
 	rm -f *.o
@@ -95,6 +101,8 @@ clean: cleanO
 	rm -f ProgramasLectores/LectorNuevosRequerimientos-Tester
 	rm -f ProgramasLectores/LectorProgramas-Disp
 	rm -f ProgramasLectores/LectorProgramas-Tester
+	rm -f ProgramasLectores/LectorOrdenes-Disp
+	rm -f ProgramasLectores/LectorOrdenes-Tester
 	rm -f iniciador
 	rm -f terminador
 

@@ -5,7 +5,7 @@
  * Created on October 4, 2014, 8:04 PM
  */
 #include "AtendedorDispositivos.h"
-#include "../common/common.h"
+#include "common.h"
 #include <cstdlib>
 
 AtendedorDispositivos::AtendedorDispositivos() { 
@@ -21,7 +21,7 @@ AtendedorDispositivos::AtendedorDispositivos() {
         exit(1);
     }
     
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_ORDENES);
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_ORDENES_LECTURA);
     this->cola_ordenes = msgget(key, 0666);
     if(this->cola_ordenes == -1) {
         exit(1);
