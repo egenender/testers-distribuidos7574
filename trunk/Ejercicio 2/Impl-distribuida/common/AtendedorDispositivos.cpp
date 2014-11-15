@@ -27,7 +27,7 @@ AtendedorDispositivos::AtendedorDispositivos() {
         exit(1);
     }
     
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_PROGRAMAS);
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_PROGRAMAS_LECTURA);
     this->cola_programas = msgget(key, 0666);
     if(this->cola_programas == -1) {
         exit(1);

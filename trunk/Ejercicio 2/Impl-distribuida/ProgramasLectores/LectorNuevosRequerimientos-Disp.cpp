@@ -3,8 +3,8 @@
 #include "errno.h"
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#include "logger/Logger.h"
-#include "common/common.h"
+#include "../common/common.h"
+#include "../logger/Logger.h"
 
 
 using namespace std;
@@ -16,9 +16,9 @@ int main(int argc, char** argv) {
 	nombre << __FILE__;
 	Logger::notice("Inicia el procesamiento, cargando IPCS" , nombre.str().c_str());
 	
-    key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_NUEVO_REQUERIMIENTO_SOCKET);
+    key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_NUEVO_REQUERIMIENTO_ENVIO);
     int cola_lectura = msgget(key, 0660);
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_NUEVO_REQUERIMIENTO_LECTURA);
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_NUEVO_REQUERIMIENTO_SOCKET);
     int cola_escritura = msgget(key, 0660);
    
    Logger::notice("Procesamiento inicial completo, ejecutando ciclo principal" , nombre.str().c_str());

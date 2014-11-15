@@ -152,6 +152,17 @@ void createSystemProcesses() {
                  exit(1);
             }       
         }
+        if (fork() == 0){
+			execlp("./ProgramasLectores/LectorProgramas-Tester", "LectorProgramas-Tester", param, (char*)0);
+            exit(1);
+		}
+		
+		
+		if (fork() == 0){
+			execlp("./ProgramasLectores/LectorNuevosRequerimientos-Tester", "LectorNuevosRequerimientos-Tester", (char*)0);
+			Logger::error("Error al ejecutar el programa lector de nuevos requerimientos tester", __FILE__);
+			exit(1);
+		}
     }
 
     // Creo al tecnico
@@ -161,18 +172,7 @@ void createSystemProcesses() {
         Logger::error("Error al ejecutar el programa tecnico", __FILE__);
         exit(1);
     }
-    
-    if (fork() == 0){
-		execlp("./LectorNuevosRequerimientos-Disp", "LectorNuevosRequerimientos-Disp", (char*)0);
-        Logger::error("Error al ejecutar el programa lector de nuevos requerimientos disp", __FILE__);
-        exit(1);
-	}
-	
-	if (fork() == 0){
-		execlp("./LectorNuevosRequerimientos-Tester", "LectorNuevosRequerimientos-Tester", (char*)0);
-        Logger::error("Error al ejecutar el programa lector de nuevos requerimientos tester", __FILE__);
-        exit(1);
-	}
+    	
     
     sleep(1);
     int idDispositivo = ID_DISPOSITIVO_START;
@@ -190,6 +190,15 @@ void createSystemProcesses() {
 				// Inicio el programa correspondiente
 				execlp("./Dispositivo", "Dispositivo", param, (char*)0);
 				Logger::error("Error al ejecutar el programa dispositivo de ID" + idDispositivo, __FILE__);
+				exit(1);
+			}
+			
+			if (fork() == 0){
+				execlp("./ProgramasLectores/LectorNuevosRequerimientos-Disp", "LectorNuevosRequerimientos-Disp", param, (char*)0);
+				exit(1);
+			}
+			if (fork() == 0){
+				execlp("./ProgramasLectores/LectorProgramas-Disp", "LectorProgramas-Disp", param, (char*)0);
 				exit(1);
 			}
 		}
