@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
     
     //Las colas parecerian estar al reves, pero lo que hacen es justamente ponerlo
     //en la cola correcta
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_ESCRITURA_RESULTADOS);
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_ESCRITURA_RESULTADOS_LECTURA);
     int cola_lectura = msgget(key, 0660);
     key = ftok(ipcFileName.c_str(), MSGQUEUE_LECTURA_RESULTADOS);
     int cola_escritura = msgget(key, 0660);

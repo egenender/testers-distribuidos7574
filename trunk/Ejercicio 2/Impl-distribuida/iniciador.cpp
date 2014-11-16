@@ -96,7 +96,7 @@ void createIPCObjects() {
     
     
     //creacion de colas
-    for (int q = MSGQUEUE_ESCRITURA_RESULTADOS; q <= MSGQUEUE_PLANILLA + 1; q++){
+    for (int q = MSGQUEUE_LECTURA_RESULTADOS; q <= MSGQUEUE_PLANILLA + 1; q++){
 		key = ftok(ipcFileName.c_str(), q);
 		if (msgget(key, 0660 | IPC_CREAT | IPC_EXCL) == -1){
 			std::cout << "No se pudo crear una cola: " << strerror(errno)<< std::endl;
@@ -169,6 +169,11 @@ void createSystemProcesses() {
 			execlp("./ProgramasLectores/LectorOrdenes-Tester", "LectorOrdenes-Tester", param, (char*)0);
             exit(1);
 		}
+		
+		if (fork() == 0){
+			execlp("./ProgramasLectores/LectorResultados-Tester", "LectorResultados-Tester", param, (char*)0);
+            exit(1);
+		}
     }
 
     // Creo al tecnico
@@ -210,6 +215,11 @@ void createSystemProcesses() {
 			
 			if (fork() == 0){
 				execlp("./ProgramasLectores/LectorOrdenes-Disp", "LectorOrdenes-Disp", param, (char*)0);
+				exit(1);
+			}
+			
+			if (fork() == 0){
+				execlp("./ProgramasLectores/LectorResultados-Disp", "LectorResultados-Disp", param, (char*)0);
 				exit(1);
 			}
 		}
