@@ -15,7 +15,7 @@ AtendedorDispositivos::AtendedorDispositivos() {
 		exit(1);
     }
     
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_ESCRITURA_RESULTADOS);
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_ESCRITURA_RESULTADOS_ENVIO);
     this->cola_tests = msgget(key, 0666);
     if(this->cola_tests == -1) {
         exit(1);
