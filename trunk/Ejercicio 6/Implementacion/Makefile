@@ -54,10 +54,10 @@ cleanO:
 	rm -f *.o
 
 clean: cleanO
-	rm log.txt
-	rm Dispositivo
-	rm Tecnico
-	rm TesterComun
-	rm TesterEspecial
-	rm iniciador
-	rm terminador
+	rm -f log.txt
+	rm -f Dispositivo
+	rm -f Tecnico
+	rm -f TesterComun
+	rm -f TesterEspecial
+	rm -f iniciador
+	rm -f terminador
