@@ -11,6 +11,7 @@
 */
 
 #include "common/DespachadorTecnicos.h"
+#include "common/Configuracion.h"
 #include "common/common.h"
 #include "logger/Logger.h"
 
@@ -22,8 +23,15 @@ using namespace std;
 int main(int argc, char** argv) {
 
     Logger::initialize(Constantes::ARCHIVO_LOG.c_str(), Logger::LOG_DEBUG);
+
+    Configuracion config;
+    if( !config.LeerDeArchivo() ){
+        Logger::error( "Archivo de configuracion no encontrado", __FILE__ );
+        return 1;
+    }
+
     //Obtengo comunicacion con el sistema de testeo
-    DespachadorTecnicos despachador;
+    DespachadorTecnicos despachador( config );
     stringstream ss;
 
     while(true) {

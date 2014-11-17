@@ -9,6 +9,7 @@
  */
 
 #include "common/AtendedorDispositivos.h"
+#include "common/Configuracion.h"
 #include "logger/Logger.h"
 #include "common/common.h"
 #include <sstream>
@@ -20,10 +21,6 @@ using namespace std;
 
 int main(int argc, char** argv) { //TODO Esto esta muy chorizo, dividir en metodos
 
-    //TODO Tomarlos de un archivo para no tener que recompilar
-    const int MIN_TIEMPO_ESPERA_REINTENTO = 60; //En segundos
-    const int MAX_TIEMPO_ESPERA_REINTENTO = 60; //En segundos
-
     Logger::initialize(Constantes::ARCHIVO_LOG.c_str(), Logger::LOG_DEBUG);
     // Se recibe el ID del dispositivo por parametro
     int id = atoi(argv[1]);
@@ -33,12 +30,21 @@ int main(int argc, char** argv) { //TODO Esto esta muy chorizo, dividir en metod
     Logger::debug(ss.str().c_str(), __FILE__);
     ss.str("");
 
+    //Parametros del sistema
+    Configuracion config;
+    if( !config.LeerDeArchivo() ){
+        Logger::error( "Archivo de configuracion no encontrado", __FILE__ );
+        return 1;
+    }
+    const int minTiempoEsperaReintento = config.ObtenerParametroEntero( Constantes::NombresDeParametros::MIN_TIEMPO_ESPERA_REINTENTO_TESTER_OCUPADO );
+    const int maxTiempoEsperaReintento = config.ObtenerParametroEntero( Constantes::NombresDeParametros::MAX_TIEMPO_ESPERA_REINTENTO_TESTER_OCUPADO );
+
     // Comunicacion con el sistema de testeo
-    AtendedorDispositivos atendedor;
+    AtendedorDispositivos atendedor( config );
 
     //Generar lista con ids de testers para ir eligiendolos al azar
     std::vector<int> idsTesters;
-    for( int iTester=1; iTester<=Constantes::CANT_TESTERS_ESP; iTester++ )
+    for( int iTester=1; iTester<= config.ObtenerParametroEntero( Constantes::NombresDeParametros::CANT_TESTERS_ESP ); iTester++ )
         idsTesters.push_back( iTester );
     bool apagar = false;
 
@@ -61,7 +67,7 @@ int main(int argc, char** argv) { //TODO Esto esta muy chorizo, dividir en metod
                 Logger::debug(ss.str().c_str(), __FILE__);
                 ss.str("");
                 // Si no hay programa -> no hay lugar -> Duermo y envio otro req mas tarde
-                sleep( MIN_TIEMPO_ESPERA_REINTENTO + rand() % ( MAX_TIEMPO_ESPERA_REINTENTO - MIN_TIEMPO_ESPERA_REINTENTO? MAX_TIEMPO_ESPERA_REINTENTO - MIN_TIEMPO_ESPERA_REINTENTO : 1 ) );
+                sleep( minTiempoEsperaReintento + rand() % ( maxTiempoEsperaReintento - minTiempoEsperaReintento? maxTiempoEsperaReintento - minTiempoEsperaReintento : 1 ) );
                 continue;
             }
 

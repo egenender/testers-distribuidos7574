@@ -7,13 +7,15 @@
 
 #include "AtendedorDispositivos.h"
 #include "logger/Logger.h"
+#include "common/Configuracion.h"
 #include "common/common.h"
 #include <sys/msg.h>
 #include <cerrno>
 #include <cstring>
 
-AtendedorDispositivos::AtendedorDispositivos() {
-    m_Key = ftok(Constantes::ARCHIVO_IPCS.c_str(), Constantes::MSG_QUEUE_ATENDEDOR);
+AtendedorDispositivos::AtendedorDispositivos( const Configuracion& config ) {
+    m_Key = ftok( config.ObtenerParametroString( Constantes::NombresDeParametros::ARCHIVO_IPCS ).c_str(),
+                  config.ObtenerParametroEntero( Constantes::NombresDeParametros::MSG_QUEUE_ATENDEDOR ) );
     m_MsgQueueId = msgget(m_Key, 0666 | IPC_CREAT);
     if(m_MsgQueueId == -1) {
         throw std::string("Error al obtener la cola del atendedor de dispositivos. Errno: " + errno);

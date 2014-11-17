@@ -6,15 +6,20 @@
  */
 
 #include "Planilla.h"
+#include "common/Configuracion.h"
 #include "common/common.h"
 #include "logger/Logger.h"
 #include <sys/shm.h>
 #include <cerrno>
 #include <cstring>
 
-Planilla::Planilla() : m_SemShMem( Constantes::ARCHIVO_IPCS, Constantes::SEM_PLANILLA) {
+Planilla::Planilla( const Configuracion& config ) :
+         MAX_CANT_DISPS( config.ObtenerParametroEntero( Constantes::NombresDeParametros::MAX_DISPOSITIVOS_EN_SISTEMA ) ),
+         m_SemShMem( config.ObtenerParametroString( Constantes::NombresDeParametros::ARCHIVO_IPCS ),
+                     config.ObtenerParametroEntero(Constantes::NombresDeParametros::SEM_PLANILLA) ) {
 
-    m_ShMemKey = ftok(Constantes::ARCHIVO_IPCS.c_str(), Constantes::SHMEM_PLANILLA);
+    m_ShMemKey = ftok( config.ObtenerParametroString( Constantes::NombresDeParametros::ARCHIVO_IPCS ).c_str(),
+                       config.ObtenerParametroEntero(Constantes::NombresDeParametros::SHMEM_PLANILLA) );
     if(m_ShMemKey == -1) {
         std::string err("Error al conseguir la key de la shmem de la planilla. Error: " + std::string(strerror(errno)));
         Logger::error(err.c_str(), __FILE__);
@@ -52,7 +57,7 @@ bool Planilla::hayLugar() {
     // Si hay lugar, registro el dispositivo
     bool result = true;
     m_SemShMem.p();
-    if(*m_pCantDispositivosSiendoTesteados >= Constantes::MAX_DISPOSITIVOS_EN_SISTEMA) {
+    if(*m_pCantDispositivosSiendoTesteados >= MAX_CANT_DISPS ) {
         result = false;
     } else {
         *m_pCantDispositivosSiendoTesteados += 1;

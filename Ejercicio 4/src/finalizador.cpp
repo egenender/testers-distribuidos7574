@@ -15,6 +15,7 @@
 #include "common/DespachadorTecnicos.h"
 #include "common/Planilla.h"
 #include "common/Programa.h"
+#include "common/Configuracion.h"
 #include "common/common.h"
 #include <cstdlib>
 #include <cerrno>
@@ -25,20 +26,26 @@ int main( int argc, char** argv ){
     Logger::initialize(Constantes::ARCHIVO_LOG.c_str(), Logger::LOG_DEBUG);
     Logger::notice("Logger inicializado. Destruyendo IPCs...", __FILE__);
 
+    Configuracion config;
+    if( !config.LeerDeArchivo() ){
+        Logger::error("Archivo de configuracion no encontrado", __FILE__);
+        return 1;
+    }
+
     // Creo objeto atendedor para destruir sus ipcs
-    AtendedorTesters atendedor;
+    AtendedorTesters atendedor( config );
     if (!atendedor.destruirComunicacion()) {
         Logger::error("No se pudo destruir la cola de mensajes del atendedor...", __FILE__);
     }
 
     // Creo objeto despachador para destruir sus ipcs
-    DespachadorTecnicos despachador;
+    DespachadorTecnicos despachador( config );
     if (!despachador.destruirComunicacion()) {
         Logger::error("No se pudo destruir la cola de mensajes del despachador...", __FILE__);
     }
 
     // Creo objeto planilla para destruir el semaforo y la memoria compartida que utiliza
-    Planilla planilla;
+    Planilla planilla( config );
     if (!planilla.destruirMemoria()) {
         Logger::error("No se pudo destruir la memoria compartida de la planilla...", __FILE__);
     }
@@ -47,7 +54,7 @@ int main( int argc, char** argv ){
         Logger::error(err.c_str(), __FILE__);
     }
 
-    unlink(Constantes::ARCHIVO_IPCS.c_str());
+    unlink( config.ObtenerParametroString(Constantes::NombresDeParametros::ARCHIVO_IPCS).c_str() );
 
     Logger::notice("IPCs eliminados...", __FILE__);
 
