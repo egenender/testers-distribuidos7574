@@ -6,10 +6,11 @@
  */
 
 #include "common/AtendedorTesters.h"
-#include "common/DespachadorTesters.h"
+#include "common/DespachadorTecnicos.h"
 #include "common/Programa.h"
 #include "common/Resultado.h"
 #include "common/Planilla.h"
+#include "common/Configuracion.h"
 #include "common/common.h"
 #include "logger/Logger.h"
 #include <sstream>
@@ -23,12 +24,18 @@ int main(int argc, char** argv) {
     // El primer parametro es el id del tester
     int id = atoi(argv[1]);
 
+    Configuracion config;
+    if( !config.LeerDeArchivo() ){
+        Logger::error( "Archivo de configuracion no encontrado", __FILE__ );
+        return 1;
+    }
+
     // Obtengo comunicacion con los dispositivos
-    AtendedorTesters atendedor;
+    AtendedorTesters atendedor( config );
     // Obtengo planilla general de sync con otros tester
-    Planilla planilla;
+    Planilla planilla( config );
     // Obtengo comunicacion con los tecnicos
-    DespachadorTesters despachador;
+    DespachadorTecnicos despachador( config );
 
     while(true) {
         try {

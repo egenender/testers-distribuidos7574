@@ -7,6 +7,8 @@
 
 #pragma once
 
+class Configuracion;
+
 #include <sys/ipc.h>
 
 class AtendedorTesters {
@@ -26,7 +28,7 @@ private:
 
     int recibirReq( int tipoMsg );
 public:
-    AtendedorTesters();
+    AtendedorTesters( const Configuracion& config );
     ~AtendedorTesters();
 
     int recibirRequerimiento();

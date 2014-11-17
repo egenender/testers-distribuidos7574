@@ -9,6 +9,8 @@
 
 #include <sys/ipc.h>
 
+class Configuracion;
+
 class DespachadorTecnicos {
 private:
     int m_MsgQueueId;
@@ -25,10 +27,11 @@ private:
 
 public:
 
-    DespachadorTecnicos();
+    DespachadorTecnicos( const Configuracion& config );
     ~DespachadorTecnicos();
 
     int recibirOrden();
+    void enviarOrden(int idDispositivo);
 
     bool destruirComunicacion();
 

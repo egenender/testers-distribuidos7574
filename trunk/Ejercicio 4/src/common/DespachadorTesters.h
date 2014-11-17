@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <sys/ipc.h>
+/*#include <sys/ipc.h>
 
 class DespachadorTesters {
 private:
@@ -30,5 +30,5 @@ public:
 
     void enviarOrden(int idDispositivo);
 
-};
+};*/
 

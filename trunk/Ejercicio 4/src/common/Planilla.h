@@ -9,11 +9,14 @@
 
 #pragma once
 
+class Configuracion;
+
 #include "ipc/Semaphore.h"
 #include <sys/ipc.h>
 
 class Planilla {
 private:
+    const int MAX_CANT_DISPS;
     Semaphore m_SemShMem;
     key_t m_ShMemKey;
     int m_ShMemId;
@@ -25,7 +28,7 @@ private:
     Planilla(const Planilla& orig);
     Planilla& operator=(const Planilla& rv);
 public:
-    Planilla();
+    Planilla( const Configuracion& config );
     ~Planilla();
 
     bool hayLugar();    // Si hay menos de 100 -> incrementa en 1 al contador

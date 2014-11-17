@@ -16,19 +16,26 @@
 #include "common/AtendedorDispositivos.h"
 #include "common/Planilla.h"
 #include "common/DespachadorTecnicos.h"
+#include "common/Configuracion.h"
 #include "common/common.h"
 #include <cerrno>
 #include <cstring>
 
-void createIPCObjects();
-void createSystemProcesses();
+void createIPCObjects( const Configuracion& config );
+void createSystemProcesses( const Configuracion& config );
 
 int main( int argc, char** argv ){
+    Configuracion config;
+    if( !config.LeerDeArchivo() ){
+        Logger::error("Archivo de configuracion no encontrado", __FILE__);
+        return 1;
+    }
+
     Logger::initialize(Constantes::ARCHIVO_LOG.c_str(), Logger::LOG_DEBUG);
     Logger::notice("Logger inicializado. Inicializando IPCs...", __FILE__);
 
     try {
-        createIPCObjects();
+        createIPCObjects( config );
     } catch(std::string err) {
         Logger::error("Error al crear los objetos activos...", __FILE__);
         Logger::destroy();
@@ -36,7 +43,7 @@ int main( int argc, char** argv ){
     }
     Logger::debug("Objetos IPC inicializados correctamente. Iniciando procesos...", __FILE__);
 
-    createSystemProcesses();
+    createSystemProcesses( config );
     Logger::debug("Procesos iniciados correctamente...", __FILE__);
 
     Logger::notice("Sistema inicializado correctamente...", __FILE__);
@@ -46,10 +53,11 @@ int main( int argc, char** argv ){
     return 0;
 }
 
-void createIPCObjects() {
+void createIPCObjects( const Configuracion& config ) {
+    const std::string archivoIpcs = config.ObtenerParametroString( Constantes::NombresDeParametros::ARCHIVO_IPCS.c_str() );
 
     // Verifico que exista el archivo con las keys de los ipcs
-    std::ifstream ipcFile(Constantes::ARCHIVO_IPCS.c_str(), std::ios::in);
+    std::ifstream ipcFile( archivoIpcs.c_str(), std::ios::in);
     if (ipcFile.bad() || ipcFile.fail()) {
         std::string err = std::string("Error creando el archivo de IPCs. Error: ") + std::string(strerror(errno));
         Logger::error(err.c_str(), __FILE__);
@@ -58,25 +66,25 @@ void createIPCObjects() {
     ipcFile.close();
 
     //Cola de mensajes entre dispositivo y testers
-    AtendedorDispositivos atendedor;
+    AtendedorDispositivos atendedor( config );
 
     // Creo semaforo para la shmem de la planilla
-    Semaphore semPlanilla(Constantes::ARCHIVO_IPCS, Constantes::SEM_PLANILLA);
+    Semaphore semPlanilla(archivoIpcs, config.ObtenerParametroEntero( Constantes::NombresDeParametros::SEM_PLANILLA ) );
     semPlanilla.creaSem();
     semPlanilla.iniSem(1); // Inicializa el semaforo en 1
     
     // Creo la shmem de la planilla
-    Planilla planilla;
+    Planilla planilla( config );
 
     // Creo la cola de mensajes entre tester y tecnico
-    DespachadorTecnicos despachador;
+    DespachadorTecnicos despachador( config );
 }
 
-void createSystemProcesses() {
+void createSystemProcesses( const Configuracion& config ) {
     // Lanzo procesos de testers
-    for(int i = 0; i < Constantes::CANT_TESTERS_ESP; i++) {
+    for(int i = 0; i < config.ObtenerParametroEntero( Constantes::NombresDeParametros::CANT_TESTERS_ESP ); i++) {
         char param[3];
-        int idTester = Constantes::ID_TESTER_ESP_START + i;
+        int idTester = config.ObtenerParametroEntero( Constantes::NombresDeParametros::ID_TESTER_ESP_START ) + i;
         sprintf(param, "%d\n", idTester);
         pid_t newPid = fork();
         if(newPid == 0) {
@@ -94,9 +102,9 @@ void createSystemProcesses() {
     }
 
     // Lanzo procesos de dispositivos
-    for(int i = 0; i < Constantes::CANT_DISPOSITIVOS; i++) {
+    for(int i = 0; i < config.ObtenerParametroEntero( Constantes::NombresDeParametros::CANT_DISPOSITIVOS ); i++) {
         char param[3];
-        int idDispositivo = Constantes::ID_DISPOSITIVO_START + i;
+        int idDispositivo = config.ObtenerParametroEntero( Constantes::NombresDeParametros::ID_DISPOSITIVO_START ) + i;
         sprintf(param, "%d\n", idDispositivo);
         pid_t newPid = fork();
         if(newPid == 0) {
@@ -108,3 +116,4 @@ void createSystemProcesses() {
 
     Logger::debug("Programas iniciados correctamente...", __FILE__);
 }
+

@@ -5,7 +5,7 @@
  * Created on October 4, 2014, 10:30 PM
  */
 
-#include "DespachadorTesters.h"
+/*#include "DespachadorTesters.h"
 #include "common/common.h"
 #include "logger/Logger.h"
 #include <sys/msg.h>
@@ -27,7 +27,7 @@ DespachadorTesters::~DespachadorTesters() {}
 void DespachadorTesters::enviarOrden(int idDispositivo) {
 
     TMessageDespachador msg;
-    msg.mtype = 0;
+    msg.mtype = 1;
     msg.idDispositivo = idDispositivo;
 
     int ret = msgsnd(m_MsgQueueId, &msg, sizeof(TMessageDespachador) - sizeof(long), 0);
@@ -36,4 +36,4 @@ void DespachadorTesters::enviarOrden(int idDispositivo) {
         Logger::error(error.c_str(), __FILE__);
         throw error;
     }
-}
+}*/

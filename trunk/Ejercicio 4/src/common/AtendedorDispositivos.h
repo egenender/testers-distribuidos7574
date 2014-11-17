@@ -9,6 +9,8 @@
 
 #include <sys/ipc.h>
 
+class Configuracion;
+
 class AtendedorDispositivos {
 private:
     int m_MsgQueueId;
@@ -27,7 +29,7 @@ private:
     void enviarReq( int tipoMsg, int idDisp );
 public:
 
-    AtendedorDispositivos();
+    AtendedorDispositivos( const Configuracion& config );
     ~AtendedorDispositivos();
 
     void enviarRequerimiento(int idDispositivo); // Disp -> Tester
