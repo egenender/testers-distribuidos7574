@@ -1,0 +1,40 @@
+called: g++
+	/home/ferno/ferno/FIUBA/Distribuidos/Practicas/testers-distribuidos7574/Ejercicio 8/Implementacion
+	g++
+	-Wall
+	-pedantic
+	-pedantic-errors
+	-g
+	-ggdb
+	-DDEBUG
+	-c
+	sync/LockFile.cpp
+
+called: g++
+	/home/ferno/ferno/FIUBA/Distribuidos/Practicas/testers-distribuidos7574/Ejercicio 8/Implementacion
+	g++
+	-Wall
+	-pedantic
+	-pedantic-errors
+	-g
+	-ggdb
+	-DDEBUG
+	-c
+	common/AtendedorDispositivos.cpp
+
+called: g++
+	/home/ferno/ferno/FIUBA/Distribuidos/Practicas/testers-distribuidos7574/Ejercicio 8/Implementacion
+	g++
+	-Wall
+	-pedantic
+	-pedantic-errors
+	-g
+	-ggdb
+	-DDEBUG
+	LockFile.o
+	logger/Logger.o
+	AtendedorDispositivos.o
+	Dispositivo.cpp
+	-o
+	Dispositivo
+
