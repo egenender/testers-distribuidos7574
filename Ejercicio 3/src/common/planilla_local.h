@@ -1,5 +1,4 @@
-#ifndef PLANILLA_LOCAL_H
-#define	PLANILLA_LOCAL_H
+#pragma once
 
 const int LIBRE = 0;
 const int OCUPADO = 1;
@@ -12,8 +11,4 @@ typedef struct struct_planilla_local{
     int estadoA;
     int estadoB;
 }planilla_local_t;
-
-
-
-#endif	/* PLANILLA_LOCAL_H */
 

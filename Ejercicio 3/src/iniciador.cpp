@@ -64,13 +64,15 @@ void createIPCObjects() {
     // Cola de mensajes entre dispositivo y testers
     AtendedorDispositivos atendedor;
     
-    // Creo semaforo para la shmem de la planilla
-    Semaphore semPlanilla(SEM_PLANILLA);
+    // Creo semaforo para la shmem general de la planilla
+    Semaphore semPlanilla(SEM_PLANILLA_GENERAL);
     semPlanilla.creaSem();
     semPlanilla.iniSem(1); // Inicializa el semaforo en 1
     
-    // Creo la shmem de la planilla
-    Planilla planilla;
+    // Creo las shmem y semaforos de las planillas
+    for( int iTester=ID_TESTER_START; iTester<ID_TESTER_START+CANT_TESTERS;iTester++ ){
+        Planilla planilla( iTester );
+    }
     
     // Creo la cola de mensajes entre tester y tecnico
     DespachadorTecnicos despachador;

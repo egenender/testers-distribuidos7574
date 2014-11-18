@@ -5,8 +5,7 @@
  * Created on October 11, 2014, 2:06 PM
  */
 
-#ifndef IPLANILLATESTERA_H
-#define	IPLANILLATESTERA_H
+#pragma once
 
 class iPlanillaTester2do {
 private:
@@ -16,11 +15,9 @@ public:
     iPlanillaTester2do(int id);
     iPlanillaTester2do(const iPlanillaTester2do& orig);
     virtual ~iPlanillaTester2do();
-    void iniciarProcesamientoDeResultadosParciales();
+    void iniciarProcesamientoDeResultados();
     void procesarSiguiente();
 
     
 };
-
-#endif	/* IPLANILLATESTERA_H */
 

@@ -34,7 +34,7 @@ public:
     virtual ~AtendedorDispositivos();
         
     void enviarRequerimiento(int idDispositivo); // Disp -> Tester
-    void enviar1erRespuesta(int idDispositivo);
+    void enviar1erRespuesta(int idDispositivo, int resultado);
     int recibirPrograma(int idDispositivo);
     void enviarResultado(int idDispositivo, int resultado); // Disp -> Tester: Grave o no grave
     int recibirOrden(int idDispositivo);

@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
             ss.str("");
 
             // Le envio resultado del primer programa de testeo
-            atendedor.enviar1erRespuesta()(id, rand() % 2);
+            atendedor.enviar1erRespuesta(id, rand() % 2);
 
             // Recibe el segundo programa, verificando que no sea un rechazo por parte del sistema
 
@@ -64,15 +64,14 @@ int main(int argc, char** argv) {
                     sleep(rand() % 60 + 60);
                     continue;
                 }
-            } while (program == -1)
+            } while (program == -1);
 
-                ss << "El dispositivo " << id << " recibe el programa numero " << program << ". Enviando respuesta...";
+            ss << "El dispositivo " << id << " recibe el programa numero " << program << ". Enviando respuesta...";
             Logger::debug(ss.str().c_str(), __FILE__);
-            ;
             ss.str("");
 
             // Le envio resultado del segundo programa de testeo
-            atendedor.enviarResultado()(id, rand() % 2);
+            atendedor.enviarResultado(id, rand() % 2);
 
             ss << "El dispositivo " << id << " espera la orden del sistema de testeo...";
             Logger::debug(ss.str().c_str(), __FILE__);

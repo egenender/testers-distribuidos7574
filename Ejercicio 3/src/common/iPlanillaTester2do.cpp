@@ -1,6 +1,7 @@
-#include "iPlanillaTester1ro.h"
+#include "iPlanillaTester2do.h"
 #include "common.h"
 #include <sys/ipc.h>
+#include <sys/msg.h>
 
 iPlanillaTester2do::iPlanillaTester2do(int id) {
     idTester = id;
@@ -13,7 +14,8 @@ iPlanillaTester2do::iPlanillaTester2do(const iPlanillaTester2do& orig) {
 
 iPlanillaTester2do::~iPlanillaTester2do() {
 }
-void iPlanillaTesterRespuesta::iniciarProcesamientoDeResultados(){
+
+void iPlanillaTester2do::iniciarProcesamientoDeResultados(){
     requerimiento_planilla_t requerimiento;
     requerimiento.tester = idTester;
     requerimiento.tipoReq = REQUERIMIENTO_PROCESAR_SIGUIENTE;
@@ -22,7 +24,7 @@ void iPlanillaTesterRespuesta::iniciarProcesamientoDeResultados(){
     msgsnd(cola,&requerimiento, sizeof(requerimiento_planilla_t) - sizeof(long),0);
 }
 
-void iPlanillaTesterRespuesta::procesarSiguiente(){
+void iPlanillaTester2do::procesarSiguiente(){
     requerimiento_planilla_t requerimiento;
     requerimiento.tester = idTester;
     requerimiento.tipoReq = REQUERIMIENTO_PROCESAR_SIGUIENTE;

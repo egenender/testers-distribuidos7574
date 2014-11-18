@@ -18,7 +18,7 @@ DISP_OBJ=$(DISP_SOURCES:.cpp=.o)
 DISP_BIN=$(BINF)/dispositivo
 
 TESTER_SOURCES=src/Testeador.cpp
-TESTER_OBJ=$(TESTER_ESP_SOURCES:.cpp=.o)
+TESTER_OBJ=$(TESTER_SOURCES:.cpp=.o)
 TESTER_BIN=$(BINF)/tester
 
 TECNICO_SOURCES=src/Tecnico.cpp

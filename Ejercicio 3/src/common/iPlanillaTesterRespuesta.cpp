@@ -1,6 +1,7 @@
-#include "iPlanillaTesterB.h"
-#include <sys/ipc.h>
+#include "iPlanillaTesterRespuesta.h"
 #include "common.h"
+#include <sys/ipc.h>
+#include <sys/msg.h>
 
 iPlanillaTesterRespuesta::iPlanillaTesterRespuesta(int id) {
     idTester = id;
@@ -14,7 +15,7 @@ iPlanillaTesterRespuesta::iPlanillaTesterRespuesta(const iPlanillaTesterRespuest
 iPlanillaTesterRespuesta::~iPlanillaTesterRespuesta() {
 }
 
-void iPlanillaTesterRespuesta::eliminarDispositivo(int iDdispositivo){
+void iPlanillaTesterRespuesta::eliminarDispositivo(int idDispositivo){
     requerimiento_planilla_t requerimiento;
     requerimiento.tester = idTester;
     requerimiento.tipoReq = REQUERIMIENTO_ELIMINAR_DISPOSITIVO;
