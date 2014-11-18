@@ -1,34 +1,76 @@
 #include "Planilla.h"
 #include <cstdlib>
 #include "ipc/Semaphore.h"
+#include "logger/Logger.h"
 #include "planilla_local.h"
 #include "common.h"
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <sys/msg.h>
+#include <cerrno>
+#include <cstring>
 
 Planilla::Planilla(int idTester) :
         mutex_planilla_general(SEM_PLANILLA_GENERAL),
         mutex_planilla_local(SEM_PLANILLA_LOCAL + idTester),
         sem_tester_primero(SEM_TESTER_A + idTester),
         sem_tester_segundo(SEM_TESTER_B + idTester),
-        sem_tester_resultado(SEM_TESTER_RESULTADO + idTester) {
+        sem_tester_resultado(SEM_TESTER_RESULTADO + idTester),
+        cola( -1 ),
+        m_IdShmLocal( -1 ),
+        m_IdShmGeneral( -1 ) {
+    //Semaforos
     this->mutex_planilla_general.getSem();
     this->mutex_planilla_local.getSem();
     this->sem_tester_primero.getSem();
     this->sem_tester_resultado.getSem();
     this->sem_tester_segundo.getSem();
 
+    //Shared memory local
     key_t key = ftok(ipcFileName.c_str(), SHM_PLANILLA_LOCAL + idTester);
-    int shmlocalid = shmget(key, sizeof (planilla_local_t), 0660);
-    //verificacion de errores
-    this->shm_planilla_local = static_cast<planilla_local_t*>( shmat(shmlocalid, NULL, 0) );
+    if(key == -1) {
+        std::string err("Error al conseguir la key de la shmem local de la planilla. Error: " + std::string(strerror(errno)));
+        Logger::error(err.c_str(), __FILE__);
+        throw err;
+    }
+    m_IdShmLocal = shmget(key, sizeof (planilla_local_t), 0660);
+    if(m_IdShmLocal == -1) {
+        std::string err("Error al conseguir la memoria compartida general de la planilla. Error: " + std::string(strerror(errno)));
+        Logger::error(err.c_str(), __FILE__);
+        throw err;
+    }
+    this->shm_planilla_local = static_cast<planilla_local_t*>( shmat(m_IdShmLocal, NULL, 0) );
+    if ( this->shm_planilla_local != (void*) -1 ) {
+        Logger::debug("Memoria compartida local de la planilla creada correctamente", __FILE__);
+    } else {
+        std::string err = std::string("Error en shmat() de memoria local de la planilla. Error: ") + std::string(strerror(errno));
+        Logger::error(err, __FILE__);
+        throw err;
+    }
 
+    //Shared memory general
     key = ftok(ipcFileName.c_str(), SHM_PLANILLA_GENERAL);
-    int shmGeneralId = shmget(key, sizeof (int), 0660);
-    //verificacion de errores
-    this->shm_planilla_general = static_cast<int*>( shmat(shmGeneralId, NULL, 0) );
+    if(key == -1) {
+        std::string err("Error al conseguir la key de la shmem general de la planilla. Error: " + std::string(strerror(errno)));
+        Logger::error(err.c_str(), __FILE__);
+        throw err;
+    }
+    m_IdShmGeneral = shmget(key, sizeof (int), 0660);
+    if(m_IdShmGeneral == -1) {
+        std::string err("Error al conseguir la memoria compartida general de la planilla. Error: " + std::string(strerror(errno)));
+        Logger::error(err.c_str(), __FILE__);
+        throw err;
+    }
+    this->shm_planilla_general = static_cast<int*>( shmat(m_IdShmGeneral, NULL, 0) );
+    if ( this->shm_planilla_general != (void*) -1 ) {
+        Logger::debug("Memoria compartida general de la planilla creada correctamente", __FILE__);
+    } else {
+        std::string err = std::string("Error en shmat() de memoria local de la planilla. Error: ") + std::string(strerror(errno));
+        Logger::error(err, __FILE__);
+        throw err;
+    }
 
+    //Cola de mensajes
     key = ftok(ipcFileName.c_str(), MSGQUEUE_PLANILLA);
     this->cola = msgget(key, IPC_CREAT);
 }
@@ -133,3 +175,35 @@ void Planilla::eliminar(int disp) {
     (*this->shm_planilla_general) = (*this->shm_planilla_general) - 1;
     this->mutex_planilla_general.v();
 }
+
+bool Planilla::destruirCola(){
+    return msgctl(this->cola, IPC_RMID, (struct msqid_ds*)0) != -1;
+}
+
+bool Planilla::destruirMemoriaGeneral() {
+    return (shmctl(m_IdShmGeneral, IPC_RMID, NULL) != -1);
+}
+
+bool Planilla::destruirMemoriaLocal() {
+    return (shmctl(m_IdShmLocal, IPC_RMID, NULL) != -1);
+}
+
+bool Planilla::destruirSemaforoGeneral(){
+    return mutex_planilla_general.eliSem();
+}
+
+bool Planilla::destruirSemaforosLocales( std::string& msjError ) {
+
+    msjError = "";
+    if( !mutex_planilla_local.eliSem() )
+        msjError += "No se pudo eliminar el semaforo de la planilla local";
+    if( !sem_tester_primero.eliSem() )
+        msjError += "No se pudo eliminar el semaforo del primer tester";
+    if( !sem_tester_segundo.eliSem() )
+        msjError += "No se pudo eliminar el semaforo del segundo tester";
+    if( !sem_tester_resultado.eliSem() )
+        msjError += "No se pudo eliminar el semaforo de los resultados";
+    return msjError == "";
+}
+
+

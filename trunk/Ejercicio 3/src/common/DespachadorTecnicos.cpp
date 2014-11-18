@@ -39,5 +39,6 @@ int DespachadorTecnicos::recibirOrden() {
 
 bool DespachadorTecnicos::destruirComunicacion() {
 
-	return (msgctl(this->msgQueueId, IPC_RMID, (struct msqid_ds*)0) != -1);
+    return (msgctl(this->msgQueueId, IPC_RMID, (struct msqid_ds*)0) != -1);
 }
+
