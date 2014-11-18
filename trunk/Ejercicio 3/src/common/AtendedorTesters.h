@@ -23,10 +23,10 @@ public:
     AtendedorTesters();
     AtendedorTesters(const AtendedorTesters& orig);
     virtual ~AtendedorTesters();
-    
+
     int recibirRequerimiento();
     int recibir2doRequerimiento();
-    void enviarPrograma(int idDispositivo, int idPrograma);  // Tester -> Disp
+    void enviarPrograma(int idDispositivo, int idTester, int idPrograma);  // Tester -> Disp
     resultado_test_t recibirResultado(int idTester);
     void enviarOrden(int idDispositivo, int orden); // Tester -> Disp: Reinicio o apagado
 

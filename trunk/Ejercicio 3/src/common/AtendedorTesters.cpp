@@ -4,16 +4,16 @@ AtendedorTesters::AtendedorTesters() {
     key_t key;
     key = ftok(ipcFileName.c_str(), MSGQUEUE_NUEVO_REQUERIMIENTO);
     this->cola_requerimiento = msgget(key, 0666 | IPC_CREAT);
-    if(this->msgQueueId == -1) {
-	std::string err = std::string("Error al obtener la cola del atendedor de testers. Errno: ") + std::string(strerror(errno));
+    if(this->cola_requerimiento == -1) {
+        std::string err = std::string("Error al obtener la cola de requerimientos del atendedor de testers. Errno: ") + std::string(strerror(errno));
         throw std::string(err.c_str());
     }
     
     key = ftok(ipcFileName.c_str(), MSGQUEUE_LECTURA_RESULTADOS);
     this->cola_recibos_tests = msgget(key, 0666 | IPC_CREAT);
-    if(this->msgQueueId == -1) {
-        msgctl(this->cola_requerimiento, IPC_RMID, (struct msqid_ds*)0);
-	std::string err = std::string("Error al obtener la cola del atendedor de testers. Errno: ") + std::string(strerror(errno));
+    if(this->cola_recibos_tests == -1) {
+        msgctl(this->cola_requerimiento, IPC_RMID, (struct msqid_ds*)0); //TODO Esto no le incumbe, es cosa del finalizador
+        std::string err = std::string("Error al obtener la cola del atendedor de testers. Errno: ") + std::string(strerror(errno));
         throw std::string(err.c_str());
     }
     

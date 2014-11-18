@@ -1,5 +1,4 @@
-#ifndef IPLANILLATESTERB_H
-#define	IPLANILLATESTERB_H
+#pragma once
 
 class iPlanillaTesterRespuesta {
 private:
@@ -14,6 +13,4 @@ public:
     void procesarSiguiente();
 
 };
-
-#endif	/* IPLANILLATESTERB_H */
 

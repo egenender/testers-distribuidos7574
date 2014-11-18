@@ -35,12 +35,13 @@ void AtendedorDispositivos::enviarRequerimiento(int idDispositivo) {
     }
 }
 
-void AtendedorDispositivos::enviar1erRespuesta(int idDispositivo) {
+void AtendedorDispositivos::enviar1erRespuesta(int idDispositivo, int resultado) {
 
     TMessageAtendedor msg;
     msg.mtype = MTYPE_REQUERIMIENTO_SEGUNDO;
     msg.idDispositivo = idDispositivo;
-    
+    msg.value = resultado;
+
     int ret = msgsnd(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
         std::string error("Error al enviar mensaje al atendedor. Error: " + errno);
