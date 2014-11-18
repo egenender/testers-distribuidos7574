@@ -16,6 +16,8 @@ private:
     Semaphore sem_tester_resultado;
 
     int cola;
+    int m_IdShmLocal;
+    int m_IdShmGeneral;
 
 public:
     Planilla(int tester);
@@ -27,5 +29,10 @@ public:
     void iniciarProcesamientoResultadosParciales();
 
     void eliminar(int idDispositivo);
+    bool destruirCola();
+    bool destruirMemoriaGeneral();
+    bool destruirMemoriaLocal();
+    bool destruirSemaforoGeneral();
+    bool destruirSemaforosLocales( std::string& msjError );
 };
 

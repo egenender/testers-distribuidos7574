@@ -100,5 +100,16 @@ void AtendedorTesters::enviarOrden(int idDispositivo, int orden) {
 
 bool AtendedorTesters::destruirComunicacion() {
 
-    return (msgctl(this->cola_recibos_tests, IPC_RMID, (struct msqid_ds*)0) != -1 && msgctl(this->cola_requerimiento, IPC_RMID, (struct msqid_ds*)0) != -1);
+    bool colaRequerimientosBorrada = msgctl(this->cola_requerimiento, IPC_RMID,     (struct msqid_ds*)0) != -1;
+    if( !colaRequerimientosBorrada ){
+        std::string error = std::string("Error al eliminar cola de requerimientos. Error: ") + std::string(strerror(errno));
+        Logger::error(error.c_str(), __FILE__);
+    }
+    bool colaRecibosBorrada = msgctl(this->cola_recibos_tests, IPC_RMID, (struct msqid_ds*)0) != -1;
+    if( !colaRecibosBorrada ){
+        std::string error = std::string("Error al eliminar cola de recibos. Error: ") + std::string(strerror(errno));
+        Logger::error(error.c_str(), __FILE__);
+    }
+    return (colaRequerimientosBorrada && colaRecibosBorrada);
 }
+
