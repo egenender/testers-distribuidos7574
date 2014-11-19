@@ -25,14 +25,15 @@ void createIPCObjects( const Configuracion& config );
 void createSystemProcesses( const Configuracion& config );
 
 int main( int argc, char** argv ){
+
+    Logger::initialize(Constantes::ARCHIVO_LOG.c_str(), Logger::LOG_DEBUG);
+    Logger::notice("Logger inicializado. Inicializando IPCs...", __FILE__);
+    
     Configuracion config;
     if( !config.LeerDeArchivo() ){
         Logger::error("Archivo de configuracion no encontrado", __FILE__);
         return 1;
     }
-
-    Logger::initialize(Constantes::ARCHIVO_LOG.c_str(), Logger::LOG_DEBUG);
-    Logger::notice("Logger inicializado. Inicializando IPCs...", __FILE__);
 
     try {
         createIPCObjects( config );
