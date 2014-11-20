@@ -1,21 +1,20 @@
 #include "AtendedorDispositivos.h"
+#include "Configuracion.h"
 
-AtendedorDispositivos::AtendedorDispositivos() { 
-    key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_NUEVO_REQUERIMIENTO);
+AtendedorDispositivos::AtendedorDispositivos( const Configuracion& config ) { 
+    const std::string archivoIpcs = config.ObtenerParametroString( Constantes::NombresDeParametros::ARCHIVO_IPCS );
+    key_t key = ftok( archivoIpcs.c_str(), config.ObtenerParametroEntero( Constantes::NombresDeParametros::MSGQUEUE_NUEVO_REQUERIMIENTO ) );
     this->cola_requerimiento = msgget(key, 0666 | IPC_CREAT);
     if(this->cola_requerimiento == -1) {
         throw std::string("Error al obtener la cola del atendedor de dispositivos. Errno: " + errno);
     }
     
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_ESCRITURA_RESULTADOS);
+    key = ftok( archivoIpcs.c_str(), config.ObtenerParametroEntero( Constantes::NombresDeParametros::MSGQUEUE_ESCRITURA_RESULTADOS ) );
     this->cola_tests = msgget(key, 0666 | IPC_CREAT);
     if(this->cola_tests == -1) {
         msgctl(this->cola_requerimiento, IPC_RMID, (struct msqid_ds*)0);
         throw std::string("Error al obtener la cola del atendedor de dispositivos. Errno: " + errno);
     }
-}
-
-AtendedorDispositivos::AtendedorDispositivos(const AtendedorDispositivos& orig) {
 }
 
 AtendedorDispositivos::~AtendedorDispositivos() {
@@ -24,7 +23,7 @@ AtendedorDispositivos::~AtendedorDispositivos() {
 void AtendedorDispositivos::enviarRequerimiento(int idDispositivo) {
 
     TMessageAtendedor msg;
-    msg.mtype = MTYPE_REQUERIMIENTO;
+    msg.mtype = Constantes::MTYPE_REQUERIMIENTO;
     msg.idDispositivo = idDispositivo;
     
     int ret = msgsnd(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
@@ -38,7 +37,7 @@ void AtendedorDispositivos::enviarRequerimiento(int idDispositivo) {
 void AtendedorDispositivos::enviar1erRespuesta(int idDispositivo, int resultado) {
 
     TMessageAtendedor msg;
-    msg.mtype = MTYPE_REQUERIMIENTO_SEGUNDO;
+    msg.mtype = Constantes::MTYPE_REQUERIMIENTO_SEGUNDO;
     msg.idDispositivo = idDispositivo;
     msg.value = resultado;
 
@@ -58,24 +57,23 @@ int AtendedorDispositivos::recibirPrograma(int idDispositivo) {
         Logger::error(error.c_str(), __FILE__);
         throw error;
     }
-    this->ultimoTester = msg.idDispositivo; //HACE DE TESTER EN ESTE CASO.. FIXME?
+    this->ultimoTester = msg.idDispositivo; //TODO: HACE DE TESTER EN ESTE CASO.. FIXME?
     return msg.value;
-
 }
+
 void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {
 
     TMessageAtendedor msg;
     msg.mtype = this->ultimoTester;
     msg.idDispositivo = idDispositivo;
     msg.value = resultado;
-    
+
     int ret = msgsnd(this->cola_tests, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
         std::string error("Error al enviar resultado al atendedor. Error: " + errno);
         Logger::error(error.c_str(), __FILE__);
         throw error;
     }
-
 }
 
 int AtendedorDispositivos::recibirOrden(int idDispositivo) {
@@ -88,5 +86,4 @@ int AtendedorDispositivos::recibirOrden(int idDispositivo) {
         throw error;
     }
     return msg.value;
-
 }

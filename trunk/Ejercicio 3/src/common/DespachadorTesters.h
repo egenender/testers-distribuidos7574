@@ -5,8 +5,7 @@
  * Created on October 4, 2014, 10:30 PM
  */
 
-#ifndef DESPACHADORTESTERS_H
-#define	DESPACHADORTESTERS_H
+#pragma once
 
 #include <string>
 #include <cstring>
@@ -15,6 +14,8 @@
 
 #include "common.h"
 #include "../logger/Logger.h"
+
+class Configuracion;
 
 class DespachadorTesters {
 private:
@@ -26,15 +27,12 @@ private:
         int idDispositivo;
     } TMessageDespachador;
     
-public:
-    
-    DespachadorTesters();
+//Prohibo copia y asignacion
     DespachadorTesters(const DespachadorTesters& orig);
-    virtual ~DespachadorTesters();
-    
+    DespachadorTesters& operator=(const DespachadorTesters& rv);
+public:    
+    DespachadorTesters( const Configuracion& config );
+    ~DespachadorTesters();
+
     void enviarOrden(int idDispositivo);
-
 };
-
-#endif	/* DESPACHADORTESTERS_H */
-

@@ -1,15 +1,12 @@
-#ifndef _SEMAPHORE_
-#define _SEMAPHORE_
+#pragma once
 
-#include <sys/types.h>
 #include <sys/ipc.h>
-#include <sys/sem.h>
 
-#include "common/common.h"
+#include <string>
 
 class Semaphore {
 public:
-    Semaphore(int);
+    Semaphore(const std::string& fileName,int);
     bool iniSem(int);
     bool getSem();
     bool creaSem();
@@ -24,4 +21,3 @@ private:
     bool existe; // si ha sido creado
 };
 
-#endif

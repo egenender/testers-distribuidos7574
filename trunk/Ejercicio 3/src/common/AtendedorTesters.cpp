@@ -1,15 +1,19 @@
 #include "AtendedorTesters.h"
+#include "Configuracion.h"
 
-AtendedorTesters::AtendedorTesters() {
+AtendedorTesters::AtendedorTesters( const Configuracion& config ) {
+    const std::string archivoIpcs = config.ObtenerParametroString(Constantes::NombresDeParametros::ARCHIVO_IPCS);
     key_t key;
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_NUEVO_REQUERIMIENTO);
+    key = ftok( archivoIpcs.c_str(),
+                config.ObtenerParametroEntero(Constantes::NombresDeParametros::MSGQUEUE_NUEVO_REQUERIMIENTO) );
     this->cola_requerimiento = msgget(key, 0666 | IPC_CREAT);
     if(this->cola_requerimiento == -1) {
         std::string err = std::string("Error al obtener la cola de requerimientos del atendedor de testers. Errno: ") + std::string(strerror(errno));
         throw std::string(err.c_str());
     }
     
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_LECTURA_RESULTADOS);
+    key = ftok( archivoIpcs.c_str(),
+                config.ObtenerParametroEntero(Constantes::NombresDeParametros::MSGQUEUE_LECTURA_RESULTADOS) );
     this->cola_recibos_tests = msgget(key, 0666 | IPC_CREAT);
     if(this->cola_recibos_tests == -1) {
         msgctl(this->cola_requerimiento, IPC_RMID, (struct msqid_ds*)0); //TODO Esto no le incumbe, es cosa del finalizador
@@ -19,16 +23,13 @@ AtendedorTesters::AtendedorTesters() {
     
 }
 
-AtendedorTesters::AtendedorTesters(const AtendedorTesters& orig) {
-}
-
 AtendedorTesters::~AtendedorTesters() {
 }
 
 int AtendedorTesters::recibirRequerimiento() {
 
     TMessageAtendedor msg;
-    int ret = msgrcv(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), MTYPE_REQUERIMIENTO, 0);
+    int ret = msgrcv(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), Constantes::MTYPE_REQUERIMIENTO, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir requerimiento del atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
@@ -40,7 +41,7 @@ int AtendedorTesters::recibirRequerimiento() {
 int AtendedorTesters::recibir2doRequerimiento() {
 
     TMessageAtendedor msg;
-    int ret = msgrcv(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), MTYPE_REQUERIMIENTO_SEGUNDO, 0);
+    int ret = msgrcv(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), Constantes::MTYPE_REQUERIMIENTO_SEGUNDO, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir requerimiento del atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);

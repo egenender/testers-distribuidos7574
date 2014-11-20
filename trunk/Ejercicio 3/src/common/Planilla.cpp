@@ -35,7 +35,7 @@ Planilla::Planilla(int idTester) :
     }
     m_IdShmLocal = shmget(key, sizeof (planilla_local_t), 0660);
     if(m_IdShmLocal == -1) {
-        std::string err("Error al conseguir la memoria compartida general de la planilla. Error: " + std::string(strerror(errno)));
+        std::string err("Error al conseguir la memoria compartida local de la planilla. Error: " + std::string(strerror(errno)));
         Logger::error(err.c_str(), __FILE__);
         throw err;
     }
@@ -65,7 +65,7 @@ Planilla::Planilla(int idTester) :
     if ( this->shm_planilla_general != (void*) -1 ) {
         Logger::debug("Memoria compartida general de la planilla creada correctamente", __FILE__);
     } else {
-        std::string err = std::string("Error en shmat() de memoria local de la planilla. Error: ") + std::string(strerror(errno));
+        std::string err = std::string("Error en shmat() de memoria general de la planilla. Error: ") + std::string(strerror(errno));
         Logger::error(err, __FILE__);
         throw err;
     }

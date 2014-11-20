@@ -1,10 +1,11 @@
 #include "Semaphore.h"
+#include <sys/sem.h>
 
 using namespace std;
 
-Semaphore::Semaphore(int identificador) {
+Semaphore::Semaphore( const string& fileName, int identificador) {
     this->identificador = identificador;
-    key = ftok(ipcFileName.c_str(),identificador);
+    key = ftok(fileName.c_str(),identificador);
 }
 
  // crear un semaforo que no existe
@@ -61,5 +62,5 @@ bool Semaphore::p() {
 
 // eliminar el semáforo del sistema
 bool Semaphore::eliSem() {
-    return(semctl(semid,0,IPC_RMID,(struct semid_ds*)0) == -1);
+    return(semctl(semid,0,IPC_RMID) != -1);
 }

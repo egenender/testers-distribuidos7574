@@ -7,17 +7,19 @@
 
 #pragma once
 
+class Configuracion;
+
 class iPlanillaTester2do {
 private:
     int idTester;
     int cola;
-public:
-    iPlanillaTester2do(int id);
+//Prohibo copia y asignacion
     iPlanillaTester2do(const iPlanillaTester2do& orig);
+    iPlanillaTester2do& operator=(const iPlanillaTester2do& rv);
+public:
+    iPlanillaTester2do(int id, const Configuracion& config);
+    
     virtual ~iPlanillaTester2do();
     void iniciarProcesamientoDeResultados();
-    void procesarSiguiente();
-
-    
+    void procesarSiguiente();    
 };
-
