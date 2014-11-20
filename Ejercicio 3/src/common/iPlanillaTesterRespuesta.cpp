@@ -1,11 +1,13 @@
 #include "iPlanillaTesterRespuesta.h"
+#include "Configuracion.h"
 #include "common.h"
 #include <sys/ipc.h>
 #include <sys/msg.h>
 
-iPlanillaTesterRespuesta::iPlanillaTesterRespuesta(int id) {
+iPlanillaTesterRespuesta::iPlanillaTesterRespuesta(int id, const Configuracion& config) {
     idTester = id;
-    key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_PLANILLA);
+    key_t key = ftok( config.ObtenerParametroString( Constantes::NombresDeParametros::ARCHIVO_IPCS ).c_str(),
+                      config.ObtenerParametroEntero( Constantes::NombresDeParametros::MSGQUEUE_PLANILLA ));
     this->cola = msgget(key, IPC_CREAT);
 }
 
@@ -18,7 +20,7 @@ iPlanillaTesterRespuesta::~iPlanillaTesterRespuesta() {
 void iPlanillaTesterRespuesta::eliminarDispositivo(int idDispositivo){
     requerimiento_planilla_t requerimiento;
     requerimiento.tester = idTester;
-    requerimiento.tipoReq = REQUERIMIENTO_ELIMINAR_DISPOSITIVO;
+    requerimiento.tipoReq = Constantes::REQUERIMIENTO_ELIMINAR_DISPOSITIVO;
     requerimiento.idDispositivo = idDispositivo;
     
     msgsnd(cola,&requerimiento, sizeof(requerimiento_planilla_t) - sizeof(long),0);
@@ -28,7 +30,7 @@ void iPlanillaTesterRespuesta::eliminarDispositivo(int idDispositivo){
 void iPlanillaTesterRespuesta::iniciarProcesamientoDeResultados(){
     requerimiento_planilla_t requerimiento;
     requerimiento.tester = idTester;
-    requerimiento.tipoReq = REQUERIMIENTO_ELIMINAR_DISPOSITIVO;
+    requerimiento.tipoReq = Constantes::REQUERIMIENTO_ELIMINAR_DISPOSITIVO;
     requerimiento.idDispositivo = 0;
     
     msgsnd(cola,&requerimiento, sizeof(requerimiento_planilla_t) - sizeof(long),0);
@@ -37,7 +39,7 @@ void iPlanillaTesterRespuesta::iniciarProcesamientoDeResultados(){
 void iPlanillaTesterRespuesta::procesarSiguiente(){
     requerimiento_planilla_t requerimiento;
     requerimiento.tester = idTester;
-    requerimiento.tipoReq = REQUERIMIENTO_ELIMINAR_DISPOSITIVO;
+    requerimiento.tipoReq = Constantes::REQUERIMIENTO_ELIMINAR_DISPOSITIVO;
     requerimiento.idDispositivo = 0;
     
     msgsnd(cola,&requerimiento, sizeof(requerimiento_planilla_t) - sizeof(long),0);

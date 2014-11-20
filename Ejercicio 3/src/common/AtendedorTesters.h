@@ -1,5 +1,4 @@
-#ifndef ATENDEDORTESTERS_H
-#define	ATENDEDORTESTERS_H
+#pragma once
 
 #include <cstring>
 #include <sys/msg.h>
@@ -7,6 +6,8 @@
 
 #include "../logger/Logger.h"
 #include "common.h"
+
+class Configuracion;
 
 class AtendedorTesters {
 private:
@@ -19,10 +20,13 @@ private:
         int value; // Este parametro posee el valor del requerimiento, del programa y del resultado
     } TMessageAtendedor;
     
-public:
-    AtendedorTesters();
+//Prohibo copia y asignacion
     AtendedorTesters(const AtendedorTesters& orig);
-    virtual ~AtendedorTesters();
+    AtendedorTesters& operator=(const AtendedorTesters& rv);
+    
+public:
+    AtendedorTesters( const Configuracion& config );    
+    ~AtendedorTesters();
 
     int recibirRequerimiento();
     int recibir2doRequerimiento();
@@ -34,5 +38,4 @@ public:
 
 };
 
-#endif	/* ATENDEDORTESTERS_H */
 

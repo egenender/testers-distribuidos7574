@@ -5,21 +5,23 @@
  * Created on October 11, 2014, 2:06 PM
  */
 
-#ifndef IPLANILLATESTERA_H
-#define	IPLANILLATESTERA_H
+#pragma once
+
+class Configuracion;
 
 class iPlanillaTester1ro {
 private:
     int idTester;
     int cola;
-public:
-    iPlanillaTester1ro(int id);
+    
+//Prohibo copia y asignacion
     iPlanillaTester1ro(const iPlanillaTester1ro& orig);
-    virtual ~iPlanillaTester1ro();
+    iPlanillaTester1ro& operator=(const iPlanillaTester1ro& rv);
+
+public:
+    iPlanillaTester1ro(int id, const Configuracion& config);
+    ~iPlanillaTester1ro();
     bool agregar(int idDispositivo);
     void terminoRequerimientoPendiente(int idDispositivo);
     
 };
-
-#endif	/* IPLANILLATESTERA_H */
-
