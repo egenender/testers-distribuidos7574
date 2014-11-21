@@ -6,19 +6,17 @@
  */
 
 #include "DespachadorTecnicos.h"
+#include "Configuracion.h"
 
-DespachadorTecnicos::DespachadorTecnicos() {
+DespachadorTecnicos::DespachadorTecnicos( const Configuracion& config ) {
 
-    key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_DESPACHADOR);
+    key_t key = ftok( config.ObtenerParametroString(Constantes::NombresDeParametros::ARCHIVO_IPCS).c_str(),
+                      config.ObtenerParametroEntero(Constantes::NombresDeParametros::MSGQUEUE_DESPACHADOR) );
     this->msgQueueId = msgget(key, 0666 | IPC_CREAT); 
     if(this->msgQueueId == -1) {
-	std::string error = std::string("Error creando la cola de mensajes del despachador. Errno = ") + std::string(strerror(errno));
+        std::string error = std::string("Error creando la cola de mensajes del despachador. Errno = ") + std::string(strerror(errno));
         throw error;
     }
-    
-}
-
-DespachadorTecnicos::DespachadorTecnicos(const DespachadorTecnicos& orig) {
 }
 
 DespachadorTecnicos::~DespachadorTecnicos() {

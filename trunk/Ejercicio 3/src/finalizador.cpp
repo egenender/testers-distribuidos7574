@@ -12,6 +12,7 @@
 #include "common/DespachadorTecnicos.h"
 #include "common/Planilla.h"
 #include "common/Programa.h"
+#include "common/Configuracion.h"
 #include "common/common.h"
 #include <cstdlib>
 #include <cerrno>
@@ -19,23 +20,30 @@
 
 int main( int argc, char** argv ){
 
-    Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
+    Logger::initialize(Constantes::ARCHIVO_LOG.c_str(), Logger::LOG_DEBUG);
     Logger::notice("Logger inicializado. Destruyendo IPCs...", __FILE__);
+    
+    Configuracion config;
+    if( !config.LeerDeArchivo() ){
+        Logger::error("Archivo de configuracion no encontrado", __FILE__);
+        return 1;
+    }
 
     // Creo objeto atendedor para destruir sus ipcs
-    AtendedorTesters atendedor;
+    AtendedorTesters atendedor( config );
     if( !atendedor.destruirComunicacion() ) {
         Logger::error("No se pudo destruir la cola de mensajes del atendedor...", __FILE__);
     }
 
     // Creo objeto despachador para destruir sus ipcs
-    DespachadorTecnicos despachador;
+    DespachadorTecnicos despachador( config );
     if( !despachador.destruirComunicacion() ) {
         Logger::error("No se pudo destruir la cola de mensajes del despachador...", __FILE__);
     }
 
     //Shared memory general de planilla: la destruyo a traves de una instancia asociada al primer tester
-    Planilla planilla( ID_TESTER_START );
+    const int iTesterStart = config.ObtenerParametroEntero( Constantes::NombresDeParametros::ID_TESTER_START );
+    Planilla planilla( iTesterStart, config );
     if( !planilla.destruirMemoriaGeneral() ){
         Logger::error("No se pudo destruir la shared memory general de la planilla...", __FILE__);
     }
@@ -49,8 +57,9 @@ int main( int argc, char** argv ){
     }
 
     //Semaforos y shms locales de planillas
-    for( int iTester=ID_TESTER_START; iTester<ID_TESTER_START+CANT_TESTERS;iTester++ ){
-        Planilla planilla( iTester );
+    const int cantTesters = config.ObtenerParametroEntero( Constantes::NombresDeParametros::CANT_TESTERS );
+    for( int iTester=iTesterStart; iTester<(iTesterStart+cantTesters); iTester++ ){
+        Planilla planilla( iTester, config );
         if (!planilla.destruirMemoriaLocal()) {
             Logger::error("No se pudo destruir la memoria compartida de la planilla...", __FILE__);
         }
@@ -60,7 +69,7 @@ int main( int argc, char** argv ){
         }
     }
 
-    unlink( ipcFileName.c_str() );
+    unlink( config.ObtenerParametroString( Constantes::NombresDeParametros::ARCHIVO_IPCS ).c_str() );
 
     Logger::notice("IPCs eliminados...", __FILE__);
 

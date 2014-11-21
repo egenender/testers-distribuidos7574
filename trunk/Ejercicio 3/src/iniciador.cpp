@@ -80,12 +80,11 @@ void createIPCObjects( const Configuracion& config ) {
     int iTesterStart = config.ObtenerParametroEntero( Constantes::NombresDeParametros::ID_TESTER_START );
     int cantTesters = config.ObtenerParametroEntero( Constantes::NombresDeParametros::CANT_TESTERS );
     for( int iTester=iTesterStart; iTester < iTesterStart + cantTesters; iTester++ ){
-        Planilla planilla( iTester );
+        Planilla planilla( iTester, config );
     }
 
     // Creo la cola de mensajes entre tester y tecnico
-    DespachadorTecnicos despachador;
-
+    DespachadorTecnicos despachador( config );
 }
 
 void createSystemProcesses( const Configuracion& config ) {

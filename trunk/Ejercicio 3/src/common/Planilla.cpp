@@ -1,4 +1,5 @@
 #include "Planilla.h"
+#include "Configuracion.h"
 #include <cstdlib>
 #include "ipc/Semaphore.h"
 #include "logger/Logger.h"
@@ -10,15 +11,21 @@
 #include <cerrno>
 #include <cstring>
 
-Planilla::Planilla(int idTester) :
-        mutex_planilla_general(SEM_PLANILLA_GENERAL),
-        mutex_planilla_local(SEM_PLANILLA_LOCAL + idTester),
-        sem_tester_primero(SEM_TESTER_A + idTester),
-        sem_tester_segundo(SEM_TESTER_B + idTester),
-        sem_tester_resultado(SEM_TESTER_RESULTADO + idTester),
+Planilla::Planilla(int idTester, const Configuracion& config) :
+        mutex_planilla_general( config.ObtenerParametroString( Constantes::NombresDeParametros::ARCHIVO_IPCS ),
+                                config.ObtenerParametroEntero(Constantes::NombresDeParametros::SEM_PLANILLA_GENERAL) ),
+        mutex_planilla_local( config.ObtenerParametroString( Constantes::NombresDeParametros::ARCHIVO_IPCS ),
+                              config.ObtenerParametroEntero(Constantes::NombresDeParametros::SEM_PLANILLA_LOCAL) + idTester ),
+        sem_tester_primero( config.ObtenerParametroString( Constantes::NombresDeParametros::ARCHIVO_IPCS ),
+                            config.ObtenerParametroEntero(Constantes::NombresDeParametros::SEM_TESTER_A) + idTester ),
+        sem_tester_segundo( config.ObtenerParametroString( Constantes::NombresDeParametros::ARCHIVO_IPCS ),
+                            config.ObtenerParametroEntero(Constantes::NombresDeParametros::SEM_TESTER_B) + idTester ),
+        sem_tester_resultado( config.ObtenerParametroString( Constantes::NombresDeParametros::ARCHIVO_IPCS ),
+                              config.ObtenerParametroEntero(Constantes::NombresDeParametros::SEM_TESTER_RESULTADO) + idTester ),
         cola( -1 ),
         m_IdShmLocal( -1 ),
-        m_IdShmGeneral( -1 ) {
+        m_IdShmGeneral( -1 ),
+        m_MaxDispositivosLocales( config.ObtenerParametroEntero(Constantes::NombresDeParametros::MAX_DISPOSITIVOS_POR_TESTER) ) {
     //Semaforos
     this->mutex_planilla_general.getSem();
     this->mutex_planilla_local.getSem();
@@ -27,7 +34,8 @@ Planilla::Planilla(int idTester) :
     this->sem_tester_segundo.getSem();
 
     //Shared memory local
-    key_t key = ftok(ipcFileName.c_str(), SHM_PLANILLA_LOCAL + idTester);
+    const std::string archivoIpcs = config.ObtenerParametroString( Constantes::NombresDeParametros::ARCHIVO_IPCS ).c_str();
+    key_t key = ftok( archivoIpcs.c_str(), config.ObtenerParametroEntero(Constantes::NombresDeParametros::SHM_PLANILLA_LOCAL) + idTester);
     if(key == -1) {
         std::string err("Error al conseguir la key de la shmem local de la planilla. Error: " + std::string(strerror(errno)));
         Logger::error(err.c_str(), __FILE__);
@@ -49,7 +57,7 @@ Planilla::Planilla(int idTester) :
     }
 
     //Shared memory general
-    key = ftok(ipcFileName.c_str(), SHM_PLANILLA_GENERAL);
+    key = ftok(archivoIpcs.c_str(), config.ObtenerParametroEntero(Constantes::NombresDeParametros::SHM_PLANILLA_GENERAL));
     if(key == -1) {
         std::string err("Error al conseguir la key de la shmem general de la planilla. Error: " + std::string(strerror(errno)));
         Logger::error(err.c_str(), __FILE__);
@@ -71,7 +79,7 @@ Planilla::Planilla(int idTester) :
     }
 
     //Cola de mensajes
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_PLANILLA);
+    key = ftok(archivoIpcs.c_str(), config.ObtenerParametroEntero(Constantes::NombresDeParametros::MSGQUEUE_PLANILLA));
     this->cola = msgget(key, IPC_CREAT);
 }
 
@@ -83,7 +91,7 @@ void Planilla::agregar(int aQuien) {
     respuesta_lugar_t respuesta;
     respuesta.mtype = aQuien;
     this->mutex_planilla_local.p();
-    if ( this->shm_planilla_local->cantidad == MAX_DISPOSITIVOS) {
+    if ( this->shm_planilla_local->cantidad == m_MaxDispositivosLocales ) {
         mutex_planilla_local.v();
         respuesta.respuesta = false;
         msgsnd(cola, &respuesta, sizeof (respuesta_lugar_t) - sizeof (long), 0);
