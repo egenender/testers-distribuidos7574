@@ -5,8 +5,7 @@
  * Created on October 4, 2014, 10:28 PM
  */
 
-#ifndef RESULTADO_H
-#define	RESULTADO_H
+#pragma once
 
 #include "./common.h"
 
@@ -16,9 +15,6 @@ public:
     Resultado(const Resultado& orig);
     virtual ~Resultado();
     
-    static int esGrave(int resultado) {return (resultado == RESULTADO_GRAVE);};
+    static bool esGrave(int resultado) { return (resultado == Constantes::RESULTADO_GRAVE); };
     
 };
-
-#endif	/* RESULTADO_H */
-

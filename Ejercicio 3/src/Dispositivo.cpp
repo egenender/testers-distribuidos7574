@@ -2,6 +2,7 @@
 #include <sstream>
 
 #include "common/AtendedorDispositivos.h"
+#include "common/Configuracion.h"
 #include "logger/Logger.h"
 #include "common/common.h"
 
@@ -12,17 +13,23 @@ using namespace std;
  */
 int main(int argc, char** argv) {
 
-    Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
+    Logger::initialize(Constantes::ARCHIVO_LOG.c_str(), Logger::LOG_DEBUG);
     // Por parametro se recibe el ID del dispositivo
     int id = atoi(argv[1]);
-
+    
     std::stringstream ss;
     ss << "El dispositivo " << id << " se crea";
     Logger::debug(ss.str().c_str(), __FILE__);
     ss.str("");
+    
+    Configuracion config;
+    if( !config.LeerDeArchivo() ){
+        Logger::error("Archivo de configuracion no encontrado", __FILE__);
+        return 1;
+    }
 
     // Comunicacion con el sistema de testeo
-    AtendedorDispositivos atendedor;
+    AtendedorDispositivos atendedor( config );
 
     // TODO: Log
 
@@ -80,7 +87,7 @@ int main(int argc, char** argv) {
             // Recibo la orden a seguir
             int orden = atendedor.recibirOrden(id);
 
-            if (orden == ORDEN_APAGADO) {
+            if (orden == Constantes::ORDEN_APAGADO) {
                 ss << "El dispositivo " << id << " recibe la orden de apagado (" << orden << "). Byebye!";
                 Logger::notice(ss.str().c_str(), __FILE__);
                 ss.str("");
