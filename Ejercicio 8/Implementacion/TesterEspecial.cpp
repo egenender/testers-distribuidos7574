@@ -41,9 +41,9 @@ int main(int argc, char** argv) {
     while(true) {
         Logger::notice("Espero por un nuevo requerimiento de testeo especial" , nombre.str().c_str());
         // Espero un requerimiento
-        int idDispositivo = atendedor.recibirRequerimientoEspecial(id);
+        TMessageAssignTE msg = atendedor.recibirRequerimientoEspecial(id);
         stringstream ss;
-		ss << idDispositivo;
+		ss << msg.idDispositivo;
 		string mensaje = "Recibido requerimiento desde dispositivo id ";
         Logger::notice(mensaje + ss.str() , nombre.str().c_str());
         ss.clear();
@@ -55,20 +55,20 @@ int main(int argc, char** argv) {
         
         do {
             tarea.resetTareas();
-            planillaAsignacion.asignarCantTareasEspeciales(idDispositivo, tarea.getCantTareasEspeciales());
+            planillaAsignacion.asignarCantTareasEspeciales(msg.posicionDispositivo, tarea.getCantTareasEspeciales());
             for (int i = 0; i < tarea.getCantTareasEspeciales(); i++) {
                 int tareaActual = tarea.getProximaTareaEspecial();
-                ss << "Envio programa de testeo especial " << tareaActual << " al dispositivo " << idDispositivo;
+                ss << "Envio programa de testeo especial " << tareaActual << " al dispositivo " << msg.idDispositivo;
                 Logger::notice(ss.str() , nombre.str().c_str());
                 ss.str("");
                 if (tareaActual == -1) break;
-                atendedor.enviarTareaEspecial(idDispositivo, id, tareaActual);
+                atendedor.enviarTareaEspecial(msg.idDispositivo, id, tareaActual, msg.posicionDispositivo);
             }
 
             ss << "Aviso que termine de enviar las " << tarea.getCantTareasEspeciales() << " tareas especiales";
             Logger::notice(ss.str() , nombre.str().c_str());
             ss.str("");
-            planillaAsignacion.avisarFinEnvioTareas(idDispositivo);
+            planillaAsignacion.avisarFinEnvioTareas(msg.posicionDispositivo);
 
             usleep( rand() % 1000 + 1000);
         } while (planillaReinicio.hayQueReiniciar(id));

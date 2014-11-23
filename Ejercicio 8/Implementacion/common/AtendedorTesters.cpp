@@ -99,12 +99,13 @@ void AtendedorTesters::enviarOrden(int idDispositivo, int orden) {
     }
 }
 
-void AtendedorTesters::enviarTareaEspecial(int idDispositivo, int idTester, int tarea) {
+void AtendedorTesters::enviarTareaEspecial(int idDispositivo, int idTester, int tarea, int posicionDispositivo) {
 
     TMessageAtendedor msg;
     msg.mtype = idDispositivo;
     msg.idDispositivo = idDispositivo;
     msg.idTester = idTester;
+    msg.posicionDispositivo = posicionDispositivo;
     msg.value = tarea;
     int ret = msgsnd(this->cola_tareas_especiales, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
@@ -116,13 +117,14 @@ void AtendedorTesters::enviarTareaEspecial(int idDispositivo, int idTester, int 
     }
 }
 
-void AtendedorTesters::enviarAEspeciales(bool cuales[], int idDispositivo){
+void AtendedorTesters::enviarAEspeciales(bool cuales[], int idDispositivo, int posicionDispositivo){
 	sem_cola_especiales.p();
 	for (int i = 0; i < CANT_TESTERS_ESPECIALES; i++){
             if (!cuales[i]) continue;
             TMessageAssignTE msg;
             msg.mtype = i + ID_TESTER_ESPECIAL_START;
             msg.idDispositivo = idDispositivo;
+            msg.posicionDispositivo = posicionDispositivo;
             std::stringstream ss;
             ss << "Se envia requerimiento especial a tester especial " << msg.mtype;
             Logger::debug(ss.str(), __FILE__);
@@ -137,7 +139,7 @@ void AtendedorTesters::enviarAEspeciales(bool cuales[], int idDispositivo){
 	sem_cola_especiales.v();
 }
 
-int AtendedorTesters::recibirRequerimientoEspecial(int idEsp) {
+TMessageAssignTE AtendedorTesters::recibirRequerimientoEspecial(int idEsp) {
 
     TMessageAssignTE msg;
     int ret = msgrcv(this->cola_testers_especiales, &msg, sizeof(TMessageAssignTE) - sizeof(long), idEsp, 0);
@@ -146,7 +148,7 @@ int AtendedorTesters::recibirRequerimientoEspecial(int idEsp) {
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
-    return msg.idDispositivo;
+    return msg;
 }
 
 bool AtendedorTesters::destruirComunicacion() {
