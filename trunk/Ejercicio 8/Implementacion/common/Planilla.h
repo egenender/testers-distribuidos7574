@@ -19,9 +19,10 @@
 class Planilla {
 private:
     Semaphore semShMem;
-    key_t shMemKey;
-    int shMemId;
+    key_t shMemKey, shMemPosicionesKey;
+    int shMemId, shMemPosicionesId;
     int* cantDispositivosSiendoTesteados;
+    bool* idsPrivadosDispositivos;
     
     int cantProcesosUsandoPlanilla();
     
@@ -31,8 +32,8 @@ public:
     Planilla(const Planilla& orig);
     virtual ~Planilla();
     
-    bool hayLugar();    // Si hay menos de 100 -> incrementa en 1 al contador
-    void eliminarDispositivo(); // Simplemente decrementa en 1 el contador en la shmem
+    int hayLugar();    // Si hay menos de 100 -> incrementa en 1 al contador y devuelve la posicion en las memorias privadas del sistema
+    void eliminarDispositivo(int posicionDispositivo); // Simplemente decrementa en 1 el contador en la shmem
 
     bool destruirMemoria();
     bool destruirSemaforo();

@@ -21,7 +21,7 @@ public:
     PlanillaAsignacionTesterComun();
     virtual ~PlanillaAsignacionTesterComun();
     
-    void asignarCantTestersEspeciales(int idDispositivo, int cantTestersEspeciales);
+    void asignarCantTestersEspeciales(int posicionDispositivo, int cantTestersEspeciales);
     
     bool destruirComunicacion();
     

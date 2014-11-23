@@ -93,6 +93,7 @@ int AtendedorDispositivos::recibirProgramaEspecial(int idDispositivo) {
         exit(0);
     }
     this->idTester = msg.idTester;
+    this->posicionDispositivo = msg.posicionDispositivo;
     return msg.value;
 }
 
@@ -104,6 +105,7 @@ void AtendedorDispositivos::enviarResultadoEspecial(int idDispositivo, int resul
     resultadoTestEspecial.mtype = MTYPE_RESULTADO_ESPECIAL;
     resultadoTestEspecial.idDispositivo = idDispositivo;
     resultadoTestEspecial.idTester = this->idTester;
+    resultadoTestEspecial.posicionDispositivo = this->posicionDispositivo;
     resultadoTestEspecial.resultado = resultado;
             
     int ret = msgsnd(this->cola_tests_especiales, &resultadoTestEspecial, sizeof(TResultadoEspecial) - sizeof(long), 0);

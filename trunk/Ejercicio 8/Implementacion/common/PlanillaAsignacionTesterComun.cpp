@@ -72,10 +72,10 @@ PlanillaAsignacionTesterComun::PlanillaAsignacionTesterComun() : semShmemCantTes
 PlanillaAsignacionTesterComun::~PlanillaAsignacionTesterComun() {
 }
 
-void PlanillaAsignacionTesterComun::asignarCantTestersEspeciales(int idDispositivo, int cantTestersEspeciales) {
+void PlanillaAsignacionTesterComun::asignarCantTestersEspeciales(int posicionDispositivo, int cantTestersEspeciales) {
 
     this->semShmemCantTesters.p();
-    this->cantTestersEspecialesAsignados[idDispositivo].cantTestersEspecialesTotal = cantTestersEspeciales;
+    this->cantTestersEspecialesAsignados[posicionDispositivo].cantTestersEspecialesTotal = cantTestersEspeciales;
     this->semShmemCantTesters.v();
 }
 

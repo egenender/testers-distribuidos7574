@@ -27,9 +27,9 @@ public:
     void enviarPrograma(int idDispositivo, int tester, int idPrograma);  // Tester -> Disp
     resultado_test_t recibirResultado(int idTester);
     void enviarOrden(int idDispositivo, int orden); // Tester -> Disp: Reinicio o apagado
-    void enviarAEspeciales(bool cuales[], int idDispositivo);
-    int recibirRequerimientoEspecial(int idEsp);
-    void enviarTareaEspecial(int idDispositivo, int idTester, int tarea);
+    void enviarAEspeciales(bool cuales[], int idDispositivo, int posicionDispositivo);
+    TMessageAssignTE recibirRequerimientoEspecial(int idEsp);
+    void enviarTareaEspecial(int idDispositivo, int idTester, int tarea, int posicionDispositivo);
 
     bool destruirComunicacion();
 

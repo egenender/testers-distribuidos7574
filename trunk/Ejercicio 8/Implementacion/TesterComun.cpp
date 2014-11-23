@@ -45,12 +45,13 @@ int main(int argc, char** argv) {
 		string mensaje = "Recibido requerimiento desde dispositivo id ";
         Logger::notice(mensaje + ss.str() , nombre.str().c_str());
         
-        if (! planilla.hayLugar()){
-			string mensaje = "No hay lugar para atender al dispositivo id ";
-			Logger::notice(mensaje + ss.str() , nombre.str().c_str());
-			atendedor.enviarPrograma(idDispositivo, id, SIN_LUGAR);
-			continue;
-		}
+        int posicionDispositivo = planilla.hayLugar();
+        if (posicionDispositivo == SIN_LUGAR){
+            string mensaje = "No hay lugar para atender al dispositivo id ";
+            Logger::notice(mensaje + ss.str() , nombre.str().c_str());
+            atendedor.enviarPrograma(idDispositivo, id, SIN_LUGAR);
+            continue;
+	}
         
         usleep( rand() % 1000 + 1000);
         Logger::notice(string("Envio programa a dispositivo ") + ss.str(), nombre.str().c_str());                  	
@@ -67,6 +68,7 @@ int main(int argc, char** argv) {
             atendedor.enviarOrden(idDispositivo, ORDEN_APAGADO);
             Logger::notice(string("Le envio al tecnico la notificacion ") + ss.str(), nombre.str().c_str());
             despachador.enviarOrden(idDispositivo);
+            planilla.eliminarDispositivo(posicionDispositivo);
         } else if (resul.result == SEGUIR_TESTEANDO){
             int cant_testers = 0;
             bool los_testers[CANT_TESTERS_ESPECIALES];
@@ -88,10 +90,11 @@ int main(int argc, char** argv) {
                             ss << i+ID_TESTER_ESPECIAL_START << " ";
             }
             Logger::notice(ss.str() , nombre.str().c_str());
-            planillaAsignacion.asignarCantTestersEspeciales(idDispositivo, cant_testers);
-            atendedor.enviarAEspeciales(los_testers, idDispositivo);
+            planillaAsignacion.asignarCantTestersEspeciales(posicionDispositivo, cant_testers);
+            atendedor.enviarAEspeciales(los_testers, idDispositivo, posicionDispositivo);
         }else{
             atendedor.enviarOrden(idDispositivo, ORDEN_REINICIO);
+            planilla.eliminarDispositivo(posicionDispositivo);
         }
                
     }

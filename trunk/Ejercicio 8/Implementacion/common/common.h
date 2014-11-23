@@ -15,7 +15,7 @@
 
 // Constantes del sistema
 
-const int CANT_DISPOSITIVOS = 49;
+const int CANT_DISPOSITIVOS = 101;
 const int CANT_TESTERS_COMUNES = 5;
 const int CANT_TESTERS_ESPECIALES = 15;
 const int ID_DISPOSITIVO_START = 50;
@@ -35,6 +35,7 @@ const int SEM_PLANILLA_CANT_TESTER_ASIGNADOS = 4;
 const int SEM_PLANILLA_CANT_TAREAS_ASIGNADAS = 5;
 const int SHM_PLANILLA_CANT_TESTER_ASIGNADOS = 6;
 const int SHM_PLANILLA_CANT_TAREAS_ASIGNADAS = 7;
+const int SHM_PLANILLA_GENERAL_POSICIONES = 8;
 
 const int MSGQUEUE_DISPOSITIVOS = 20;
 const int MSGQUEUE_TESTERS = 21;
@@ -78,6 +79,7 @@ typedef struct resultado{
 typedef struct TMessageAssignTE{
 	long mtype;
 	int idDispositivo;
+        int posicionDispositivo;
 } TMessageAssignTE;
 
 typedef struct resultado_test{
@@ -100,6 +102,7 @@ typedef struct TResultadoEspecial {
     long mtype;
     int idDispositivo;
     int idTester;
+    int posicionDispositivo;
     int resultado;
 } TResultadoEspecial;
 
@@ -113,6 +116,7 @@ typedef struct message {
     int idDispositivo;
     int idTester;
     int value; // Este parametro posee el valor del requerimiento, del programa y del resultado
+    int posicionDispositivo;
 } TMessageAtendedor;
 
 #endif	/* COMMON_H */
