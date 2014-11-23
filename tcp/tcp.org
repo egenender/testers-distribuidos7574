@@ -1,0 +1,356 @@
+#+Title: Introducción a la arquitectura Cliente-Servidor
+#+Author: Sistemas distribuidos I - 2014
+#+Email: 
+
+#+OPTIONS: reveal_center:t reveal_progress:t reveal_history:nil reveal_control:t
+#+OPTIONS: reveal_mathjax:nil reveal_rolling_links:t reveal_keyboard:t reveal_overview:t num:nil
+#+OPTIONS: reveal_width:1200 reveal_height:800
+#+OPTIONS: toc:nil
+#+OPTIONS: ^:nil
+#+REVEAL_MARGIN: 0.1
+#+REVEAL_MIN_SCALE: 0.5
+#+REVEAL_MAX_SCALE: 1.5
+#+REVEAL_TRANS: linear
+#+REVEAL_THEME: serif
+#+REVEAL_HLEVEL: 1
+#+REVEAL-SLIDE-NUMBER: t
+#+REVEAL_HEAD_PREAMBLE: <link rel="stylesheet" type="text/css" href="../../reveal.js/css/theme/fiuba.css" />
+#+REVEAL_ROOT: ../../reveal.js/
+#+COMMENT: #+REVEAL_ROOT: http://cdn.jsdelivr.net/reveal.js/2.6.2/
+
+* PRIMERA PARTE
+
+* Cliente Servidor
+
+  Un sistema Ciente-Servidor es aquel en el cual existe una clara
+  separación entre quienes realizan pedidos (y reciben respuestas) o
+  *Clientes* y quien atienden esos pedidos o *Servidor* (no
+  necesariamente uno solo).
+
+  En particular es necesario que el *Servidor* se encuentre disponible
+  antes de que aparezca el primer cliente, es decir que se requiere
+  por lo menos ese sincronismo inicial.
+
+* Funcionamiento
+
+  Siempre un *Request* precede a un *Reply*. El *Request* viaja desde
+  el *Cliente* hacia el *Servidor*. 
+  
+  [[./img/req-rep.png]]
+  
+
+* Tipos de *Servidores*
+  Si bien puede haber mas de un *Servidor* siempre la cantidad mas
+  grande es la de *Clientes*. Según la forma en que un *Servidor*
+  atiende a los *Clientes* puede clasificarse en *Iterativo* o
+  *Concurrente*.
+
+* *Servidor* iterativo
+  Es el mas sencillo de construir. El *Servidor* espera conexiones de
+  los *Clientes* y atiende solo una a la vez.
+
+#+BEGIN_SRC c++ -n
+int main(){
+    int fd = tcp_open_pasivo("0.0.0.0", 8080);
+    while(1){
+        int clientfd = accept(fd, (strunct sockadr*) NULL, NULL);
+        //Atender cliente con su file descriptor
+        close(clientfd);
+    }
+}
+#+END_SRC
+
+* *Servidor* concurrente.
+
+  El *Servidor Concurrente* es capaz de atender a los *Clientes* en
+  paralelo. Al llegar una nueva conexión, el *Servidor* puede por
+  ejemplo crear un nuevo *Thread* o *Proceso* cuya única misión es
+  atender el *Request*. Otra posibilidad es tener un *pool* de
+  *Threads* o *Procesos* e ir distribuyendo las conexiones a medida
+  que van llegando.
+
+#+BEGIN_SRC c++ -n
+int main(){
+    int fd = tcp_open_pasivo("0.0.0.0", 8080);
+    while(1){
+        int clientfd = accept(fd, (strunct sockadr*) NULL, NULL);
+
+        static char fd_string[10];
+        snprintf(fd_string, 10, "%d", client_fd);
+
+        int pid = fork();
+        if(pid == 0){
+            close(fd);
+            execlp("atender_cliente", "atender_cliente", fd_string, (void*)0);
+            exit(-1);
+        }
+        close(clientfd);
+    }
+}
+#+END_SRC
+
+* Múltiples *Servidores*
+  
+  Muchas veces es buena idea contar con mas de un *Servidor* en caso
+  de que alguno falle o para poder atender a una mayor cantidad de
+  *Clientes*. Obviamente al tener mas de un *Servidor* se nos presenta
+  un nuevo problema. ¿Cómo ubicar a los diferentes servidores y cómo
+  decidir a cuál conectarse?
+
+  La solución mas primitiva (pero no por eso poco efectiva) al
+  problema nos lo da el mismo *DNS*. Es práctica común que el
+  resolvedor *DNS* al tener varios direcciones bajo el mismo nombre
+  vaya permutando el orden de la lista en la respuesta cada vez (*DNS
+  Round Robin*). De esta forma, y en un caso ideal, cada *Servidor*
+  atiende el mismo número de *Clientes*. Adicionalmente si un
+  *Cliente* falla al conectarse al *Servidor*, si no se utilizan
+  mecanismos de cacheo locales de *DNS*, es muy posible que en la
+  reconexión intente conectarse con uno de los *Servidores*
+  alternativos.
+
+* Ejemplo de *DNS Round Robin*
+#+BEGIN_SRC bash
+#> dig irc.dal.net
+
+; <<>> DiG 9.9.4-rpz2.13269.14-P2 <<>> irc.dal.net
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 57442
+;; flags: qr rd ra; QUERY: 1, ANSWER: 9, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 512
+;; QUESTION SECTION:
+;irc.dal.net.                   IN      A
+
+;; ANSWER SECTION:
+irc.dal.net.            268     IN      A       108.61.240.240
+irc.dal.net.            268     IN      A       154.35.174.2
+irc.dal.net.            268     IN      A       154.35.175.101
+irc.dal.net.            268     IN      A       194.14.236.50
+irc.dal.net.            268     IN      A       194.68.45.50
+irc.dal.net.            268     IN      A       195.50.191.12
+irc.dal.net.            268     IN      A       208.64.121.187
+irc.dal.net.            268     IN      A       67.198.195.194
+irc.dal.net.            268     IN      A       91.217.189.35
+#+END_SRC
+
+* Ejemplo de *DNS Round Robin*
+
+#+BEGIN_SRC bash
+#> dig irc.dal.net
+
+; <<>> DiG 9.9.4-rpz2.13269.14-P2 <<>> irc.dal.net
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 52349
+;; flags: qr rd ra; QUERY: 1, ANSWER: 9, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 512
+;; QUESTION SECTION:
+;irc.dal.net.                   IN      A
+
+;; ANSWER SECTION:
+irc.dal.net.            265     IN      A       195.50.191.12
+irc.dal.net.            265     IN      A       208.64.121.187
+irc.dal.net.            265     IN      A       67.198.195.194
+irc.dal.net.            265     IN      A       91.217.189.35
+irc.dal.net.            265     IN      A       108.61.240.240
+irc.dal.net.            265     IN      A       154.35.174.2
+irc.dal.net.            265     IN      A       154.35.175.101
+irc.dal.net.            265     IN      A       194.14.236.50
+irc.dal.net.            265     IN      A       194.68.45.50
+#+END_SRC
+
+
+* SEGUNDA PARTE - Sockets *BSD*
+
+* Creación de *Sockets*
+  Los *sockets* se pueden crear de dos tipos diferentes: Los *sockets
+  activos*, que se conectan a un *socket* remoto y los *sockets
+  pasivos*, que espera por conexiones entrantes y crea un *socket
+  activo* al establecer la conexion.
+
+  Un *servidor* que espera por conexiones entrantes debe utilizar un
+  *socket pasivo* mientras que los *clientes* que quieren conectarse a
+  ese *servidor* deben utilizar *sockets activos*.
+
+* Creación de un *Socket* activo
+#+BEGIN_SRC c++ -n
+int tcp_open_activo(const char* host_name, uint16_t port){
+    int fd = 0;
+    struct sockaddr_in server;
+    struct hostent *host;
+
+    if((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+      return -1;
+
+    host = gethostbyname(host_name);
+    if (host == NULL)
+      return -2;
+
+    memset(&server, 0, sizeof(server));
+
+    server.sin_family = AF_INET;
+    server.sin_family = host->h_addrtype;
+    memcpy((char *)&(server.sin_addr.s_addr), (host->h_addr_list)[0], host->h_length);
+    server.sin_port = htons(port);
+
+    if(connect(fd, (struct sockaddr *)&server, sizeof(server)) < 0)
+      return -3;
+
+    return fd;
+}
+#+END_SRC
+
+* Creación de un *Socket* pasivo
+#+BEGIN_SRC c++ -n
+int tcp_open_pasivo(uint16_t port){
+    struct sockaddr_in serv_addr; 
+    int fd = socket(AF_INET, SOCK_STREAM, 0);
+    memset(&serv_addr, 0, sizeof(serv_addr));
+
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    serv_addr.sin_port = htons(port);
+
+    if(bind(fd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) != 0)
+      return -1;
+
+    return fd;
+}
+#+END_SRC
+
+* IMPORTANTE
+  
+  Nunca hay que olvidarse de inicializar las estructuras a cero o los
+  resultados pueden ser impredecibles.
+
+#+BEGIN_SRC c++ -n
+    memset(&server, 0, sizeof(server));
+#+END_SRC
+
+* Familia de protocolos
+  Uno de los parámetros de creación del *socket* es la familia de
+  protocolo a utilizar. Existen casi 40 familias distintas (consultar
+  *<sys/socket.h>* o *<bits/socket.h>*).
+
+  Las familias mas utilizadas son:
+
+  - AF_INET: IPv4.
+  - AF_INET6: IPv6.
+  - AF_UNIX: Igual que AF_LOCAL, para comunicaciones locales.
+  - AF_X25
+  - AF_IPX
+
+* AF_LOCAL
+  ¿Existe alguna diferencia entre utilizar AF_LOCAL o AF_INET para
+  comunicaciones locales?
+
+  Si. Como *AF_LOCAL* (o *AF_UNIX*) fueron diseñados como mecanismo
+  *IPC* son mas eficientes que *AF_INET*. Al saber que ambos procesos
+  corren en la misma computadora se pueden evitar cambios de contexto y
+  copias redundantes de los buffers.
+
+* Conexión
+
+  Los *sockets activos* requieren de un *connect* que les indica el
+  *socket remoto* al cual deben conectarse. En el caso de los *sockets
+  pasivos* no es necesario (ni tendría sentido) realizar un
+  *connect*. Sin embargo para los *sockets pasivos* es necesario
+  realizar otras 3 operaciones adicionales: *bind*, *listen* y *accept*.
+
+* Bind
+  La operación *bind* acepta un *socket* y una dirección. Cuando un
+  *socket* es creado no posee asociada ninguna dirección, para esta
+  tarea es que se utiliza la operación *bind*.
+
+  En caso de los *sockets pasivos* es necesaria esta operación para
+  especificar la dirección en la cual se esperan las conexiones
+  entrantes (por ejemplo *INADDR_ANY* espera conexiones por cualquier
+  dirección, es lo mismo que *0.0.0.0*).
+
+  Para los *sockets activos* esta operación no es necesaria, ya que la
+  dirección por la que sale la conexión queda determinada por la
+  operación *connect*. Sin embargo puede realizarse un *bind* en caso
+  que sea necesario especificar la dirección de salida de la conexión
+  (un sistema *multihoming*).
+  
+* Listen
+  La operación *listen* sirve para asignar un tamaño de *backlog* al
+  socket. El tamaño del *backlog* define la cantidad máxima de
+  conexiones pendientes que puede tener el *socket*. Si el *backlog*
+  se encuentra lleno las posteriores conexiones serán rechazadas.
+  
+  La semántica del *backlog* varía de un sistema a otro. Por ejemplo
+  en versiones de *Linux* anteriores a *2.2* el *backlog* no hacía
+  diferencia entre conexiones establecidas o a medio establecer (en
+  medio del *3-Way Handshake*). En las versiones actuales el
+  *backlog* solo tiene en cuenta la cantidad de conexiones
+  *completamente establecidas*. (consultar *man 2 listen*)
+
+* Accept
+  La operación *accept* posee dos parámetros: el file descriptor del
+  *socket* y una estructura *sockaddr*. El primer parámetro es el
+  *socket* (pasivo) mediante el cual se acepta una conexion
+  entrante. *Accept* saca una conexion de la cola de
+  conexiones pendientes, arma un *socket* que representa a la conexión
+  y devuelve el file descriptor de ese nuevo *socket*. El segundo
+  parámetro sirve para almacenar la información de la dirección remota
+  de la conexion entrante y es optativo (puede ser /NULL/).
+
+  Si no existe ninguna conexión pendiente *accept* se bloquea a la
+  espera de una. Si el *socket* fue marcado como /no bloqueante/ la
+  operación falla y devuelve *EAGAIN*.
+
+* Lectura/Escritura
+  Para leer y escribir del socket se utilizan las funciones *read* y
+  *write*. Existen también funciones mas específicas (*recv* y
+  *send*), que reciben un parámetro adicional (*flags*) que permite
+  pasar opciones extra (consultar *man 2 send*).
+
+  Un punto importante a tener en cuenta es que estas funciones no
+  siempre escriben/leen la cantidad de bytes pedidos en la
+  llamada. Por este motivo es que el valor de retorno de las funciones
+  es la cantidad de bytes leídos/escritos. Para una lectura/escritura
+  efectiva se deben controlar estos valores y realizar tantas llamadas
+  como sean necesarias para completar la operación.
+
+* Ejemplo de lectura efectiva
+#+BEGIN_SRC c++ -n
+  int a_leer = 100; //leer 100 bytes
+  char buffer[100]; //en este buffer
+  
+  int total_leido=0;
+  int restante = a_leer;
+  
+  while(restante > 0){
+      int leido = read(socketfd, buffer+total_leido, restante);
+      if(leido < 0){
+          perror("Error al leer del socket.");
+          exit(1);
+      }
+      restante -= leido;
+      total_leido += leido;
+  }
+#+END_SRC
+
+* SIGPIPE
+  Al escribir a un socket cerrado (por ejemplo el *servidor* intenta
+  enviarle datos a un *cliente* que ya cerró la conexion) se genera un
+  *SIGPIPE*. Para evitar inconvenientes (y que el proceso escritor
+  muera prematuramente) puede ignorarse la señal.
+
+#+BEGIN_SRC c -n
+signal(SIGPIPE, SIG_IGN);
+#+END_SRC
+
+  *NOTA*: El uso de *signal* está desaconsejado excepto para
+  especificar *SIG_IGN* (ignorar) o *SIG_DFL* (por defecto). Para
+  utilizar handlers personalizados se debe utilizar *sigaction*.
+
+* Links de interés
+
+  - http://lists.freebsd.org/pipermail/freebsd-performance/2005-February/001143.html
+

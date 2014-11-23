@@ -1,0 +1,583 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Introducción a la arquitectura Cliente-Servidor</title>
+<meta name="author" content="(Sistemas distribuidos I - 2014)"/>
+<link rel="stylesheet" href="../../reveal.js/css/reveal.min.css"/>
+<link rel="stylesheet" href="../../reveal.js/css/theme/serif.css" id="theme"/>
+
+<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+<script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = '../../reveal.js/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+</script>
+<link rel="stylesheet" type="text/css" href="../../reveal.js/css/theme/fiuba.css" />
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<h1>Introducción a la arquitectura Cliente-Servidor</h1>
+<h2>Sistemas distribuidos I - 2014</h2>
+<h2><a href="mailto:"></a></h2>
+<h2></h2></section>
+
+<section>
+<section id="sec-1" >
+
+<h2>PRIMERA PARTE</h2>
+</section>
+
+</section>
+<section>
+<section id="sec-2" >
+
+<h2>Cliente Servidor</h2>
+<p>
+Un sistema Ciente-Servidor es aquel en el cual existe una clara
+separación entre quienes realizan pedidos (y reciben respuestas) o
+<b>Clientes</b> y quien atienden esos pedidos o <b>Servidor</b> (no
+necesariamente uno solo).
+</p>
+
+<p>
+En particular es necesario que el <b>Servidor</b> se encuentre disponible
+antes de que aparezca el primer cliente, es decir que se requiere
+por lo menos ese sincronismo inicial.
+</p>
+</section>
+</section>
+<section>
+<section id="sec-3" >
+
+<h2>Funcionamiento</h2>
+<p>
+Siempre un <b>Request</b> precede a un <b>Reply</b>. El <b>Request</b> viaja desde
+el <b>Cliente</b> hacia el <b>Servidor</b>. 
+</p>
+
+<img src="./img/req-rep.png" alt="req-rep.png" />
+</section>
+
+</section>
+<section>
+<section id="sec-4" >
+
+<h2>Tipos de <b>Servidores</b></h2>
+<p>
+Si bien puede haber mas de un <b>Servidor</b> siempre la cantidad mas
+grande es la de <b>Clientes</b>. Según la forma en que un <b>Servidor</b>
+atiende a los <b>Clientes</b> puede clasificarse en <b>Iterativo</b> o
+<b>Concurrente</b>.
+</p>
+</section>
+</section>
+<section>
+<section id="sec-5" >
+
+<h2><b>Servidor</b> iterativo</h2>
+<p>
+Es el mas sencillo de construir. El <b>Servidor</b> espera conexiones de
+los <b>Clientes</b> y atiende solo una a la vez.
+</p>
+
+<div class="org-src-container">
+
+<pre  class="src src-c++"><span class="linenr">1: </span><span style="color: #228b22;">int</span> <span style="color: #0000ff;">main</span>(){
+<span class="linenr">2: </span>    <span style="color: #228b22;">int</span> <span style="color: #b8860b;">fd</span> = tcp_open_pasivo(<span style="color: #bc8f8f;">"0.0.0.0"</span>, 8080);
+<span class="linenr">3: </span>    <span style="color: #a020f0;">while</span>(1){
+<span class="linenr">4: </span>        <span style="color: #228b22;">int</span> <span style="color: #b8860b;">clientfd</span> = accept(fd, (strunct <span style="color: #228b22;">sockadr</span>*) <span style="color: #5f9ea0;">NULL</span>, <span style="color: #5f9ea0;">NULL</span>);
+<span class="linenr">5: </span>        <span style="color: #b22222;">//</span><span style="color: #b22222;">Atender cliente con su file descriptor</span>
+<span class="linenr">6: </span>        close(clientfd);
+<span class="linenr">7: </span>    }
+<span class="linenr">8: </span>}
+</pre>
+</div>
+</section>
+</section>
+<section>
+<section id="sec-6" >
+
+<h2><b>Servidor</b> concurrente.</h2>
+<p>
+El <b>Servidor Concurrente</b> es capaz de atender a los <b>Clientes</b> en
+paralelo. Al llegar una nueva conexión, el <b>Servidor</b> puede por
+ejemplo crear un nuevo <b>Thread</b> o <b>Proceso</b> cuya única misión es
+atender el <b>Request</b>. Otra posibilidad es tener un <b>pool</b> de
+<b>Threads</b> o <b>Procesos</b> e ir distribuyendo las conexiones a medida
+que van llegando.
+</p>
+
+<div class="org-src-container">
+
+<pre  class="src src-c++"><span class="linenr"> 1: </span><span style="color: #228b22;">int</span> <span style="color: #0000ff;">main</span>(){
+<span class="linenr"> 2: </span>    <span style="color: #228b22;">int</span> <span style="color: #b8860b;">fd</span> = tcp_open_pasivo(<span style="color: #bc8f8f;">"0.0.0.0"</span>, 8080);
+<span class="linenr"> 3: </span>    <span style="color: #a020f0;">while</span>(1){
+<span class="linenr"> 4: </span>        <span style="color: #228b22;">int</span> <span style="color: #b8860b;">clientfd</span> = accept(fd, (strunct <span style="color: #228b22;">sockadr</span>*) <span style="color: #5f9ea0;">NULL</span>, <span style="color: #5f9ea0;">NULL</span>);
+<span class="linenr"> 5: </span>
+<span class="linenr"> 6: </span>        <span style="color: #a020f0;">static</span> <span style="color: #228b22;">char</span> <span style="color: #b8860b;">fd_string</span>[10];
+<span class="linenr"> 7: </span>        snprintf(fd_string, 10, <span style="color: #bc8f8f;">"%d"</span>, client_fd);
+<span class="linenr"> 8: </span>
+<span class="linenr"> 9: </span>        <span style="color: #228b22;">int</span> <span style="color: #b8860b;">pid</span> = fork();
+<span class="linenr">10: </span>        <span style="color: #a020f0;">if</span>(pid == 0){
+<span class="linenr">11: </span>            close(fd);
+<span class="linenr">12: </span>            execlp(<span style="color: #bc8f8f;">"atender_cliente"</span>, <span style="color: #bc8f8f;">"atender_cliente"</span>, fd_string, (<span style="color: #228b22;">void</span>*)0);
+<span class="linenr">13: </span>            exit(-1);
+<span class="linenr">14: </span>        }
+<span class="linenr">15: </span>        close(clientfd);
+<span class="linenr">16: </span>    }
+<span class="linenr">17: </span>}
+</pre>
+</div>
+</section>
+</section>
+<section>
+<section id="sec-7" >
+
+<h2>Múltiples <b>Servidores</b></h2>
+<p>
+Muchas veces es buena idea contar con mas de un <b>Servidor</b> en caso
+de que alguno falle o para poder atender a una mayor cantidad de
+<b>Clientes</b>. Obviamente al tener mas de un <b>Servidor</b> se nos presenta
+un nuevo problema. ¿Cómo ubicar a los diferentes servidores y cómo
+decidir a cuál conectarse?
+</p>
+
+<p>
+La solución mas primitiva (pero no por eso poco efectiva) al
+problema nos lo da el mismo <b>DNS</b>. Es práctica común que el
+resolvedor <b>DNS</b> al tener varios direcciones bajo el mismo nombre
+vaya permutando el orden de la lista en la respuesta cada vez (<b>DNS
+Round Robin</b>). De esta forma, y en un caso ideal, cada <b>Servidor</b>
+atiende el mismo número de <b>Clientes</b>. Adicionalmente si un
+<b>Cliente</b> falla al conectarse al <b>Servidor</b>, si no se utilizan
+mecanismos de cacheo locales de <b>DNS</b>, es muy posible que en la
+reconexión intente conectarse con uno de los <b>Servidores</b>
+alternativos.
+</p>
+</section>
+</section>
+<section>
+<section id="sec-8" >
+
+<h2>Ejemplo de <b>DNS Round Robin</b></h2>
+<div class="org-src-container">
+
+<pre  class="src src-bash">#&gt; dig irc.dal.net
+
+; &lt;&lt;&gt;&gt; DiG 9.9.4-rpz2.13269.14-P2 &lt;&lt;&gt;&gt; irc.dal.net
+;; global options: +cmd
+;; Got answer:
+;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, status: NOERROR, id: 57442
+;; flags: qr rd ra; QUERY: 1, ANSWER: 9, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 512
+;; QUESTION SECTION:
+;irc.dal.net.                   IN      A
+
+;; ANSWER SECTION:
+irc.dal.net.            268     IN      A       108.61.240.240
+irc.dal.net.            268     IN      A       154.35.174.2
+irc.dal.net.            268     IN      A       154.35.175.101
+irc.dal.net.            268     IN      A       194.14.236.50
+irc.dal.net.            268     IN      A       194.68.45.50
+irc.dal.net.            268     IN      A       195.50.191.12
+irc.dal.net.            268     IN      A       208.64.121.187
+irc.dal.net.            268     IN      A       67.198.195.194
+irc.dal.net.            268     IN      A       91.217.189.35
+</pre>
+</div>
+</section>
+</section>
+<section>
+<section id="sec-9" >
+
+<h2>Ejemplo de <b>DNS Round Robin</b></h2>
+<div class="org-src-container">
+
+<pre  class="src src-bash">#&gt; dig irc.dal.net
+
+; &lt;&lt;&gt;&gt; DiG 9.9.4-rpz2.13269.14-P2 &lt;&lt;&gt;&gt; irc.dal.net
+;; global options: +cmd
+;; Got answer:
+;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, status: NOERROR, id: 52349
+;; flags: qr rd ra; QUERY: 1, ANSWER: 9, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 512
+;; QUESTION SECTION:
+;irc.dal.net.                   IN      A
+
+;; ANSWER SECTION:
+irc.dal.net.            265     IN      A       195.50.191.12
+irc.dal.net.            265     IN      A       208.64.121.187
+irc.dal.net.            265     IN      A       67.198.195.194
+irc.dal.net.            265     IN      A       91.217.189.35
+irc.dal.net.            265     IN      A       108.61.240.240
+irc.dal.net.            265     IN      A       154.35.174.2
+irc.dal.net.            265     IN      A       154.35.175.101
+irc.dal.net.            265     IN      A       194.14.236.50
+irc.dal.net.            265     IN      A       194.68.45.50
+</pre>
+</div>
+</section>
+
+</section>
+<section>
+<section id="sec-10" >
+
+<h2>SEGUNDA PARTE - Sockets <b>BSD</b></h2>
+</section>
+
+</section>
+<section>
+<section id="sec-11" >
+
+<h2>Creación de <b>Sockets</b></h2>
+<p>
+Los <b>sockets</b> se pueden crear de dos tipos diferentes: Los <b>sockets
+activos</b>, que se conectan a un <b>socket</b> remoto y los <b>sockets
+pasivos</b>, que espera por conexiones entrantes y crea un <b>socket
+activo</b> al establecer la conexion.
+</p>
+
+<p>
+Un <b>servidor</b> que espera por conexiones entrantes debe utilizar un
+<b>socket pasivo</b> mientras que los <b>clientes</b> que quieren conectarse a
+ese <b>servidor</b> deben utilizar <b>sockets activos</b>.
+</p>
+</section>
+</section>
+<section>
+<section id="sec-12" >
+
+<h2>Creación de un <b>Socket</b> activo</h2>
+<div class="org-src-container">
+
+<pre  class="src src-c++"><span class="linenr"> 1: </span><span style="color: #228b22;">int</span> <span style="color: #0000ff;">tcp_open_activo</span>(<span style="color: #a020f0;">const</span> <span style="color: #228b22;">char</span>* <span style="color: #b8860b;">host_name</span>, <span style="color: #228b22;">uint16_t</span> <span style="color: #b8860b;">port</span>){
+<span class="linenr"> 2: </span>    <span style="color: #228b22;">int</span> <span style="color: #b8860b;">fd</span> = 0;
+<span class="linenr"> 3: </span>    <span style="color: #a020f0;">struct</span> <span style="color: #228b22;">sockaddr_in</span> <span style="color: #b8860b;">server</span>;
+<span class="linenr"> 4: </span>    <span style="color: #a020f0;">struct</span> <span style="color: #228b22;">hostent</span> *<span style="color: #b8860b;">host</span>;
+<span class="linenr"> 5: </span>
+<span class="linenr"> 6: </span>    <span style="color: #a020f0;">if</span>((fd = socket(AF_INET, SOCK_STREAM, 0)) &lt; 0)
+<span class="linenr"> 7: </span>      <span style="color: #a020f0;">return</span> -1;
+<span class="linenr"> 8: </span>
+<span class="linenr"> 9: </span>    host = gethostbyname(host_name);
+<span class="linenr">10: </span>    <span style="color: #a020f0;">if</span> (host == <span style="color: #5f9ea0;">NULL</span>)
+<span class="linenr">11: </span>      <span style="color: #a020f0;">return</span> -2;
+<span class="linenr">12: </span>
+<span class="linenr">13: </span>    memset(&amp;server, 0, <span style="color: #a020f0;">sizeof</span>(server));
+<span class="linenr">14: </span>
+<span class="linenr">15: </span>    server.sin_family = AF_INET;
+<span class="linenr">16: </span>    server.sin_family = host-&gt;h_addrtype;
+<span class="linenr">17: </span>    memcpy((<span style="color: #228b22;">char</span> *)&amp;(server.sin_addr.s_addr), (host-&gt;h_addr_list)[0], host-&gt;h_length);
+<span class="linenr">18: </span>    server.sin_port = htons(port);
+<span class="linenr">19: </span>
+<span class="linenr">20: </span>    <span style="color: #a020f0;">if</span>(connect(fd, (<span style="color: #a020f0;">struct</span> <span style="color: #228b22;">sockaddr</span> *)&amp;server, <span style="color: #a020f0;">sizeof</span>(server)) &lt; 0)
+<span class="linenr">21: </span>      <span style="color: #a020f0;">return</span> -3;
+<span class="linenr">22: </span>
+<span class="linenr">23: </span>    <span style="color: #a020f0;">return</span> fd;
+<span class="linenr">24: </span>}
+</pre>
+</div>
+</section>
+</section>
+<section>
+<section id="sec-13" >
+
+<h2>Creación de un <b>Socket</b> pasivo</h2>
+<div class="org-src-container">
+
+<pre  class="src src-c++"><span class="linenr"> 1: </span><span style="color: #228b22;">int</span> <span style="color: #0000ff;">tcp_open_pasivo</span>(<span style="color: #228b22;">uint16_t</span> <span style="color: #b8860b;">port</span>){
+<span class="linenr"> 2: </span>    <span style="color: #a020f0;">struct</span> <span style="color: #228b22;">sockaddr_in</span> <span style="color: #b8860b;">serv_addr</span>; 
+<span class="linenr"> 3: </span>    <span style="color: #228b22;">int</span> <span style="color: #b8860b;">fd</span> = socket(AF_INET, SOCK_STREAM, 0);
+<span class="linenr"> 4: </span>    memset(&amp;serv_addr, 0, <span style="color: #a020f0;">sizeof</span>(serv_addr));
+<span class="linenr"> 5: </span>
+<span class="linenr"> 6: </span>    serv_addr.sin_family = AF_INET;
+<span class="linenr"> 7: </span>    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+<span class="linenr"> 8: </span>    serv_addr.sin_port = htons(port);
+<span class="linenr"> 9: </span>
+<span class="linenr">10: </span>    <span style="color: #a020f0;">if</span>(bind(fd, (<span style="color: #a020f0;">struct</span> <span style="color: #228b22;">sockaddr</span>*)&amp;serv_addr, <span style="color: #a020f0;">sizeof</span>(serv_addr)) != 0)
+<span class="linenr">11: </span>      <span style="color: #a020f0;">return</span> -1;
+<span class="linenr">12: </span>
+<span class="linenr">13: </span>    <span style="color: #a020f0;">return</span> fd;
+<span class="linenr">14: </span>}
+</pre>
+</div>
+</section>
+</section>
+<section>
+<section id="sec-14" >
+
+<h2>IMPORTANTE</h2>
+<p>
+Nunca hay que olvidarse de inicializar las estructuras a cero o los
+resultados pueden ser impredecibles.
+</p>
+
+<div class="org-src-container">
+
+<pre  class="src src-c++"><span class="linenr">1: </span>memset(&amp;server, 0, <span style="color: #a020f0;">sizeof</span>(server));
+</pre>
+</div>
+</section>
+</section>
+<section>
+<section id="sec-15" >
+
+<h2>Familia de protocolos</h2>
+<p>
+Uno de los parámetros de creación del <b>socket</b> es la familia de
+protocolo a utilizar. Existen casi 40 familias distintas (consultar
+<b>&lt;sys/socket.h&gt;</b> o <b>&lt;bits/socket.h&gt;</b>).
+</p>
+
+<p>
+Las familias mas utilizadas son:
+</p>
+
+<ul class="org-ul">
+<li>AF_INET: IPv4.
+</li>
+<li>AF_INET6: IPv6.
+</li>
+<li>AF_UNIX: Igual que AF_LOCAL, para comunicaciones locales.
+</li>
+<li>AF_X25
+</li>
+<li>AF_IPX
+</li>
+</ul>
+</section>
+</section>
+<section>
+<section id="sec-16" >
+
+<h2>AF_LOCAL</h2>
+<p>
+¿Existe alguna diferencia entre utilizar AF_LOCAL o AF_INET para
+comunicaciones locales?
+</p>
+
+<p>
+Si. Como <b>AF_LOCAL</b> (o <b>AF_UNIX</b>) fueron diseñados como mecanismo
+<b>IPC</b> son mas eficientes que <b>AF_INET</b>. Al saber que ambos procesos
+corren en la misma computadora se pueden evitar cambios de contexto y
+copias redundantes de los buffers.
+</p>
+</section>
+</section>
+<section>
+<section id="sec-17" >
+
+<h2>Conexión</h2>
+<p>
+Los <b>sockets activos</b> requieren de un <b>connect</b> que les indica el
+<b>socket remoto</b> al cual deben conectarse. En el caso de los <b>sockets
+pasivos</b> no es necesario (ni tendría sentido) realizar un
+<b>connect</b>. Sin embargo para los <b>sockets pasivos</b> es necesario
+realizar otras 3 operaciones adicionales: <b>bind</b>, <b>listen</b> y <b>accept</b>.
+</p>
+</section>
+</section>
+<section>
+<section id="sec-18" >
+
+<h2>Bind</h2>
+<p>
+La operación <b>bind</b> acepta un <b>socket</b> y una dirección. Cuando un
+<b>socket</b> es creado no posee asociada ninguna dirección, para esta
+tarea es que se utiliza la operación <b>bind</b>.
+</p>
+
+<p>
+En caso de los <b>sockets pasivos</b> es necesaria esta operación para
+especificar la dirección en la cual se esperan las conexiones
+entrantes (por ejemplo <b>INADDR_ANY</b> espera conexiones por cualquier
+dirección, es lo mismo que <b>0.0.0.0</b>).
+</p>
+
+<p>
+Para los <b>sockets activos</b> esta operación no es necesaria, ya que la
+dirección por la que sale la conexión queda determinada por la
+operación <b>connect</b>. Sin embargo puede realizarse un <b>bind</b> en caso
+que sea necesario especificar la dirección de salida de la conexión
+(un sistema <b>multihoming</b>).
+</p>
+</section>
+</section>
+<section>
+<section id="sec-19" >
+
+<h2>Listen</h2>
+<p>
+La operación <b>listen</b> sirve para asignar un tamaño de <b>backlog</b> al
+socket. El tamaño del <b>backlog</b> define la cantidad máxima de
+conexiones pendientes que puede tener el <b>socket</b>. Si el <b>backlog</b>
+se encuentra lleno las posteriores conexiones serán rechazadas.
+</p>
+
+<p>
+La semántica del <b>backlog</b> varía de un sistema a otro. Por ejemplo
+en versiones de <b>Linux</b> anteriores a <b>2.2</b> el <b>backlog</b> no hacía
+diferencia entre conexiones establecidas o a medio establecer (en
+medio del <b>3-Way Handshake</b>). En las versiones actuales el
+<b>backlog</b> solo tiene en cuenta la cantidad de conexiones
+<b>completamente establecidas</b>. (consultar <b>man 2 listen</b>)
+</p>
+</section>
+</section>
+<section>
+<section id="sec-20" >
+
+<h2>Accept</h2>
+<p>
+La operación <b>accept</b> posee dos parámetros: el file descriptor del
+<b>socket</b> y una estructura <b>sockaddr</b>. El primer parámetro es el
+<b>socket</b> (pasivo) mediante el cual se acepta una conexion
+entrante. <b>Accept</b> saca una conexion de la cola de
+conexiones pendientes, arma un <b>socket</b> que representa a la conexión
+y devuelve el file descriptor de ese nuevo <b>socket</b>. El segundo
+parámetro sirve para almacenar la información de la dirección remota
+de la conexion entrante y es optativo (puede ser <i>NULL</i>).
+</p>
+
+<p>
+Si no existe ninguna conexión pendiente <b>accept</b> se bloquea a la
+espera de una. Si el <b>socket</b> fue marcado como <i>no bloqueante</i> la
+operación falla y devuelve <b>EAGAIN</b>.
+</p>
+</section>
+</section>
+<section>
+<section id="sec-21" >
+
+<h2>Lectura/Escritura</h2>
+<p>
+Para leer y escribir del socket se utilizan las funciones <b>read</b> y
+<b>write</b>. Existen también funciones mas específicas (<b>recv</b> y
+<b>send</b>), que reciben un parámetro adicional (<b>flags</b>) que permite
+pasar opciones extra (consultar <b>man 2 send</b>).
+</p>
+
+<p>
+Un punto importante a tener en cuenta es que estas funciones no
+siempre escriben/leen la cantidad de bytes pedidos en la
+llamada. Por este motivo es que el valor de retorno de las funciones
+es la cantidad de bytes leídos/escritos. Para una lectura/escritura
+efectiva se deben controlar estos valores y realizar tantas llamadas
+como sean necesarias para completar la operación.
+</p>
+</section>
+</section>
+<section>
+<section id="sec-22" >
+
+<h2>Ejemplo de lectura efectiva</h2>
+<div class="org-src-container">
+
+<pre  class="src src-c++"><span class="linenr"> 1: </span><span style="color: #228b22;">int</span> <span style="color: #b8860b;">a_leer</span> = 100; <span style="color: #b22222;">//</span><span style="color: #b22222;">leer 100 bytes</span>
+<span class="linenr"> 2: </span><span style="color: #228b22;">char</span> <span style="color: #b8860b;">buffer</span>[100]; <span style="color: #b22222;">//</span><span style="color: #b22222;">en este buffer</span>
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span><span style="color: #228b22;">int</span> <span style="color: #b8860b;">total_leido</span>=0;
+<span class="linenr"> 5: </span><span style="color: #228b22;">int</span> <span style="color: #b8860b;">restante</span> = a_leer;
+<span class="linenr"> 6: </span>
+<span class="linenr"> 7: </span><span style="color: #a020f0;">while</span>(restante &gt; 0){
+<span class="linenr"> 8: </span>    <span style="color: #228b22;">int</span> <span style="color: #b8860b;">leido</span> = read(socketfd, buffer+total_leido, restante);
+<span class="linenr"> 9: </span>    <span style="color: #a020f0;">if</span>(leido &lt; 0){
+<span class="linenr">10: </span>        perror(<span style="color: #bc8f8f;">"Error al leer del socket."</span>);
+<span class="linenr">11: </span>        exit(1);
+<span class="linenr">12: </span>    }
+<span class="linenr">13: </span>    restante -= leido;
+<span class="linenr">14: </span>    total_leido += leido;
+<span class="linenr">15: </span>}
+</pre>
+</div>
+</section>
+</section>
+<section>
+<section id="sec-23" >
+
+<h2>SIGPIPE</h2>
+<p>
+Al escribir a un socket cerrado (por ejemplo el <b>servidor</b> intenta
+enviarle datos a un <b>cliente</b> que ya cerró la conexion) se genera un
+<b>SIGPIPE</b>. Para evitar inconvenientes (y que el proceso escritor
+muera prematuramente) puede ignorarse la señal.
+</p>
+
+<div class="org-src-container">
+
+<pre  class="src src-c"><span class="linenr">1: </span>signal(SIGPIPE, SIG_IGN);
+</pre>
+</div>
+
+<p>
+<b>NOTA</b>: El uso de <b>signal</b> está desaconsejado excepto para
+especificar <b>SIG_IGN</b> (ignorar) o <b>SIG_DFL</b> (por defecto). Para
+utilizar handlers personalizados se debe utilizar <b>sigaction</b>.
+</p>
+</section>
+</section>
+<section>
+<section id="sec-24" >
+
+<h2>Links de interés</h2>
+<ul class="org-ul">
+<li><a href="http://lists.freebsd.org/pipermail/freebsd-performance/2005-February/001143.html">http://lists.freebsd.org/pipermail/freebsd-performance/2005-February/001143.html</a>
+</li>
+</ul>
+</section>
+</section>
+</div>
+</div>
+<script src="../../reveal.js/lib/js/head.min.js"></script>
+<script src="../../reveal.js/js/reveal.min.js"></script>
+<script>
+
+        		// Full list of configuration options available here:
+        		// https://github.com/hakimel/reveal.js#configuration
+        		Reveal.initialize({
+        			controls: true,
+        			progress: true,
+        			history: false,
+        			center: true,
+                                slideNumber: true,
+        			rollingLinks: true,
+        			keyboard: true,
+        			overview: true,
+        			width: 1200, // slide width
+        			height: 800, // slide height
+        			margin: 0.10, // slide margin
+        			minScale: 0.50, // slide minimum scaling factor
+        			maxScale: 1.50, // slide maximum scaling factor
+
+
+        			theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+        			transition: Reveal.getQueryHash().transition || 'linear', // default/cube/page/concave/zoom/linear/fade/none
+        			transitionSpeed: 'default',
+
+        			// Optional libraries used to extend on reveal.js
+        			dependencies: [
+        				{ src: '../../reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } }
+        				,{ src: '../../reveal.js/plugin/markdown/showdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } }
+        				,{ src: '../../reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } }
+        				,{ src: '../../reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+        				,{ src: '../../reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } }
+        				,{ src: '../../reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+        				// { src: '../../reveal.js/plugin/search/search.js', async: true, condition: function() { return !!document.body.classList; } }
+        				// { src: '../../reveal.js/plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+         				
+        			]
+        		});
+</script>
+</body>
+</html>
