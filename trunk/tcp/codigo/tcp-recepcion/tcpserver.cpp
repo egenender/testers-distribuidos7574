@@ -1,20 +1,23 @@
 #include "../tcp.h"
 #include <signal.h>
 #include <string.h>
+#include <stddef.h>
+#include <sys/msg.h>
 
-/**
- * Servidor tcp que envia a cada cliente un mensaje (basura) del tamaño indicado en bytes.
- */
 int main(int argc, char *argv[])
 {
-    char buffer[] = "Lorem ipsum";
 
-    if(argc != 2){
-      printf("Uso: %s <puerto>\n", argv[0]);
+    if(argc != 5){
+      printf("Uso: %s <puerto> <id_cola> <tam> <id_lectura>\n", argv[0]);
       return -1;
     }
-
-    double size = strlen(buffer);
+	
+	int id_cola = atoi(argv[2]);
+	
+    size_t size = atoi(argv[3]);
+    
+    int id_lectura = atoi(argv[4]);
+    
     if(size <= 0){
       printf("Error: el tamaño del mensaje debe ser mayor a cero\n");
       return -2;
@@ -36,20 +39,29 @@ int main(int argc, char *argv[])
     signal(SIGPIPE, SIG_IGN);
 
     printf("Esperando conextiones...\n");
-
+    
+    key_t key = ftok("ipcs-prueba", id_cola);
+    int cola = msgget(key, 0660);
+	
     while(1){
-      int clientfd = accept(fd, (struct sockaddr*)NULL, NULL);
+		int clientfd = accept(fd, (struct sockaddr*)NULL, NULL);
 
-      double enviado=0, acumulado=0;
-
-      printf("Enviando %i bytes...\n", size);
-
-      while((enviado = write(clientfd, buffer, strlen(buffer))) > 0 && acumulado < size)
-	acumulado += enviado;
-
-      printf("Enviados %i bytes\n", acumulado);
+		int enviado=0, acumulado=0;
       
-      close(clientfd);
-    }
+		void* buffer = malloc(size);
+		int ok_read = msgrcv(cola, buffer, size - sizeof(long), id_lectura, 0);
+        if (ok_read == -1){
+			exit(0);
+		}
+		printf("Enviando %zu bytes...\n", size);
+		
+		while((enviado = write(clientfd, buffer, size)) > 0 && acumulado < size)
+			acumulado += enviado;
 
+		printf("Enviados %d bytes\n", acumulado);
+      
+		free(buffer);
+		close(clientfd);
+	}
+	
 }
