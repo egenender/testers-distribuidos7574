@@ -14,14 +14,14 @@
 
 // Constantes del sistema
 
-const int CANT_DISPOSITIVOS = 100;
+const int CANT_DISPOSITIVOS = 1;
 const int CANT_TESTERS = 5;
 const int ID_DISPOSITIVO_START = 50;
 const int ID_TESTER_START = 1;
 const int MAX_DISPOSITIVOS_EN_SISTEMA = 100;
 
-const int MINIMOS_LANZADOS = 0;
-const int MAXIMOS_LANZADOS = 1;
+const int MINIMOS_LANZADOS = 1;
+const int MAXIMOS_LANZADOS = 15;
 
 // IDs de los IPC
 const int SEM_PLANILLA_GENERAL = 1;
@@ -29,27 +29,17 @@ const int SHM_PLANILLA_GENERAL = 2;
 const int SEM_TESTER_A = 30;
 const int SEM_TESTER_B = 40;
 
-const int MSGQUEUE_LECTURA_RESULTADOS = 60;
 
-const int MSGQUEUE_ESCRITURA_RESULTADOS_ENVIO = 61;
-const int MSGQUEUE_ESCRITURA_RESULTADOS_SOCKET = 62;
-const int MSGQUEUE_ESCRITURA_RESULTADOS_LECTURA = 63;
+const int MSGQUEUE_ESCRITURA_RESULTADOS = 80;
+const int MSGQUEUE_LECTURA_RESULTADOS = 81;
+const int MSGQUEUE_NUEVO_REQUERIMIENTO = 82;
+const int MSGQUEUE_DISPOSITIVOS_ESCRITURA = 83;
+const int MSGQUEUE_DISPOSITIVOS_LECTURA = 84;
+const int MSGQUEUE_ORDENES_ESCRITURA = 85;
 
-const int MSGQUEUE_NUEVO_REQUERIMIENTO_ENVIO = 64;
-const int MSGQUEUE_NUEVO_REQUERIMIENTO_SOCKET = 65;
-const int MSGQUEUE_NUEVO_REQUERIMIENTO_LECTURA = 66;
 
-const int MSGQUEUE_PROGRAMAS_ENVIO = 67;
-const int MSGQUEUE_PROGRAMAS_SOCKET = 68;
-const int MSGQUEUE_PROGRAMAS_LECTURA = 69;
-
-const int MSGQUEUE_ORDENES_ENVIO = 70;
-const int MSGQUEUE_ORDENES_SOCKET = 71;
-const int MSGQUEUE_ORDENES_LECTURA = 72;
-
-const int MSGQUEUE_DESPACHADOR = 73;
-const int MSGQUEUE_PLANILLA = 74;
-
+const int MSGQUEUE_DESPACHADOR = 86;
+const int MSGQUEUE_PLANILLA = 87;
 const int TIPO_A = 0;
 const int TIPO_B = 1;
 
@@ -98,10 +88,13 @@ typedef struct resultado_test{
     int dispositivo;
 }resultado_test_t;
 
+
 typedef struct message {
-        long mtype;
-        int idDispositivo;
-        int value; // Este parametro posee el valor del requerimiento, del programa y del resultado
+	long mtype;
+    int idDispositivo;
+    int tester;
+    int value; // Este parametro posee el valor del requerimiento, del programa y del resultado
+    int cola_a_usar;
 } TMessageAtendedor;
 
 #endif	/* COMMON_H */

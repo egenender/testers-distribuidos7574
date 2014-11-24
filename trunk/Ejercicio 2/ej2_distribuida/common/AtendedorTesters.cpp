@@ -3,7 +3,7 @@
 
 AtendedorTesters::AtendedorTesters() {
     key_t key;
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_NUEVO_REQUERIMIENTO_LECTURA);
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_NUEVO_REQUERIMIENTO);
     this->cola_requerimiento = msgget(key, 0666);
     if(this->cola_requerimiento == -1) {
 		std::string err = std::string("Error al obtener la cola de requerimientos del atendedor de testers. Errno: ") + std::string(strerror(errno));
@@ -19,18 +19,10 @@ AtendedorTesters::AtendedorTesters() {
         exit(1);
     }
     
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_ORDENES_ENVIO);
-    this->cola_ordenes = msgget(key, 0666);
-    if(this->cola_ordenes == -1) {
-        std::string err = std::string("Error al obtener la cola de escritura de Ordenes del atendedor de testers. Errno: ") + std::string(strerror(errno));
-        Logger::error(err, __FILE__);
-        exit(1);
-    }
-    
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_PROGRAMAS_ENVIO);
-    this->cola_programas = msgget(key, 0666);
-    if(this->cola_programas == -1) {
-        std::string err = std::string("Error al obtener la cola de escritura de programas del atendedor de testers. Errno: ") + std::string(strerror(errno));
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_DISPOSITIVOS_ESCRITURA);
+    this->cola_dispositivos= msgget(key, 0666);
+    if(this->cola_dispositivos == -1) {
+        std::string err = std::string("Error al obtener la cola de lectura de resultados del atendedor de testers. Errno: ") + std::string(strerror(errno));
         Logger::error(err, __FILE__);
         exit(1);
     }
@@ -61,8 +53,9 @@ void AtendedorTesters::enviarPrograma(int idDispositivo, int tester, int idProgr
     msg.mtype = idDispositivo;
     msg.idDispositivo = tester; //FIXME?
     msg.value = idPrograma;
+    msg.cola_a_usar = MSGQUEUE_DISPOSITIVOS_LECTURA;
     
-    int ret = msgsnd(this->cola_programas, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    int ret = msgsnd(this->cola_dispositivos, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
         std::string error = std::string("Error al enviar programa al atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
@@ -89,8 +82,9 @@ void AtendedorTesters::enviarOrden(int idDispositivo, int orden) {
     msg.mtype = idDispositivo;
     msg.idDispositivo = idDispositivo;
     msg.value = orden;
+    msg.cola_a_usar = MSGQUEUE_DISPOSITIVOS_LECTURA;
     
-    int ret = msgsnd(this->cola_ordenes, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    int ret = msgsnd(this->cola_dispositivos, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
         std::string error = std::string("Error al enviar orden al atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);

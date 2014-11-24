@@ -18,14 +18,13 @@ class AtendedorDispositivos {
 private:
     int cola_requerimiento;
     int cola_tests;
-    int cola_ordenes;
-    int cola_programas;
+    int cola_dispositivos;
     
     int ultimoTester;
         
 public:
 
-    AtendedorDispositivos();
+    AtendedorDispositivos(int id);
     AtendedorDispositivos(const AtendedorDispositivos& orig);    
     virtual ~AtendedorDispositivos();
         

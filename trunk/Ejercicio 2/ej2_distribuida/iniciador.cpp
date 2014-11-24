@@ -96,7 +96,7 @@ void createIPCObjects() {
     
     
     //creacion de colas
-    for (int q = MSGQUEUE_LECTURA_RESULTADOS; q <= MSGQUEUE_PLANILLA + 1; q++){
+    for (int q = MSGQUEUE_ESCRITURA_RESULTADOS; q <= MSGQUEUE_PLANILLA + 1; q++){
 		key = ftok(ipcFileName.c_str(), q);
 		if (msgget(key, 0660 | IPC_CREAT | IPC_EXCL) == -1){
 			std::cout << "No se pudo crear una cola: " << strerror(errno)<< std::endl;
@@ -152,29 +152,16 @@ void createSystemProcesses() {
                  exit(1);
             }       
         }
-        if (fork() == 0){
-			execlp("./ProgramasLectores/LectorProgramas-Tester", "LectorProgramas-Tester", param, (char*)0);
-            exit(1);
-		}
-		
-		
-		if (fork() == 0){
-			execlp("./ProgramasLectores/LectorNuevosRequerimientos-Tester", "LectorNuevosRequerimientos-Tester", (char*)0);
-			Logger::error("Error al ejecutar el programa lector de nuevos requerimientos tester", __FILE__);
-			exit(1);
-		}
-		
-		
-		if (fork() == 0){
-			execlp("./ProgramasLectores/LectorOrdenes-Tester", "LectorOrdenes-Tester", param, (char*)0);
-            exit(1);
-		}
-		
-		if (fork() == 0){
-			execlp("./ProgramasLectores/LectorResultados-Tester", "LectorResultados-Tester", param, (char*)0);
-            exit(1);
-		}
     }
+    
+    Logger::notice("Voy a ejecutar tcpserver_emisor", __FILE__);
+    if (fork() == 0){
+		std::stringstream ss;
+		ss << MSGQUEUE_DISPOSITIVOS_ESCRITURA;
+		execlp("./tcpserver_emisor", "tcpserver_emisor", "9000", ss.str().c_str(),(char*)0);
+		Logger::error("Error al ejecutar el programa tcpserver_emisor", __FILE__);
+		exit(1);
+	}
 
     // Creo al tecnico
     pid_t tecPid = fork();
@@ -183,7 +170,6 @@ void createSystemProcesses() {
         Logger::error("Error al ejecutar el programa tecnico", __FILE__);
         exit(1);
     }
-    	
     
     sleep(1);
     int idDispositivo = ID_DISPOSITIVO_START;
@@ -203,30 +189,10 @@ void createSystemProcesses() {
 				Logger::error("Error al ejecutar el programa dispositivo de ID" + idDispositivo, __FILE__);
 				exit(1);
 			}
-			
-			if (fork() == 0){
-				execlp("./ProgramasLectores/LectorNuevosRequerimientos-Disp", "LectorNuevosRequerimientos-Disp", param, (char*)0);
-				exit(1);
-			}
-			if (fork() == 0){
-				execlp("./ProgramasLectores/LectorProgramas-Disp", "LectorProgramas-Disp", param, (char*)0);
-				exit(1);
-			}
-			
-			if (fork() == 0){
-				execlp("./ProgramasLectores/LectorOrdenes-Disp", "LectorOrdenes-Disp", param, (char*)0);
-				exit(1);
-			}
-			
-			if (fork() == 0){
-				execlp("./ProgramasLectores/LectorResultados-Disp", "LectorResultados-Disp", param, (char*)0);
-				exit(1);
-			}
 		}
 		cantidad_lanzada += cantidad_a_lanzar;
 		usleep(1000);
 	}
     
     Logger::debug("Programas iniciados correctamente...", __FILE__);
-    
 }
