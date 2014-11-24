@@ -16,7 +16,7 @@ Planilla::Planilla() : semShMem(SEM_PLANILLA) {
         Logger::error(err.c_str(), __FILE__);
         throw err;
     }
-    this->shMemId = shmget(this->shMemKey, sizeof(int), IPC_CREAT);
+    this->shMemId = shmget(this->shMemKey, sizeof(int), IPC_CREAT | 0666);
     if(this->shMemId == -1) {
         std::string err("Error al conseguir la memoria compartida de la planilla. Error: " + std::string(strerror(errno)));
         Logger::error(err.c_str(), __FILE__);

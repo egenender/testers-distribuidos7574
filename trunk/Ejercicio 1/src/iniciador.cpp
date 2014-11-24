@@ -12,6 +12,7 @@
 #include <common/common.h>
 #include "unistd.h"
 #include <errno.h>
+#include <sstream>
 
 #include "ipc/Semaphore.h"
 #include "logger/Logger.h"
@@ -61,9 +62,6 @@ void createIPCObjects() {
     }
     ipcFile.close();
     
-    // Cola de mensajes entre dispositivo y testers
-    AtendedorDispositivos atendedor;
-    
     // Creo semaforo para la shmem de la planilla
     Semaphore semPlanilla(SEM_PLANILLA);
     semPlanilla.creaSem();
@@ -71,6 +69,9 @@ void createIPCObjects() {
     
     // Creo la shmem de la planilla
     Planilla planilla;
+    
+    // Cola de mensajes entre dispositivo y testers
+    AtendedorDispositivos atendedor;
     
     // Creo la cola de mensajes entre tester y tecnico
     DespachadorTecnicos despachador;
@@ -82,26 +83,29 @@ void createSystemProcesses() {
     // Creo dispositivos
     for(int i = 0; i < CANT_DISPOSITIVOS; i++) {
         char param[3];
-        int idDispositivo = ID_DISPOSITIVO_START;
-        sprintf(param, "%d\n", idDispositivo++);
+        sprintf(param, "%d\n", i + ID_DISPOSITIVO_START);
+        std::stringstream ss;
+        ss << "Se creara el dispositivo " << param;
+        Logger::notice(ss.str(), __FILE__);
         pid_t newPid = fork();
         if(newPid == 0) {
             // Inicio el programa correspondiente
             execlp("./dispositivo", "dispositivo", param, (char*)0);
-            Logger::error("Error al ejecutar el programa dispositivo de ID" + idDispositivo, __FILE__);
+            Logger::error("Error al ejecutar el programa dispositivo de ID", __FILE__);
+            exit(1);
         }
     }
     
     // Creo testers
     for(int i = 0; i < CANT_TESTERS; i++) {
         char param[3];
-        int idTester = ID_TESTER_START;
-        sprintf(param, "%d\n", idTester++);
+        sprintf(param, "%d\n", i + ID_TESTER_START);
         pid_t newPid = fork();
         if(newPid == 0) {
             // Inicio el programa correspondiente
             execlp("./tester", "tester", param, (char*)0);
-            Logger::error("Error al ejecutar el programa tester de ID" + idTester, __FILE__);
+            Logger::error("Error al ejecutar el programa tester de ID", __FILE__);
+            exit(1);
         }
     }
     
@@ -110,6 +114,7 @@ void createSystemProcesses() {
     if(tecPid == 0) {
         execlp("./tecnico", "tecnico", (char*)0);
         Logger::error("Error al ejecutar el programa tecnico", __FILE__);
+        exit(1);
     }
     
     Logger::debug("Programas iniciados correctamente...", __FILE__);

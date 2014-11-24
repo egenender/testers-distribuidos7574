@@ -42,12 +42,14 @@ int main(int argc, char** argv) {
 
     // Creo objeto planilla para destruir el semaforo y la memoria compartida que utiliza
     Planilla planilla;
-    if (!planilla.destruirMemoria()) {
-	Logger::error("No se pudo destruir la memoria compartida de la planilla...", __FILE__);
-    }
+    
     if (!planilla.destruirSemaforo()) {
 	std::string err = std::string("No se pudo destruir el semaforo de la planilla. Error: ") + std::string(strerror(errno));
 	Logger::error(err.c_str(), __FILE__);
+    }
+    
+    if (!planilla.destruirMemoria()) {
+	Logger::error("No se pudo destruir la memoria compartida de la planilla...", __FILE__);
     }
 
     unlink(ipcFileName.c_str());

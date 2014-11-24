@@ -44,14 +44,16 @@ int AtendedorDispositivos::recibirPrograma(int idDispositivo) {
         Logger::error(error.c_str(), __FILE__);
         throw error;
     }
+    this->idTester = msg.idTester;
     return msg.value;
 
 }
 void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {
 
     TMessageAtendedor msg;
-    msg.mtype = idDispositivo;
+    msg.mtype = this->idTester;
     msg.idDispositivo = idDispositivo;
+    msg.idTester = this->idTester;
     msg.value = resultado;
     
     int ret = msgsnd(this->msgQueueId, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
