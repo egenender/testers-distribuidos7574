@@ -55,7 +55,7 @@ void AtendedorTesters::enviarPrograma(int idDispositivo, int tester, int idProgr
     TMessageAtendedor msg;
     msg.mtype = idDispositivo;
     msg.idDispositivo = tester; //FIXME?
-    msg.value = idPrograma;
+    msg.value = 0;
     
     int ret = msgsnd(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
