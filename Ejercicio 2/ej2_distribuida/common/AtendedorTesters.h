@@ -12,8 +12,7 @@ class AtendedorTesters {
 private:
     int cola_requerimiento;
     int cola_recibos_tests;
-    int cola_ordenes;
-	int cola_programas;
+    int cola_dispositivos;
     
 public:
     AtendedorTesters();

@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
     ss.str("");
     
     // Comunicacion con el sistema de testeo
-    AtendedorDispositivos atendedor;
+    AtendedorDispositivos atendedor(id);
     // TODO: Log
     
     while(true) {

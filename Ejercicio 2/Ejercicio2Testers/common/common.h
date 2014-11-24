@@ -20,7 +20,7 @@ const int ID_DISPOSITIVO_START = 50;
 const int ID_TESTER_START = 1;
 const int MAX_DISPOSITIVOS_EN_SISTEMA = 100;
 
-const int MINIMOS_LANZADOS = 5;
+const int MINIMOS_LANZADOS = 1;
 const int MAXIMOS_LANZADOS = 15;
 
 // IDs de los IPC
@@ -59,7 +59,7 @@ const int REQUERIMIENTO_PROCESAR_SIGUIENTE = 4;
 
 // Archivos necesarios
 
-const std::string ipcFileName = "tmp/buchwaldipcs";
+const std::string ipcFileName = "/tmp/buchwaldipcs";
 
 const std::string logFileName = "log.txt";
 

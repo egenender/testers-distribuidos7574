@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-Wall -pedantic -pedantic-errors -g -ggdb -DDEBUG
 
-all: dispositivo tecnico arriboResul testerA testerB planillaA planillaB lectorNuevosReqD lectorNuevosReqT lectorProgD lectorProgT lectorOrdD lectorOrdT lectorResulD lectorResulT iniciador terminador cleanO
+all: dispositivo tecnico arriboResul testerA testerB planillaA planillaB tcpclient_receptor tcpserver_emisor iniciador terminador cleanO
 
 lockfile:
 	$(CC) $(CFLAGS) -c sync/LockFile.cpp
@@ -60,42 +60,25 @@ planillaA: planilla lockfile logger
 planillaB: planilla lockfile logger
 	$(CC) $(CFLAGS) Semaphore.o Planilla.o LockFile.o logger/Logger.o PlanillaTesterB.cpp -o PlanillaTesterB
 
+tcpclient_receptor: lockfile logger
+	$(CC) tcp/tcpclient_receptor.cpp LockFile.o logger/Logger.o -o tcpclient_receptor
+	
+tcpserver_emisor: lockfile logger
+	$(CC) tcp/tcpserver_emisor.cpp LockFile.o logger/Logger.o -o tcpserver_emisor
+
 iniciador: semaphore logger lockfile
 	$(CC) $(CFLAGS) Semaphore.o LockFile.o logger/Logger.o iniciador.cpp -o iniciador
 
 terminador: semaphore lockfile logger
 	$(CC) $(CFLAGS) Semaphore.o LockFile.o logger/Logger.o terminador.cpp -o terminador
 	
-lectorNuevosReqD: lockfile logger
-	$(CC) $(CFLAGS) LockFile.o logger/Logger.o ProgramasLectores/LectorNuevosRequerimientos-Disp.cpp -o ProgramasLectores/LectorNuevosRequerimientos-Disp
-
-lectorNuevosReqT: lockfile logger
-	$(CC) $(CFLAGS) LockFile.o logger/Logger.o ProgramasLectores/LectorNuevosRequerimientos-Tester.cpp -o ProgramasLectores/LectorNuevosRequerimientos-Tester
-	
-lectorProgD: lockfile logger
-	$(CC) $(CFLAGS) LockFile.o logger/Logger.o ProgramasLectores/LectorProgramas-Disp.cpp -o ProgramasLectores/LectorProgramas-Disp
-
-lectorProgT: lockfile logger
-	$(CC) $(CFLAGS) LockFile.o logger/Logger.o ProgramasLectores/LectorProgramas-Tester.cpp -o ProgramasLectores/LectorProgramas-Tester
-
-lectorOrdD: lockfile logger
-	$(CC) $(CFLAGS) LockFile.o logger/Logger.o ProgramasLectores/LectorOrdenes-Disp.cpp -o ProgramasLectores/LectorOrdenes-Disp
-
-lectorOrdT: lockfile logger
-	$(CC) $(CFLAGS) LockFile.o logger/Logger.o ProgramasLectores/LectorOrdenes-Tester.cpp -o ProgramasLectores/LectorOrdenes-Tester
-
-lectorResulD: lockfile logger
-	$(CC) $(CFLAGS) LockFile.o logger/Logger.o ProgramasLectores/LectorResultados-Disp.cpp -o ProgramasLectores/LectorResultados-Disp
-
-lectorResulT: lockfile logger
-	$(CC) $(CFLAGS) LockFile.o logger/Logger.o ProgramasLectores/LectorResultados-Tester.cpp -o ProgramasLectores/LectorResultados-Tester
-
-
 cleanO:
 	rm -f *.o
 
-clean: cleanO
+cleanLog:
 	rm -f log.txt
+
+clean: cleanO cleanLog
 	rm -f Dispositivo
 	rm -f Tecnico
 	rm -f ArriboDeResultados
@@ -103,14 +86,8 @@ clean: cleanO
 	rm -f TesterB
 	rm -f PlanillaTesterA
 	rm -f PlanillaTesterB
-	rm -f ProgramasLectores/LectorNuevosRequerimientos-Disp
-	rm -f ProgramasLectores/LectorNuevosRequerimientos-Tester
-	rm -f ProgramasLectores/LectorProgramas-Disp
-	rm -f ProgramasLectores/LectorProgramas-Tester
-	rm -f ProgramasLectores/LectorOrdenes-Disp
-	rm -f ProgramasLectores/LectorOrdenes-Tester
-	rm -f ProgramasLectores/LectorResultados-Disp
-	rm -f ProgramasLectores/LectorResultados-Tester
+	rm -f tcpserver_emisor
+	rm -f tcpclient_receptor
 	rm -f iniciador
 	rm -f terminador
 

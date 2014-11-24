@@ -1,0 +1,115 @@
+24/11/2014 18:07:01 [ iniciador.cpp ] Logger inicializado. Inicializando IPCs...
+24/11/2014 18:07:01 [ iniciador.cpp ] Objetos IPC inicializados correctamente. Iniciando procesos...
+24/11/2014 18:07:01 [ TesterA.cpp 5 ] Inicia el procesamiento, cargo el atendedor y mi iPlanilla
+24/11/2014 18:07:01 [ PlanillaTesterA.cpp 2 ] Inicia el procesamiento, cargando IPCS
+24/11/2014 18:07:01 [ PlanillaTesterA.cpp 2 ] Entrando a loop principal
+24/11/2014 18:07:01 [ TesterA.cpp 5 ] Espero por un nuevo requerimiento de testeo
+24/11/2014 18:07:01 [ PlanillaTesterA.cpp 4 ] Inicia el procesamiento, cargando IPCS
+24/11/2014 18:07:01 [ PlanillaTesterA.cpp 4 ] Entrando a loop principal
+24/11/2014 18:07:01 [ TesterA.cpp 4 ] Inicia el procesamiento, cargo el atendedor y mi iPlanilla
+24/11/2014 18:07:01 [ TesterA.cpp 4 ] Espero por un nuevo requerimiento de testeo
+24/11/2014 18:07:01 [ PlanillaTesterB.cpp 5 ] Inicia el procesamiento, cargando IPCS
+24/11/2014 18:07:01 [ PlanillaTesterB.cpp 5 ] Entrando a loop principal
+24/11/2014 18:07:01 [ ArriboDeResultados.cpp 3 ] Inicia el procesamiento, cargando IPCS
+24/11/2014 18:07:01 [ PlanillaTesterB.cpp 1 ] Inicia el procesamiento, cargando IPCS
+24/11/2014 18:07:01 [ PlanillaTesterB.cpp 1 ] Entrando a loop principal
+24/11/2014 18:07:01 [ PlanillaTesterB.cpp 4 ] Inicia el procesamiento, cargando IPCS
+24/11/2014 18:07:01 [ PlanillaTesterB.cpp 4 ] Entrando a loop principal
+24/11/2014 18:07:01 [ TesterA.cpp 1 ] Inicia el procesamiento, cargo el atendedor y mi iPlanilla
+24/11/2014 18:07:01 [ TesterA.cpp 1 ] Espero por un nuevo requerimiento de testeo
+24/11/2014 18:07:01 [ ArriboDeResultados.cpp 3 ] Procesamiento inicial completo, ejecutando ciclo principal
+24/11/2014 18:07:01 [ TesterB.cpp 5 ] Inicia el procesamiento, cargo el atendedor y mi iPlanilla
+24/11/2014 18:07:01 [ TesterB.cpp 5 ] Espero la llegada de un nuevo resultado
+24/11/2014 18:07:01 [ ArriboDeResultados.cpp 4 ] Inicia el procesamiento, cargando IPCS
+24/11/2014 18:07:01 [ ArriboDeResultados.cpp 4 ] Procesamiento inicial completo, ejecutando ciclo principal
+24/11/2014 18:07:01 [ PlanillaTesterA.cpp 3 ] Inicia el procesamiento, cargando IPCS
+24/11/2014 18:07:01 [ PlanillaTesterA.cpp 3 ] Entrando a loop principal
+24/11/2014 18:07:01 [ PlanillaTesterB.cpp 5 ] Recibo un pedido para que el tester B pueda iniciar el procesamiento de resultados
+24/11/2014 18:07:01 [ Planilla component 5 ] No hay resultados pendientes, asi que el tester B queda libre
+24/11/2014 18:07:01 [ TesterB.cpp 4 ] Inicia el procesamiento, cargo el atendedor y mi iPlanilla
+24/11/2014 18:07:01 [ TesterB.cpp 2 ] Inicia el procesamiento, cargo el atendedor y mi iPlanilla
+24/11/2014 18:07:01 [ ArriboDeResultados.cpp 2 ] Inicia el procesamiento, cargando IPCS
+24/11/2014 18:07:01 [ ArriboDeResultados.cpp 2 ] Procesamiento inicial completo, ejecutando ciclo principal
+24/11/2014 18:07:01 [ TesterA.cpp 3 ] Inicia el procesamiento, cargo el atendedor y mi iPlanilla
+24/11/2014 18:07:01 [ TesterA.cpp 3 ] Espero por un nuevo requerimiento de testeo
+24/11/2014 18:07:01 [ PlanillaTesterB.cpp 2 ] Inicia el procesamiento, cargando IPCS
+24/11/2014 18:07:01 [ PlanillaTesterB.cpp 2 ] Entrando a loop principal
+24/11/2014 18:07:01 [ TesterB.cpp 4 ] Espero la llegada de un nuevo resultado
+24/11/2014 18:07:01 [ PlanillaTesterB.cpp 4 ] Recibo un pedido para que el tester B pueda iniciar el procesamiento de resultados
+24/11/2014 18:07:01 [ Planilla component 4 ] No hay resultados pendientes, asi que el tester B queda libre
+24/11/2014 18:07:01 [ PlanillaTesterA.cpp 5 ] Inicia el procesamiento, cargando IPCS
+24/11/2014 18:07:01 [ PlanillaTesterA.cpp 5 ] Entrando a loop principal
+24/11/2014 18:07:01 [ TesterB.cpp 2 ] Espero la llegada de un nuevo resultado
+24/11/2014 18:07:01 [ PlanillaTesterB.cpp 2 ] Recibo un pedido para que el tester B pueda iniciar el procesamiento de resultados
+24/11/2014 18:07:01 [ Planilla component 2 ] No hay resultados pendientes, asi que el tester B queda libre
+24/11/2014 18:07:01 [ PlanillaTesterA.cpp 1 ] Inicia el procesamiento, cargando IPCS
+24/11/2014 18:07:01 [ PlanillaTesterA.cpp 1 ] Entrando a loop principal
+24/11/2014 18:07:01 [ TesterB.cpp 3 ] Inicia el procesamiento, cargo el atendedor y mi iPlanilla
+24/11/2014 18:07:01 [ TesterB.cpp 3 ] Espero la llegada de un nuevo resultado
+24/11/2014 18:07:01 [ ArriboDeResultados.cpp 5 ] Inicia el procesamiento, cargando IPCS
+24/11/2014 18:07:01 [ TesterB.cpp 1 ] Inicia el procesamiento, cargo el atendedor y mi iPlanilla
+24/11/2014 18:07:01 [ TesterB.cpp 1 ] Espero la llegada de un nuevo resultado
+24/11/2014 18:07:01 [ ArriboDeResultados.cpp 5 ] Procesamiento inicial completo, ejecutando ciclo principal
+24/11/2014 18:07:01 [ PlanillaTesterB.cpp 1 ] Recibo un pedido para que el tester B pueda iniciar el procesamiento de resultados
+24/11/2014 18:07:01 [ Planilla component 1 ] No hay resultados pendientes, asi que el tester B queda libre
+24/11/2014 18:07:01 [ ArriboDeResultados.cpp 1 ] Inicia el procesamiento, cargando IPCS
+24/11/2014 18:07:01 [ ArriboDeResultados.cpp 1 ] Procesamiento inicial completo, ejecutando ciclo principal
+24/11/2014 18:07:01 [ TesterA.cpp 2 ] Inicia el procesamiento, cargo el atendedor y mi iPlanilla
+24/11/2014 18:07:01 [ TesterA.cpp 2 ] Espero por un nuevo requerimiento de testeo
+24/11/2014 18:07:01 [ PlanillaTesterB.cpp 3 ] Inicia el procesamiento, cargando IPCS
+24/11/2014 18:07:01 [ PlanillaTesterB.cpp 3 ] Entrando a loop principal
+24/11/2014 18:07:01 [ PlanillaTesterB.cpp 3 ] Recibo un pedido para que el tester B pueda iniciar el procesamiento de resultados
+24/11/2014 18:07:01 [ Planilla component 3 ] No hay resultados pendientes, asi que el tester B queda libre
+24/11/2014 18:07:01 [ Tecnico.cpp ] El tecnico entra a esperar ordenes de reparacion...
+24/11/2014 18:07:02 [ iniciador.cpp ] Programas iniciados correctamente...
+24/11/2014 18:07:02 [ iniciador.cpp ] Procesos iniciados correctamente...
+24/11/2014 18:07:02 [ iniciador.cpp ] Sistema inicializado correctamente...
+24/11/2014 18:07:02 [ Dispositivo.cpp ] El dispositivo 50 se crea
+24/11/2014 18:07:02 [ Dispositivo.cpp ] El dispositivo 50 envia un requerimiento al sistema de testeo
+24/11/2014 18:07:02 [ TesterA.cpp 5 ] Recibido requerimiento desde dispositivo id 50
+24/11/2014 18:07:02 [ TesterA.cpp 5 ] Me fijo si hay lugar en la planilla
+24/11/2014 18:07:02 [ PlanillaTesterA.cpp 5 ] Recibo un pedido para agregar el dispositivo 50 a la planilla
+24/11/2014 18:07:02 [ common/Planilla.h ] Ahora hay 1 dispositivos en el sistema
+24/11/2014 18:07:02 [ Planilla component 5 ] El tester B esta libre, asi que el tester A puede trabajar
+24/11/2014 18:07:02 [ TesterA.cpp 5 ] HAY lugar para atender a dispositivo id 50
+24/11/2014 18:07:02 [ TesterA.cpp 5 ] Se envio el programa voy a marcarle a mi iplanilla que termine de procesar el requerimiento
+24/11/2014 18:07:02 [ TesterA.cpp 5 ] Espero por un nuevo requerimiento de testeo
+24/11/2014 18:07:02 [ PlanillaTesterA.cpp 5 ] Recibo un pedido para marcar la finalizacion de requerimiento pendiente
+24/11/2014 18:07:02 [ Planilla component 5 ] El tester A ahora esta libre
+24/11/2014 18:07:02 [ Planilla component 5 ] El tester B no estaba esperando, asi que no hago nada
+24/11/2014 18:07:02 [ Dispositivo.cpp ] El dispositivo 50 recibe el programa numero 66
+24/11/2014 18:07:02 [ Dispositivo.cpp ] El dispositivo 50 envia los resultados
+24/11/2014 18:07:02 [ Dispositivo.cpp ] El dispositivo 50 espera la orden del sistema de testeo...
+24/11/2014 18:07:02 [ ArriboDeResultados.cpp 5 ] Se recibe resultado de testeo desde el dispositivo 50
+24/11/2014 18:07:02 [ TesterB.cpp 5 ] Llega un nuevo resultado del dispositivo id 50
+24/11/2014 18:07:02 [ TesterB.cpp 5 ] El resultado es grave, debe apagarse el dispositivo
+24/11/2014 18:07:02 [ Tecnico.cpp ] El tecnico recibio una orden para reparar el dispositivo 50
+24/11/2014 18:07:02 [ Tecnico.cpp ] El tecnico entra a esperar ordenes de reparacion...
+24/11/2014 18:07:02 [ ArriboDeResultados.cpp 5 ] Puse el resultado en la cola correcta para que lo lea el tester B correspondiente
+24/11/2014 18:07:02 [ ArriboDeResultados.cpp 5 ] Aumente la cantidad de resultados pendientes de procesar para este tester
+24/11/2014 18:07:02 [ ArriboDeResultados.cpp 5 ] El tester B esta libre, asi que reviso la activida del tester A
+24/11/2014 18:07:02 [ ArriboDeResultados.cpp 5 ] El tester A NO esta ocupad, Asi que el Tester B ya puede actuar
+24/11/2014 18:07:02 [ TesterB.cpp 5 ] Envie orden correspondiente al dispositivo
+24/11/2014 18:07:02 [ TesterB.cpp 5 ] Elimine el dispositivo de mi iplanilla
+24/11/2014 18:07:02 [ PlanillaTesterB.cpp 5 ] Recibo un pedido para eliminar un dispositivo a la planilla
+24/11/2014 18:07:02 [ Planilla component 5 ] Ahora hay 0 dispositivos en el sistema
+24/11/2014 18:07:02 [ TesterB.cpp 5 ] Espero la llegada de un nuevo resultado
+24/11/2014 18:07:02 [ PlanillaTesterB.cpp 5 ] Recibo un pedido para poder procesar el siguiente resultado pendiente
+24/11/2014 18:07:02 [ Planilla component 5 ] En procesar siguiente, no hay resultados pendientes me fijo el estado de A
+24/11/2014 18:07:02 [ Planilla component 5 ] A no estaba esperando, asi que no hay nada que hacer
+24/11/2014 18:07:02 [ PlanillaTesterB.cpp 5 ] Recibo un pedido para que el tester B pueda iniciar el procesamiento de resultados
+24/11/2014 18:07:02 [ Planilla component 5 ] No hay resultados pendientes, asi que el tester B queda libre
+24/11/2014 18:21:47 [ terminador.cpp ] Logger inicializado. Destruyendo IPCs...
+24/11/2014 18:21:47 [ common/AtendedorTesters.cpp ] Error al recibir resultado del atendedor. Error: Identifier removed
+24/11/2014 18:21:47 [ common/AtendedorTesters.cpp ] Error al recibir requerimiento del atendedor. Error: Identifier removed
+24/11/2014 18:21:47 [ common/AtendedorTesters.cpp ] Error al recibir requerimiento del atendedor. Error: Identifier removed
+24/11/2014 18:21:47 [ common/AtendedorTesters.cpp ] Error al recibir requerimiento del atendedor. Error: Identifier removed
+24/11/2014 18:21:47 [ Dispositivo.cpp ] El dispositivo 50 recibe la orden de reinicio (66). Vuelvo pronto!
+24/11/2014 18:21:47 [ Dispositivo.cpp ] El dispositivo 50 ha terminado el testeo
+24/11/2014 18:21:47 [ common/AtendedorTesters.cpp ] Error al recibir resultado del atendedor. Error: Identifier removed
+24/11/2014 18:21:47 [ common/AtendedorTesters.cpp ] Error al recibir resultado del atendedor. Error: Identifier removed
+24/11/2014 18:21:47 [ common/AtendedorTesters.cpp ] Error al recibir requerimiento del atendedor. Error: Identifier removed
+24/11/2014 18:21:47 [ common/DespachadorTecnicos.cpp ] Error al recibir requerimiento del atendedor. Error: Identifier removed
+24/11/2014 18:21:47 [ common/AtendedorTesters.cpp ] Error al recibir requerimiento del atendedor. Error: Identifier removed
+24/11/2014 18:21:47 [ common/AtendedorTesters.cpp ] Error al recibir resultado del atendedor. Error: Identifier removed
+24/11/2014 18:21:47 [ common/AtendedorTesters.cpp ] Error al recibir resultado del atendedor. Error: Identifier removed

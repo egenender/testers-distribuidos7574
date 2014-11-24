@@ -5,33 +5,38 @@
  * Created on October 4, 2014, 8:04 PM
  */
 #include "AtendedorDispositivos.h"
-#include "common.h"
+#include "../common/common.h"
 #include <cstdlib>
+#include <string>
 
-AtendedorDispositivos::AtendedorDispositivos() { 
-    key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_NUEVO_REQUERIMIENTO_ENVIO);
+AtendedorDispositivos::AtendedorDispositivos(int idDispositivo) { 
+    key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_NUEVO_REQUERIMIENTO);
     this->cola_requerimiento = msgget(key, 0666);
     if(this->cola_requerimiento == -1) {
 		exit(1);
     }
     
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_ESCRITURA_RESULTADOS_ENVIO);
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_ESCRITURA_RESULTADOS);
     this->cola_tests = msgget(key, 0666);
     if(this->cola_tests == -1) {
         exit(1);
     }
     
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_ORDENES_LECTURA);
-    this->cola_ordenes = msgget(key, 0666);
-    if(this->cola_ordenes == -1) {
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_DISPOSITIVOS_LECTURA);
+    this->cola_dispositivos = msgget(key, 0666);
+    if(this->cola_dispositivos == -1) {
         exit(1);
     }
     
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_PROGRAMAS_LECTURA);
-    this->cola_programas = msgget(key, 0666);
-    if(this->cola_programas == -1) {
-        exit(1);
-    }
+    std::stringstream ss;
+    ss << idDispositivo;
+    
+    Logger::notice("Voy a ejecutar tcpclient_receptor", __FILE__);
+    if (fork() == 0){
+		execlp("./tcpclient_receptor", "tcpclient_receptor", "localhost", "9000", ss.str().c_str(), (char*)0);
+		Logger::error("Error al ejecutar el programa tcpclient_receptor", __FILE__);
+		exit(1);
+	}
 }
 
 AtendedorDispositivos::AtendedorDispositivos(const AtendedorDispositivos& orig) {
@@ -56,7 +61,7 @@ void AtendedorDispositivos::enviarRequerimiento(int idDispositivo) {
 
 int AtendedorDispositivos::recibirPrograma(int idDispositivo) {
     TMessageAtendedor msg;
-    int ret = msgrcv(this->cola_programas, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
+    int ret = msgrcv(this->cola_dispositivos, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
     if(ret == -1) {
         std::string error("Error al recibir programa del atendedor. Error: " + errno);
         Logger::error(error.c_str(), __FILE__);
@@ -86,7 +91,7 @@ void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {
 int AtendedorDispositivos::recibirOrden(int idDispositivo) {
 
     TMessageAtendedor msg;
-    int ret = msgrcv(this->cola_ordenes, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
+    int ret = msgrcv(this->cola_dispositivos, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
     if(ret == -1) {
         std::string error("Error al recibir orden del atendedor. Error: " + errno);
         Logger::error(error.c_str(), __FILE__);
