@@ -5,7 +5,7 @@
 namespace Constantes{
     
     namespace NombresDeParametros{
-        const std::string ARCHIVO_IPCS = "/home/marcos/sorrentino-ipcs";
+        const std::string ARCHIVO_IPCS = "ArchivoIpcs";
         const std::string CANT_DISPOSITIVOS = "CantDispositivos";
         const std::string CANT_TESTERS = "CantTesters";
         const std::string ID_DISPOSITIVO_START = "IdDispositivoStart";
