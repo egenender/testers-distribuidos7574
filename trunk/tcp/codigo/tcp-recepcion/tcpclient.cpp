@@ -23,9 +23,6 @@ int main(int argc, char *argv[])
       return -2;
     }
     
-    printf("Conectado al servidor. Presione una tecla para continuar.\n");
-    getchar();
-
     tic();
     int leido = 0;
     size_t acumulado = 0;
