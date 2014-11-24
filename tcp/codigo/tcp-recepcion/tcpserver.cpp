@@ -45,22 +45,28 @@ int main(int argc, char *argv[])
 	
     while(1){
 		int clientfd = accept(fd, (struct sockaddr*)NULL, NULL);
-
-		int enviado=0, acumulado=0;
-      
-		void* buffer = malloc(size);
-		int ok_read = msgrcv(cola, buffer, size - sizeof(long), id_lectura, 0);
-        if (ok_read == -1){
-			exit(0);
-		}
-		printf("Enviando %zu bytes...\n", size);
 		
-		while((enviado = write(clientfd, buffer, size)) > 0 && acumulado < size)
-			acumulado += enviado;
+		if (fork() == 0){
 
-		printf("Enviados %d bytes\n", acumulado);
+			int enviado=0, acumulado=0;
       
-		free(buffer);
+			void* buffer = malloc(size);
+			int ok_read = msgrcv(cola, buffer, size - sizeof(long), id_lectura, 0);
+			if (ok_read == -1){
+				exit(0);
+			}
+			printf("Enviando %zu bytes...\n", size);
+		
+			while((enviado = write(clientfd, buffer, size)) > 0 && acumulado < size)
+				acumulado += enviado;
+
+			printf("Enviados %d bytes\n", acumulado);
+      
+			free(buffer);
+			close(clientfd);
+			exit(0);
+			
+		}
 		close(clientfd);
 	}
 	
