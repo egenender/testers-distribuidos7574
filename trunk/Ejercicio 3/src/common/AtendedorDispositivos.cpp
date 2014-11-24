@@ -5,8 +5,13 @@ AtendedorDispositivos::AtendedorDispositivos( const Configuracion& config ) {
     const std::string archivoIpcs = config.ObtenerParametroString( Constantes::NombresDeParametros::ARCHIVO_IPCS );
     key_t key = ftok( archivoIpcs.c_str(), config.ObtenerParametroEntero( Constantes::NombresDeParametros::MSGQUEUE_NUEVO_REQUERIMIENTO ) );
     this->cola_requerimiento = msgget(key, 0666 | IPC_CREAT);
+    std::stringstream ss;
     if(this->cola_requerimiento == -1) {
         throw std::string("Error al obtener la cola del atendedor de dispositivos. Errno: " + errno);
+    }else{
+        ss << "Cola de requerimientos creada con id " << this->cola_requerimiento;
+        Logger::notice( ss.str().c_str(), __FILE__ );
+        ss.str("");
     }
     
     key = ftok( archivoIpcs.c_str(), config.ObtenerParametroEntero( Constantes::NombresDeParametros::MSGQUEUE_ESCRITURA_RESULTADOS ) );
@@ -14,6 +19,10 @@ AtendedorDispositivos::AtendedorDispositivos( const Configuracion& config ) {
     if(this->cola_tests == -1) {
         msgctl(this->cola_requerimiento, IPC_RMID, (struct msqid_ds*)0);
         throw std::string("Error al obtener la cola del atendedor de dispositivos. Errno: " + errno);
+    }else{
+        ss << "Cola de requerimientos creada con id " << this->cola_tests;
+        Logger::notice( ss.str().c_str(), __FILE__ );
+        ss.str("");
     }
 }
 

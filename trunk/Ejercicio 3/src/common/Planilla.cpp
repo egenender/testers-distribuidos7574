@@ -33,6 +33,7 @@ Planilla::Planilla(int idTester, const Configuracion& config) :
     this->sem_tester_resultado.getSem();
     this->sem_tester_segundo.getSem();
 
+    std::stringstream ss;
     //Shared memory local
     const std::string archivoIpcs = config.ObtenerParametroString( Constantes::NombresDeParametros::ARCHIVO_IPCS ).c_str();
     key_t key = ftok( archivoIpcs.c_str(), config.ObtenerParametroEntero(Constantes::NombresDeParametros::SHM_PLANILLA_LOCAL) + idTester);
@@ -49,7 +50,9 @@ Planilla::Planilla(int idTester, const Configuracion& config) :
     }
     this->shm_planilla_local = static_cast<planilla_local_t*>( shmat(m_IdShmLocal, NULL, 0) );
     if ( this->shm_planilla_local != (void*) -1 ) {
-        Logger::debug("Memoria compartida local de la planilla creada correctamente", __FILE__);
+        ss << "Memoria compartida local de la planilla creada correctamente con id " << m_IdShmLocal;
+        Logger::debug(ss.str().c_str(), __FILE__);
+        ss.str("");
     } else {
         std::string err = std::string("Error en shmat() de memoria local de la planilla. Error: ") + std::string(strerror(errno));
         Logger::error(err, __FILE__);
@@ -71,7 +74,9 @@ Planilla::Planilla(int idTester, const Configuracion& config) :
     }
     this->shm_planilla_general = static_cast<int*>( shmat(m_IdShmGeneral, NULL, 0) );
     if ( this->shm_planilla_general != (void*) -1 ) {
-        Logger::debug("Memoria compartida general de la planilla creada correctamente", __FILE__);
+        ss << "Memoria compartida local de la planilla creada correctamente con id " << m_IdShmGeneral;
+        Logger::debug(ss.str().c_str(), __FILE__);
+        ss.str("");
     } else {
         std::string err = std::string("Error en shmat() de memoria general de la planilla. Error: ") + std::string(strerror(errno));
         Logger::error(err, __FILE__);
