@@ -18,12 +18,7 @@ class AtendedorDispositivos {
 private:
     int msgQueueId;
     key_t key;
-    
-    typedef struct message {
-        long mtype;
-        int idDispositivo;
-        int value; // Este parametro posee el valor del requerimiento, del programa y del resultado
-    } TMessageAtendedor;
+    int idTester;
     
 public:
 

@@ -34,11 +34,12 @@ int AtendedorTesters::recibirRequerimiento() {
     return msg.idDispositivo;
 }
 
-void AtendedorTesters::enviarPrograma(int idDispositivo, int idPrograma) {
+void AtendedorTesters::enviarPrograma(int idDispositivo, int idPrograma, int idTester) {
 
     TMessageAtendedor msg;
     msg.mtype = idDispositivo;
     msg.idDispositivo = idDispositivo;
+    msg.idTester = idTester;
     msg.value = idPrograma;
     
     int ret = msgsnd(this->msgQueueId, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);

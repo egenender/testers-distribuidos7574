@@ -16,7 +16,7 @@ public:
     Programa(const Programa& orig);
     virtual ~Programa();
     
-    static int getPrograma() {return rand() % 100;};
+    static int getPrograma() {return ((rand() % 100) + 10);};
 
 };
 

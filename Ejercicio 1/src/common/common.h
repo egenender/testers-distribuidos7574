@@ -14,10 +14,10 @@
 
 // Constantes del sistema
 
-const int CANT_DISPOSITIVOS = 1;
-const int CANT_TESTERS = 1;
-const int ID_DISPOSITIVO_START = 2;
-const int ID_TESTER_START = 2;
+const int CANT_DISPOSITIVOS = 150;
+const int CANT_TESTERS = 5;
+const int ID_DISPOSITIVO_START = 10;
+const int ID_TESTER_START = ID_DISPOSITIVO_START + CANT_DISPOSITIVOS;
 const int MAX_DISPOSITIVOS_EN_SISTEMA = 100;
 
 // IDs de los IPC
@@ -41,6 +41,12 @@ const std::string ipcFileName = "/tmp/pereira-ipcs";
 
 const std::string logFileName = "log.txt";
 
+typedef struct message {
+    long mtype;
+    int idDispositivo;
+    int idTester;
+    int value; // Este parametro posee el valor del requerimiento, del programa y del resultado
+} TMessageAtendedor;
 
 #endif	/* COMMON_H */
 

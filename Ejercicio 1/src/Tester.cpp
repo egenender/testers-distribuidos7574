@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
 	    ss << "El tester " << id << " le avisa al dispositivo " << idDispositivo << " que no hay lugar";
 	    Logger::debug(ss.str().c_str(), __FILE__);
 	    ss.str("");
-            atendedor.enviarPrograma(idDispositivo, -1);
+            atendedor.enviarPrograma(idDispositivo, -1, id);
             continue;
         }
         
@@ -55,8 +55,8 @@ int main(int argc, char** argv) {
 	Logger::debug(ss.str().c_str(), __FILE__);
 	ss.str("");
 
-        atendedor.enviarPrograma(idDispositivo, Programa::getPrograma());
-        int resultado = atendedor.recibirResultado(idDispositivo);
+        atendedor.enviarPrograma(idDispositivo, Programa::getPrograma(), id);
+        int resultado = atendedor.recibirResultado(id);
 
 	ss << "El tester " << id << " recibe el resultado " << resultado << " por parte del dispositivo " << idDispositivo;
 	Logger::debug(ss.str().c_str(), __FILE__);
