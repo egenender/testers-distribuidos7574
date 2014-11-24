@@ -53,9 +53,9 @@ int main(int argc, char** argv) {
 
             ss << "El dispositivo " << id << " recibe el programa numero " << program << ". Enviando respuesta...";
             Logger::debug(ss.str().c_str(), __FILE__);
-            ;
             ss.str("");
 
+            usleep(rand() % 1000 + 1000);
             // Le envio resultado del primer programa de testeo
             atendedor.enviar1erRespuesta(id, rand() % 2);
 
@@ -73,10 +73,11 @@ int main(int argc, char** argv) {
                 }
             } while (program == -1);
 
-            ss << "El dispositivo " << id << " recibe el programa numero " << program << ". Enviando respuesta...";
+            ss << "El dispositivo " << id << " recibe el programa numero " << program << ". Enviando 2da respuesta...";
             Logger::debug(ss.str().c_str(), __FILE__);
             ss.str("");
 
+            usleep(rand() % 1000 + 1000);
             // Le envio resultado del segundo programa de testeo
             atendedor.enviarResultado(id, rand() % 2);
 
