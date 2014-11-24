@@ -3,12 +3,12 @@
 #include <sys/msg.h>
 #include <stdlib.h>
 
+#define TAM_BUFFER 10
 
 typedef struct mensaje{
 	long mtype;
-	char buffer[10];
+	char buffer[TAM_BUFFER + 1];
 } mensaje_t;
-
 
 int main(void){
 
