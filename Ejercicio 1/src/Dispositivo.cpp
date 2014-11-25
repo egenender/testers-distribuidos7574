@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
 	ss.str("");
 
         // Le envio resultado del programa de testeo
-        atendedor.enviarResultado(id, (rand() % 2) + 2);
+        atendedor.enviarResultado(id, rand() % 2);
         
 	ss << "El dispositivo " << id << " espera la orden del sistema de testeo...";
 	Logger::debug(ss.str().c_str(), __FILE__);

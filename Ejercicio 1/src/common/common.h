@@ -28,6 +28,7 @@ const int SHMEM_PLANILLA = 30;
 const int MSG_QUEUE_DESPACHADOR = 40;
 
 const int MTYPE_REQUERIMIENTO = 1;
+const int MTYPE_ORDEN = 1;
 
 const int ORDEN_APAGADO = 0;
 const int ORDEN_REINICIO = 1;

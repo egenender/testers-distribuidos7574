@@ -16,7 +16,7 @@ public:
     Resultado(const Resultado& orig);
     virtual ~Resultado();
     
-    static int esGrave(int resultado) {return (resultado == RESULTADO_GRAVE);};
+    static bool esGrave(int resultado) {return (resultado == RESULTADO_GRAVE);};
     
 };
 

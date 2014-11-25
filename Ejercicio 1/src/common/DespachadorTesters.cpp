@@ -27,7 +27,7 @@ DespachadorTesters::~DespachadorTesters() {
 void DespachadorTesters::enviarOrden(int idDispositivo) {
 
     TMessageDespachador msg;
-    msg.mtype = 0;
+    msg.mtype = MTYPE_ORDEN;
     msg.idDispositivo = idDispositivo;
     
     int ret = msgsnd(this->msgQueueId, &msg, sizeof(TMessageDespachador) - sizeof(long), 0);
