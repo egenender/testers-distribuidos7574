@@ -27,7 +27,7 @@ DespachadorTecnicos::~DespachadorTecnicos() {
 int DespachadorTecnicos::recibirOrden() {
 
     TMessageDespachador msg;
-    int ret = msgrcv(this->msgQueueId, &msg, sizeof(TMessageDespachador) - sizeof(long), 0, 0);
+    int ret = msgrcv(this->msgQueueId, &msg, sizeof(TMessageDespachador) - sizeof(long), MTYPE_ORDEN, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir requerimiento del atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
