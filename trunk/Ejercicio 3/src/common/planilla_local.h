@@ -8,7 +8,8 @@ typedef struct struct_planilla_local{
     int cantidad;
     int resultados;
     int resultadosParciales;
-    int estadoA;
-    int estadoB;
+    int estado1;
+    int estado2;
+    int estadoRes;
 }planilla_local_t;
 

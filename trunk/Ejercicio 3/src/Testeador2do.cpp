@@ -21,11 +21,17 @@ int main(int argc, char** argv) {
         
     while(true) {
         
+        
         // Espero un requerimiento
         int idDispositivo = atendedor.recibir2doRequerimiento();
-        
+     
         atendedor.enviarPrograma(idDispositivo, id, Programa::getPrograma());
+        
         planilla.iniciarProcesamientoResultadosParciales();
+        
+        planilla.procesarSiguienteResultado();
+        
+        
     }
 
     return 0;

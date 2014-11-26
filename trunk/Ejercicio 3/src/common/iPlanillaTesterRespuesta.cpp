@@ -30,7 +30,7 @@ void iPlanillaTesterRespuesta::eliminarDispositivo(int idDispositivo){
 void iPlanillaTesterRespuesta::iniciarProcesamientoDeResultados(){
     requerimiento_planilla_t requerimiento;
     requerimiento.tester = idTester;
-    requerimiento.tipoReq = Constantes::REQUERIMIENTO_ELIMINAR_DISPOSITIVO;
+    requerimiento.tipoReq = Constantes::REQUERIMIENTO_INICIAR_PROC_RESULTADOS;
     requerimiento.idDispositivo = 0;
     
     msgsnd(cola,&requerimiento, sizeof(requerimiento_planilla_t) - sizeof(long),0);
@@ -39,7 +39,7 @@ void iPlanillaTesterRespuesta::iniciarProcesamientoDeResultados(){
 void iPlanillaTesterRespuesta::procesarSiguiente(){
     requerimiento_planilla_t requerimiento;
     requerimiento.tester = idTester;
-    requerimiento.tipoReq = Constantes::REQUERIMIENTO_ELIMINAR_DISPOSITIVO;
+    requerimiento.tipoReq = Constantes::REQUERIMIENTO_PROCESAR_SIGUIENTE;
     requerimiento.idDispositivo = 0;
     
     msgsnd(cola,&requerimiento, sizeof(requerimiento_planilla_t) - sizeof(long),0);
