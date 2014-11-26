@@ -20,6 +20,6 @@ public:
     iPlanillaTester2do(int id, const Configuracion& config);
     
     virtual ~iPlanillaTester2do();
-    void iniciarProcesamientoDeResultados();
+    void iniciarProcesamientoDeResultadosParciales();
     void procesarSiguiente();    
 };

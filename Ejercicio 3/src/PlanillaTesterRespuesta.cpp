@@ -10,9 +10,6 @@ int main(int argc, char** argv) {
     while (true){
         msgrcv(planilla.queue(), &requerimiento, sizeof(requerimiento_planilla_t) - sizeof(long), id, 0 );
         switch(requerimiento.tipoReq){
-            case REQUERIMIENTO_AGREGAR:
-                planilla.agregar(requerimiento.idDispositivo);
-                break;
             case REQUERIMIENTO_ELIMINAR_DISPOSITIVO:
                 planilla.eliminar();
                 break;

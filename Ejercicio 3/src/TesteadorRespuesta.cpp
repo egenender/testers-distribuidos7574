@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
     // Obtengo comunicacion con los dispositivos
     AtendedorTesters atendedor;
     // Obtengo planilla general de sync con otros tester
-    iPlanillaTesterB planilla(id);
+    iPlanillaTesterRespuesta planilla(id);
     // Obtengo comunicacion con los tecnicos
     DespachadorTesters despachador;
     

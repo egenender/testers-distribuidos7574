@@ -17,10 +17,10 @@ iPlanillaTester2do::iPlanillaTester2do(const iPlanillaTester2do& orig) {
 iPlanillaTester2do::~iPlanillaTester2do() {
 }
 
-void iPlanillaTester2do::iniciarProcesamientoDeResultados(){
+void iPlanillaTester2do::iniciarProcesamientoDeResultadosParciales(){
     requerimiento_planilla_t requerimiento;
     requerimiento.tester = idTester;
-    requerimiento.tipoReq = Constantes::REQUERIMIENTO_PROCESAR_SIGUIENTE;
+    requerimiento.tipoReq = Constantes::REQUERIMIENTO_INICIAR_PROC_RESULTADOS_PARCIALES;
     requerimiento.idDispositivo = 0;
     
     msgsnd(cola,&requerimiento, sizeof(requerimiento_planilla_t) - sizeof(long),0);

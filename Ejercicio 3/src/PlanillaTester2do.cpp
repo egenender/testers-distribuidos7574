@@ -11,8 +11,8 @@ int main(int argc, char** argv) {
     while (true){
         msgrcv(planilla.queue(), &requerimiento, sizeof(requerimiento_planilla_t) - sizeof(long), id, 0 );
         switch(requerimiento.tipoReq){
-            case REQUERIMIENTO_INICIAR_PROC_RESULTADOS:
-                planilla.iniciarProcesamientoResultadosPendientes();
+            case REQUERIMIENTO_INICIAR_PROC_RESULTADOS_PARCIALES:
+                planilla.iniciarProcesamientoResultadosParciales();
                 break;
             case REQUERIMIENTO_PROCESAR_SIGUIENTE:
                 planilla.procesarSiguiente();

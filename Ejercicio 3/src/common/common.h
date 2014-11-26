@@ -46,6 +46,7 @@ namespace Constantes{
     const int REQUERIMIENTO_ELIMINAR_DISPOSITIVO = 2;
     const int REQUERIMIENTO_INICIAR_PROC_RESULTADOS = 3;
     const int REQUERIMIENTO_PROCESAR_SIGUIENTE = 4;
+    const int REQUERIMIENTO_INICIAR_PROC_RESULTADOS_PARCIALES = 5;
 
     // Archivos necesarios
     const std::string ARCHIVO_LOG = "log.txt";
