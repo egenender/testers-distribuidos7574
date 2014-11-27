@@ -13,6 +13,7 @@ public:
     void eliminarDispositivo(int iDdispositivo);
     void iniciarProcesamientoDeResultados();
     void procesarSiguiente();
+    void agregarResultado();
 
 };
 
