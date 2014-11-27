@@ -19,8 +19,8 @@ int main(int argc, char** argv) {
             case REQUERIMIENTO_PROCESAR_SIGUIENTE:
                 planilla.procesarSiguiente();
                 break;
-            case REQUERIMIENTO_TERMINO_PENDIENTE_REQ:
-                planilla.terminadoRequerimientoPendiente();
+            case REQUERIMIENTO_AGREGAR_RESULTADO:
+                planilla.agregarResultado();
                 break;
         }
               

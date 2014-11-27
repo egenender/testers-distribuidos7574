@@ -21,5 +21,6 @@ public:
     
     virtual ~iPlanillaTester2do();
     void iniciarProcesamientoDeResultadosParciales();
-    void procesarSiguiente();    
+    void procesarSiguiente();
+    void agregarResultadoParcial();
 };

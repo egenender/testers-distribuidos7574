@@ -24,9 +24,13 @@ int main(int argc, char** argv) {
     DespachadorTesters despachador;
     
     while(true) {
+    
+        resultado_test_t resultado = atendedor.recibirResultado(id);
+        
+        //meto el resultado en la planilla 
+        
         planilla.iniciarProcesamientoDeResultados();
         
-        resultado_test_t resultado = atendedor.recibirResultado(id);
         int orden;
         if(Resultado::esGrave(resultado)) {
             despachador.enviarOrden(resultado.dispositivo);

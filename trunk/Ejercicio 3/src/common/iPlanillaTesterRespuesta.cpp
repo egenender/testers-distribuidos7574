@@ -45,5 +45,14 @@ void iPlanillaTesterRespuesta::procesarSiguiente(){
     msgsnd(cola,&requerimiento, sizeof(requerimiento_planilla_t) - sizeof(long),0);
 }
 
+void iPlanillaTesterRespuesta::agregarResultado(){
+    requerimiento_planilla_t requerimiento;
+    requerimiento.tester = idTester;
+    requerimiento.tipoReq = Constantes::REQUERIMIENTO_AGREGAR_RESULTADO;
+    requerimiento.idDispositivo = 0;
+    
+    msgsnd(cola,&requerimiento, sizeof(requerimiento_planilla_t) - sizeof(long),0);
+}
+
 
 

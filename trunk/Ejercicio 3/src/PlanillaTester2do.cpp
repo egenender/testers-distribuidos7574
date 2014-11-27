@@ -17,6 +17,9 @@ int main(int argc, char** argv) {
             case REQUERIMIENTO_PROCESAR_SIGUIENTE:
                 planilla.procesarSiguiente();
                 break;
+            case REQUERIMIENTO_AGREGAR_RESULTADO_PARCIAL:
+                planilla.agregarResultadoParcial();
+                break;
         }
               
     }

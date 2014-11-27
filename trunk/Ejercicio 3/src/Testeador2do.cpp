@@ -24,12 +24,14 @@ int main(int argc, char** argv) {
         
         // Espero un requerimiento
         int idDispositivo = atendedor.recibir2doRequerimiento();
-     
+      
+        // meto resultado parcial en la planilla
+        
         atendedor.enviarPrograma(idDispositivo, id, Programa::getPrograma());
         
         planilla.iniciarProcesamientoResultadosParciales();
         
-        planilla.procesarSiguienteResultado();
+        planilla.procesarSiguiente();
         
         
     }

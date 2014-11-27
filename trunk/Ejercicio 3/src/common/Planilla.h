@@ -1,7 +1,13 @@
 #pragma once
 
-#include "planilla_local.h"
 #include "../ipc/Semaphore.h"
+#include "planilla_local.h"
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/msg.h>
+#include <cstdlib>
+#include "../logger/Logger.h"
+#include <string>
 
 class Configuracion;
 
@@ -21,6 +27,8 @@ private:
     int m_IdShmLocal;
     int m_IdShmGeneral;
     int m_MaxDispositivosLocales;
+    int id;
+    std::string nombre;
     
 //Prohibo copia y asignacion
     Planilla(const Planilla& orig);
@@ -35,10 +43,9 @@ public:
     void iniciarProcesamientoResultadosParciales();
 
     void eliminar(int idDispositivo);
-    bool destruirCola();
-    bool destruirMemoriaGeneral();
-    bool destruirMemoriaLocal();
-    bool destruirSemaforoGeneral();
-    bool destruirSemaforosLocales( std::string& msjError );
+    
+    void agregarResultado();
+    void agregarResultadoParcial();
+
 };
 
