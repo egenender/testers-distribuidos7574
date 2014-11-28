@@ -12,7 +12,7 @@ using namespace std;
 
 int main(int argc, char** argv) {
     
-    Logger::initialize(logFileName.c_str(), Logger::LOG_NOTICE);
+    Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
     // El primer parametro es el id del tester
     int id = atoi(argv[1]);
     
@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
     
         resultado_test_t resultado = atendedor.recibirResultado(id);
         
-        //meto el resultado en la planilla 
+        planilla.agregarResultado();
         
         planilla.iniciarProcesamientoDeResultados();
         

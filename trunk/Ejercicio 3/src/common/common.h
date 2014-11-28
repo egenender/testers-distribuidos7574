@@ -9,8 +9,7 @@ namespace Constantes{
         const std::string CANT_DISPOSITIVOS = "CantDispositivos";
         const std::string CANT_TESTERS = "CantTesters";
         const std::string ID_DISPOSITIVO_START = "IdDispositivoStart";
-        const std::string ID_TESTER_START = "IdTesterStart";
-        const std::string MAX_DISPOSITIVOS_POR_TESTER = "MaxDispositivosPorTester";
+        const std::string ID_TESTER_START = "IdTesterStart";        
         const std::string MSGQUEUE_DESPACHADOR = "MsgQueueDespachador";
         const std::string MSGQUEUE_ESCRITURA_RESULTADOS = "MsgQueueEscrituraResultados";
         const std::string MSGQUEUE_LECTURA_RESULTADOS = "MsgQueueLecturaResultados";
@@ -30,6 +29,7 @@ namespace Constantes{
 
     // IDs de los IPC
     const int CANTIDAD_TESTERS_MAXIMA = 5;
+    const int MAX_DISPOSITIVOS_POR_TESTER = 20;
 
     const int MTYPE_REQUERIMIENTO = 1;
     const int MTYPE_REQUERIMIENTO_SEGUNDO = 2;

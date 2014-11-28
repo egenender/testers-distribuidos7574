@@ -26,15 +26,16 @@ private:
     int cola;
     int m_IdShmLocal;
     int m_IdShmGeneral;
-    int m_MaxDispositivosLocales;
     int id;
     std::string nombre;
+    
+    std::stringstream ss;
     
 //Prohibo copia y asignacion
     Planilla(const Planilla& orig);
     Planilla& operator=(const Planilla& rv);
 public:
-    Planilla(int tester, const Configuracion& config);
+    Planilla(int idTester, const Configuracion& config);
     int queue();
     void agregar(int idDispositivo);
     void terminadoRequerimientoPendiente();
