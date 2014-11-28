@@ -29,7 +29,7 @@ FIN_SOURCES=src/finalizador.cpp
 FIN_OBJ=$(FIN_SOURCES:.cpp=.o)
 FIN_BIN=$(BINF)/finalizador
 
-all: iniciador dispositivo tester tecnico finalizador
+all: iniciador dispositivo tester tecnico
 
 iniciador: $(INIT_OBJ) $(SHARED_OBJ)
 	$(CC) $(SHARED_OBJ) $(INIT_OBJ) -o $(INIT_BIN) -I$(HEADER_DIR)

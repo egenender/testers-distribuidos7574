@@ -12,7 +12,7 @@ using namespace std;
 
 int main(int argc, char** argv) {
 
-    Logger::initialize(Constantes::ARCHIVO_LOG.c_str(), Logger::LOG_NOTICE);
+    Logger::initialize(Constantes::ARCHIVO_LOG.c_str(), Logger::LOG_DEBUG);
     // El primer parametro es el id del tester
     int id = atoi(argv[1]);
     

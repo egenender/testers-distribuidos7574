@@ -10,7 +10,7 @@ using namespace std;
 
 int main(int argc, char** argv) {
     
-    Logger::initialize(logFileName.c_str(), Logger::LOG_NOTICE);
+    Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
     // El primer parametro es el id del tester
     int id = atoi(argv[1]);
     
@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
         // Espero un requerimiento
         int idDispositivo = atendedor.recibir2doRequerimiento();
       
-        // meto resultado parcial en la planilla
+        planilla.agregarResultadoParcial();
         
         atendedor.enviarPrograma(idDispositivo, id, Programa::getPrograma());
         
