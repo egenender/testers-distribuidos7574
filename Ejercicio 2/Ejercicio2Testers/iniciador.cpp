@@ -22,9 +22,14 @@
 #include "common/DespachadorTecnicos.h"
 
 void createIPCObjects();
-void createSystemProcesses();
+void createSystemProcesses(int, int, int, int);
 
 int main(int argc, char** argv) {
+	if (argc != 5){
+		printf("Uso: %s <CANT_DISPOSITIVOS> <MIN_DISP> <MAX_DISP> <TIEMPO_SEP_SIM_MILISEC>\n", argv[0]);
+		exit(0);
+	}
+	
     srand(time(NULL));
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
     Logger::error("Logger inicializado. Inicializando IPCs...", __FILE__);
@@ -38,7 +43,7 @@ int main(int argc, char** argv) {
     }
     Logger::debug("Objetos IPC inicializados correctamente. Iniciando procesos...", __FILE__);
     
-    createSystemProcesses();
+    createSystemProcesses(atoi(argv[1]), atoi(argv[2]), atoi(argv[3]), atoi(argv[4]));
     Logger::debug("Procesos iniciados correctamente...", __FILE__);
     
     Logger::notice("Sistema inicializado correctamente...", __FILE__);
@@ -105,7 +110,7 @@ void createIPCObjects() {
           
 }
 
-void createSystemProcesses() {
+void createSystemProcesses(int cant_dispositivos, int min_lanzados, int max_lanzados, int micro_sim) {
            
     // Creo testers
     int idTester = ID_TESTER_START;
@@ -165,10 +170,10 @@ void createSystemProcesses() {
     sleep(1);
     int idDispositivo = ID_DISPOSITIVO_START;
     int cantidad_lanzada = 0;
-    while (cantidad_lanzada < CANT_DISPOSITIVOS){
-		int cantidad_a_lanzar = MINIMOS_LANZADOS + rand() % (MAXIMOS_LANZADOS - MINIMOS_LANZADOS + 1);
-		if (cantidad_a_lanzar + cantidad_lanzada > CANT_DISPOSITIVOS)
-			cantidad_a_lanzar = CANT_DISPOSITIVOS - cantidad_lanzada;
+    while (cantidad_lanzada < cant_dispositivos){
+		int cantidad_a_lanzar = min_lanzados + rand() % (max_lanzados - min_lanzados + 1);
+		if (cantidad_a_lanzar + cantidad_lanzada > cant_dispositivos)
+			cantidad_a_lanzar = cant_dispositivos - cantidad_lanzada;
 		for (int i = 0; i < cantidad_a_lanzar; i++){
 			char param[3];
 			sprintf(param, "%d", idDispositivo);
@@ -182,7 +187,8 @@ void createSystemProcesses() {
 			}
 		}
 		cantidad_lanzada += cantidad_a_lanzar;
-		usleep(1000);
+		long tiempo = micro_sim * 1000;
+		usleep(tiempo);
 	}
     
     Logger::debug("Programas iniciados correctamente...", __FILE__);

@@ -3,7 +3,7 @@
 #include <string>
 #include "../logger/Logger.h"
 
-AtendedorTesters::AtendedorTesters() {
+AtendedorTesters::AtendedorTesters() : sem_cola_especiales(SEM_COLA_ESPECIALES){
     key_t key;
     key = ftok(ipcFileName.c_str(), MSGQUEUE_DISPOSITIVOS);
     this->cola_requerimiento = msgget(key, 0666);
@@ -28,9 +28,11 @@ AtendedorTesters::AtendedorTesters() {
         Logger::error(err, __FILE__);
         exit(1);
     }
+    
+    sem_cola_especiales.getSem();
 }
 
-AtendedorTesters::AtendedorTesters(const AtendedorTesters& orig) {
+AtendedorTesters::AtendedorTesters(const AtendedorTesters& orig)  : sem_cola_especiales(SEM_COLA_ESPECIALES){
 }
 
 AtendedorTesters::~AtendedorTesters() {
@@ -50,23 +52,24 @@ int AtendedorTesters::recibirRequerimiento() {
 
 void AtendedorTesters::enviarPrograma(int idDispositivo, int tester, int idPrograma) {
 
-    TMessageAtendedor msg;
-    msg.mtype = idDispositivo;
-    msg.tester = tester; 
-    msg.value = idPrograma;
-    msg.idDispositivo = 0;
-    msg.cant_testers = 0;
+    TMessageAtendedor* msg = (TMessageAtendedor*) malloc(sizeof(TMessageAtendedor));
+    msg->mtype = idDispositivo;
+    msg->tester = tester; 
+    msg->value = idPrograma;
+    msg->idDispositivo = 0;
+    msg->cant_testers = 0;
  
 	std::stringstream ss;
 	ss << "Envio programa a dispositivo " << idDispositivo << " desde el tester " << tester;
 	Logger::notice(ss.str(), __FILE__);
-    int ret = msgsnd(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    int ret = msgsnd(this->cola_requerimiento, msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    free(msg);
     if(ret == -1) {
         std::string error = std::string("Error al enviar programa al atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
-
+	
 }
 
 resultado_test_t AtendedorTesters::recibirResultado(int idTester) {
@@ -98,6 +101,7 @@ void AtendedorTesters::enviarOrden(int idDispositivo, int orden, int cantidad) {
 }
 
 void AtendedorTesters::enviarAEspeciales(bool cuales[], int posicion){
+	sem_cola_especiales.p();
 	for (int i = 0; i < CANT_TESTERS_ESPECIALES; i++){
 		posicion_en_shm_t pos;
 		pos.mtype = i + ID_TESTER_ESPECIAL_START ;
@@ -110,6 +114,7 @@ void AtendedorTesters::enviarAEspeciales(bool cuales[], int posicion){
 			exit(0);
 		}
 	}
+	sem_cola_especiales.v();
 }
 
 int AtendedorTesters::recibirRequerimientoEspecial(int idEsp) {

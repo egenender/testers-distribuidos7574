@@ -46,18 +46,20 @@ void AtendedorDispositivos::enviarRequerimiento(int idDispositivo) {
 }
 
 int AtendedorDispositivos::recibirPrograma(int idDispositivo) {
-    TMessageAtendedor msg;
-    int ret = msgrcv(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
+    TMessageAtendedor* msg = (TMessageAtendedor*) malloc (sizeof(TMessageAtendedor));;
+    int ret = msgrcv(this->cola_requerimiento, msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
     if(ret == -1) {
         std::string error("Error al recibir programa del atendedor. Error: " + errno);
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
     std::stringstream ss;
-    ss << "El dispositivo "<< idDispositivo << " recibe programa desde tester " << msg.tester;
+    ss << "El dispositivo "<< idDispositivo << " recibe programa desde tester " << msg->tester;
     Logger::notice(ss.str(), __FILE__);
-    this->ultimoTester = msg.tester;
-    return msg.value;
+    this->ultimoTester = msg->tester;
+    int valor = msg->value;
+    free(msg);
+    return valor;
 
 }
 void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {

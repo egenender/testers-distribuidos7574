@@ -7,12 +7,14 @@
 
 #include "../logger/Logger.h"
 #include "common.h"
+#include "../ipc/Semaphore.h"
 
 class AtendedorTesters {
 private:
     int cola_requerimiento;
     int cola_recibos_tests;
     int cola_testers_especiales;
+	Semaphore sem_cola_especiales;
   
 public:
     AtendedorTesters();

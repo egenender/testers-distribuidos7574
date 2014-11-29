@@ -30,6 +30,7 @@ int main(int argc, char** argv) {
         int idDispositivo = despachador.recibirOrden();
 	ss << "El tecnico recibio una orden para reparar el dispositivo " << idDispositivo;
         Logger::notice(ss.str().c_str(), __FILE__);
+        ss.str("");
 	} catch(std::string exception) {
 		Logger::error("Error en el tecnico...", __FILE__);
 		break;

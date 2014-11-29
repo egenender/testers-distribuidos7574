@@ -21,10 +21,14 @@
 #include "logger/Logger.h"
 
 void createIPCObjects();
-void createSystemProcesses();
+void createSystemProcesses(int, int, int, int);
 
 int main(int argc, char** argv) {
-    
+    if (argc != 5){
+		printf("Uso: %s <CANT_DISPOSITIVOS> <MIN_DISP> <MAX_DISP> <TIEMPO_SEP_SIM_MILISEC>\n", argv[0]);
+		exit(0);
+	}
+
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
     Logger::error("Logger inicializado. Inicializando IPCs...", __FILE__);
     
@@ -37,7 +41,7 @@ int main(int argc, char** argv) {
     }
     Logger::debug("Objetos IPC inicializados correctamente. Iniciando procesos...", __FILE__);
     
-    createSystemProcesses();
+    createSystemProcesses(atoi(argv[1]), atoi(argv[2]), atoi(argv[3]), atoi(argv[4]));
     Logger::debug("Procesos iniciados correctamente...", __FILE__);
     
     Logger::notice("Sistema inicializado correctamente...", __FILE__);
@@ -62,6 +66,10 @@ void createIPCObjects() {
     Semaphore semPlanillaGeneral(SEM_PLANILLA_GENERAL);
     semPlanillaGeneral.creaSem();
     semPlanillaGeneral.iniSem(1); // Inicializa el semaforo en 1
+    
+    Semaphore sem_cola_especiales(SEM_COLA_ESPECIALES);
+    sem_cola_especiales.creaSem();
+    sem_cola_especiales.iniSem(1); // Inicializa el semaforo en 1
 
     key_t key = ftok(ipcFileName.c_str(), SHM_PLANILLA_GENERAL);
     int shmgeneralid = shmget(key, sizeof(resultado_t) * CANT_RESULTADOS, IPC_CREAT | IPC_EXCL | 0660);
@@ -90,7 +98,7 @@ void createIPCObjects() {
    
 }
 
-void createSystemProcesses() {
+void createSystemProcesses(int cant_dispositivos, int min_lanzados, int max_lanzados, int micro_sim) {
     // Creo testers
     int idTester = ID_TESTER_START;
     for(int i = 0; i < CANT_TESTERS_COMUNES; i++, idTester++) {
@@ -132,10 +140,10 @@ void createSystemProcesses() {
     sleep(1);
     int idDispositivo = ID_DISPOSITIVO_START;
     int cantidad_lanzada = 0;
-    while (cantidad_lanzada < CANT_DISPOSITIVOS){
-		int cantidad_a_lanzar = MINIMOS_LANZADOS + rand() % (MAXIMOS_LANZADOS - MINIMOS_LANZADOS + 1);
-		if (cantidad_a_lanzar + cantidad_lanzada > CANT_DISPOSITIVOS)
-			cantidad_a_lanzar = CANT_DISPOSITIVOS - cantidad_lanzada;
+    while (cantidad_lanzada < cant_dispositivos){
+		int cantidad_a_lanzar = min_lanzados + rand() % (max_lanzados - min_lanzados + 1);
+		if (cantidad_a_lanzar + cantidad_lanzada > cant_dispositivos)
+			cantidad_a_lanzar = cant_dispositivos - cantidad_lanzada;
 		for (int i = 0; i < cantidad_a_lanzar; i++){
 			char param[3];
 			sprintf(param, "%d", idDispositivo);
@@ -149,7 +157,8 @@ void createSystemProcesses() {
 			}
 		}
 		cantidad_lanzada += cantidad_a_lanzar;
-		usleep(1000);
+		long tiempo = micro_sim * 1000;
+		usleep(tiempo);
 	}
 	    
     Logger::debug("Programas iniciados correctamente...", __FILE__);
