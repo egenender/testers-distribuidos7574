@@ -31,6 +31,10 @@ int main(int argc, char** argv) {
     semPlanillaGeneral.getSem();
     semPlanillaGeneral.eliSem();
     
+    Semaphore sem_cola_especiales(SEM_COLA_ESPECIALES);
+    sem_cola_especiales.getSem();
+    sem_cola_especiales.eliSem(); // Inicializa el semaforo en 1
+    
         //Destruccion de colas
     for (int q = MSGQUEUE_DISPOSITIVOS; q <= MSGQUEUE_DESPACHADOR; q++){
 		key = ftok(ipcFileName.c_str(), q);

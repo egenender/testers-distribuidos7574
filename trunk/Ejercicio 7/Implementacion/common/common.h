@@ -29,6 +29,7 @@ const int MAXIMOS_LANZADOS = 10;
 // IDs de los IPC
 const int SEM_PLANILLA_GENERAL = 1;
 const int SHM_PLANILLA_GENERAL = 2;
+const int SEM_COLA_ESPECIALES = 3;
 
 const int MSGQUEUE_DISPOSITIVOS = 31;
 const int MSGQUEUE_TESTERS = 32;
@@ -57,7 +58,7 @@ const int MAXIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION = 4;
 const int MINIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION = 2;
 // Archivos necesarios
 
-const std::string ipcFileName = "tmp/buchwaldipcs";
+const std::string ipcFileName = "/tmp/buchwaldipcs";
 
 const std::string logFileName = "log.txt";
 
