@@ -11,7 +11,7 @@ int main(void){
 
 	
 	if (fork() == 0){
-		execlp("./tcpclient", "tcpclient", "localhost","9000","3",(char*)0);
+		execlp("./tcpclient_receptor", "tcpclient_receptor", "localhost","9000","3",(char*)0);
 		exit(1);
 	}
 	
