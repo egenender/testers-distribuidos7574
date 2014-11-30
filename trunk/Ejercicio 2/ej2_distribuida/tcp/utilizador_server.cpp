@@ -11,18 +11,22 @@ int main(void){
 
 	
 	if (fork() == 0){
-		execlp("./tcpserver", "tcpserver", "9000","1",(char*)0);
+		execlp("./tcpserver_emisor", "tcpserver_emisor", "9000","1",(char*)0);
 		exit(1);
 	}
 	
 	TMessageAtendedor msg;
 	
-	msg.mtype = 3;
-	msg.idDispositivo = 7;
+	msg.mtype = 2;
+	msg.idDispositivo = 6;
 	msg.cola_a_usar = 2;
 	
 	printf ("Voy a mandar mensaje a dispositivo 3\n");
 	int ok = msgsnd(cola_server, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+	msg.mtype = 3;
+	msg.idDispositivo = 7;
+	ok = msgsnd(cola_server, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+	
     if (ok == -1){
 		exit(0);
 	}
