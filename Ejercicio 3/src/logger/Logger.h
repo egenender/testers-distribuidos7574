@@ -22,6 +22,7 @@ private:
 	unsigned short int _logLevel;
 	struct tm* _currentTime;
 	static Logger* _logger;
+        static char salida[];
 
 	Logger(const char* filename) : _output(filename), _logLevel(Logger::LOG_NOTICE), _currentTime(NULL) {};
 	virtual ~Logger() {
@@ -36,6 +37,7 @@ public:
 	static const unsigned short int LOG_NOTICE = 2;
 	static const unsigned short int LOG_WARNING = 3;
 	static const unsigned short int LOG_CRITICAL = 4;
+        
 
 	/*
 	 * filename: nombre del archivo a crear

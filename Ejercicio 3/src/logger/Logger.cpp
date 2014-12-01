@@ -8,8 +8,10 @@
 #include "Logger.h"
 
 #include <iostream>
+#include <cstring>
 
 Logger* Logger::_logger = NULL;
+char Logger::salida[2048];
 
 void Logger::log(const std::string& msg, unsigned short int logLevel) {
 	if (logLevel >= _logger->_logLevel) {
@@ -28,7 +30,9 @@ void Logger::log(const std::string& msg, unsigned short int logLevel) {
 		_logger->_output.tomarLock();
 		_logger->_output.escribir((const void*)oss.str().c_str(), (long int)oss.str().size());
 		// Comentar esto cuando haga falta
-		std::cout << oss.str() << std::flush;
+		//std::cout << oss.str() << std::flush;
+                strcpy(salida,oss.str().c_str());
+                write( fileno(stdout) , salida, oss.str().size());
 		_logger->_output.liberarLock();
 	}
 }

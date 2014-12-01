@@ -13,6 +13,7 @@ public:
     bool p();
     bool v();
     bool eliSem();
+    int getSemId();
 
 private:
     int identificador; // nro de IPC del mismo directorio p/clave

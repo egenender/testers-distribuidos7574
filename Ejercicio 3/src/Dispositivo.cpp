@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
                 Logger::debug(ss.str().c_str(), __FILE__);
                 ss.str("");
                 // Si no hay programa -> no hay lugar -> Duermo y envio otro req mas tarde
-                sleep(rand() % 60 + 60);
+                sleep(rand() % 5 + 5);
                 continue;
             }
 
@@ -107,6 +107,7 @@ int main(int argc, char** argv) {
 
     ss << "El dispositivo " << id << " ha terminado el testeo";
     Logger::notice(ss.str().c_str(), __FILE__);
+    ss.str("");
 
     Logger::destroy();
 

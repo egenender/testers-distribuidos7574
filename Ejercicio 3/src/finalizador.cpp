@@ -1,9 +1,9 @@
-/* 
+/*
  * File:   terminador.cpp
  * Author: knoppix
  *
  * Created on October 4, 2014, 7:09 PM
- * 
+ *
  * Destruye todos los IPCs utilizados en la aplicacion
  */
 
@@ -22,7 +22,7 @@ int main( int argc, char** argv ){
 
     Logger::initialize(Constantes::ARCHIVO_LOG.c_str(), Logger::LOG_DEBUG);
     Logger::notice("Logger inicializado. Destruyendo IPCs...", __FILE__);
-    
+   
     Configuracion config;
     if( !config.LeerDeArchivo() ){
         Logger::error("Archivo de configuracion no encontrado", __FILE__);
@@ -77,4 +77,3 @@ int main( int argc, char** argv ){
 
     return 0;
 }
-

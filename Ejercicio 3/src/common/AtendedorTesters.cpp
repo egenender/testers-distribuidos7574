@@ -7,6 +7,12 @@ AtendedorTesters::AtendedorTesters( const Configuracion& config ) {
     key = ftok( archivoIpcs.c_str(),
                 config.ObtenerParametroEntero(Constantes::NombresDeParametros::MSGQUEUE_NUEVO_REQUERIMIENTO) );
     this->cola_requerimiento = msgget(key, 0666 | IPC_CREAT);
+    
+    std::stringstream ss; //<DBG>
+    ss << "MSGQUEUE_NUEVO_REQUERIMIENTO creada con id " << cola_requerimiento;
+    Logger::notice( ss.str().c_str(), __FILE__ );
+    ss.str("");
+    
     if(this->cola_requerimiento == -1) {
         std::string err = std::string("Error al obtener la cola de requerimientos del atendedor de testers. Errno: ") + std::string(strerror(errno));
         throw std::string(err.c_str());
@@ -15,6 +21,11 @@ AtendedorTesters::AtendedorTesters( const Configuracion& config ) {
     key = ftok( archivoIpcs.c_str(),
                 config.ObtenerParametroEntero(Constantes::NombresDeParametros::MSGQUEUE_LECTURA_RESULTADOS) );
     this->cola_recibos_tests = msgget(key, 0666 | IPC_CREAT);
+    
+    ss << "MSGQUEUE_LECTURA_RESULTADOS creada con id " << cola_recibos_tests;
+    Logger::notice( ss.str().c_str(), __FILE__ );
+    ss.str("");
+    
     if(this->cola_recibos_tests == -1) {
         msgctl(this->cola_requerimiento, IPC_RMID, (struct msqid_ds*)0); //TODO Esto no le incumbe, es cosa del finalizador
         std::string err = std::string("Error al obtener la cola del atendedor de testers. Errno: ") + std::string(strerror(errno));
@@ -38,10 +49,10 @@ int AtendedorTesters::recibirRequerimiento() {
     return msg.idDispositivo;
 }
 
-int AtendedorTesters::recibir2doRequerimiento() {
+int AtendedorTesters::recibir2doRequerimiento(int idTester) {
 
     TMessageAtendedor msg;
-    int ret = msgrcv(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), Constantes::MTYPE_REQUERIMIENTO_SEGUNDO, 0);
+    int ret = msgrcv(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), idTester, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir requerimiento del atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
@@ -54,8 +65,9 @@ void AtendedorTesters::enviarPrograma(int idDispositivo, int tester, int idProgr
 
     TMessageAtendedor msg;
     msg.mtype = idDispositivo;
-    msg.idDispositivo = tester; //FIXME?
-    msg.value = idPrograma;
+    msg.idDispositivo = idDispositivo;
+    msg.idTester = tester; 
+    msg.programa = idPrograma;
     
     int ret = msgsnd(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
@@ -63,6 +75,8 @@ void AtendedorTesters::enviarPrograma(int idDispositivo, int tester, int idProgr
         Logger::error(error.c_str(), __FILE__);
         throw error;
     }
+    
+    Logger::notice("Se envio el programa desde atendedor testers", __FILE__);
 
 }
 
@@ -78,8 +92,9 @@ resultado_test_t AtendedorTesters::recibirResultado(int idTester) {
     }
     rsp.tester = msg.mtype;
     rsp.dispositivo = msg.idDispositivo;
-    rsp.result = msg.value;
+    rsp.result = msg.resultado;
     
+     
     return rsp;
 
 }
@@ -88,7 +103,7 @@ void AtendedorTesters::enviarOrden(int idDispositivo, int orden) {
     TMessageAtendedor msg;
     msg.mtype = idDispositivo;
     msg.idDispositivo = idDispositivo;
-    msg.value = orden;
+    msg.orden = orden;
     
     int ret = msgsnd(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
