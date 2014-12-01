@@ -1,39 +1,48 @@
 #include <cstdlib>
 
-#include "common/AtendedorDispositivos.h"
+#include "common/AtendedorTesters.h"
 #include "common/Programa.h"
 #include "common/Resultado.h"
-#include "common/DespachadorTecnicos.h"
+#include "common/iPlanillaTester2do.h"
+#include "common/Configuracion.h"
 #include "logger/Logger.h"
+
+
 
 using namespace std;
 
 int main(int argc, char** argv) {
-    
-    Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
+
+    Logger::initialize(Constantes::ARCHIVO_LOG.c_str(), Logger::LOG_DEBUG);
+
+    Configuracion config;
+    if (!config.LeerDeArchivo()) {
+        Logger::error("Archivo de configuracion no encontrado", __FILE__);
+        return 1;
+    }
+   
     // El primer parametro es el id del tester
-    int id = atoi(argv[1]);
-    
+    int id = config.ObtenerParametroEntero("Tester2doIdOffset") + atoi(argv[1]);
+
+
     // Obtengo comunicacion con los dispositivos
-    AtendedorTesters atendedor;
+    AtendedorTesters atendedor(config);
     // Obtengo planilla general de sync con otros tester
-    iPlanillaTester2do planilla(id);
-        
-    while(true) {
-        
-        
+    iPlanillaTester2do planilla(id,config);
+
+    while (true) {
+
+
         // Espero un requerimiento
-        int idDispositivo = atendedor.recibir2doRequerimiento();
-      
-        planilla.agregarResultadoParcial();
-        
+        int idDispositivo = atendedor.recibir2doRequerimiento(id);
+
         atendedor.enviarPrograma(idDispositivo, id, Programa::getPrograma());
-        
-        planilla.iniciarProcesamientoResultadosParciales();
-        
+
+        planilla.iniciarProcesamientoDeResultadosParciales();
+
         planilla.procesarSiguiente();
-        
-        
+
+
     }
 
     return 0;

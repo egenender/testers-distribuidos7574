@@ -20,12 +20,6 @@ private:
     int cola_tests;
     int ultimoTester;
 
-    typedef struct message {
-        long mtype;
-        int idDispositivo;
-        int value; // Este parametro posee el valor del requerimiento, del programa y del resultado
-    } TMessageAtendedor;
-
 //Prohibo copia y asignacion
     AtendedorDispositivos(const AtendedorDispositivos& orig);
     AtendedorDispositivos& operator=(const AtendedorDispositivos& rv);

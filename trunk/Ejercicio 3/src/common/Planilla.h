@@ -27,8 +27,6 @@ private:
     int m_IdShmLocal;
     int m_IdShmGeneral;
     int id;
-    std::string nombre;
-    
     std::stringstream ss;
     
 //Prohibo copia y asignacion
@@ -47,6 +45,12 @@ public:
     
     void agregarResultado();
     void agregarResultadoParcial();
+    
+    bool destruirCola();
+    bool destruirMemoriaGeneral();
+    bool destruirMemoriaLocal();
+    bool destruirSemaforoGeneral();
+    bool destruirSemaforosLocales( std::string& msjError );
 
 };
 

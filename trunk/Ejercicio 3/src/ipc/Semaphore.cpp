@@ -64,3 +64,7 @@ bool Semaphore::p() {
 bool Semaphore::eliSem() {
     return(semctl(semid,0,IPC_RMID) != -1);
 }
+
+int Semaphore::getSemId(){
+    return this->semid;
+}

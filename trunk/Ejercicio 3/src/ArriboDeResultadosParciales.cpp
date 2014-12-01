@@ -36,6 +36,8 @@ int main(int argc, char** argv) {
     ss.str("");
     planilla_local_t* shm_planilla_local = (planilla_local_t*) shmat(shmlocalid, NULL, 0);
 
+    Semaphore sem_tester_segundo(archivoIpcs.c_str(),
+            config.ObtenerParametroEntero(NombresDeParametros::SEM_TESTER_B));
     Semaphore sem_tester_resultado(archivoIpcs.c_str(),
             config.ObtenerParametroEntero(NombresDeParametros::SEM_TESTER_RESULTADO));
 
@@ -59,7 +61,7 @@ int main(int argc, char** argv) {
     ss.str("");
 
 
-    long idTesterResultado = idTester + config.ObtenerParametroEntero("TesterRtaOffset");
+    long idTesterResultado = idTester + config.ObtenerParametroEntero("Tester2doOffset");
 
     while (true) {
         resultado_test_t resultado;
@@ -81,15 +83,19 @@ int main(int argc, char** argv) {
 
         }
 
-        if (shm_planilla_local->estadoRes == LIBRE) {
-            if (shm_planilla_local->estado1 == OCUPADO || shm_planilla_local->estado2 == OCUPADO) {
-                shm_planilla_local->estadoRes = ESPERANDO;
-            } else {
-                shm_planilla_local->estadoRes = OCUPADO;
-                sem_tester_resultado.v();
+         if (shm_planilla_local->estado2 == LIBRE) {
+                if (shm_planilla_local->estadoRes == OCUPADO || shm_planilla_local->estadoRes == ESPERANDO
+                        || shm_planilla_local->estado1 == OCUPADO) {
+                    shm_planilla_local->estado2 = ESPERANDO;
+                    if (shm_planilla_local->estadoRes == ESPERANDO) {
+                        shm_planilla_local->estadoRes = OCUPADO;
+                        sem_tester_segundo.v();
+                    }
+                } else {
+                    shm_planilla_local->estado2 = OCUPADO;
+                    sem_tester_resultado.v();
+                }
             }
-        }
-
         mutex_planilla_local.v();
     }
     return 0;

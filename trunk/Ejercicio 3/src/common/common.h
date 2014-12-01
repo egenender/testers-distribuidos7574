@@ -22,6 +22,10 @@ namespace Constantes{
         const std::string SEM_TESTER_RESULTADO = "SemTesterResultado";
         const std::string SHM_PLANILLA_GENERAL = "ShmPlanillaGeneral";
         const std::string SHM_PLANILLA_LOCAL = "ShmPlanillaLocal";
+        const std::string TESTER_ID_OFFSET = "TesterIdOffset";
+        const std::string TESTER_2DO_ID_OFFSET = "Tester2doIdOffset";
+        const std::string TESTER_RTA_ID_OFFSET = "TesterRtaIdOffset";
+
     }
 
     //Constantes del sistema
@@ -57,7 +61,8 @@ namespace Constantes{
 
 //Estructuras communes:
 typedef struct requerimiento_planilla{
-    long tester;
+    long mtype;
+    int tester;
     int tipoReq;
     int idDispositivo;
 }requerimiento_planilla_t;
@@ -67,8 +72,25 @@ typedef struct respuesta_lugar{
     bool respuesta;
 }respuesta_lugar_t;
 
+enum TipoResultado{
+    PARCIAL = 0,
+    FINAL
+};
+
 typedef struct resultado_test{
     long tester;
     int result;
     int dispositivo;
+    TipoResultado tipo;
 }resultado_test_t;
+
+typedef struct message {
+    long mtype;
+    int idDispositivo;
+    int idTester;
+    int requerimiento;
+    int programa;
+    int resultado;
+    int orden;
+    TipoResultado tipoResultado;
+} TMessageAtendedor;
