@@ -86,14 +86,14 @@ void createIPCObjects(const Configuracion& config) {
         Semaphore semPlanillaLocal(archivoIpcs, config.ObtenerParametroEntero(Constantes::NombresDeParametros::SEM_PLANILLA_LOCAL) + iTester);
         semPlanillaLocal.creaSem();
         semPlanillaLocal.iniSem(1); // Inicializa el semaforo en 1
-        ss << "Se creo el semaforo para la shem general con ID " << semPlanillaLocal.getSemId();
+        ss << "Se creo el semaforo para la shem local con ID " << semPlanillaLocal.getSemId();
         Logger::error(ss.str().c_str(), __FILE__);
         ss.str("");
 
         Semaphore semTester1ro(archivoIpcs, config.ObtenerParametroEntero(Constantes::NombresDeParametros::SEM_TESTER_A) + iTester);
         semTester1ro.creaSem();
         semTester1ro.iniSem(1); // Inicializa el semaforo en 1
-        ss << "Se creo el semaforo para la shem general con ID " << semTester1ro.getSemId();
+        ss << "Se creo el semaforo, para el tester 1, con ID " << semTester1ro.getSemId();
         Logger::error(ss.str().c_str(), __FILE__);
         ss.str("");
 
@@ -101,14 +101,14 @@ void createIPCObjects(const Configuracion& config) {
         Semaphore semTester2do(archivoIpcs, config.ObtenerParametroEntero(Constantes::NombresDeParametros::SEM_TESTER_B) + iTester);
         semTester2do.creaSem();
         semTester2do.iniSem(0); // Inicializa el semaforo en 1
-        ss << "Se creo el semaforo para la shem general con ID " << semTester2do.getSemId();
+        ss << "Se creo el semaforo, para el tester 2, con ID " << semTester2do.getSemId();
         Logger::error(ss.str().c_str(), __FILE__);
         ss.str("");
 
         Semaphore semTesterRta(archivoIpcs, config.ObtenerParametroEntero(Constantes::NombresDeParametros::SEM_TESTER_RESULTADO) + iTester);
         semTesterRta.creaSem();
         semTesterRta.iniSem(0); // Inicializa el semaforo en 1
-        ss << "Se creo el semaforo para la shem general con ID " << semTesterRta.getSemId();
+        ss << "Se creo el semaforo,para el tester de resultados, con ID " << semTesterRta.getSemId();
         Logger::error(ss.str().c_str(), __FILE__);
         ss.str("");
 
@@ -144,6 +144,8 @@ void createSystemProcesses(const Configuracion& config) {
         sprintf(param, "%d", idTester);
         //Subprocesos
         lanzarProceso("tester", param, idTester);
+        lanzarProceso("tester_2do", param, idTester);
+        lanzarProceso("tester_respuesta", param, idTester);
         lanzarProceso("arribo_de_resultados", param, idTester);
         lanzarProceso("arribo_de_resultados_parciales", param, idTester);
         lanzarProceso("planilla_tester_1ro", param, idTester);

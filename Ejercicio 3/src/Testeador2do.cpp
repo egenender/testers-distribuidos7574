@@ -35,14 +35,21 @@ int main(int argc, char** argv) {
 
         // Espero un requerimiento
         int idDispositivo = atendedor.recibir2doRequerimiento(id);
+        
+        Logger::notice("Se recibio un 2do Requerimiento", __FILE__);
 
         atendedor.enviarPrograma(idDispositivo, id, Programa::getPrograma());
+        
+        Logger::notice("Se envio el 2do programa", __FILE__);
 
         planilla.iniciarProcesamientoDeResultadosParciales();
-
+        
+        Logger::notice("Termino el procesamiento de resultados parciales", __FILE__);
+        
         planilla.procesarSiguiente();
 
-
+        Logger::notice("Termino procesar siguiente", __FILE__);
+        
     }
 
     return 0;

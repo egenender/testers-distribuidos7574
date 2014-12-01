@@ -13,10 +13,10 @@ iPlanillaTester1ro::iPlanillaTester1ro(int id, const Configuracion& config) {
     key_t key = ftok(config.ObtenerParametroString(Constantes::NombresDeParametros::ARCHIVO_IPCS).c_str(),
             config.ObtenerParametroEntero(Constantes::NombresDeParametros::MSGQUEUE_PLANILLA));
     this->cola = msgget(key, 0666 | IPC_CREAT);
-    
+
     std::stringstream ss; //<DBG>
     ss << "MSGQUEUE_PLANILLA creada con id " << cola;
-    Logger::notice( ss.str().c_str(), __FILE__ );
+    Logger::notice(ss.str().c_str(), __FILE__);
     ss.str("");
 }
 
@@ -38,8 +38,8 @@ bool iPlanillaTester1ro::agregar(int idDispositivo) {
 
     }
 
-    Logger::notice("se envio un nuevo requerimiento, ahora recibe el mensaje si hay lugar", __FILE__);
-    
+    Logger::notice("se envio un nuevo requerimiento", __FILE__);
+
     respuesta_lugar_t hayLugar;
     if (-1 == msgrcv(cola, &hayLugar, sizeof (respuesta_lugar_t) - sizeof (long), idDispositivo, 0)) {
 
@@ -48,6 +48,9 @@ bool iPlanillaTester1ro::agregar(int idDispositivo) {
         exit(-1);
 
     }
+
+    Logger::notice("Se recibio una nueva respuesta", __FILE__);
+
     return hayLugar.respuesta;
 }
 

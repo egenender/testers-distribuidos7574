@@ -34,4 +34,6 @@ public:
     int recibirPrograma(int idDispositivo);
     void enviarResultado(int idDispositivo, int resultado); // Disp -> Tester: Grave o no grave
     int recibirOrden(int idDispositivo);
+    bool destruirComunicacion();
+    
 };

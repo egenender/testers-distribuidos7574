@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
 
     Logger::notice("Entrando a loop principal", nombre.str().c_str());
     while (true) {
-        if (-1 == msgrcv(planilla.queue(), &requerimiento, sizeof (requerimiento_planilla_t) - sizeof (long), id, 0)) {
+        if (-1 == msgrcv(planilla.queue(), &requerimiento, sizeof (requerimiento_planilla_t) - sizeof (long), id, 0 )) {
             std::string error = std::string("Error al hacer msgrcv. Error: ") + std::string(strerror(errno));
             Logger::error(error.c_str(), __FILE__);
             exit(-1);
