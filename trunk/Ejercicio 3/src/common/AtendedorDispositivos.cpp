@@ -1,6 +1,7 @@
 #include "AtendedorDispositivos.h"
 #include "Configuracion.h"
 #include <cstdlib>
+#include <cstring>
 
 AtendedorDispositivos::AtendedorDispositivos(const Configuracion& config) {
     const std::string archivoIpcs = config.ObtenerParametroString(Constantes::NombresDeParametros::ARCHIVO_IPCS);
@@ -131,4 +132,20 @@ int AtendedorDispositivos::recibirOrden(int idDispositivo) {
         throw error;
     }
     return msg.orden;
+}
+
+
+bool AtendedorDispositivos::destruirComunicacion() {
+
+    bool colaRequerimientosBorrada = msgctl(this->cola_requerimiento, IPC_RMID,     (struct msqid_ds*)0) != -1;
+    if( !colaRequerimientosBorrada ){
+        std::string error = std::string("Error al eliminar cola de requerimientos. Error: ") + std::string(strerror(errno));
+        Logger::error(error.c_str(), __FILE__);
+    }
+    bool colaRecibosBorrada = msgctl(this->cola_tests, IPC_RMID, (struct msqid_ds*)0) != -1;
+    if( !colaRecibosBorrada ){
+        std::string error = std::string("Error al eliminar cola de tests. Error: ") + std::string(strerror(errno));
+        Logger::error(error.c_str(), __FILE__);
+    }
+    return (colaRequerimientosBorrada && colaRecibosBorrada);
 }
