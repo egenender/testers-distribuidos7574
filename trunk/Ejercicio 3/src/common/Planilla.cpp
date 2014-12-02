@@ -115,7 +115,7 @@ int Planilla::queue() {
 
 void Planilla::agregar(int idDispositivo) {
     respuesta_lugar_t respuesta;
-    respuesta.mtype = idDispositivo;
+    respuesta.mtype = idDispositivo + Constantes::OFFSET_LUGAR;
     this->mutex_planilla_local.p();
     if (this->shm_planilla_local->cantidad > Constantes::MAX_DISPOSITIVOS_POR_TESTER) {
         mutex_planilla_local.v();

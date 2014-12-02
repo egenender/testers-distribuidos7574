@@ -63,7 +63,7 @@ void AtendedorDispositivos::enviar1erRespuesta(int idDispositivo, int resultado)
         exit(-1);
     }
 
-    long nextTesterIdOffset = config.ObtenerParametroEntero("Tester2doOffset") - config.ObtenerParametroEntero("TesterOffset");
+    long nextTesterIdOffset = config.ObtenerParametroEntero("Tester2doIdOffset") - config.ObtenerParametroEntero("TesterIdOffset");
 
     TMessageAtendedor msg;
     msg.mtype = this->ultimoTester + nextTesterIdOffset;
@@ -78,6 +78,11 @@ void AtendedorDispositivos::enviar1erRespuesta(int idDispositivo, int resultado)
         Logger::error(error.c_str(), __FILE__);
         throw error;
     }
+    
+    std::stringstream ss;
+    ss << "Se envio la primer respuesta con mtype: " << msg.mtype << " desde el dispositivo " << msg.idDispositivo << "nextTesterId Offset: " << nextTesterIdOffset;
+    Logger::notice(ss.str().c_str(), __FILE__);
+    ss.str("");
 }
 
 int AtendedorDispositivos::recibirPrograma(int idDispositivo) {
@@ -106,7 +111,7 @@ void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {
         exit(-1);
     }
 
-    long nextTesterIdOffset = config.ObtenerParametroEntero("TesterRtaOffset") - config.ObtenerParametroEntero("Tester2doOffset");
+    long nextTesterIdOffset = config.ObtenerParametroEntero("TesterRtaIdOffset") - config.ObtenerParametroEntero("Tester2doIdOffset");
 
     TMessageAtendedor msg;
     msg.mtype = this->ultimoTester + nextTesterIdOffset;

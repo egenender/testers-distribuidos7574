@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
     ss.str("");
 
 
-    long idTesterResultado = idTester + config.ObtenerParametroEntero("Tester2doOffset");
+    long idTesterResultado = idTester + config.ObtenerParametroEntero("Tester2doIdOffset");
 
     while (true) {
         resultado_test_t resultado;
