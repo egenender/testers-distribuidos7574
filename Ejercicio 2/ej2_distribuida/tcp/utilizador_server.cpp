@@ -25,6 +25,7 @@ int main(void){
 	int ok = msgsnd(cola_server, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
 	msg.mtype = 3;
 	msg.idDispositivo = 7;
+	printf ("Voy a mandar mensaje a dispositivo 7\n");
 	ok = msgsnd(cola_server, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
 	
     if (ok == -1){

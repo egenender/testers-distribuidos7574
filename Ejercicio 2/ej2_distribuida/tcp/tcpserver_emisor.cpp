@@ -54,7 +54,7 @@ int main(int argc, char *argv[]){
 			}
 						
 			long dispositivo_a_tratar = buffer->idDispositivo;
-			printf("Tengo que leer del dispositivo %ld de mtype 1? %lu\n", dispositivo_a_tratar, buffer->mtype);
+			printf("\nTengo que leer del dispositivo %ld de mtype 1? %lu\n", dispositivo_a_tratar, buffer->mtype);
 			
 			while (true){
 				int ok_read = msgrcv(cola, buffer, size - sizeof(long), dispositivo_a_tratar, 0);

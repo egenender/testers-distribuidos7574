@@ -14,7 +14,7 @@ int main(void){
 		execlp("./tcpclient_receptor", "tcpclient_receptor", "localhost","9000","3",(char*)0);
 		exit(1);
 	}
-	
+	printf("Soy el dispositivo 3 y espero un mensaje para mi\n");
 	TMessageAtendedor msg;
 	
 	int ok_read = msgrcv(cola_client, &msg, sizeof(TMessageAtendedor) - sizeof(long), 3, 0);
