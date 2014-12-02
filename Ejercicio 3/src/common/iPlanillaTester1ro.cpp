@@ -41,7 +41,7 @@ bool iPlanillaTester1ro::agregar(int idDispositivo) {
     Logger::notice("se envio un nuevo requerimiento", __FILE__);
 
     respuesta_lugar_t hayLugar;
-    if (-1 == msgrcv(cola, &hayLugar, sizeof (respuesta_lugar_t) - sizeof (long), idDispositivo, 0)) {
+    if (-1 == msgrcv(cola, &hayLugar, sizeof (respuesta_lugar_t) - sizeof (long), idDispositivo + Constantes::OFFSET_LUGAR, 0)) {
 
         std::string error = std::string("Error al hacer msgrcv. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);

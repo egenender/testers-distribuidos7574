@@ -16,8 +16,8 @@ int main(int argc, char** argv) {
 
     Logger::initialize(Constantes::ARCHIVO_LOG.c_str(), Logger::LOG_DEBUG);
     std::stringstream nombre;
-    nombre << __FILE__ << " " << id;
-    Logger::notice("Inicia el procesamiento, cargando IPCS - id", nombre.str().c_str());
+    nombre << "Inicia el procesamiento, cargando IPCS id " << id;
+    Logger::notice( nombre.str().c_str(),__FILE__);
 
     Configuracion config;
     if (!config.LeerDeArchivo()) {
@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
 
     std::stringstream ss;
 
-    Logger::notice("Entrando a loop principal", nombre.str().c_str());
+    Logger::notice("Entrando a loop principal", __FILE__);
     while (true) {
         if (-1 == msgrcv(planilla.queue(), &requerimiento, sizeof (requerimiento_planilla_t) - sizeof (long), Constantes::MTYPE_REQUERIMIENTO, 0)) {
 
@@ -42,12 +42,12 @@ int main(int argc, char** argv) {
         switch (requerimiento.tipoReq) {
             case Constantes::REQUERIMIENTO_AGREGAR:
                 ss << "Recibo un pedido para agregar el dispositivo " << requerimiento.idDispositivo << " a la planilla";
-                Logger::notice(ss.str().c_str(), nombre.str().c_str());
+                Logger::notice(ss.str().c_str(), __FILE__);
                 ss.str("");
                 planilla.agregar(requerimiento.idDispositivo);
                 break;
             case Constantes::REQUERIMIENTO_TERMINO_PENDIENTE_REQ:
-                Logger::notice("Recibo un pedido para marcar la finalizacion de requerimiento pendiente", nombre.str().c_str());
+                Logger::notice("Recibo un pedido para marcar la finalizacion de requerimiento pendiente", __FILE__);
                 planilla.terminadoRequerimientoPendiente();
                 break;
         }

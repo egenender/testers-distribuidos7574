@@ -25,6 +25,7 @@
 
 void createIPCObjects(const Configuracion& config);
 void createSystemProcesses(const Configuracion& config);
+void createExternProcesses(const Configuracion& config);
 
 int main(int argc, char** argv) {
 
@@ -47,6 +48,7 @@ int main(int argc, char** argv) {
     Logger::debug("Objetos IPC inicializados correctamente. Iniciando procesos...", __FILE__);
 
     createSystemProcesses(config);
+    createExternProcesses(config);
     Logger::debug("Procesos iniciados correctamente...", __FILE__);
 
     Logger::notice("Sistema inicializado correctamente...", __FILE__);
@@ -159,8 +161,13 @@ void createSystemProcesses(const Configuracion& config) {
         execlp("./tecnico", "tecnico", (char*) 0);
         Logger::error("Error al ejecutar el programa tecnico", __FILE__);
     }
+    Logger::debug("Programas del sistema iniciados correctamente...", __FILE__);
 
-    // Creo dispositivos
+}
+
+void createExternProcesses(const Configuracion& config) {
+    
+        // Creo dispositivos
     for (int i = 0; i < config.ObtenerParametroEntero(Constantes::NombresDeParametros::CANT_DISPOSITIVOS); i++) {
         char param[3];
         int idDispositivo = config.ObtenerParametroEntero(Constantes::NombresDeParametros::ID_DISPOSITIVO_START) + i;
@@ -172,7 +179,5 @@ void createSystemProcesses(const Configuracion& config) {
             Logger::error("Error al ejecutar el programa dispositivo de ID" + idDispositivo, __FILE__);
         }
     }
-
-    Logger::debug("Programas iniciados correctamente...", __FILE__);
-
+     Logger::debug("Dispositivos iniciados correctamente...", __FILE__);
 }
