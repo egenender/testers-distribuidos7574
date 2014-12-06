@@ -141,18 +141,76 @@ void createSystemProcesses(const Configuracion& config) {
 
     // Creo testers
     for (int i = 0; i < config.ObtenerParametroEntero(Constantes::NombresDeParametros::CANT_TESTERS); i++) {
-        char param[3];
+        usleep(10);
         int idTester = config.ObtenerParametroEntero(Constantes::NombresDeParametros::ID_TESTER_START) + i;
+        char param[3];
         sprintf(param, "%d", idTester);
-        //Subprocesos
-        lanzarProceso("tester", param, idTester);
-        lanzarProceso("tester_2do", param, idTester);
-        lanzarProceso("tester_respuesta", param, idTester);
-        lanzarProceso("arribo_de_resultados", param, idTester);
-        lanzarProceso("arribo_de_resultados_parciales", param, idTester);
-        lanzarProceso("planilla_tester_1ro", param, idTester);
-        lanzarProceso("planilla_tester_2do", param, idTester);
-        lanzarProceso("planilla_tester_rta", param, idTester);
+        pid_t newPid = fork();
+        if (newPid == 0) {
+            pid_t otherPid = fork();
+            if (otherPid == 0) {
+                pid_t planilla = fork();
+                if (planilla == 0) {
+                    // Inicio el programa correspondiente
+                    execlp("./tester", "tester", param, (char*) 0);
+                    Logger::error("Error al ejecutar el programa tester de ID" + idTester, __FILE__);
+                    exit(1);
+                } else {
+                    // Inicio el programa correspondiente
+                    execlp("./planilla_tester_1ro", "planilla_tester_1ro", param, (char*) 0);
+                    Logger::error("Error al ejecutar el programa PlanillaTester1ro de ID" + idTester, __FILE__);
+                    exit(1);
+                }
+            } else {
+                pid_t planilla = fork();
+                if (planilla == 0) {
+                    // Inicio el programa correspondiente
+                    execlp("./tester_2do", "tester_2do", param, (char*) 0);
+                    Logger::error("Error al ejecutar el programa tester_2do de ID" + idTester, __FILE__);
+                    exit(1);
+                } else {
+                    pid_t planilla = fork();
+                    if (planilla == 0) {
+                        // Inicio el programa correspondiente
+                        execlp("./tester_respuesta", "tester_respuesta", param, (char*) 0);
+                        Logger::error("Error al ejecutar el programa tester_2do de ID" + idTester, __FILE__);
+                        exit(1);
+                    } else {
+                        pid_t planilla = fork();
+                        if (planilla == 0) {
+                            // Inicio el programa correspondiente
+                            execlp("./planilla_tester_rta", "planilla_tester_rta", param, (char*) 0);
+                            Logger::error("Error al ejecutar el programa tester_2do de ID" + idTester, __FILE__);
+                            exit(1);
+                        } else {
+                            // Inicio el programa correspondiente
+                            execlp("./planilla_tester_2do", "planilla_tester_2do", param, (char*) 0);
+                            Logger::error("Error al ejecutar el programa PlanillaTesterB de ID" + idTester, __FILE__);
+                            exit(1);
+                        }
+
+                    }
+                }
+            }
+        } else {
+            pid_t arribos = fork();
+            if (arribos == 0) {
+                // Inicio el programa correspondiente
+                execlp("./arribo_de_resultados", "arribo_de_resultados", param, (char*) 0);
+                Logger::error("Error al ejecutar el programa ArriboDeResultados de ID" + idTester, __FILE__);
+                exit(1);
+            } else {
+                pid_t arribosParciales = fork();
+                if (arribosParciales == 0) {
+                    // Inicio el programa correspondiente
+                    execlp("./arribo_de_resultados_parciales", "arribo_de_resultados_parciales", param, (char*) 0);
+                    Logger::error("Error al ejecutar el programa arribo_de_resultados_parciales de ID" + idTester, __FILE__);
+                    exit(1);
+
+                }
+            }
+        }
+
     }
 
     // Creo al tecnico
@@ -166,8 +224,8 @@ void createSystemProcesses(const Configuracion& config) {
 }
 
 void createExternProcesses(const Configuracion& config) {
-    
-        // Creo dispositivos
+
+    // Creo dispositivos
     for (int i = 0; i < config.ObtenerParametroEntero(Constantes::NombresDeParametros::CANT_DISPOSITIVOS); i++) {
         char param[3];
         int idDispositivo = config.ObtenerParametroEntero(Constantes::NombresDeParametros::ID_DISPOSITIVO_START) + i;
@@ -179,5 +237,5 @@ void createExternProcesses(const Configuracion& config) {
             Logger::error("Error al ejecutar el programa dispositivo de ID" + idDispositivo, __FILE__);
         }
     }
-     Logger::debug("Dispositivos iniciados correctamente...", __FILE__);
+    Logger::debug("Dispositivos iniciados correctamente...", __FILE__);
 }

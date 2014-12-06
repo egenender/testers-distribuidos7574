@@ -17,6 +17,9 @@ using namespace std;
 int main(int argc, char** argv) {
     int idTester = atoi(argv[1]);
 
+    Logger::initialize(Constantes::ARCHIVO_LOG.c_str(), Logger::LOG_DEBUG);
+    Logger::notice("SE CREO ARRIBO DE RESULTADOS PARCIALES", __FILE__);
+
     Configuracion config;
     if (!config.LeerDeArchivo()) {
         Logger::error("Archivo de configuracion no encontrado", __FILE__);
@@ -65,7 +68,7 @@ int main(int argc, char** argv) {
 
     while (true) {
         resultado_test_t resultado;
-        if (-1 == msgrcv(cola_lectura, &resultado, sizeof (resultado_test_t) - sizeof (long), idTesterResultado, 0)) {
+        if (-1 == msgrcv(cola_lectura, &resultado, sizeof (TMessageAtendedor )- sizeof (long), idTesterResultado, 0)) {
 
             std::string error = std::string("Error al hacer msgrcv. Error: ") + std::string(strerror(errno));
             Logger::error(error.c_str(), __FILE__);
@@ -74,7 +77,7 @@ int main(int argc, char** argv) {
         mutex_planilla_local.p();
         shm_planilla_local->resultados++;
 
-        if (-1 == msgsnd(cola_escritura, &resultado, sizeof (resultado_test_t) - sizeof (long), 0)) {
+        if (-1 == msgsnd(cola_escritura, &resultado, sizeof (TMessageAtendedor) - sizeof (long), 0)) {
 
 
             std::string error = std::string("Error al hacer msgsnd. Error: ") + std::string(strerror(errno));
@@ -83,19 +86,19 @@ int main(int argc, char** argv) {
 
         }
 
-         if (shm_planilla_local->estado2 == LIBRE) {
-                if (shm_planilla_local->estadoRes == OCUPADO || shm_planilla_local->estadoRes == ESPERANDO
-                        || shm_planilla_local->estado1 == OCUPADO) {
-                    shm_planilla_local->estado2 = ESPERANDO;
-                    if (shm_planilla_local->estadoRes == ESPERANDO) {
-                        shm_planilla_local->estadoRes = OCUPADO;
-                        sem_tester_segundo.v();
-                    }
-                } else {
-                    shm_planilla_local->estado2 = OCUPADO;
-                    sem_tester_resultado.v();
+        if (shm_planilla_local->estado2 == LIBRE) {
+            if (shm_planilla_local->estadoRes == OCUPADO || shm_planilla_local->estadoRes == ESPERANDO
+                    || shm_planilla_local->estado1 == OCUPADO) {
+                shm_planilla_local->estado2 = ESPERANDO;
+                if (shm_planilla_local->estadoRes == ESPERANDO) {
+                    shm_planilla_local->estadoRes = OCUPADO;
+                    sem_tester_segundo.v();
                 }
+            } else {
+                shm_planilla_local->estado2 = OCUPADO;
+                sem_tester_resultado.v();
             }
+        }
         mutex_planilla_local.v();
     }
     return 0;

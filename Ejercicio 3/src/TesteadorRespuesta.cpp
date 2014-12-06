@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
     }
    
     // El primer parametro es el id del tester
-    int id = config.ObtenerParametroEntero("TesterIdOffset") + atoi(argv[1]);
+    int id = config.ObtenerParametroEntero("TesterRtaIdOffset") + atoi(argv[1]);
 
 
     // Obtengo comunicacion con los dispositivos
@@ -37,7 +37,10 @@ int main(int argc, char** argv) {
         
         
         planilla.iniciarProcesamientoDeResultados();
+        Logger::notice("Se termino el procesamiento de resultados", __FILE__);
+        
         resultado_test_t resultado = atendedor.recibirResultado(id);
+        Logger::notice("Se recibio un Resultado", __FILE__);
 
         int orden;
         if (Resultado::esGrave(resultado.result)) {
@@ -47,9 +50,12 @@ int main(int argc, char** argv) {
             orden = Constantes::ORDEN_REINICIO;
         }
         atendedor.enviarOrden(resultado.dispositivo, orden);
+        Logger::notice("Se envio una orden", __FILE__);
 
         planilla.eliminarDispositivo(resultado.dispositivo);
+        Logger::notice("Se elimino el dispositivo de la planilla", __FILE__);
         planilla.procesarSiguiente();
+        Logger::notice("Termino procesar siguiente", __FILE__);
     }
 
     return 0;
