@@ -22,7 +22,7 @@ AtendedorTesters::AtendedorTesters( const Configuracion& config ) {
                 config.ObtenerParametroEntero(Constantes::NombresDeParametros::MSGQUEUE_LECTURA_RESULTADOS) );
     this->cola_recibos_tests = msgget(key, 0666 | IPC_CREAT);
     
-    ss << "MSGQUEUE_LECTURA_RESULTADOS creada con id " << cola_recibos_tests;
+    ss << "MSGQUEUE_RESULTADOS creada con id " << cola_recibos_tests;
     Logger::notice( ss.str().c_str(), __FILE__ );
     ss.str("");
     
@@ -52,7 +52,7 @@ int AtendedorTesters::recibirRequerimiento() {
 int AtendedorTesters::recibir2doRequerimiento(int idTester) {
 
     TMessageAtendedor msg;
-    int ret = msgrcv(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), idTester, 0);
+    int ret = msgrcv(this->cola_recibos_tests, &msg, sizeof(TMessageAtendedor) - sizeof(long), idTester, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir requerimiento del atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
@@ -84,12 +84,20 @@ resultado_test_t AtendedorTesters::recibirResultado(int idTester) {
 
     resultado_test_t rsp;
     TMessageAtendedor msg;
-    int ret = msgrcv(this->cola_recibos_tests, &msg, sizeof(resultado_test_t) - sizeof(long), idTester, 0);
+
+    std::stringstream ss;
+    ss << "Intenta recibir una respuesta con mtype: " << idTester << " de la cola: " << this->cola_recibos_tests;
+    Logger::notice(ss.str().c_str(), __FILE__);
+    ss.str("");
+    
+    int ret = msgrcv(this->cola_recibos_tests, &msg, sizeof(TMessageAtendedor) - sizeof(long), idTester, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir resultado del atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
         throw error;
     }
+    
+    Logger::notice("SACO LA RESPUESTA DE LA COLA DE RESPUESTAS", __FILE__);
     rsp.tester = msg.mtype;
     rsp.dispositivo = msg.idDispositivo;
     rsp.result = msg.resultado;
@@ -105,7 +113,7 @@ void AtendedorTesters::enviarOrden(int idDispositivo, int orden) {
     msg.idDispositivo = idDispositivo;
     msg.orden = orden;
     
-    int ret = msgsnd(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    int ret = msgsnd(this->cola_recibos_tests, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
         std::string error = std::string("Error al enviar orden al atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);

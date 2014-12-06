@@ -17,6 +17,9 @@ using namespace std;
 int main(int argc, char** argv) {
     int idTester = atoi(argv[1]);
 
+    Logger::initialize(Constantes::ARCHIVO_LOG.c_str(), Logger::LOG_DEBUG);
+    Logger::notice("SE CREO ARRIBO DE RESULTADOS", __FILE__);
+
     Configuracion config;
     if (!config.LeerDeArchivo()) {
         Logger::error("Archivo de configuracion no encontrado", __FILE__);
@@ -62,8 +65,16 @@ int main(int argc, char** argv) {
     long idTesterResultado = idTester + config.ObtenerParametroEntero("TesterRtaIdOffset");
 
     while (true) {
-        resultado_test_t resultado;
-        if (-1 == msgrcv(cola_lectura, &resultado, sizeof (resultado_test_t) - sizeof (long), idTesterResultado, 0)) {
+        TMessageAtendedor resultado;
+        
+        
+        std::stringstream ss;
+        ss << "Intenta recibir una resultado con mtype: " << idTesterResultado << " de la cola: " << cola_lectura;
+        Logger::notice(ss.str().c_str(), __FILE__);
+        ss.str("");
+
+
+        if (-1 == msgrcv(cola_lectura, &resultado, sizeof (TMessageAtendedor) - sizeof (long), idTesterResultado, 0)) {
 
             std::string error = std::string("Error al hacer msgrcv. Error: ") + std::string(strerror(errno));
             Logger::error(error.c_str(), __FILE__);
@@ -72,7 +83,7 @@ int main(int argc, char** argv) {
         mutex_planilla_local.p();
         shm_planilla_local->resultados++;
 
-        if (-1 == msgsnd(cola_escritura, &resultado, sizeof (resultado_test_t) - sizeof (long), 0)) {
+        if (-1 == msgsnd(cola_escritura, &resultado, sizeof (TMessageAtendedor) - sizeof (long), 0)) {
 
 
             std::string error = std::string("Error al hacer msgsnd. Error: ") + std::string(strerror(errno));

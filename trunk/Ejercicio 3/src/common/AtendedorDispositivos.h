@@ -18,6 +18,7 @@ class AtendedorDispositivos {
 private:
     int cola_requerimiento;
     int cola_tests;
+    int cola_orden;
     int ultimoTester;
 
 //Prohibo copia y asignacion
