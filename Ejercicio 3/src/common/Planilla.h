@@ -43,9 +43,6 @@ public:
 
     void eliminar(int idDispositivo);
     
-    void agregarResultado();
-    void agregarResultadoParcial();
-    
     bool destruirCola();
     bool destruirMemoriaGeneral();
     bool destruirMemoriaLocal();

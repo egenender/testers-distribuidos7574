@@ -173,19 +173,19 @@ void createSystemProcesses(const Configuracion& config) {
                     if (planilla == 0) {
                         // Inicio el programa correspondiente
                         execlp("./tester_respuesta", "tester_respuesta", param, (char*) 0);
-                        Logger::error("Error al ejecutar el programa tester_2do de ID" + idTester, __FILE__);
+                        Logger::error("Error al ejecutar el programa tester_rta de ID" + idTester, __FILE__);
                         exit(1);
                     } else {
                         pid_t planilla = fork();
                         if (planilla == 0) {
                             // Inicio el programa correspondiente
                             execlp("./planilla_tester_rta", "planilla_tester_rta", param, (char*) 0);
-                            Logger::error("Error al ejecutar el programa tester_2do de ID" + idTester, __FILE__);
+                            Logger::error("Error al ejecutar el planilla_tester_rta de ID" + idTester, __FILE__);
                             exit(1);
                         } else {
                             // Inicio el programa correspondiente
                             execlp("./planilla_tester_2do", "planilla_tester_2do", param, (char*) 0);
-                            Logger::error("Error al ejecutar el programa PlanillaTesterB de ID" + idTester, __FILE__);
+                            Logger::error("Error al ejecutar el programa planilla_tester_2do de ID" + idTester, __FILE__);
                             exit(1);
                         }
 

@@ -13,8 +13,6 @@ using namespace std;
  */
 int main(int argc, char** argv) {
     
-    srand (time(NULL));
-
     Logger::initialize(Constantes::ARCHIVO_LOG.c_str(), Logger::LOG_DEBUG);
     // Por parametro se recibe el ID del dispositivo
     int id = atoi(argv[1]);
@@ -36,6 +34,7 @@ int main(int argc, char** argv) {
     // TODO: Log
 
     while (true) {
+        srand (time(NULL));
         try {
             // Dispositivo envia requerimiento
             ss << "El dispositivo " << id << " envia un requerimiento al sistema de testeo";

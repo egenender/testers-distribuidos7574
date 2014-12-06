@@ -13,7 +13,7 @@
 using namespace std;
 
 int main(int argc, char** argv) {
-    
+
     Logger::initialize(Constantes::ARCHIVO_LOG.c_str(), Logger::LOG_DEBUG);
 
     Configuracion config;
@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
         Logger::error("Archivo de configuracion no encontrado", __FILE__);
         return 1;
     }
-   
+
     // El primer parametro es el id del tester
     int id = config.ObtenerParametroEntero("TesterRtaIdOffset") + atoi(argv[1]);
 
@@ -29,16 +29,16 @@ int main(int argc, char** argv) {
     // Obtengo comunicacion con los dispositivos
     AtendedorTesters atendedor(config);
     // Obtengo planilla general de sync con otros tester
-    iPlanillaTesterRespuesta planilla(id,config);
+    iPlanillaTesterRespuesta planilla(id, config);
     // Obtengo comunicacion con los tecnicos
     DespachadorTesters despachador(config);
 
     while (true) {
-        
-        
+
+
         planilla.iniciarProcesamientoDeResultados();
         Logger::notice("Se termino el procesamiento de resultados", __FILE__);
-        
+
         resultado_test_t resultado = atendedor.recibirResultado(id);
         Logger::notice("Se recibio un Resultado", __FILE__);
 
@@ -54,8 +54,8 @@ int main(int argc, char** argv) {
 
         planilla.eliminarDispositivo(resultado.dispositivo);
         Logger::notice("Se elimino el dispositivo de la planilla", __FILE__);
-        planilla.procesarSiguiente();
-        Logger::notice("Termino procesar siguiente", __FILE__);
+        //   planilla.procesarSiguiente();
+        //   Logger::notice("Termino procesar siguiente", __FILE__);
     }
 
     return 0;
