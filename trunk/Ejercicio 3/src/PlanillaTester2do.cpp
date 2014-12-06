@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
 
     int id = config.ObtenerParametroEntero("Tester2doIdOffset") + atoi(argv[1]);
     
-    Planilla planilla(id, config);
+    Planilla planilla(atoi(argv[1]), config);
     requerimiento_planilla_t requerimiento;
 
     Logger::notice("Entrando a loop principal", nombre.str().c_str());
@@ -43,10 +43,6 @@ int main(int argc, char** argv) {
             case REQUERIMIENTO_PROCESAR_SIGUIENTE:
                 Logger::notice("Recibo un pedido para procesar siguiente", nombre.str().c_str());
                 planilla.procesarSiguiente();
-                break;
-            case REQUERIMIENTO_AGREGAR_RESULTADO_PARCIAL:
-                Logger::notice("Recibo un pedido para agregar un resultado parcial", nombre.str().c_str());
-                planilla.agregarResultadoParcial();
                 break;
         }
 

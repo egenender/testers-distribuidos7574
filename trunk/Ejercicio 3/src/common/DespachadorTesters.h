@@ -22,11 +22,7 @@ private:
     int msgQueueId;
     key_t key;
     
-    typedef struct message {
-        long mtype;
-        int idDispositivo;
-    } TMessageDespachador;
-    
+
 //Prohibo copia y asignacion
     DespachadorTesters(const DespachadorTesters& orig);
     DespachadorTesters& operator=(const DespachadorTesters& rv);

@@ -2,14 +2,14 @@
 
 #pragma once
 
-namespace Constantes{
-    
-    namespace NombresDeParametros{
+namespace Constantes {
+
+    namespace NombresDeParametros {
         const std::string ARCHIVO_IPCS = "ArchivoIpcs";
         const std::string CANT_DISPOSITIVOS = "CantDispositivos";
         const std::string CANT_TESTERS = "CantTesters";
         const std::string ID_DISPOSITIVO_START = "IdDispositivoStart";
-        const std::string ID_TESTER_START = "IdTesterStart";        
+        const std::string ID_TESTER_START = "IdTesterStart";
         const std::string MSGQUEUE_DESPACHADOR = "MsgQueueDespachador";
         const std::string MSGQUEUE_ESCRITURA_RESULTADOS = "MsgQueueEscrituraResultados";
         const std::string MSGQUEUE_LECTURA_RESULTADOS = "MsgQueueLecturaResultados";
@@ -29,7 +29,7 @@ namespace Constantes{
     }
 
     //Constantes del sistema
-    
+
 
     // IDs de los IPC
     const int CANTIDAD_TESTERS_MAXIMA = 5;
@@ -38,14 +38,16 @@ namespace Constantes{
     const int MTYPE_REQUERIMIENTO = 4000;
     const int MTYPE_REQUERIMIENTO_SEGUNDO = 5000;
 
-    const int ORDEN_APAGADO = 0;
-    const int ORDEN_REINICIO = 1;
+    const long ORDEN_TECNICO = 1;
+    
+    const int ORDEN_APAGADO = 1;
+    const int ORDEN_REINICIO = 2;
     const int SIN_LUGAR = -1;
 
     const long OFFSET_LUGAR = 15000;
-    
-    const int RESULTADO_GRAVE = 0;
-    const int RESULTADO_NO_GRAVE = 1;
+
+    const int RESULTADO_GRAVE = 1;
+    const int RESULTADO_NO_GRAVE = 2;
 
     const int REQUERIMIENTO_AGREGAR = 0;
     const int REQUERIMIENTO_TERMINO_PENDIENTE_REQ = 6000;
@@ -62,29 +64,30 @@ namespace Constantes{
 
 
 //Estructuras communes:
-typedef struct requerimiento_planilla{
+
+typedef struct requerimiento_planilla {
     long mtype;
     int tester;
     int tipoReq;
     int idDispositivo;
-}requerimiento_planilla_t;
+} requerimiento_planilla_t;
 
-typedef struct respuesta_lugar{
+typedef struct respuesta_lugar {
     long mtype;
     bool respuesta;
-}respuesta_lugar_t;
+} respuesta_lugar_t;
 
-enum TipoResultado{
+enum TipoResultado {
     PARCIAL = 0,
     FINAL
 };
 
-typedef struct resultado_test{
+typedef struct resultado_test {
     long tester;
     int result;
     int dispositivo;
     TipoResultado tipo;
-}resultado_test_t;
+} resultado_test_t;
 
 typedef struct message {
     long mtype;
@@ -96,3 +99,8 @@ typedef struct message {
     int orden;
     TipoResultado tipoResultado;
 } TMessageAtendedor;
+
+typedef struct messageDespachador {
+    long mtype;
+    int idDispositivo;
+} TMessageDespachador;

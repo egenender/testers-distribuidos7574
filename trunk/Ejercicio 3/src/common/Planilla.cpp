@@ -127,6 +127,7 @@ void Planilla::agregar(int idDispositivo) {
         }
         return;
     }
+
     mutex_planilla_general.p();
     *shm_planilla_general = *shm_planilla_general + 1;
     stringstream ss;
@@ -143,7 +144,6 @@ void Planilla::agregar(int idDispositivo) {
     if (this->shm_planilla_local->estadoRes == LIBRE && this->shm_planilla_local->estado2 == LIBRE) {
         Logger::notice("El tester de resultados y el 2do estan libres, asi que el primer tester puede trabajar", __FILE__);
         this->shm_planilla_local->estado1 = OCUPADO;
-        this->sem_tester_primero.v();
 
     } else {
         Logger::notice("El tester 1 tiene que esperar porque los otros no estan ambos libres", __FILE__);
@@ -159,11 +159,11 @@ void Planilla::agregar(int idDispositivo) {
             this->sem_tester_segundo.v();
         }
         this->sem_tester_primero.p();
-        
+
     }
 
     this->mutex_planilla_local.v();
-    
+
     respuesta.respuesta = true;
     ;
     if (msgsnd(this->cola, &respuesta, sizeof (respuesta_lugar_t) - sizeof (long), 0) == -1) {
@@ -181,7 +181,7 @@ void Planilla::terminadoRequerimientoPendiente() {
         this->shm_planilla_local->estadoRes = OCUPADO;
         this->sem_tester_resultado.v();
     } else {
-        if (this->shm_planilla_local->estado2 == ESPERANDO && this->shm_planilla_local->estadoRes != OCUPADO) {
+        if (this->shm_planilla_local->estado2 == ESPERANDO && this->shm_planilla_local->estadoRes == LIBRE) {
             Logger::notice("El tester 2do estaba esperando, asi que lo OCUPO", __FILE__);
             this->shm_planilla_local->estado2 = OCUPADO;
             this->sem_tester_segundo.v();
@@ -199,6 +199,18 @@ void Planilla::procesarSiguiente() {
         ss << "En procesar siguiente Quedan " << this->shm_planilla_local->resultados << " resultados pendientes";
         Logger::notice(ss.str().c_str(), __FILE__);
         ss.str("");
+//        if (this->shm_planilla_local->estado2 == OCUPADO) {
+//            
+//            if (this->shm_planilla_local->resultadosParciales > 0) {
+//                this->shm_planilla_local->estado2 = ESPERANDO;
+//                this->sem_tester_segundo.p();
+//            } else {
+//                this->shm_planilla_local->estado2 = LIBRE;
+//                this->sem_tester_segundo.p();
+//            }
+//
+//        }
+
         this->mutex_planilla_local.v();
         return;
     }
@@ -283,21 +295,6 @@ void Planilla::eliminar(int idDispositivo) {
     this->mutex_planilla_general.v();
 }
 
-void Planilla::agregarResultado() {
-
-    this->mutex_planilla_local.p();
-    this->shm_planilla_local->resultados++;
-    this->mutex_planilla_local.v();
-}
-
-void Planilla::agregarResultadoParcial() {
-
-    this->mutex_planilla_local.p();
-    this->shm_planilla_local->resultadosParciales++;
-    this->mutex_planilla_local.v();
-
-
-}
 
 bool Planilla::destruirCola() {
     return msgctl(this->cola, IPC_RMID, (struct msqid_ds*) 0) != -1;

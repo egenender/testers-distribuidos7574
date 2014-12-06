@@ -92,11 +92,11 @@ int main(int argc, char** argv) {
                 shm_planilla_local->estado2 = ESPERANDO;
                 if (shm_planilla_local->estadoRes == ESPERANDO && shm_planilla_local->estado1 != OCUPADO) {
                     shm_planilla_local->estadoRes = OCUPADO;
-                    sem_tester_segundo.v();
+                    sem_tester_resultado.v();
                 }
             } else {
                 shm_planilla_local->estado2 = OCUPADO;
-                sem_tester_resultado.v();
+                sem_tester_segundo.v();
             }
         }
         mutex_planilla_local.v();

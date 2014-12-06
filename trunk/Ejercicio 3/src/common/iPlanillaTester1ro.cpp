@@ -49,8 +49,6 @@ bool iPlanillaTester1ro::agregar(int idDispositivo) {
 
     }
 
-    Logger::notice("Se recibio una nueva respuesta", __FILE__);
-
     return hayLugar.respuesta;
 }
 
