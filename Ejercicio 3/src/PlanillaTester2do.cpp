@@ -11,11 +11,10 @@ using namespace Constantes;
 using namespace std;
 
 int main(int argc, char** argv) {
-    int id = atoi(argv[1]);
 
     Logger::initialize(Constantes::ARCHIVO_LOG.c_str(), Logger::LOG_DEBUG);
     std::stringstream nombre;
-    nombre << __FILE__ << " " << id;
+    nombre << __FILE__;
     Logger::notice("Inicia el procesamiento, cargando IPCS", nombre.str().c_str());
 
     Configuracion config;
@@ -24,6 +23,8 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    int id = config.ObtenerParametroEntero("Tester2doIdOffset") + atoi(argv[1]);
+    
     Planilla planilla(id, config);
     requerimiento_planilla_t requerimiento;
 

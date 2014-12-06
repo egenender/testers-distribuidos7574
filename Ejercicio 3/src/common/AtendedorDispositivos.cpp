@@ -180,5 +180,10 @@ bool AtendedorDispositivos::destruirComunicacion() {
         std::string error = std::string("Error al eliminar cola de tests. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
     }
-    return (colaRequerimientosBorrada && colaRecibosBorrada);
+    bool colaOrdenesBorrada = msgctl(this->cola_orden, IPC_RMID, (struct msqid_ds*)0) != -1;
+    if( !colaOrdenesBorrada ){
+        std::string error = std::string("Error al eliminar cola de ordenes. Error: ") + std::string(strerror(errno));
+        Logger::error(error.c_str(), __FILE__);
+    }
+    return (colaRequerimientosBorrada && colaRecibosBorrada && colaOrdenesBorrada);
 }

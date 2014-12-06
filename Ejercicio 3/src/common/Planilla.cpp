@@ -25,11 +25,10 @@ sem_tester_segundo(config.ObtenerParametroString(Constantes::NombresDeParametros
 config.ObtenerParametroEntero(Constantes::NombresDeParametros::SEM_TESTER_B) + idTester),
 sem_tester_resultado(config.ObtenerParametroString(Constantes::NombresDeParametros::ARCHIVO_IPCS),
 config.ObtenerParametroEntero(Constantes::NombresDeParametros::SEM_TESTER_RESULTADO) + idTester),
-cola(-1),
 m_IdShmLocal(-1),
 m_IdShmGeneral(-1),
-id(idTester){
-    
+id(idTester) {
+
     Logger::initialize(Constantes::ARCHIVO_LOG.c_str(), Logger::LOG_DEBUG);
     //Semaforos
     this->mutex_planilla_general.getSem();
@@ -91,22 +90,22 @@ id(idTester){
     //Cola de mensajes
     key = ftok(config.ObtenerParametroString(Constantes::NombresDeParametros::ARCHIVO_IPCS).c_str(), config.ObtenerParametroEntero(Constantes::NombresDeParametros::MSGQUEUE_PLANILLA));
     this->cola = msgget(key, 0666 | IPC_CREAT);
-    
- //<DBG>
+
+    //<DBG>
     ss << "MSGQUEUE_PLANILLA creada con id " << cola;
-    Logger::notice( ss.str().c_str(), __FILE__ );
+    Logger::notice(ss.str().c_str(), __FILE__);
     ss.str("");
-    
+
     this->mutex_planilla_local.p();
-    this->shm_planilla_local->cantidad=0;
-    this->shm_planilla_local->resultados=0;
-    this->shm_planilla_local->resultadosParciales=0;
-    this->shm_planilla_local->estado1=LIBRE;
-    this->shm_planilla_local->estado2=LIBRE;
-    this->shm_planilla_local->estadoRes=LIBRE;
+    this->shm_planilla_local->cantidad = 0;
+    this->shm_planilla_local->resultados = 0;
+    this->shm_planilla_local->resultadosParciales = 0;
+    this->shm_planilla_local->estado1 = LIBRE;
+    this->shm_planilla_local->estado2 = LIBRE;
+    this->shm_planilla_local->estadoRes = LIBRE;
     this->mutex_planilla_local.v();
-    
-    
+
+
 }
 
 int Planilla::queue() {
@@ -117,13 +116,13 @@ void Planilla::agregar(int idDispositivo) {
     respuesta_lugar_t respuesta;
     respuesta.mtype = idDispositivo + Constantes::OFFSET_LUGAR;
     this->mutex_planilla_local.p();
-    if (this->shm_planilla_local->cantidad > Constantes::MAX_DISPOSITIVOS_POR_TESTER) {
+    if (shm_planilla_local->cantidad == Constantes::MAX_DISPOSITIVOS_POR_TESTER) {
         mutex_planilla_local.v();
         respuesta.respuesta = false;
         Logger::notice("No hay lugar en la planilla", __FILE__);
-        if (msgsnd(cola, &respuesta, sizeof (respuesta_lugar_t) - sizeof (long), 0) == -1){
-        
-            Logger::error("SE CIERRA POR ERROR EN LA COLA", __FILE__);    
+        if (msgsnd(cola, &respuesta, sizeof (respuesta_lugar_t) - sizeof (long), 0) == -1) {
+
+            Logger::error("SE CIERRA POR ERROR EN LA COLA", __FILE__);
             exit(0);
         }
         return;
@@ -141,11 +140,11 @@ void Planilla::agregar(int idDispositivo) {
     Logger::notice(ss.str().c_str(), __FILE__);
     ss.str("");
 
-    this->shm_planilla_local->cantidad++;
     if (this->shm_planilla_local->estadoRes == LIBRE && this->shm_planilla_local->estado2 == LIBRE) {
         Logger::notice("El tester de resultados y el 2do estan libres, asi que el primer tester puede trabajar", __FILE__);
         this->shm_planilla_local->estado1 = OCUPADO;
-        this->mutex_planilla_local.v();
+        this->sem_tester_primero.v();
+
     } else {
         Logger::notice("El tester 1 tiene que esperar porque los otros no estan ambos libres", __FILE__);
         this->shm_planilla_local->estado1 = ESPERANDO;
@@ -159,14 +158,16 @@ void Planilla::agregar(int idDispositivo) {
             this->shm_planilla_local->estado2 = OCUPADO;
             this->sem_tester_segundo.v();
         }
-
-        this->mutex_planilla_local.v();
         this->sem_tester_primero.p();
+        
     }
 
+    this->mutex_planilla_local.v();
+    
     respuesta.respuesta = true;
-    if (msgsnd(this->cola, &respuesta, sizeof (respuesta_lugar_t) - sizeof (long), 0) == -1){
-        Logger::error("SE CIERRA POR ERROR EN LA COLA", __FILE__);   
+    ;
+    if (msgsnd(this->cola, &respuesta, sizeof (respuesta_lugar_t) - sizeof (long), 0) == -1) {
+        Logger::error("SE CIERRA POR ERROR EN LA COLA", __FILE__);
         exit(0);
     }
 }
@@ -175,13 +176,13 @@ void Planilla::terminadoRequerimientoPendiente() {
     this->mutex_planilla_local.p();
     Logger::notice("El tester 1 ahora esta libre", __FILE__);
     this->shm_planilla_local->estado1 = LIBRE;
-    if (this->shm_planilla_local->estadoRes == ESPERANDO) {
-        Logger::notice("El tester de resultados estaba esperando, asi que lo libero", __FILE__);
+    if (this->shm_planilla_local->estadoRes == ESPERANDO && this->shm_planilla_local->estado2 != OCUPADO) {
+        Logger::notice("El tester de resultados estaba esperando, asi que lo OCUPO", __FILE__);
         this->shm_planilla_local->estadoRes = OCUPADO;
         this->sem_tester_resultado.v();
     } else {
-        if (this->shm_planilla_local->estado2 == ESPERANDO) {
-            Logger::notice("El tester 2do estaba esperando, asi que lo libero", __FILE__);
+        if (this->shm_planilla_local->estado2 == ESPERANDO && this->shm_planilla_local->estadoRes != OCUPADO) {
+            Logger::notice("El tester 2do estaba esperando, asi que lo OCUPO", __FILE__);
             this->shm_planilla_local->estado2 = OCUPADO;
             this->sem_tester_segundo.v();
         } else {
@@ -237,8 +238,12 @@ void Planilla::iniciarProcesamientoResultados() {
             ss << "Quedan " << this->shm_planilla_local->resultadosParciales << " resultados parciales pendientes";
             Logger::notice(ss.str().c_str(), __FILE__);
             ss.str("");
-            this->shm_planilla_local->estado2 = OCUPADO;
-            this->shm_planilla_local->resultadosParciales--;
+            if (this->shm_planilla_local->estado1 != OCUPADO) {
+                this->shm_planilla_local->estado2 = OCUPADO;
+                this->shm_planilla_local->resultadosParciales--;
+            } else {
+                this->shm_planilla_local->estado2 = ESPERANDO;
+            }
 
         }
 
@@ -249,8 +254,12 @@ void Planilla::iniciarProcesamientoResultados() {
         ss << "Quedan " << this->shm_planilla_local->resultados << " resultados pendientes";
         Logger::notice(ss.str().c_str(), __FILE__);
         ss.str("");
-        this->shm_planilla_local->estadoRes = OCUPADO;
-        this->shm_planilla_local->resultados--;
+        if (this->shm_planilla_local->estado1 == OCUPADO || this->shm_planilla_local->estado2 == OCUPADO) {
+            this->shm_planilla_local->estadoRes = ESPERANDO;
+        } else {
+            this->shm_planilla_local->estadoRes = OCUPADO;
+            this->shm_planilla_local->resultados--;
+        }
         this->mutex_planilla_local.v();
     }
 
@@ -290,37 +299,36 @@ void Planilla::agregarResultadoParcial() {
 
 }
 
-
-bool Planilla::destruirCola(){
-    return msgctl(this->cola, IPC_RMID, (struct msqid_ds*)0) != -1;
+bool Planilla::destruirCola() {
+    return msgctl(this->cola, IPC_RMID, (struct msqid_ds*) 0) != -1;
 }
 
 bool Planilla::destruirMemoriaGeneral() {
-    if( shmdt( this->shm_planilla_general ) == -1 )
+    if (shmdt(this->shm_planilla_general) == -1)
         return false;
     return (shmctl(m_IdShmGeneral, IPC_RMID, NULL) != -1);
 }
 
 bool Planilla::destruirMemoriaLocal() {
-    if( shmdt( this->shm_planilla_local ) == -1 )
+    if (shmdt(this->shm_planilla_local) == -1)
         return false;
     return (shmctl(m_IdShmLocal, IPC_RMID, NULL) != -1);
 }
 
-bool Planilla::destruirSemaforoGeneral(){
+bool Planilla::destruirSemaforoGeneral() {
     return mutex_planilla_general.eliSem();
 }
 
-bool Planilla::destruirSemaforosLocales( std::string& msjError ) {
+bool Planilla::destruirSemaforosLocales(std::string& msjError) {
 
     msjError = "";
-    if( !mutex_planilla_local.eliSem() )
+    if (!mutex_planilla_local.eliSem())
         msjError += "No se pudo eliminar el semaforo de la planilla local";
-    if( !sem_tester_primero.eliSem() )
+    if (!sem_tester_primero.eliSem())
         msjError += "No se pudo eliminar el semaforo del primer tester";
-    if( !sem_tester_segundo.eliSem() )
+    if (!sem_tester_segundo.eliSem())
         msjError += "No se pudo eliminar el semaforo del segundo tester";
-    if( !sem_tester_resultado.eliSem() )
+    if (!sem_tester_resultado.eliSem())
         msjError += "No se pudo eliminar el semaforo de los resultados";
     return msjError == "";
 }

@@ -1,6 +1,6 @@
 #include <cstdlib>
 #include <sstream>
-
+#include <time.h> 
 #include "common/AtendedorDispositivos.h"
 #include "common/Configuracion.h"
 #include "logger/Logger.h"
@@ -12,6 +12,8 @@ using namespace std;
  * 
  */
 int main(int argc, char** argv) {
+    
+    srand (time(NULL));
 
     Logger::initialize(Constantes::ARCHIVO_LOG.c_str(), Logger::LOG_DEBUG);
     // Por parametro se recibe el ID del dispositivo
@@ -79,6 +81,7 @@ int main(int argc, char** argv) {
 
             usleep(rand() % 1000 + 1000);
             // Le envio resultado del segundo programa de testeo
+            
             atendedor.enviarResultado(id, rand() % 2);
 
             ss << "El dispositivo " << id << " espera la orden del sistema de testeo...";

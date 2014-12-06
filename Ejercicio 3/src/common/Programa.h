@@ -9,6 +9,7 @@
 #define	PROGRAMA_H
 
 #include <cstdlib>
+#include <time.h>       /* time */
 
 class Programa {
 public:
@@ -16,7 +17,7 @@ public:
     Programa(const Programa& orig);
     virtual ~Programa();
     
-    static int getPrograma() {return rand() % 100;};
+    static int getPrograma() {srand (time(NULL)); return rand() % 100;};
 
 };
 

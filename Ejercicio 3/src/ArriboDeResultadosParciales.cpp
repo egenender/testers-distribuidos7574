@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
             exit(-1);
         }
         mutex_planilla_local.p();
-        shm_planilla_local->resultados++;
+        shm_planilla_local->resultadosParciales++;
 
         if (-1 == msgsnd(cola_escritura, &resultado, sizeof (TMessageAtendedor) - sizeof (long), 0)) {
 
@@ -90,7 +90,7 @@ int main(int argc, char** argv) {
             if (shm_planilla_local->estadoRes == OCUPADO || shm_planilla_local->estadoRes == ESPERANDO
                     || shm_planilla_local->estado1 == OCUPADO) {
                 shm_planilla_local->estado2 = ESPERANDO;
-                if (shm_planilla_local->estadoRes == ESPERANDO) {
+                if (shm_planilla_local->estadoRes == ESPERANDO && shm_planilla_local->estado1 != OCUPADO) {
                     shm_planilla_local->estadoRes = OCUPADO;
                     sem_tester_segundo.v();
                 }
