@@ -27,7 +27,7 @@ AtendedorTesters::AtendedorTesters( const Configuracion& config ) {
     ss.str("");
     
     if(this->cola_recibos_tests == -1) {
-        msgctl(this->cola_requerimiento, IPC_RMID, (struct msqid_ds*)0); //TODO Esto no le incumbe, es cosa del finalizador
+        msgctl(this->cola_recibos_tests, IPC_RMID, (struct msqid_ds*)0); //TODO Esto no le incumbe, es cosa del finalizador
         std::string err = std::string("Error al obtener la cola del atendedor de testers. Errno: ") + std::string(strerror(errno));
         throw std::string(err.c_str());
     }

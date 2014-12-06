@@ -28,6 +28,7 @@ iPlanillaTester2do::~iPlanillaTester2do() {
 
 void iPlanillaTester2do::iniciarProcesamientoDeResultadosParciales() {
     requerimiento_planilla_t requerimiento;
+    requerimiento.mtype = idTester;
     requerimiento.tester = idTester;
     requerimiento.tipoReq = Constantes::REQUERIMIENTO_INICIAR_PROC_RESULTADOS_PARCIALES;
     requerimiento.idDispositivo = 0;
@@ -42,6 +43,7 @@ void iPlanillaTester2do::iniciarProcesamientoDeResultadosParciales() {
 
 void iPlanillaTester2do::procesarSiguiente() {
     requerimiento_planilla_t requerimiento;
+    requerimiento.mtype = idTester;
     requerimiento.tester = idTester;
     requerimiento.tipoReq = Constantes::REQUERIMIENTO_PROCESAR_SIGUIENTE;
     requerimiento.idDispositivo = 0;
@@ -56,6 +58,7 @@ void iPlanillaTester2do::procesarSiguiente() {
 
 void iPlanillaTester2do::agregarResultadoParcial() {
     requerimiento_planilla_t requerimiento;
+    requerimiento.mtype = idTester;
     requerimiento.tester = idTester;
     requerimiento.tipoReq = Constantes::REQUERIMIENTO_AGREGAR_RESULTADO_PARCIAL;
     requerimiento.idDispositivo = 0;
