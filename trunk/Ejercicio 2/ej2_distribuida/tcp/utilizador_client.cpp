@@ -27,10 +27,10 @@ int main(void){
 		execlp("./tcpclient_emisor", "tcpclient_emisor", "localhost","9001","3", "4", param_pid, (char*)0);
 		exit(1);
 	}
-	
-	printf("Soy el dispositivo 3 y espero un mensaje para mi\n");
+	/* FIN SETUP */
 	TMessageAtendedor msg;
 	
+		
 	int ok_read = msgrcv(cola_client_rec, &msg, sizeof(TMessageAtendedor) - sizeof(long), 3, 0);
     if (ok_read == -1){
 		perror("Error en la cola");
