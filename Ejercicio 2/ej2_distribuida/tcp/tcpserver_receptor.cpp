@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stddef.h>
 #include <sys/msg.h>
+#include <signal.h>
+#include <sys/wait.h>
 #include "../common/common.h"
 #include "comunes_tcp.h"
 
@@ -11,6 +13,11 @@
 #else
 #define IPCS_FILE "/tmp/buchwaldipcs"
 #endif
+
+void terminar_ejecucion(int sig){
+	// ACA HAY QUE TOCAR SI DEBERIA HACER ALGO DISTINTO A SIMPLEMENTE MORIR
+	exit(0);
+}
 
 int main(int argc, char *argv[]){
 	
@@ -34,11 +41,19 @@ int main(int argc, char *argv[]){
     }
 
     signal(SIGPIPE, SIG_IGN);
-    
+    signal(SIGHUP, terminar_ejecucion);
     /* FIN del setup */
+    
+    int cant_atendidos = 0;
     
     while(true){
 		int clientfd = accept(fd, (struct sockaddr*)NULL, NULL);
+		//Verifico no estar atendiendo ya muchos clientes
+		while (cant_atendidos >= MAXIMOS_ATENDIDOS){
+			wait(NULL);
+			cant_atendidos--;
+		}
+		cant_atendidos++;
 		
 		if (fork() == 0){
 			TMessageAtendedor* buffer = (TMessageAtendedor*) malloc(sizeof(TMessageAtendedor));

@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stddef.h>
 
+#define MAXIMOS_ATENDIDOS 10
+
 void recibir (TMessageAtendedor* buffer, int fd){
 	size_t size = sizeof(TMessageAtendedor);
 	size_t acumulado = 0;

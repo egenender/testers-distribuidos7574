@@ -1,19 +1,19 @@
 CC=g++
-CFLAGS=-Wall -pedantic -pedantic-errors -g -ggdb
+CFLAGS=-Wall -pedantic -pedantic-errors -g -ggdb -DEJEMPLO_TEST
 
 all: client_receptor client_emisor server_emisor server_receptor u_client u_server term
 
 client_receptor:
-	$(CC) $(CFLAGS) tcpclient_receptor.cpp -o tcpclient_receptor -DEJEMPLO_TEST
+	$(CC) $(CFLAGS) tcpclient_receptor.cpp -o tcpclient_receptor 
 
 client_emisor:
-	$(CC) $(CFLAGS) tcpclient_emisor.cpp -o tcpclient_emisor -DEJEMPLO_TEST
+	$(CC) $(CFLAGS) tcpclient_emisor.cpp -o tcpclient_emisor
 
 server_emisor:
-	$(CC) $(CFLAGS) tcpserver_emisor.cpp -o tcpserver_emisor -DEJEMPLO_TEST
+	$(CC) $(CFLAGS) tcpserver_emisor.cpp -o tcpserver_emisor
 
 server_receptor:
-	$(CC) $(CFLAGS) tcpserver_receptor.cpp -o tcpserver_receptor -DEJEMPLO_TEST
+	$(CC) $(CFLAGS) tcpserver_receptor.cpp -o tcpserver_receptor
 
 u_client:
 	$(CC) $(CFLAGS) utilizador_client.cpp -o utilizador_client
