@@ -3,6 +3,7 @@
 #include <sys/msg.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <unistd.h>
 #include "../common/common.h"
 
 int main(void){
