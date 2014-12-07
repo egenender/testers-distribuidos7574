@@ -93,10 +93,12 @@ typedef struct resultado_test{
 
 typedef struct message {
 	long mtype;
+	int cola_a_usar;
+    int finalizar_conexion; //1 para finalizar
+	/* END HEADER */
     int idDispositivo;
     int tester;
     int value; // Este parametro posee el valor del requerimiento, del programa y del resultado
-    int cola_a_usar;
 } TMessageAtendedor;
 
 #endif	/* COMMON_H */
