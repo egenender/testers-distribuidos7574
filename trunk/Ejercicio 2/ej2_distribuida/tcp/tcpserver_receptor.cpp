@@ -35,27 +35,34 @@ int main(int argc, char *argv[]){
 
     signal(SIGPIPE, SIG_IGN);
     
-    while(1){
+    /* FIN del setup */
+    
+    while(true){
 		int clientfd = accept(fd, (struct sockaddr*)NULL, NULL);
 		
 		if (fork() == 0){
 			TMessageAtendedor* buffer = (TMessageAtendedor*) malloc(sizeof(TMessageAtendedor));
 			
+			//Espero primer mensaje, que el cliente me tiene que decir su ID.
 			recibir(buffer, clientfd);
 						
 			key_t key = ftok(IPCS_FILE, MSGQUEUE_SERVER_RECEPTOR_EMISOR);
 			int cola_id_disp = msgget(key, 0660| IPC_CREAT);
-			//Mando Primer mensaje, que me dice el identificador del cliente (al emisor)   
+			//Mando Primer mensaje, que me dice el identificador del cliente (al emisor) 
+			//y tambien mi pid para que el emisor me 'mate' cuando todo se termine
 			buffer->mtype = id_tester;
 			buffer->value = getpid();
+			
 			int ok = msgsnd(cola_id_disp, buffer, sizeof(TMessageAtendedor) - sizeof(long), 0);
 			if (ok == -1){
 				exit(1);
 			}
 								
 			while (true) {
+				//Espero por un mensaje desde el cliente
 				recibir(buffer, clientfd);
 				
+				//Mando el mensaje por la cola que el cliente me dice que tengo que usar
 				key_t key = ftok(IPCS_FILE, buffer->cola_a_usar);
 				int cola = msgget(key, 0660);
 				int ok = msgsnd(cola, buffer, sizeof(TMessageAtendedor) - sizeof(long), 0);
