@@ -68,6 +68,7 @@ int main(int argc, char *argv[]){
 			}
 					
 			long dispositivo_a_tratar = buffer->idDispositivo;
+			pid_t receptor = buffer->value;
 			
 			buffer->idDispositivo = id_tester;
 			enviar(buffer, clientfd);
@@ -75,8 +76,12 @@ int main(int argc, char *argv[]){
 			while (true){
 				int ok_read = msgrcv(cola, buffer, size - sizeof(long), dispositivo_a_tratar, 0);
 				if (ok_read == -1){
-					exit(0);
+					exit(1);
 				}
+				if (buffer->finalizar_conexion){
+					kill(receptor, SIGHUP);
+					exit(0);
+				}				
 				enviar(buffer, clientfd);
 			}
 			free(buffer);
