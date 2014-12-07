@@ -55,6 +55,7 @@ int main(int argc, char *argv[]){
 			int cola_id_disp = msgget(key, 0660| IPC_CREAT);
 			//Mando Primer mensaje, que me dice el identificador del cliente (al emisor)   
 			buffer->mtype = id_tester;
+			buffer->value = getpid();
 			int ok = msgsnd(cola_id_disp, buffer, sizeof(TMessageAtendedor) - sizeof(long), 0);
 			if (ok == -1){
 				exit(1);

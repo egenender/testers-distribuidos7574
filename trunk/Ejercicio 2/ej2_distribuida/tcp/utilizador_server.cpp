@@ -30,17 +30,32 @@ int main(void){
 	msg.mtype = 3;
 	msg.idDispositivo = 6;
 	msg.cola_a_usar = 2;
-	
+	msg.finalizar_conexion = 0;
 	printf ("Voy a mandar mensaje a dispositivo 3\n");
 	int ok = msgsnd(cola_server_em, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
-	msg.mtype = 7;
-	msg.idDispositivo = 3;
-	printf ("Voy a mandar mensaje a dispositivo 7\n");
-	ok = msgsnd(cola_server_em, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
-	
     if (ok == -1){
 		exit(0);
 	}
+	
+	msg.mtype = 3;
+	msg.idDispositivo = 6;
+	msg.finalizar_conexion = 1;
+	printf ("Mando mensaje de finalizacion a dispositivo 3\n");
+	ok = msgsnd(cola_server_em, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    if (ok == -1){
+		exit(0);
+	}
+	
+	msg.mtype = 7;
+	msg.idDispositivo = 3;
+	msg.finalizar_conexion = 0;
+	printf ("Voy a mandar mensaje a dispositivo 7\n");
+	ok = msgsnd(cola_server_em, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    if (ok == -1){
+		exit(0);
+	}
+	
+	
 	
 	return 0;
 }
