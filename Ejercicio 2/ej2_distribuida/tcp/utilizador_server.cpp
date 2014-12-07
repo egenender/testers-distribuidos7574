@@ -24,7 +24,7 @@ int main(void){
 		execlp("./tcpserver_receptor", "tcpserver_receptor", "9001","6",(char*)0);
 		exit(1);
 	}
-	
+	/* FIN SETUP */
 	TMessageAtendedor msg;
 	
 	msg.mtype = 3;
@@ -37,6 +37,8 @@ int main(void){
 		exit(0);
 	}
 	
+	
+	
 	msg.mtype = 3;
 	msg.idDispositivo = 6;
 	msg.finalizar_conexion = 1;
@@ -44,18 +46,7 @@ int main(void){
 	ok = msgsnd(cola_server_em, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if (ok == -1){
 		exit(0);
-	}
-	
-	msg.mtype = 7;
-	msg.idDispositivo = 3;
-	msg.finalizar_conexion = 0;
-	printf ("Voy a mandar mensaje a dispositivo 7\n");
-	ok = msgsnd(cola_server_em, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
-    if (ok == -1){
-		exit(0);
-	}
-	
-	
+	}	
 	
 	return 0;
 }
