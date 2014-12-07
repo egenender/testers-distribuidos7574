@@ -54,8 +54,8 @@ int main(int argc, char** argv) {
 
         planilla.eliminarDispositivo(resultado.dispositivo);
         Logger::notice("Se elimino el dispositivo de la planilla", __FILE__);
-        //   planilla.procesarSiguiente();
-        //   Logger::notice("Termino procesar siguiente", __FILE__);
+        planilla.procesarSiguiente();
+        Logger::notice("Termino procesar siguiente", __FILE__);
     }
 
     return 0;
