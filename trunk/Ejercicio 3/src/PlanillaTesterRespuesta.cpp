@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
                 break;
             case REQUERIMIENTO_PROCESAR_SIGUIENTE:
                 Logger::notice("Recibo un pedido para procesar siguiente", nombre.str().c_str());
-                planilla.procesarSiguiente();
+                planilla.procesarSiguienteResultado();
                 break;
         }
 

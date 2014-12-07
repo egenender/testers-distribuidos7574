@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
                 shm_planilla_local->estadoRes = ESPERANDO;
             } else {
                 shm_planilla_local->estadoRes = OCUPADO;
-                sem_tester_resultado.v();
+    //            sem_tester_resultado.v();
             }
         }
 

@@ -37,7 +37,8 @@ public:
     int queue();
     void agregar(int idDispositivo);
     void terminadoRequerimientoPendiente();
-    void procesarSiguiente();
+    void procesarSiguienteResultado();
+    void procesarSiguienteResultadoParcial();
     void iniciarProcesamientoResultados();
     void iniciarProcesamientoResultadosParciales();
 

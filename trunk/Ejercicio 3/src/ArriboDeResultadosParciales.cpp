@@ -86,18 +86,8 @@ int main(int argc, char** argv) {
 
         }
 
-        if (shm_planilla_local->estado2 == LIBRE) {
-            if (shm_planilla_local->estadoRes == OCUPADO || shm_planilla_local->estadoRes == ESPERANDO
-                    || shm_planilla_local->estado1 == OCUPADO) {
-                shm_planilla_local->estado2 = ESPERANDO;
-                if (shm_planilla_local->estadoRes == ESPERANDO && shm_planilla_local->estado1 != OCUPADO) {
-                    shm_planilla_local->estadoRes = OCUPADO;
-                    sem_tester_resultado.v();
-                }
-            } else {
-                shm_planilla_local->estado2 = OCUPADO;
-                sem_tester_segundo.v();
-            }
+        if (shm_planilla_local->estado2 != OCUPADO) {
+            shm_planilla_local->estado2 = ESPERANDO;
         }
         mutex_planilla_local.v();
     }

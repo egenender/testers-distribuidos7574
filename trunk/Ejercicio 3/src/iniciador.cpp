@@ -76,7 +76,7 @@ void createIPCObjects(const Configuracion& config) {
     semPlanilla.iniSem(1); // Inicializa el semaforo en 1
 
     std::stringstream ss;
-    ss << "Se crep el semaforo para la shem general con ID " << semPlanilla.getSemId();
+    ss << "Se creo el semaforo para la shem general con ID " << semPlanilla.getSemId();
     Logger::error(ss.str().c_str(), __FILE__);
     ss.str("");
 
