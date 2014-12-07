@@ -7,11 +7,11 @@
 #include "../common/common.h"
 
 int main(void){
-	
+	/* Begin setup */
 	key_t key = ftok("ipcs-prueba", 1);
 	int cola_server_em = msgget(key, 0660 | IPC_CREAT);
 	key = ftok("ipcs-prueba", 3);
-	/*int cola_server_rec = */msgget(key, 0660 | IPC_CREAT);
+	int cola_server_rec = msgget(key, 0660 | IPC_CREAT);
 
 	pid_t emisor = fork();
 	if (emisor == 0){
@@ -37,16 +37,21 @@ int main(void){
 		exit(0);
 	}
 	
-	
-	
-	msg.mtype = 3;
-	msg.idDispositivo = 6;
-	msg.finalizar_conexion = 1;
-	printf ("Mando mensaje de finalizacion a dispositivo 3\n");
-	ok = msgsnd(cola_server_em, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
-    if (ok == -1){
-		exit(0);
+	int ok_read = msgrcv(cola_server_rec, &msg, sizeof(TMessageAtendedor) - sizeof(long), 6, 0);
+    if (ok_read == -1){
+		perror("Error en la cola");
+		exit(1);
 	}	
 	
+	if (msg.value == 10){
+		msg.mtype = 3;
+		msg.idDispositivo = 6;
+		msg.finalizar_conexion = 1;
+		printf ("Mando mensaje de finalizacion a dispositivo 3\n");
+		ok = msgsnd(cola_server_em, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+		if (ok == -1){
+			exit(0);
+		}	
+	}
 	return 0;
 }
