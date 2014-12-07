@@ -23,12 +23,7 @@ int main(int argc, char *argv[]){
 	long id_tester = atol(argv[3]);
 	
     size_t size = sizeof(TMessageAtendedor);
-    
-    if(size <= 0){
-      printf("Error: el tamaño del mensaje debe ser mayor a cero\n");
-      return -2;
-    }
-
+   
     int fd = tcp_open_pasivo(atoi(argv[1]));
     if(fd < 0){
       perror("Error");
@@ -43,18 +38,22 @@ int main(int argc, char *argv[]){
     }
 
     signal(SIGPIPE, SIG_IGN);
-    
+	
     key_t key = ftok(IPCS_FILE, id_cola);
     int cola = msgget(key, 0660);
+	
+	/* FIN del setup */
 		
     while(1){
 		int clientfd = accept(fd, (struct sockaddr*)NULL, NULL);
 		
 		if (fork() == 0){
 			TMessageAtendedor* buffer = (TMessageAtendedor*) malloc(size);
+			
+			//Espero Primer mensaje, que me dice el identificador del cliente + pid del receptor, para poder 'matarlo'
 			key_t key = ftok(IPCS_FILE, MSGQUEUE_SERVER_RECEPTOR_EMISOR);
 			int cola_id_disp = msgget(key, 0660| IPC_CREAT);
-			//Espero Primer mensaje, que me dice el identificador del cliente    
+			
 			int ok_read = msgrcv(cola_id_disp, buffer, size - sizeof(long), id_tester, 0);
 				if (ok_read == -1){
 					exit(0);
@@ -64,23 +63,24 @@ int main(int argc, char *argv[]){
 			pid_t receptor = buffer->value;
 			
 			buffer->idDispositivo = id_tester;
+			//Le envio al cliente para que sepa el id del servidor que tiene que esperar (para que se lo pase a su emisor)
 			enviar(buffer, clientfd);
 			
 			while (true){
+				//Espero un mensaje que deba ser enviado al dispositivo en cuestion
 				int ok_read = msgrcv(cola, buffer, size - sizeof(long), dispositivo_a_tratar, 0);
 				if (ok_read == -1){
 					exit(1);
 				}
+				//Si el mensaje era de finalizacion, entonces 'mato' al receptor y termino mi labor
 				if (buffer->finalizar_conexion){
 					kill(receptor, SIGHUP);
+					free(buffer);
+					close(clientfd);
 					exit(0);
 				}				
 				enviar(buffer, clientfd);
-			}
-			free(buffer);
-			close(clientfd);
-			exit(0);
-			
+			}			
 		}
 		close(clientfd);
 	}

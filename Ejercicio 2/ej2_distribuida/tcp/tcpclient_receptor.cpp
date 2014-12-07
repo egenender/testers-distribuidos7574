@@ -25,9 +25,14 @@ int main(int argc, char *argv[]){
     }
     
     long id_dispositivo = atol(argv[3]);
-
+	
+	/* FIN del setup */
+	
+	//Espero primer mensaje del servidor para saber quien es el tester que me atiende
 	TMessageAtendedor* buffer = (TMessageAtendedor*) malloc(size);
 	recibir(buffer, fd);
+	
+	//Envio por la cola al emisor, para que sepa el id del servidor/tester
 	key_t key = ftok(IPCS_FILE, MSGQUEUE_DISPOSITIVO_RECEPTOR_EMISOR);
 	int cola_emisor = msgget(key, 0660);
 	buffer->mtype = id_dispositivo;
@@ -37,8 +42,12 @@ int main(int argc, char *argv[]){
 		exit(1);
 	}
 	
+	//Ciclo general
     while (true) {
+		//Espero un mensaje desde el servidor
 		recibir(buffer, fd);
+		
+		//Mando el mensaje por la cola que me indique el server
 		key_t key = ftok(IPCS_FILE, buffer->cola_a_usar);
 		int cola = msgget(key, 0660| IPC_CREAT);
 		
