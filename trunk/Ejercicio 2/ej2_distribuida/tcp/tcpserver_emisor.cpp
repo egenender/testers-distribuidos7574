@@ -5,6 +5,12 @@
 #include <sys/msg.h>
 #include "../common/common.h"
 
+#ifdef EJEMPLO_TEST
+#define IPCS_FILE "ipcs-prueba"
+#else
+#define IPCS_FILE "/tmp/buchwaldipcs"
+#endif
+
 void enviar(TMessageAtendedor* buffer, int fd){
 	size_t size = sizeof(TMessageAtendedor);
 	size_t acumulado = 0;
@@ -50,8 +56,7 @@ int main(int argc, char *argv[]){
 
     signal(SIGPIPE, SIG_IGN);
     
-    //key_t key = ftok(ipcFileName.c_str(), id_cola);
-    key_t key = ftok("ipcs-prueba", id_cola);
+    key_t key = ftok(IPCS_FILE, id_cola);
     int cola = msgget(key, 0660);
 		
     while(1){
@@ -59,7 +64,7 @@ int main(int argc, char *argv[]){
 		
 		if (fork() == 0){
 			TMessageAtendedor* buffer = (TMessageAtendedor*) malloc(size);
-			key_t key = ftok("ipcs-prueba", MSGQUEUE_SERVER_RECEPTOR_EMISOR);
+			key_t key = ftok(IPCS_FILE, MSGQUEUE_SERVER_RECEPTOR_EMISOR);
 			int cola_id_disp = msgget(key, 0660| IPC_CREAT);
 			//Espero Primer mensaje, que me dice el identificador del cliente    
 			int ok_read = msgrcv(cola_id_disp, buffer, size - sizeof(long), id_tester, 0);
