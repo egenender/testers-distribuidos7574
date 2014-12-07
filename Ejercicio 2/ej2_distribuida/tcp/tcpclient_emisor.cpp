@@ -5,9 +5,12 @@
 #include <signal.h>
 #include "../common/common.h"
 
-/**
- * Cliente que recibe datos del socket leyendo cada vez la cantidad de bytes indicada.
- */
+#ifdef EJEMPLO_TEST
+#define IPCS_FILE "ipcs-prueba"
+#else
+#define IPCS_FILE "/tmp/buchwaldipcs"
+#endif
+
 void enviar(TMessageAtendedor* buffer, int fd){
 	size_t acumulado = 0;
 	size_t size = sizeof(TMessageAtendedor);
@@ -40,7 +43,7 @@ int main(int argc, char *argv[]){
     }
     
     //key_t key = ftok(ipcFileName.c_str(), id_cola);
-    key_t key = ftok("ipcs-prueba", id_cola);
+    key_t key = ftok(IPCS_FILE, id_cola);
     int cola = msgget(key, 0660);
     
     TMessageAtendedor* buffer = (TMessageAtendedor*) malloc(size);
@@ -49,7 +52,7 @@ int main(int argc, char *argv[]){
 	
 	enviar(buffer, fd);
 	
-	key = ftok("ipcs-prueba", MSGQUEUE_DISPOSITIVO_RECEPTOR_EMISOR);
+	key = ftok(IPCS_FILE, MSGQUEUE_DISPOSITIVO_RECEPTOR_EMISOR);
 	int cola_id_tester = msgget(key, 0660| IPC_CREAT);
 	//Espero Primer mensaje, que me dice el identificador del cliente    
 	int ok_read = msgrcv(cola_id_tester, buffer, size - sizeof(long), id, 0);

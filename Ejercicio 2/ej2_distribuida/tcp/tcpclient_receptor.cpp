@@ -4,9 +4,11 @@
 #include <sys/msg.h>
 #include "../common/common.h"
 
-/**
- * Cliente que recibe datos del socket leyendo cada vez la cantidad de bytes indicada.
- */
+#ifdef EJEMPLO_TEST
+#define IPCS_FILE "ipcs-prueba"
+#else
+#define IPCS_FILE "/tmp/buchwaldipcs"
+#endif
  
 void recibir(TMessageAtendedor* buffer, int fd){
 	size_t size = sizeof(TMessageAtendedor);
@@ -40,7 +42,7 @@ int main(int argc, char *argv[]){
 
 	TMessageAtendedor* buffer = (TMessageAtendedor*) malloc(size);
 	recibir(buffer, fd);
-	key_t key = ftok("ipcs-prueba", MSGQUEUE_DISPOSITIVO_RECEPTOR_EMISOR);
+	key_t key = ftok(IPCS_FILE, MSGQUEUE_DISPOSITIVO_RECEPTOR_EMISOR);
 	int cola_emisor = msgget(key, 0660);
 	buffer->mtype = id_dispositivo;
 		
@@ -51,8 +53,7 @@ int main(int argc, char *argv[]){
 	
     while (true) {
 		recibir(buffer, fd);
-		//key_t key = ftok(ipcFileName.c_str(), buffer->cola_a_usar);
-		key_t key = ftok("ipcs-prueba", buffer->cola_a_usar);
+		key_t key = ftok(IPCS_FILE, buffer->cola_a_usar);
 		int cola = msgget(key, 0660| IPC_CREAT);
 		
 		int ok = msgsnd(cola, buffer, size - sizeof(long), 0);
