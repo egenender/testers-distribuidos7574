@@ -5,14 +5,28 @@
 #include <sys/msg.h>
 #include "../common/common.h"
 
+void enviar(TMessageAtendedor* buffer, int fd){
+	size_t size = sizeof(TMessageAtendedor);
+	size_t acumulado = 0;
+	int enviado = 0;
+	char* buffer_envio = (char*) buffer;			
+	while((enviado = write(fd, buffer_envio + acumulado, size - acumulado)) >= 0 && acumulado < size){
+		acumulado += enviado;
+	}
+	if (acumulado != size){
+		perror("Error al enviar el mensaje al cliente");
+	}
+}
+
 int main(int argc, char *argv[]){
 	
-    if(argc != 3){
-		printf("Uso: %s <puerto> <id_cola>\n", argv[0]);
+    if(argc != 4){
+		printf("Uso: %s <puerto> <id_cola> <id_tester>\n", argv[0]);
 		return -1;
     }
 	
 	int id_cola = atoi(argv[2]);
+	long id_tester = atol(argv[3]);
 	
     size_t size = sizeof(TMessageAtendedor);
     
@@ -44,28 +58,26 @@ int main(int argc, char *argv[]){
 		int clientfd = accept(fd, (struct sockaddr*)NULL, NULL);
 		
 		if (fork() == 0){
-			int enviado = 0, acumulado = 0, leido = 0;			
 			TMessageAtendedor* buffer = (TMessageAtendedor*) malloc(size);
-			    
-			char* buffer_act = (char*) buffer;
-			while( (leido = read(fd, buffer_act, size - acumulado)) > 0){
-				acumulado += leido;
-				buffer_act = buffer_act + leido;
+			key_t key = ftok("ipcs-prueba", MSGQUEUE_SERVER_RECEPTOR_EMISOR);
+			int cola_id_disp = msgget(key, 0660| IPC_CREAT);
+			//Espero Primer mensaje, que me dice el identificador del cliente    
+			int ok_read = msgrcv(cola_id_disp, buffer, size - sizeof(long), id_tester, 0);
+				if (ok_read == -1){
+					exit(0);
 			}
-						
+					
 			long dispositivo_a_tratar = buffer->idDispositivo;
-			printf("\nTengo que leer del dispositivo %ld de mtype 1? %lu\n", dispositivo_a_tratar, buffer->mtype);
+			
+			buffer->idDispositivo = id_tester;
+			enviar(buffer, clientfd);
 			
 			while (true){
 				int ok_read = msgrcv(cola, buffer, size - sizeof(long), dispositivo_a_tratar, 0);
 				if (ok_read == -1){
 					exit(0);
 				}
-				printf("Lei mensaje para el dispositivo %ld\n", dispositivo_a_tratar);
-				char* buffer_envio = (char*) buffer;			
-				while((enviado = write(clientfd, buffer_envio + acumulado, size - acumulado)) > 0 && acumulado < size){
-					acumulado += enviado;
-				}
+				enviar(buffer, clientfd);
 			}
 			free(buffer);
 			close(clientfd);
