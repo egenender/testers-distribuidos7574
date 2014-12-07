@@ -4,25 +4,13 @@
 #include <stddef.h>
 #include <sys/msg.h>
 #include "../common/common.h"
+#include "comunes_tcp.h"
 
 #ifdef EJEMPLO_TEST
 #define IPCS_FILE "ipcs-prueba"
 #else
 #define IPCS_FILE "/tmp/buchwaldipcs"
 #endif
-
-void enviar(TMessageAtendedor* buffer, int fd){
-	size_t size = sizeof(TMessageAtendedor);
-	size_t acumulado = 0;
-	int enviado = 0;
-	char* buffer_envio = (char*) buffer;			
-	while((enviado = write(fd, buffer_envio + acumulado, size - acumulado)) >= 0 && acumulado < size){
-		acumulado += enviado;
-	}
-	if (acumulado != size){
-		perror("Error al enviar el mensaje al cliente");
-	}
-}
 
 int main(int argc, char *argv[]){
 	

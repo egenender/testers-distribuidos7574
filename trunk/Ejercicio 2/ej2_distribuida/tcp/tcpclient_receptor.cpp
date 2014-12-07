@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <sys/msg.h>
 #include "../common/common.h"
+#include "comunes_tcp.h"
 
 #ifdef EJEMPLO_TEST
 #define IPCS_FILE "ipcs-prueba"
@@ -10,21 +11,6 @@
 #define IPCS_FILE "/tmp/buchwaldipcs"
 #endif
  
-void recibir(TMessageAtendedor* buffer, int fd){
-	size_t size = sizeof(TMessageAtendedor);
-	size_t acumulado = 0;
-	int leido;
-	char* buffer_act = (char*) buffer;
-	while( (leido = read(fd, buffer_act, size - acumulado)) >= 0 && acumulado < size){
-		acumulado += leido;
-		buffer_act = buffer_act + leido;
-	}
-	if (acumulado != size){
-		perror("Error recibiendo mensaje desde el servidor");
-		exit(1);
-	}	
-}
-
 int main(int argc, char *argv[]){
 	if(argc != 4){
         printf("%s <host> <port> <id_dispositivo>\n",argv[0]);
