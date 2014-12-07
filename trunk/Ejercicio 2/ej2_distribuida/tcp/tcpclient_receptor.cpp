@@ -2,6 +2,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <sys/msg.h>
+#include <signal.h>
 #include "../common/common.h"
 #include "comunes_tcp.h"
 
@@ -10,6 +11,11 @@
 #else
 #define IPCS_FILE "/tmp/buchwaldipcs"
 #endif
+ 
+void terminar_ejecucion(int sig){
+	// ACA HAY QUE TOCAR SI DEBERIA HACER ALGO DISTINTO A SIMPLEMENTE MORIR
+	exit(0);
+}
  
 int main(int argc, char *argv[]){
 	if(argc != 4){
@@ -25,7 +31,7 @@ int main(int argc, char *argv[]){
     }
     
     long id_dispositivo = atol(argv[3]);
-	
+	signal(SIGHUP, terminar_ejecucion);
 	/* FIN del setup */
 	
 	//Espero primer mensaje del servidor para saber quien es el tester que me atiende

@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stddef.h>
 #include <sys/msg.h>
+#include <sys/wait.h>
 #include "../common/common.h"
 #include "comunes_tcp.h"
 
@@ -43,9 +44,16 @@ int main(int argc, char *argv[]){
     int cola = msgget(key, 0660);
 	
 	/* FIN del setup */
-		
+	int cant_atendidos = 0;
+	
     while(1){
 		int clientfd = accept(fd, (struct sockaddr*)NULL, NULL);
+		//Verifico no estar atendiendo ya muchos clientes
+		while (cant_atendidos >= MAXIMOS_ATENDIDOS){
+			wait(NULL);
+			cant_atendidos--;
+		}
+		cant_atendidos++;
 		
 		if (fork() == 0){
 			TMessageAtendedor* buffer = (TMessageAtendedor*) malloc(size);
