@@ -9,7 +9,7 @@ int main(void){
 	
 	key_t key = ftok("ipcs-prueba", 1);
 	int cola_server_em = msgget(key, 0660 | IPC_CREAT);
-	key = ftok("ipcs-prueba", 1);
+	key = ftok("ipcs-prueba", 3);
 	/*int cola_server_rec = */msgget(key, 0660 | IPC_CREAT);
 
 	pid_t emisor = fork();
