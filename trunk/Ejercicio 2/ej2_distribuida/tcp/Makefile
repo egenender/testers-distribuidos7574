@@ -1,26 +1,34 @@
 CC=g++
-CFLAGS=-Wall -pedantic -pedantic-errors -g -ggdb -DDEBUG
+CFLAGS=-Wall -pedantic -pedantic-errors -g -ggdb
 
-all: client_receptor server_emisor u_client u_server term
+all: client_receptor client_emisor server_emisor server_receptor u_client u_server term
 
 client_receptor:
-	make tcpclient_receptor
+	$(CC) $(CFLAGS) tcpclient_receptor.cpp -o tcpclient_receptor
+
+client_emisor:
+	$(CC) $(CFLAGS) tcpclient_emisor.cpp -o tcpclient_emisor
 
 server_emisor:
-	make tcpserver_emisor
+	$(CC) $(CFLAGS) tcpserver_emisor.cpp -o tcpserver_emisor
+
+server_receptor:
+	$(CC) $(CFLAGS) tcpserver_receptor.cpp -o tcpserver_receptor
 
 u_client:
-	make utilizador_client
+	$(CC) $(CFLAGS) utilizador_client.cpp -o utilizador_client
 
 u_server:
-	make utilizador_server
+	$(CC) $(CFLAGS) utilizador_server.cpp -o utilizador_server
 
 term:
-	make terminador
+	$(CC) $(CFLAGS) terminador.cpp -o terminador
 	
 clean:
 	rm -f tcpclient_receptor
+	rm -f tcpclient_emisor
 	rm -f tcpserver_emisor
+	rm -f tcpserver_receptor
 	rm -f utilizador_client
 	rm -f utilizador_server
 	rm -f terminador

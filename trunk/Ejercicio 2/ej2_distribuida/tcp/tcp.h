@@ -60,7 +60,7 @@ int tcp_open_pasivo(uint16_t port){
 
 void tcp_disable_nagle(int sock){
     int flag = 1;
-    int result = setsockopt(sock,            /* socket affected */
+    /*int result =*/ setsockopt(sock,            /* socket affected */
                             IPPROTO_TCP,     /* set option at TCP level */
                             TCP_NODELAY,     /* name of option */
                             (char *) &flag,  /* the cast is historical cruft */
