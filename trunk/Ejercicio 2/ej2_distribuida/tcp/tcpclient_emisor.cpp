@@ -2,6 +2,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <sys/msg.h>
+#include <signal.h>
 #include "../common/common.h"
 
 /**
@@ -22,13 +23,15 @@ void enviar(TMessageAtendedor* buffer, int fd){
 }
  
 int main(int argc, char *argv[]){
-	if(argc != 5){
-        printf("%s <host> <port> <id_dispositivo> <id_cola> \n",argv[0]);
+	if(argc != 6){
+        printf("%s <host> <port> <id_dispositivo> <id_cola> <pid_receptor>\n",argv[0]);
         return -1;
     }
 	size_t size = sizeof(TMessageAtendedor);
 	int id = atoi(argv[3]);
 	int id_cola = atoi(argv[4]);
+	
+	pid_t receptor = atoi(argv[5]);
 	
     int fd = tcp_open_activo(argv[1], atoi(argv[2]));
     if(fd < 0){
@@ -57,9 +60,15 @@ int main(int argc, char *argv[]){
 	
     while (true) {
 		int ok_read = msgrcv(cola, buffer, size - sizeof(long), id_tester, 0);
+			
 		if (ok_read == -1){
 			exit(0);
 		}
+		if (buffer->finalizar_conexion == 1){
+			kill(receptor, SIGHUP);
+			exit(0);
+		}
+		
 		enviar(buffer, fd);
 	}
 	close(fd);
