@@ -51,7 +51,7 @@ void AtendedorTesters::enviarPrograma(int idDispositivo, int tester, int idProgr
 
     TMessageAtendedor msg;
     msg.mtype = idDispositivo;
-    msg.idDispositivo = tester; //FIXME?
+    msg.tester = tester;
     msg.value = idPrograma;
     
     int ret = msgsnd(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
@@ -63,16 +63,18 @@ void AtendedorTesters::enviarPrograma(int idDispositivo, int tester, int idProgr
 
 }
 
-resultado_test_t AtendedorTesters::recibirResultado(int idTester) {
-    resultado_test_t rsp;
-    int ret = msgrcv(this->cola_recibos_tests, &rsp, sizeof(resultado_test_t) - sizeof(long), idTester, 0);
+int AtendedorTesters::recibirResultado(int idTester) {
+    //resultado_test_t rsp;
+    TMessageAtendedor msg;
+    
+    int ret = msgrcv(this->cola_recibos_tests, &msg, sizeof(TMessageAtendedor) - sizeof(long), idTester, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir resultado del atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
         
-    return rsp;
+    return msg.value;
 
 }
 

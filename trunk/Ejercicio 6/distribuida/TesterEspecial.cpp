@@ -50,11 +50,11 @@ int main(int argc, char** argv) {
         
         mensaje = "Espero resultado desde el dispositivo id ";
         Logger::notice(mensaje + ss.str() , nombre.str().c_str());
-        resultado_test_t resul = atendedor.recibirResultado(id);
+        int result = atendedor.recibirResultado(id);
         mensaje = "Recibi resultado desde el dispositivo ";
         Logger::notice(mensaje + ss.str() , nombre.str().c_str());
         
-        int seguimiento = planilla.terminarProcesamiento(posicion, resul.result == RESULTADO_GRAVE);
+        int seguimiento = planilla.terminarProcesamiento(posicion, result == RESULTADO_GRAVE);
         usleep( rand() % 1000 + 1000);
         if (seguimiento == NO_CONTESTAR){
 			mensaje = "Aun faltan testeos por hacer, asi que yo sigo con lo mio";

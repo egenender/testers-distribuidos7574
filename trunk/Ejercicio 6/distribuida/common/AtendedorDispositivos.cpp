@@ -50,19 +50,25 @@ int AtendedorDispositivos::recibirPrograma(int idDispositivo) {
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
-    this->ultimoTester = msg.idDispositivo;
+    this->ultimoTester = msg.tester;
     return msg.value;
 
 }
 void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {
 
-    resultado_test_t resultado_test;
+    /*resultado_test_t resultado_test;
     
     resultado_test.tester = (long)this->ultimoTester;
     resultado_test.result = resultado;
-    resultado_test.dispositivo = idDispositivo;
+    resultado_test.dispositivo = idDispositivo;*/
+    
+    TMessageAtendedor msg;
+    msg.mtype = (long) this->ultimoTester;
+    msg.tester = this->ultimoTester;
+    msg.idDispositivo = idDispositivo;
+    msg.value = resultado;
             
-    int ret = msgsnd(this->cola_tests, &resultado_test, sizeof(resultado_test_t) - sizeof(long), 0);
+    int ret = msgsnd(this->cola_tests, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
         std::string error("Error al enviar resultado al atendedor. Error: " + errno);
         Logger::error(error.c_str(), __FILE__);
