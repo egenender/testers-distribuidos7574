@@ -45,6 +45,7 @@ int main(int argc, char *argv[]){
 	
 	// Espero mensaje en la cola, proveniente del servidor, del id del server/tester.
 	// Necesito ese id porque es con ese id que voy a esperar en la cola de emision
+	
 	int ok_read = msgrcv(cola_id_tester, buffer, size - sizeof(long), id, 0);
 	if (ok_read == -1){
 		exit(0);

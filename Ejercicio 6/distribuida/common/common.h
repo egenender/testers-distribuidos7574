@@ -16,10 +16,10 @@
 // Constantes del sistema
 
 const int CANT_DISPOSITIVOS = 100;
-const int CANT_TESTERS_COMUNES = 3;
-const int CANT_TESTERS_ESPECIALES = 5;
+const int CANT_TESTERS_COMUNES = 1;
+const int CANT_TESTERS_ESPECIALES = 1;
 const int ID_DISPOSITIVO_START = 50;
-const int ID_TESTER_START = 2;
+const int ID_TESTER_START = 1;
 const int ID_TESTER_ESPECIAL_START = ID_TESTER_START + CANT_TESTERS_COMUNES;
 const int MAX_DISPOSITIVOS_EN_SISTEMA = 100;
 
@@ -58,6 +58,11 @@ const int FINALIZAR_CONEXION = 1;
 
 const int MAXIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION = 4;
 const int MINIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION = 2;
+
+const char PUERTO_SERVER_EMISOR[] = "9000";
+const char PUERTO_SERVER_RECEPTOR[] = "9001";
+const char UBICACION_SERVER[] = "localhost";
+
 // Archivos necesarios
 
 const std::string ipcFileName = "/tmp/buchwaldipcs";

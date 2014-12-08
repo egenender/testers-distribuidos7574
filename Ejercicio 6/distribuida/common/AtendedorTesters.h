@@ -17,7 +17,7 @@ private:
     Semaphore sem_cola_especiales;
           
 public:
-    AtendedorTesters();
+    AtendedorTesters(int idTester);
     AtendedorTesters(const AtendedorTesters& orig);
     virtual ~AtendedorTesters();
     

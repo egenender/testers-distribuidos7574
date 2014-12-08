@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
     ss.str("");
     
     // Comunicacion con el sistema de testeo
-    AtendedorDispositivos atendedor;
+    AtendedorDispositivos atendedor(id);
     // TODO: Log
     
     while(true) {
@@ -62,6 +62,7 @@ int main(int argc, char** argv) {
 		
         // Le envio resultado del primer programa de testeo
         int resul = rand() % 10;
+        resul = 0;
         if (resul >= 4){
 			atendedor.enviarResultado(id, SEGUIR_TESTEANDO);
 		}else if (resul >= 2){
@@ -131,6 +132,7 @@ int main(int argc, char** argv) {
     
     Logger::destroy();
     
+    atendedor.terminar_atencion();
     return 0;
 }
 

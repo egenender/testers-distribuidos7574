@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
 	Logger::notice("Inicia el procesamiento, cargo el atendedor y despachador" , nombre.str().c_str());
     
     // Obtengo comunicacion con los dispositivos
-    AtendedorTesters atendedor;
+    AtendedorTesters atendedor(id);
     // Obtengo comunicacion con los tecnicos
     DespachadorTesters despachador;
     // Obtengo planilla general de sync con otros tester
