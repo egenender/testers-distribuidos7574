@@ -18,7 +18,6 @@ int main(int argc, char** argv) {
     int idTester = atoi(argv[1]);
 
     Logger::initialize(Constantes::ARCHIVO_LOG.c_str(), Logger::LOG_DEBUG);
-    Logger::notice("SE CREO ARRIBO DE RESULTADOS", __FILE__);
 
     Configuracion config;
     if (!config.LeerDeArchivo()) {
@@ -67,13 +66,6 @@ int main(int argc, char** argv) {
     while (true) {
         TMessageAtendedor resultado;
         
-        
-        std::stringstream ss;
-        ss << "Intenta recibir una resultado con mtype: " << idTesterResultado << " de la cola: " << cola_lectura;
-        Logger::notice(ss.str().c_str(), __FILE__);
-        ss.str("");
-
-
         if (-1 == msgrcv(cola_lectura, &resultado, sizeof (TMessageAtendedor) - sizeof (long), idTesterResultado, 0)) {
 
             std::string error = std::string("Error al hacer msgrcv. Error: ") + std::string(strerror(errno));
@@ -96,9 +88,7 @@ int main(int argc, char** argv) {
             if (shm_planilla_local->estado1 == OCUPADO || shm_planilla_local->estado2 == OCUPADO) {
                 shm_planilla_local->estadoRes = ESPERANDO;
                 mutex_planilla_local.v();
-                Logger::notice("EL TESTER RESULTADO SE BLOQUEO", __FILE__);
                 sem_tester_resultado.p();
-                Logger::notice("EL TESTER RESULTADO SE DESBLOQUEO", __FILE__);
             } else {
                 shm_planilla_local->estadoRes = OCUPADO;
             }

@@ -91,11 +91,6 @@ id(idTester) {
     //Cola de mensajes
     key = ftok(config.ObtenerParametroString(Constantes::NombresDeParametros::ARCHIVO_IPCS).c_str(), config.ObtenerParametroEntero(Constantes::NombresDeParametros::MSGQUEUE_PLANILLA));
     this->cola = msgget(key, 0666 | IPC_CREAT);
-
-    //<DBG>
-    ss << "MSGQUEUE_PLANILLA creada con id " << cola;
-    Logger::notice(ss.str().c_str(), __FILE__);
-    ss.str("");
 }
 
 int Planilla::queue() {
@@ -155,9 +150,7 @@ void Planilla::agregar(int idDispositivo) {
         }
 
         this->mutex_planilla_local.v();
-        Logger::notice("EL TESTER 1 SE BLOQUEO", __FILE__);
         this->sem_tester_primero.p();
-        Logger::notice("EL TESTER 1 SE DESBLOQUEO", __FILE__);
 
     }
 
@@ -194,7 +187,6 @@ void Planilla::procesarSiguienteResultadoParcial() {
             if (this->shm_planilla_local->resultadosParciales == 0) {
                 this->shm_planilla_local->estado2 = LIBRE;
             }
-            Logger::notice("EL TESTER RESULTADO SE DESBLOQUEA DESDE procSigParcial", __FILE__);
             sem_tester_resultado.v();
 
         }
@@ -245,7 +237,7 @@ void Planilla::procesarSiguienteResultado() {
             this->sem_tester_primero.v();
         } else {
             this->shm_planilla_local->estadoRes = LIBRE;
-            Logger::notice("Ningun Tester estaba esperando, asi que no hay nada que hacer y si aca se traba entonces ATENCION!!!!", __FILE__);
+            Logger::notice("Ningun Tester estaba esperando, asi que no hay nada que hacer", __FILE__);
         }
     }
     this->mutex_planilla_local.v();
@@ -285,7 +277,9 @@ void Planilla::iniciarProcesamientoResultadosParciales() {
 
 void Planilla::eliminar(int idDispositivo) {
     this->mutex_planilla_local.p();
-    this->shm_planilla_local->cantidad--;
+    if (this->shm_planilla_local->cantidad > 0) {
+        this->shm_planilla_local->cantidad--;
+    }
     this->mutex_planilla_local.v();
 
     this->mutex_planilla_general.p();

@@ -9,9 +9,6 @@ AtendedorDispositivos::AtendedorDispositivos(const Configuracion& config) {
     this->cola_requerimiento = msgget(key, 0666 | IPC_CREAT);
 
     std::stringstream ss; //<DBG>
-    ss << "MSGQUEUE_NUEVO_REQUERIMIENTO creada con id " << cola_requerimiento;
-    Logger::notice(ss.str().c_str(), __FILE__);
-    ss.str("");
 
     if (this->cola_requerimiento == -1) {
         throw std::string("Error al obtener la cola del atendedor de dispositivos. Errno: " + errno);
@@ -24,9 +21,6 @@ AtendedorDispositivos::AtendedorDispositivos(const Configuracion& config) {
     key = ftok(archivoIpcs.c_str(), config.ObtenerParametroEntero(Constantes::NombresDeParametros::MSGQUEUE_ESCRITURA_RESULTADOS));
     this->cola_tests = msgget(key, 0666 | IPC_CREAT);
 
-    ss << "MSGQUEUE_RESULTADOS creada con id " << cola_tests;
-    Logger::notice(ss.str().c_str(), __FILE__);
-    ss.str("");
 
     if (this->cola_tests == -1) {
         msgctl(this->cola_tests, IPC_RMID, (struct msqid_ds*) 0);
@@ -39,10 +33,6 @@ AtendedorDispositivos::AtendedorDispositivos(const Configuracion& config) {
 
     key = ftok(archivoIpcs.c_str(), config.ObtenerParametroEntero(Constantes::NombresDeParametros::MSGQUEUE_LECTURA_RESULTADOS));
     this->cola_orden = msgget(key, 0666 | IPC_CREAT);
-
-    ss << "MSGQUEUE_RESULTADOS creada con id " << cola_orden;
-    Logger::notice(ss.str().c_str(), __FILE__);
-    ss.str("");
 
     if (this->cola_orden == -1) {
         msgctl(this->cola_orden, IPC_RMID, (struct msqid_ds*) 0);
@@ -94,11 +84,6 @@ void AtendedorDispositivos::enviar1erRespuesta(int idDispositivo, int resultado)
         Logger::error(error.c_str(), __FILE__);
         throw error;
     }
-    
-    std::stringstream ss;
-    ss << "Se envio la primer respuesta con mtype: " << msg.mtype << " desde el dispositivo " << msg.idDispositivo << "nextTesterId Offset: " << nextTesterIdOffset;
-    Logger::notice(ss.str().c_str(), __FILE__);
-    ss.str("");
 }
 
 int AtendedorDispositivos::recibirPrograma(int idDispositivo) {
@@ -109,11 +94,6 @@ int AtendedorDispositivos::recibirPrograma(int idDispositivo) {
         Logger::error(error.c_str(), __FILE__);
         throw error;
     }
-
-    std::stringstream ss;
-    ss << " El atendedor recibio el programa " << msg.programa << " del tester " << msg.idTester << " para el dispositivo " << idDispositivo ;
-    Logger::notice(ss.str().c_str(), __FILE__ );
-    ss.str("");
 
     this->ultimoTester = msg.idTester;
     return msg.programa;
@@ -142,22 +122,12 @@ void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {
         throw error;
     }
     
-    std::stringstream ss;
-    ss << "Se envio el resultado con mtype: " << msg.mtype << " desde el dispositivo " << msg.idDispositivo << "a la cola id: " << cola_tests;
-    Logger::notice(ss.str().c_str(), __FILE__);
-    ss.str("");
 }
 
 int AtendedorDispositivos::recibirOrden(int idDispositivo) {
 
     TMessageAtendedor msg;
-    
-        std::stringstream ss;
-    ss << "Se trata de recibir uan orden con mtype: " << idDispositivo << " que es el id del dispositivo de la cola id: " << cola_tests;
-    Logger::notice(ss.str().c_str(), __FILE__);
-    ss.str("");
-    
-    
+        
     int ret = msgrcv(this->cola_orden, &msg, sizeof (TMessageAtendedor) - sizeof (long), idDispositivo, 0);
     if (ret == -1) {
         std::string error("Error al recibir orden del atendedor. Error: " + errno);

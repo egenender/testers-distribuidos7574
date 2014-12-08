@@ -18,8 +18,6 @@ int main(int argc, char** argv) {
     int idTester = atoi(argv[1]);
 
     Logger::initialize(Constantes::ARCHIVO_LOG.c_str(), Logger::LOG_DEBUG);
-    Logger::notice("SE CREO ARRIBO DE RESULTADOS PARCIALES", __FILE__);
-
     Configuracion config;
     if (!config.LeerDeArchivo()) {
         Logger::error("Archivo de configuracion no encontrado", __FILE__);
@@ -99,9 +97,7 @@ int main(int argc, char** argv) {
             }
 
             mutex_planilla_local.v();
-            Logger::notice("EL TESTER SEGUNDO SE BLOQUEO", __FILE__);
             sem_tester_segundo.p();
-            Logger::notice("EL TESTER SEGUNDO SE DESBLOQUEO", __FILE__);
         }
 
     }

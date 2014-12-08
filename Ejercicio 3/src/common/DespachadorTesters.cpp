@@ -14,11 +14,6 @@ DespachadorTesters::DespachadorTesters( const Configuracion& config ) {
                       config.ObtenerParametroEntero( Constantes::NombresDeParametros::MSGQUEUE_DESPACHADOR ) );
     this->msgQueueId = msgget(key, 0666 | IPC_CREAT); 
     
-    std::stringstream ss; //<DBG>
-    ss << "MSGQUEUE_DESPACHADOR creada con id " << msgQueueId;
-    Logger::notice( ss.str().c_str(), __FILE__ );
-    ss.str("");
-    
     if(this->msgQueueId == -1) {
 	std::string error = std::string("Error creando la cola de mensajes del despachador. Errno = ") + std::string(strerror(errno));
         throw error;

@@ -49,13 +49,10 @@ int main(int argc, char** argv) {
         Logger::notice("Se envio una orden", __FILE__);
         
         planilla.iniciarProcesamientoDeResultados();
-        Logger::notice("Se termino el procesamiento de resultados", __FILE__);
         
         planilla.eliminarDispositivo(resultado.dispositivo);
-        Logger::notice("Se elimino el dispositivo de la planilla", __FILE__);
         
         planilla.procesarSiguiente();
-        Logger::notice("Termino procesar siguiente", __FILE__);
     }
 
     return 0;

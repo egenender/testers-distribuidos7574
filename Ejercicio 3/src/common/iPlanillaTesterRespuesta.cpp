@@ -14,10 +14,6 @@ iPlanillaTesterRespuesta::iPlanillaTesterRespuesta(int id, const Configuracion& 
             config.ObtenerParametroEntero(Constantes::NombresDeParametros::MSGQUEUE_PLANILLA));
     this->cola = msgget(key, 0666 | IPC_CREAT);
     
-    std::stringstream ss; //<DBG>
-    ss << "MSGQUEUE_PLANILLA creada con id " << cola;
-    Logger::notice( ss.str().c_str(), __FILE__ );
-    ss.str("");
 }
 
 iPlanillaTesterRespuesta::iPlanillaTesterRespuesta(const iPlanillaTesterRespuesta& orig) {
@@ -39,9 +35,7 @@ void iPlanillaTesterRespuesta::eliminarDispositivo(int idDispositivo) {
         Logger::error(error.c_str(), __FILE__);
         exit(-1);
     }
-    
-    Logger::notice("se envio eliminarDispositivo", __FILE__);
-    //Deberia esperar un ok?
+
 }
 
 void iPlanillaTesterRespuesta::iniciarProcesamientoDeResultados() {
