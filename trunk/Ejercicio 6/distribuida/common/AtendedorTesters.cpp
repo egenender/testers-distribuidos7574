@@ -51,6 +51,7 @@ void AtendedorTesters::enviarPrograma(int idDispositivo, int tester, int idProgr
 
     TMessageAtendedor msg;
     msg.mtype = idDispositivo;
+    msg.finalizar_conexion = 0;
     msg.tester = tester;
     msg.value = idPrograma;
     
@@ -64,7 +65,6 @@ void AtendedorTesters::enviarPrograma(int idDispositivo, int tester, int idProgr
 }
 
 int AtendedorTesters::recibirResultado(int idTester) {
-    //resultado_test_t rsp;
     TMessageAtendedor msg;
     
     int ret = msgrcv(this->cola_recibos_tests, &msg, sizeof(TMessageAtendedor) - sizeof(long), idTester, 0);
@@ -81,6 +81,7 @@ int AtendedorTesters::recibirResultado(int idTester) {
 void AtendedorTesters::enviarOrden(int idDispositivo, int orden, int cantidad) {
     TMessageAtendedor msg;
     msg.mtype = idDispositivo;
+    msg.finalizar_conexion = 0;
     msg.idDispositivo = idDispositivo;
     msg.value = orden;
     msg.cant_testers = cantidad;
@@ -122,7 +123,15 @@ int AtendedorTesters::recibirRequerimientoEspecial(int idEsp) {
     return pos.lugar;
 }
 
-bool AtendedorTesters::destruirComunicacion() {
-
-    return (msgctl(this->cola_recibos_tests, IPC_RMID, (struct msqid_ds*)0) != -1 && msgctl(this->cola_requerimiento, IPC_RMID, (struct msqid_ds*)0) != -1);
+void AtendedorTesters::terminar_atencion(int idDispositivo_atendido){
+	TMessageAtendedor msg;
+    msg.mtype = idDispositivo_atendido;
+    msg.finalizar_conexion = FINALIZAR_CONEXION;
+    
+    int ret = msgsnd(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0); // VER A QUE COLA MANDAR
+    if(ret == -1) {
+        std::string error = std::string("Error al enviar orden al atendedor. Error: ") + std::string(strerror(errno));
+        Logger::error(error.c_str(), __FILE__);
+        exit(0);
+    }
 }

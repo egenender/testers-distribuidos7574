@@ -33,6 +33,7 @@ void AtendedorDispositivos::enviarRequerimiento(int idDispositivo) {
     TMessageAtendedor msg;
     msg.mtype = MTYPE_REQUERIMIENTO;
     msg.idDispositivo = idDispositivo;
+    msg.finalizar_conexion = 0;
     
     int ret = msgsnd(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
@@ -55,15 +56,9 @@ int AtendedorDispositivos::recibirPrograma(int idDispositivo) {
 
 }
 void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {
-
-    /*resultado_test_t resultado_test;
-    
-    resultado_test.tester = (long)this->ultimoTester;
-    resultado_test.result = resultado;
-    resultado_test.dispositivo = idDispositivo;*/
-    
     TMessageAtendedor msg;
     msg.mtype = (long) this->ultimoTester;
+    msg.finalizar_conexion = 0;
     msg.tester = this->ultimoTester;
     msg.idDispositivo = idDispositivo;
     msg.value = resultado;
@@ -88,5 +83,19 @@ int AtendedorDispositivos::recibirOrden(int idDispositivo, int* cantidad) {
     }
     *cantidad = msg.cant_testers;
     return msg.value;
+
+}
+
+void AtendedorDispositivos::terminar_atencion(){
+	TMessageAtendedor msg;
+    msg.mtype = (long) this->ultimoTester;
+    msg.finalizar_conexion = FINALIZAR_CONEXION;
+                
+    int ret = msgsnd(this->cola_tests, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0); //REVISAR A QUE COLA MANDAR
+    if(ret == -1) {
+        std::string error("Error al enviar resultado al atendedor. Error: " + errno);
+        Logger::error(error.c_str(), __FILE__);
+        exit(0);
+    }
 
 }
