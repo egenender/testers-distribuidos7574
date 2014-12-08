@@ -40,8 +40,8 @@ int main(int argc, char** argv) {
                 Logger::notice("Recibo un pedido para iniciar el procesamiento de resultados parciales", nombre.str().c_str());
                 planilla.iniciarProcesamientoResultadosParciales();
                 break;
-            case REQUERIMIENTO_PROCESAR_SIGUIENTE:
-                Logger::notice("Recibo un pedido para procesar siguiente", nombre.str().c_str());
+            case REQUERIMIENTO_PROCESAR_SIGUIENTE_RESULTADO_PARCIAL:
+                Logger::notice("Recibo un pedido para procesar siguiente resultado parcial", nombre.str().c_str());
                 planilla.procesarSiguienteResultadoParcial();
                 break;
         }

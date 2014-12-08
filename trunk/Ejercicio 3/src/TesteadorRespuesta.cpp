@@ -34,11 +34,7 @@ int main(int argc, char** argv) {
     DespachadorTesters despachador(config);
 
     while (true) {
-
-
-        planilla.iniciarProcesamientoDeResultados();
-        Logger::notice("Se termino el procesamiento de resultados", __FILE__);
-
+        
         resultado_test_t resultado = atendedor.recibirResultado(id);
         Logger::notice("Se recibio un Resultado", __FILE__);
 
@@ -51,9 +47,13 @@ int main(int argc, char** argv) {
         }
         atendedor.enviarOrden(resultado.dispositivo, orden);
         Logger::notice("Se envio una orden", __FILE__);
-
+        
+        planilla.iniciarProcesamientoDeResultados();
+        Logger::notice("Se termino el procesamiento de resultados", __FILE__);
+        
         planilla.eliminarDispositivo(resultado.dispositivo);
         Logger::notice("Se elimino el dispositivo de la planilla", __FILE__);
+        
         planilla.procesarSiguiente();
         Logger::notice("Termino procesar siguiente", __FILE__);
     }

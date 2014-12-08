@@ -25,6 +25,7 @@ sem_tester_segundo(config.ObtenerParametroString(Constantes::NombresDeParametros
 config.ObtenerParametroEntero(Constantes::NombresDeParametros::SEM_TESTER_B) + idTester),
 sem_tester_resultado(config.ObtenerParametroString(Constantes::NombresDeParametros::ARCHIVO_IPCS),
 config.ObtenerParametroEntero(Constantes::NombresDeParametros::SEM_TESTER_RESULTADO) + idTester),
+cola(-1),
 m_IdShmLocal(-1),
 m_IdShmGeneral(-1),
 id(idTester) {
@@ -95,17 +96,6 @@ id(idTester) {
     ss << "MSGQUEUE_PLANILLA creada con id " << cola;
     Logger::notice(ss.str().c_str(), __FILE__);
     ss.str("");
-
-    this->mutex_planilla_local.p();
-    this->shm_planilla_local->cantidad = 0;
-    this->shm_planilla_local->resultados = 0;
-    this->shm_planilla_local->resultadosParciales = 0;
-    this->shm_planilla_local->estado1 = LIBRE;
-    this->shm_planilla_local->estado2 = LIBRE;
-    this->shm_planilla_local->estadoRes = LIBRE;
-    this->mutex_planilla_local.v();
-
-
 }
 
 int Planilla::queue() {
@@ -127,10 +117,15 @@ void Planilla::agregar(int idDispositivo) {
         }
         return;
     }
+    stringstream ss;
+
+    ss << "Se agrego el dispositivo " << idDispositivo << " a la planilla " << id;
+    Logger::notice(ss.str().c_str(), __FILE__);
+    ss.str("");
 
     mutex_planilla_general.p();
     *shm_planilla_general = *shm_planilla_general + 1;
-    stringstream ss;
+
     ss << "Ahora hay " << *shm_planilla_general << " dispositivos en el sistema";
     Logger::notice(ss.str().c_str(), __FILE__);
     ss.str("");
@@ -144,7 +139,7 @@ void Planilla::agregar(int idDispositivo) {
     if (this->shm_planilla_local->estadoRes == LIBRE && this->shm_planilla_local->estado2 == LIBRE) {
         Logger::notice("El tester de resultados y el 2do estan libres, asi que el primer tester puede trabajar", __FILE__);
         this->shm_planilla_local->estado1 = OCUPADO;
-
+        this->mutex_planilla_local.v();
     } else {
         Logger::notice("El tester 1 tiene que esperar porque los otros no estan ambos libres", __FILE__);
         this->shm_planilla_local->estado1 = ESPERANDO;
@@ -158,14 +153,18 @@ void Planilla::agregar(int idDispositivo) {
             this->shm_planilla_local->estado2 = OCUPADO;
             this->sem_tester_segundo.v();
         }
+
+        this->mutex_planilla_local.v();
+        Logger::notice("EL TESTER 1 SE BLOQUEO", __FILE__);
         this->sem_tester_primero.p();
+        Logger::notice("EL TESTER 1 SE DESBLOQUEO", __FILE__);
 
     }
 
-    this->mutex_planilla_local.v();
+
 
     respuesta.respuesta = true;
-    ;
+
     if (msgsnd(this->cola, &respuesta, sizeof (respuesta_lugar_t) - sizeof (long), 0) == -1) {
         Logger::error("SE CIERRA POR ERROR EN LA COLA", __FILE__);
         exit(0);
@@ -176,19 +175,6 @@ void Planilla::terminadoRequerimientoPendiente() {
     this->mutex_planilla_local.p();
     Logger::notice("El tester 1 ahora esta libre", __FILE__);
     this->shm_planilla_local->estado1 = LIBRE;
-    if (this->shm_planilla_local->estadoRes == ESPERANDO && this->shm_planilla_local->estado2 != OCUPADO) {
-        Logger::notice("El tester de resultados estaba esperando, asi que lo OCUPO", __FILE__);
-        this->shm_planilla_local->estadoRes = OCUPADO;
-        this->sem_tester_resultado.v();
-    } else {
-        if (this->shm_planilla_local->estado2 == ESPERANDO && this->shm_planilla_local->estadoRes == LIBRE) {
-            Logger::notice("El tester 2do estaba esperando, asi que lo OCUPO", __FILE__);
-            this->shm_planilla_local->estado2 = OCUPADO;
-            this->sem_tester_segundo.v();
-        } else {
-            Logger::notice("El tester 2 y el de resultados ninguno estaba esperando, asi que no hago nada", __FILE__);
-        }
-    }
     this->mutex_planilla_local.v();
 }
 
@@ -200,9 +186,15 @@ void Planilla::procesarSiguienteResultadoParcial() {
         ss << "En procesar siguiente Quedan " << this->shm_planilla_local->resultados << " resultados pendientes";
         Logger::notice(ss.str().c_str(), __FILE__);
         ss.str("");
-        this->shm_planilla_local->estado2 = ESPERANDO;
-        if (shm_planilla_local->estadoRes == ESPERANDO) {
+        if (this->shm_planilla_local->resultadosParciales > 0) {
+            this->shm_planilla_local->estado2 = ESPERANDO;
+        }
+        if (shm_planilla_local->estadoRes == ESPERANDO && shm_planilla_local->estado1 != OCUPADO) {
             shm_planilla_local->estadoRes = OCUPADO;
+            if (this->shm_planilla_local->resultadosParciales == 0) {
+                this->shm_planilla_local->estado2 = LIBRE;
+            }
+            Logger::notice("EL TESTER RESULTADO SE DESBLOQUEA DESDE procSigParcial", __FILE__);
             sem_tester_resultado.v();
 
         }
@@ -219,18 +211,13 @@ void Planilla::procesarSiguienteResultadoParcial() {
         return;
 
     }
-    
-    
-    this->shm_planilla_local->estado2 = LIBRE;
-    
-    this->sem_tester_primero.v();
+
+    if (shm_planilla_local->estado1 == ESPERANDO) {
+        shm_planilla_local->estado1 = OCUPADO;
+        this->shm_planilla_local->estado2 = LIBRE;
+        this->sem_tester_primero.v();
+    }
     this->mutex_planilla_local.v();
-    
-    this->sem_tester_resultado.p();
-    
-    
-    
-    
 
 }
 
@@ -244,21 +231,21 @@ void Planilla::procesarSiguienteResultado() {
         this->mutex_planilla_local.v();
         return;
     }
-
-    this->shm_planilla_local->estadoRes = LIBRE;
-
     Logger::notice("En procesar siguiente, no hay resultados pendientes me fijo el estado de Tester 2", __FILE__);
-    if (this->shm_planilla_local->estado2 == ESPERANDO || this->shm_planilla_local->resultadosParciales > 0) {
+    if (this->shm_planilla_local->estado2 == ESPERANDO && this->shm_planilla_local->estado1 != OCUPADO) {
         Logger::notice("Tester 2 estaba esperando, asi que ahora va a poder trabajar", __FILE__);
         this->shm_planilla_local->estado2 = OCUPADO;
+        this->shm_planilla_local->estadoRes = LIBRE;
         this->sem_tester_segundo.v();
     } else {
         if (this->shm_planilla_local->estado1 == ESPERANDO) {
             Logger::notice("Tester 1 estaba esperando, asi que ahora va a poder trabajar", __FILE__);
             this->shm_planilla_local->estado1 = OCUPADO;
+            this->shm_planilla_local->estadoRes = LIBRE;
             this->sem_tester_primero.v();
         } else {
-            Logger::notice("Ningun Tester estaba esperando, asi que no hay nada que hacer", __FILE__);
+            this->shm_planilla_local->estadoRes = LIBRE;
+            Logger::notice("Ningun Tester estaba esperando, asi que no hay nada que hacer y si aca se traba entonces ATENCION!!!!", __FILE__);
         }
     }
     this->mutex_planilla_local.v();
@@ -266,58 +253,34 @@ void Planilla::procesarSiguienteResultado() {
 
 void Planilla::iniciarProcesamientoResultados() {
     this->mutex_planilla_local.p();
-
+    this->shm_planilla_local->resultados--;
+    stringstream ss;
+    ss << "Quedan " << this->shm_planilla_local->resultados << " resultados pendientes";
+    Logger::notice(ss.str().c_str(), __FILE__);
+    ss.str("");
     if (this->shm_planilla_local->resultados == 0) {
-        Logger::notice("No hay resultados pendientes, asi que el tester de resultados queda libre", __FILE__);
+        Logger::notice("No hay resultados pendientes, asi que tester resultado queda libre", __FILE__);
         this->shm_planilla_local->estadoRes = LIBRE;
-        this->mutex_planilla_local.v();
-        this->sem_tester_resultado.p();
 
-
-    } else {
-        stringstream ss;
-        ss << "Quedan " << this->shm_planilla_local->resultados << " resultados pendientes";
-        Logger::notice(ss.str().c_str(), __FILE__);
-        ss.str("");
-        if (this->shm_planilla_local->estado1 == OCUPADO || this->shm_planilla_local->estado2 == OCUPADO) {
-            this->shm_planilla_local->estadoRes = ESPERANDO;
-        } else {
-            this->shm_planilla_local->estadoRes = OCUPADO;
-            this->shm_planilla_local->resultados--;
-        }
-        this->mutex_planilla_local.v();
     }
-
+    this->mutex_planilla_local.v();
 }
 
 void Planilla::iniciarProcesamientoResultadosParciales() {
     this->mutex_planilla_local.p();
 
+    this->shm_planilla_local->resultadosParciales--;
+    stringstream ss;
+    ss << "Quedan " << this->shm_planilla_local->resultadosParciales << " resultados parciales pendientes";
+    Logger::notice(ss.str().c_str(), __FILE__);
+    ss.str("");
     if (this->shm_planilla_local->resultadosParciales == 0) {
-        Logger::notice("No hay resultados parciales pendientes, asi que el tester 2 queda libre", __FILE__);
+        Logger::notice("No hay resultados parciales pendientes, asi que tester 2 queda libre", __FILE__);
         this->shm_planilla_local->estado2 = LIBRE;
-        this->mutex_planilla_local.v();
-        this->sem_tester_segundo.p();
-    } else {
 
-        stringstream ss;
-        ss << "Quedan " << this->shm_planilla_local->resultadosParciales << " resultados parciales pendientes";
-        Logger::notice(ss.str().c_str(), __FILE__);
-        ss.str("");
-        if (this->shm_planilla_local->estado1 != OCUPADO && this->shm_planilla_local->estadoRes != LIBRE) {
-            this->shm_planilla_local->estado2 = OCUPADO;
-            this->shm_planilla_local->resultadosParciales--;
-        } else {
-            this->shm_planilla_local->estado2 = ESPERANDO;
-            if (this->shm_planilla_local->estadoRes == ESPERANDO) {
-                this->shm_planilla_local->estadoRes = OCUPADO;
-                this->sem_tester_resultado.v();
-            }
-
-        }
-        this->mutex_planilla_local.v();
     }
 
+    this->mutex_planilla_local.v();
 }
 
 void Planilla::eliminar(int idDispositivo) {

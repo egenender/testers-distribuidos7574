@@ -39,13 +39,14 @@ void iPlanillaTester2do::iniciarProcesamientoDeResultadosParciales() {
         Logger::error(error.c_str(), __FILE__);
         exit(-1);
     }
+    
 }
 
 void iPlanillaTester2do::procesarSiguiente() {
     requerimiento_planilla_t requerimiento;
     requerimiento.mtype = idTester;
     requerimiento.tester = idTester;
-    requerimiento.tipoReq = Constantes::REQUERIMIENTO_PROCESAR_SIGUIENTE;
+    requerimiento.tipoReq = Constantes::REQUERIMIENTO_PROCESAR_SIGUIENTE_RESULTADO_PARCIAL;
     requerimiento.idDispositivo = 0;
 
     if (-1 == msgsnd(cola, &requerimiento, sizeof (requerimiento_planilla_t) - sizeof (long), 0)) {
@@ -54,22 +55,5 @@ void iPlanillaTester2do::procesarSiguiente() {
         Logger::error(error.c_str(), __FILE__);
         exit(-1);
     }
+    
 }
-
-void iPlanillaTester2do::agregarResultadoParcial() {
-    requerimiento_planilla_t requerimiento;
-    requerimiento.mtype = idTester;
-    requerimiento.tester = idTester;
-    requerimiento.tipoReq = Constantes::REQUERIMIENTO_AGREGAR_RESULTADO_PARCIAL;
-    requerimiento.idDispositivo = 0;
-
-    if (-1 == msgsnd(cola, &requerimiento, sizeof (requerimiento_planilla_t) - sizeof (long), 0)) {
-
-        std::string error = std::string("Error al hacer msgsnd. Error: ") + std::string(strerror(errno));
-        Logger::error(error.c_str(), __FILE__);
-        exit(-1);
-
-    }
-}
-
-

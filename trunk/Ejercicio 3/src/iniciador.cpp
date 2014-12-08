@@ -102,14 +102,14 @@ void createIPCObjects(const Configuracion& config) {
 
         Semaphore semTester2do(archivoIpcs, config.ObtenerParametroEntero(Constantes::NombresDeParametros::SEM_TESTER_B) + iTester);
         semTester2do.creaSem();
-        semTester2do.iniSem(1); // Inicializa el semaforo en 1
+        semTester2do.iniSem(0); // Inicializa el semaforo en 0
         ss << "Se creo el semaforo, para el tester 2, con ID " << semTester2do.getSemId();
         Logger::error(ss.str().c_str(), __FILE__);
         ss.str("");
 
         Semaphore semTesterRta(archivoIpcs, config.ObtenerParametroEntero(Constantes::NombresDeParametros::SEM_TESTER_RESULTADO) + iTester);
         semTesterRta.creaSem();
-        semTesterRta.iniSem(1); // Inicializa el semaforo en 1
+        semTesterRta.iniSem(0); // Inicializa el semaforo en 0
         ss << "Se creo el semaforo,para el tester de resultados, con ID " << semTesterRta.getSemId();
         Logger::error(ss.str().c_str(), __FILE__);
         ss.str("");

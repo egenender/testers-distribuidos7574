@@ -30,13 +30,17 @@ int main(int argc, char** argv) {
     // Obtengo planilla general de sync con otros tester
     iPlanillaTester2do planilla(id, config);
 
+    std::stringstream ss;
+    
     while (true) {
 
 
         // Espero un requerimiento
         int idDispositivo = atendedor.recibir2doRequerimiento(id);
 
-        Logger::notice("Se recibio un 2do Requerimiento", __FILE__);
+        ss << "Se recibio un 2do Requerimiento del dispositivo " << idDispositivo ;
+        Logger::notice(ss.str().c_str(), __FILE__);
+        ss.str("");
 
         atendedor.enviarPrograma(idDispositivo, id, Programa::getPrograma());
 

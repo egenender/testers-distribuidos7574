@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
 
     while (true) {
         resultado_test_t resultado;
-        if (-1 == msgrcv(cola_lectura, &resultado, sizeof (TMessageAtendedor )- sizeof (long), idTesterResultado, 0)) {
+        if (-1 == msgrcv(cola_lectura, &resultado, sizeof (TMessageAtendedor) - sizeof (long), idTesterResultado, 0)) {
 
             std::string error = std::string("Error al hacer msgrcv. Error: ") + std::string(strerror(errno));
             Logger::error(error.c_str(), __FILE__);
@@ -86,10 +86,24 @@ int main(int argc, char** argv) {
 
         }
 
-        if (shm_planilla_local->estado2 != OCUPADO) {
+        if (shm_planilla_local->estadoRes == LIBRE && shm_planilla_local->estado1 != OCUPADO) {
+            shm_planilla_local->estado2 = OCUPADO;
+            mutex_planilla_local.v();
+        } else {
             shm_planilla_local->estado2 = ESPERANDO;
+
+            if (shm_planilla_local->estadoRes == ESPERANDO && shm_planilla_local->estado1 != OCUPADO) {
+                shm_planilla_local->estadoRes = OCUPADO;
+                sem_tester_resultado.v();
+
+            }
+
+            mutex_planilla_local.v();
+            Logger::notice("EL TESTER SEGUNDO SE BLOQUEO", __FILE__);
+            sem_tester_segundo.p();
+            Logger::notice("EL TESTER SEGUNDO SE DESBLOQUEO", __FILE__);
         }
-        mutex_planilla_local.v();
+
     }
     return 0;
 }
