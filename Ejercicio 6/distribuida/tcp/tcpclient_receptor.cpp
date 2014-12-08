@@ -32,6 +32,9 @@ int main(int argc, char *argv[]){
     
     long id_dispositivo = atol(argv[3]);
 	signal(SIGHUP, terminar_ejecucion);
+	key_t key = ftok(IPCS_FILE, MSGQUEUE_DISPOSITIVO_RECEPTOR_EMISOR);
+	int cola_emisor = msgget(key, 0660 | IPC_CREAT);
+	
 	/* FIN del setup */
 	
 	//Espero primer mensaje del servidor para saber quien es el tester que me atiende
@@ -39,8 +42,6 @@ int main(int argc, char *argv[]){
 	recibir(buffer, fd);
 	
 	//Envio por la cola al emisor, para que sepa el id del servidor/tester
-	key_t key = ftok(IPCS_FILE, MSGQUEUE_DISPOSITIVO_RECEPTOR_EMISOR);
-	int cola_emisor = msgget(key, 0660);
 	buffer->mtype = id_dispositivo;
 		
 	int ok = msgsnd(cola_emisor, buffer, size - sizeof(long), 0);

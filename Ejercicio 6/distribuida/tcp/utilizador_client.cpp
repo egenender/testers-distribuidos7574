@@ -37,10 +37,10 @@ int main(void){
 		exit(1);
 	}
 
-	printf("Se recibe mensaje desde tester %d\n", msg.idDispositivo);
+	printf("Se recibe mensaje desde tester %d\n", msg.tester);
 	
 	msg.finalizar_conexion = 0;
-	long tester = msg.idDispositivo;
+	long tester = msg.tester;
 	msg.mtype = tester;
 	msg.idDispositivo = 3;
 	msg.value = 10;
