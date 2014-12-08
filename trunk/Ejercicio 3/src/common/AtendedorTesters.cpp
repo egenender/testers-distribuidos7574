@@ -8,11 +8,6 @@ AtendedorTesters::AtendedorTesters( const Configuracion& config ) {
                 config.ObtenerParametroEntero(Constantes::NombresDeParametros::MSGQUEUE_NUEVO_REQUERIMIENTO) );
     this->cola_requerimiento = msgget(key, 0666 | IPC_CREAT);
     
-    std::stringstream ss; //<DBG>
-    ss << "MSGQUEUE_NUEVO_REQUERIMIENTO creada con id " << cola_requerimiento;
-    Logger::notice( ss.str().c_str(), __FILE__ );
-    ss.str("");
-    
     if(this->cola_requerimiento == -1) {
         std::string err = std::string("Error al obtener la cola de requerimientos del atendedor de testers. Errno: ") + std::string(strerror(errno));
         throw std::string(err.c_str());
@@ -21,10 +16,6 @@ AtendedorTesters::AtendedorTesters( const Configuracion& config ) {
     key = ftok( archivoIpcs.c_str(),
                 config.ObtenerParametroEntero(Constantes::NombresDeParametros::MSGQUEUE_LECTURA_RESULTADOS) );
     this->cola_recibos_tests = msgget(key, 0666 | IPC_CREAT);
-    
-    ss << "MSGQUEUE_RESULTADOS creada con id " << cola_recibos_tests;
-    Logger::notice( ss.str().c_str(), __FILE__ );
-    ss.str("");
     
     if(this->cola_recibos_tests == -1) {
         msgctl(this->cola_recibos_tests, IPC_RMID, (struct msqid_ds*)0); //TODO Esto no le incumbe, es cosa del finalizador
@@ -75,9 +66,6 @@ void AtendedorTesters::enviarPrograma(int idDispositivo, int tester, int idProgr
         Logger::error(error.c_str(), __FILE__);
         throw error;
     }
-    std::stringstream ss;
-    ss << "Se envio el programa desde atendedor testers para el dispositivo " << idDispositivo;
-    Logger::notice(ss.str().c_str(), __FILE__);
 
 }
 
@@ -85,12 +73,7 @@ resultado_test_t AtendedorTesters::recibirResultado(int idTester) {
 
     resultado_test_t rsp;
     TMessageAtendedor msg;
-
-    std::stringstream ss;
-    ss << "Intenta recibir una respuesta con mtype: " << idTester << " de la cola: " << this->cola_recibos_tests;
-    Logger::notice(ss.str().c_str(), __FILE__);
-    ss.str("");
-    
+   
     int ret = msgrcv(this->cola_recibos_tests, &msg, sizeof(TMessageAtendedor) - sizeof(long), idTester, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir resultado del atendedor. Error: ") + std::string(strerror(errno));
@@ -98,7 +81,6 @@ resultado_test_t AtendedorTesters::recibirResultado(int idTester) {
         throw error;
     }
     
-    Logger::notice("SACO LA RESPUESTA DE LA COLA DE RESPUESTAS", __FILE__);
     rsp.tester = msg.mtype;
     rsp.dispositivo = msg.idDispositivo;
     rsp.result = msg.resultado;

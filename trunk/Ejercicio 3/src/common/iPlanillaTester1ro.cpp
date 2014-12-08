@@ -14,10 +14,6 @@ iPlanillaTester1ro::iPlanillaTester1ro(int id, const Configuracion& config) {
             config.ObtenerParametroEntero(Constantes::NombresDeParametros::MSGQUEUE_PLANILLA));
     this->cola = msgget(key, 0666 | IPC_CREAT);
 
-    std::stringstream ss; //<DBG>
-    ss << "MSGQUEUE_PLANILLA creada con id " << cola;
-    Logger::notice(ss.str().c_str(), __FILE__);
-    ss.str("");
 }
 
 iPlanillaTester1ro::~iPlanillaTester1ro() {

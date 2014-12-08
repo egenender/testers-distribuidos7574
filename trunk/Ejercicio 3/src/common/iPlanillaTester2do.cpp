@@ -13,11 +13,7 @@ iPlanillaTester2do::iPlanillaTester2do(int id, const Configuracion& config) {
     key_t key = ftok(config.ObtenerParametroString(Constantes::NombresDeParametros::ARCHIVO_IPCS).c_str(),
             config.ObtenerParametroEntero(Constantes::NombresDeParametros::MSGQUEUE_PLANILLA));
     this->cola = msgget(key, 0666 | IPC_CREAT);
-    
-    std::stringstream ss; //<DBG>
-    ss << "MSGQUEUE_PLANILLA creada con id " << cola;
-    Logger::notice( ss.str().c_str(), __FILE__ );
-    ss.str("");
+
 }
 
 iPlanillaTester2do::iPlanillaTester2do(const iPlanillaTester2do& orig) {

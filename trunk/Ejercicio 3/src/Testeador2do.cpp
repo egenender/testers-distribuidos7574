@@ -48,11 +48,7 @@ int main(int argc, char** argv) {
 
         planilla.iniciarProcesamientoDeResultadosParciales();
 
-        Logger::notice("Termino el procesamiento de resultados parciales", __FILE__);
-
         planilla.procesarSiguiente();
-
-        Logger::notice("Termino procesar siguiente", __FILE__);
 
     }
 
