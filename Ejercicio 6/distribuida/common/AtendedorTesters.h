@@ -26,9 +26,9 @@ public:
     int recibirResultado(int idTester);
     void enviarOrden(int idDispositivo, int orden, int cant); // Tester -> Disp: Reinicio o apagado
     void enviarAEspeciales(bool cuales[], int posicion);
-	int recibirRequerimientoEspecial(int idEsp);
-
-    bool destruirComunicacion();
+	int recibirRequerimientoEspecial(int idEsp); 
+    
+    void terminar_atencion(int idDispositivo_atendido);
 
 };
 
