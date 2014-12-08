@@ -15,14 +15,7 @@ private:
     int cola_recibos_tests;
     int cola_testers_especiales;
     Semaphore sem_cola_especiales;
-        
-    typedef struct message {
-        long mtype;
-        int idDispositivo;
-        int value; // Este parametro posee el valor del requerimiento, del programa y del resultado
-        int cant_testers;
-    } TMessageAtendedor;
-    
+          
 public:
     AtendedorTesters();
     AtendedorTesters(const AtendedorTesters& orig);
@@ -30,7 +23,7 @@ public:
     
     int recibirRequerimiento();
     void enviarPrograma(int idDispositivo, int tester, int idPrograma);  // Tester -> Disp
-    resultado_test_t recibirResultado(int idTester);
+    int recibirResultado(int idTester);
     void enviarOrden(int idDispositivo, int orden, int cant); // Tester -> Disp: Reinicio o apagado
     void enviarAEspeciales(bool cuales[], int posicion);
 	int recibirRequerimientoEspecial(int idEsp);

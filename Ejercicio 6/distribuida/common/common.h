@@ -23,9 +23,6 @@ const int ID_TESTER_START = 1;
 const int ID_TESTER_ESPECIAL_START = ID_TESTER_START + CANT_TESTERS_COMUNES;
 const int MAX_DISPOSITIVOS_EN_SISTEMA = 100;
 
-const int MINIMOS_LANZADOS = 5;
-const int MAXIMOS_LANZADOS = 20;
-
 // IDs de los IPC
 const int SEM_PLANILLA_GENERAL = 1;
 const int SHM_PLANILLA_GENERAL = 2;
@@ -35,6 +32,8 @@ const int MSGQUEUE_DISPOSITIVOS = 10;
 const int MSGQUEUE_TESTERS = 11;
 const int MSGQUEUE_TESTERS_ESPECIALES = 12;
 const int MSGQUEUE_DESPACHADOR = 13;
+const int MSGQUEUE_DISPOSITIVO_RECEPTOR_EMISOR = 14;
+const int MSGQUEUE_SERVER_RECEPTOR_EMISOR = 15;
 
 const int MTYPE_REQUERIMIENTO = 1;
 
@@ -70,11 +69,17 @@ typedef struct posicion_en_shm{
 	int lugar;
 }posicion_en_shm_t;
 
-typedef struct resultado_test{
-    long tester;
-    int result;
-    int dispositivo;
-}resultado_test_t;
+typedef struct message {
+		/* BEGIN HEADER */
+        long mtype;
+        int finalizar_conexion;
+        int cola_a_usar;
+        /* END HEADER */
+        int idDispositivo;
+        int tester;
+        int value; // Este parametro posee el valor del requerimiento, del programa y del resultado
+        int cant_testers;
+} TMessageAtendedor;
 
 #endif	/* COMMON_H */
 

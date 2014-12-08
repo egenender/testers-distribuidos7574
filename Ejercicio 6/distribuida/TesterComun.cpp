@@ -56,16 +56,16 @@ int main(int argc, char** argv) {
         
         Logger::notice(string("Espero resultado de dispositivo ") + ss.str(), nombre.str().c_str());                  	    
   
-        resultado_test_t resul = atendedor.recibirResultado(id);
+        int result = atendedor.recibirResultado(id);
         Logger::notice(string("Recibi resultado del dispositivo ") + ss.str(), nombre.str().c_str());
         usleep( rand() % 1000 + 1000);
         
-        if (resul.result == RESULTADO_GRAVE){
+        if (result == RESULTADO_GRAVE){
 			Logger::notice(string("Le envio orden de apagado al dispositivo ") + ss.str(), nombre.str().c_str());
 			atendedor.enviarOrden(idDispositivo, ORDEN_APAGADO, 0);
 			Logger::notice(string("Le envio al tecnico la notificacion ") + ss.str(), nombre.str().c_str());
 			despachador.enviarOrden(idDispositivo);
-		}else if (resul.result == SEGUIR_TESTEANDO){
+		}else if (result == SEGUIR_TESTEANDO){
 			//int cant_testers = rand() % (MAXIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION - MINIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION) + MINIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION;	
 			int cant_testers = 0;
 			bool los_testers[CANT_TESTERS_ESPECIALES];
