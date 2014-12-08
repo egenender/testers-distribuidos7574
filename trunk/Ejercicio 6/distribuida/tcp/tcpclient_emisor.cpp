@@ -32,6 +32,9 @@ int main(int argc, char *argv[]){
     key_t key = ftok(IPCS_FILE, id_cola);
     int cola = msgget(key, 0660);
     
+    key = ftok(IPCS_FILE, MSGQUEUE_DISPOSITIVO_RECEPTOR_EMISOR);
+	int cola_id_tester = msgget(key, 0660| IPC_CREAT);
+    
     /* FIN del setup */
     
     // Envio primer mensaje, para pasarle mi id al servidor
@@ -42,8 +45,6 @@ int main(int argc, char *argv[]){
 	
 	// Espero mensaje en la cola, proveniente del servidor, del id del server/tester.
 	// Necesito ese id porque es con ese id que voy a esperar en la cola de emision
-	key = ftok(IPCS_FILE, MSGQUEUE_DISPOSITIVO_RECEPTOR_EMISOR);
-	int cola_id_tester = msgget(key, 0660| IPC_CREAT);
 	int ok_read = msgrcv(cola_id_tester, buffer, size - sizeof(long), id, 0);
 	if (ok_read == -1){
 		exit(0);

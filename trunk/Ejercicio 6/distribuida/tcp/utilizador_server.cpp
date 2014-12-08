@@ -28,7 +28,7 @@ int main(void){
 	TMessageAtendedor msg;
 	
 	msg.mtype = 3;
-	msg.idDispositivo = 6;
+	msg.tester = 6;
 	msg.cola_a_usar = 2;
 	msg.finalizar_conexion = 0;
 	printf ("Voy a mandar mensaje a dispositivo 3\n");
@@ -45,7 +45,7 @@ int main(void){
 	
 	if (msg.value == 10){
 		msg.mtype = 3;
-		msg.idDispositivo = 6;
+		msg.tester = 6;
 		msg.finalizar_conexion = 1;
 		printf ("Mando mensaje de finalizacion a dispositivo 3\n");
 		ok = msgsnd(cola_server_em, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
