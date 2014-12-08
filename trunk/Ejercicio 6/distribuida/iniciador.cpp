@@ -81,7 +81,7 @@ void createIPCObjects() {
     
     
     //creacion de colas
-    for (int q = MSGQUEUE_DISPOSITIVOS; q <= MSGQUEUE_DESPACHADOR; q++){
+    for (int q = MSGQUEUE_DISPOSITIVOS_ENVIOS; q <= MSGQUEUE_SERVER_RECEPTOR_EMISOR; q++){
 			key = ftok(ipcFileName.c_str(), q);
 		if (msgget(key, 0660 | IPC_CREAT | IPC_EXCL) == -1){
 			std::cout << "No se pudo crear una cola: " << strerror(errno)<< std::endl;

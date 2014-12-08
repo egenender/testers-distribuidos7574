@@ -9,15 +9,15 @@
 #include <cstdlib>
 
 AtendedorDispositivos::AtendedorDispositivos() { 
-    key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_DISPOSITIVOS);
-    this->cola_requerimiento = msgget(key, 0666);
-    if(this->cola_requerimiento == -1) {
+    key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_DISPOSITIVOS_ENVIOS);
+    this->cola_envios = msgget(key, 0666);
+    if(this->cola_envios == -1) {
 		exit(1);
     }
     
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_TESTERS);
-    this->cola_tests = msgget(key, 0666);
-    if(this->cola_tests == -1) {
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_DISPOSITIVOS_RECIBOS);
+    this->cola_recibos = msgget(key, 0666);
+    if(this->cola_recibos == -1) {
         exit(1);
     }
 }
@@ -35,7 +35,7 @@ void AtendedorDispositivos::enviarRequerimiento(int idDispositivo) {
     msg.idDispositivo = idDispositivo;
     msg.finalizar_conexion = 0;
     
-    int ret = msgsnd(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    int ret = msgsnd(this->cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
         std::string error("Error al enviar mensaje al atendedor. Error: " + errno);
         Logger::error(error.c_str(), __FILE__);
@@ -45,7 +45,7 @@ void AtendedorDispositivos::enviarRequerimiento(int idDispositivo) {
 
 int AtendedorDispositivos::recibirPrograma(int idDispositivo) {
     TMessageAtendedor msg;
-    int ret = msgrcv(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
+    int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
     if(ret == -1) {
         std::string error("Error al recibir programa del atendedor. Error: " + errno);
         Logger::error(error.c_str(), __FILE__);
@@ -63,7 +63,7 @@ void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {
     msg.idDispositivo = idDispositivo;
     msg.value = resultado;
             
-    int ret = msgsnd(this->cola_tests, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    int ret = msgsnd(this->cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
         std::string error("Error al enviar resultado al atendedor. Error: " + errno);
         Logger::error(error.c_str(), __FILE__);
@@ -75,7 +75,7 @@ void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {
 int AtendedorDispositivos::recibirOrden(int idDispositivo, int* cantidad) {
 
     TMessageAtendedor msg;
-    int ret = msgrcv(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
+    int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
     if(ret == -1) {
         std::string error("Error al recibir orden del atendedor. Error: " + errno);
         Logger::error(error.c_str(), __FILE__);
@@ -91,7 +91,7 @@ void AtendedorDispositivos::terminar_atencion(){
     msg.mtype = (long) this->ultimoTester;
     msg.finalizar_conexion = FINALIZAR_CONEXION;
                 
-    int ret = msgsnd(this->cola_tests, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0); //REVISAR A QUE COLA MANDAR
+    int ret = msgsnd(this->cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
         std::string error("Error al enviar resultado al atendedor. Error: " + errno);
         Logger::error(error.c_str(), __FILE__);

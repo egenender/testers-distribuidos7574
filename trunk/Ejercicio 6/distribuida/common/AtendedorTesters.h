@@ -11,8 +11,8 @@
 
 class AtendedorTesters {
 private:
-    int cola_requerimiento;
-    int cola_recibos_tests;
+    int cola_envios;
+    int cola_recibos;
     int cola_testers_especiales;
     Semaphore sem_cola_especiales;
           
