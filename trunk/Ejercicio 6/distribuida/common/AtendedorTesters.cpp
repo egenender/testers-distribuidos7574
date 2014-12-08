@@ -3,7 +3,7 @@
 
 AtendedorTesters::AtendedorTesters(): sem_cola_especiales(SEM_COLA_ESPECIALES) {
     key_t key;
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_DISPOSITIVOS_ENVIOS);
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_TESTERS_RECIBOS);
     this->cola_recibos = msgget(key, 0666);
     if(this->cola_recibos == -1) {
 		std::string err = std::string("Error al obtener la cola de requerimientos del atendedor de testers. Errno: ") + std::string(strerror(errno));
@@ -11,7 +11,7 @@ AtendedorTesters::AtendedorTesters(): sem_cola_especiales(SEM_COLA_ESPECIALES) {
         exit(1);
     }
     
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_DISPOSITIVOS_RECIBOS);
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_TESTERS_ENVIOS);
     this->cola_envios = msgget(key, 0666);
     if(this->cola_envios == -1) {
         std::string err = std::string("Error al obtener la cola de lectura de resultados del atendedor de testers. Errno: ") + std::string(strerror(errno));

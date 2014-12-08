@@ -47,12 +47,13 @@ int main(int argc, char *argv[]){
 	int cant_atendidos = 0;
 	
     while(1){
-		int clientfd = accept(fd, (struct sockaddr*)NULL, NULL);
 		//Verifico no estar atendiendo ya muchos clientes
 		while (cant_atendidos >= MAXIMOS_ATENDIDOS){
 			wait(NULL);
 			cant_atendidos--;
 		}
+		
+		int clientfd = accept(fd, (struct sockaddr*)NULL, NULL);
 		cant_atendidos++;
 		
 		if (fork() == 0){
@@ -70,7 +71,7 @@ int main(int argc, char *argv[]){
 			long dispositivo_a_tratar = buffer->idDispositivo;
 			pid_t receptor = buffer->value;
 			
-			buffer->idDispositivo = id_tester;
+			buffer->tester = id_tester;
 			//Le envio al cliente para que sepa el id del servidor que tiene que esperar (para que se lo pase a su emisor)
 			enviar(buffer, clientfd);
 			
