@@ -75,8 +75,9 @@ void AtendedorTesters::enviarPrograma(int idDispositivo, int tester, int idProgr
         Logger::error(error.c_str(), __FILE__);
         throw error;
     }
-    
-    Logger::notice("Se envio el programa desde atendedor testers", __FILE__);
+    std::stringstream ss;
+    ss << "Se envio el programa desde atendedor testers para el dispositivo " << idDispositivo;
+    Logger::notice(ss.str().c_str(), __FILE__);
 
 }
 

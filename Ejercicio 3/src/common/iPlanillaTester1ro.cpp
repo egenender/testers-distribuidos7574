@@ -37,9 +37,6 @@ bool iPlanillaTester1ro::agregar(int idDispositivo) {
         exit(-1);
 
     }
-
-    Logger::notice("se envio un nuevo requerimiento", __FILE__);
-
     respuesta_lugar_t hayLugar;
     if (-1 == msgrcv(cola, &hayLugar, sizeof (respuesta_lugar_t) - sizeof (long), idDispositivo + Constantes::OFFSET_LUGAR, 0)) {
 
@@ -47,13 +44,13 @@ bool iPlanillaTester1ro::agregar(int idDispositivo) {
         Logger::error(error.c_str(), __FILE__);
         exit(-1);
 
-    }
-
+    }    
     return hayLugar.respuesta;
 }
 
 void iPlanillaTester1ro::terminoRequerimientoPendiente(int idDispositivo) {
     requerimiento_planilla_t requerimiento;
+    requerimiento.mtype = Constantes::MTYPE_REQUERIMIENTO;
     requerimiento.tester = idTester;
     requerimiento.tipoReq = Constantes::REQUERIMIENTO_TERMINO_PENDIENTE_REQ;
     requerimiento.idDispositivo = idDispositivo;
@@ -66,5 +63,6 @@ void iPlanillaTester1ro::terminoRequerimientoPendiente(int idDispositivo) {
         exit(-1);
 
     }
+       
 }
 

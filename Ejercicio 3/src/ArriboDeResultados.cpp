@@ -95,13 +95,16 @@ int main(int argc, char** argv) {
         if (shm_planilla_local->estadoRes == LIBRE) {
             if (shm_planilla_local->estado1 == OCUPADO || shm_planilla_local->estado2 == OCUPADO) {
                 shm_planilla_local->estadoRes = ESPERANDO;
+                mutex_planilla_local.v();
+                Logger::notice("EL TESTER RESULTADO SE BLOQUEO", __FILE__);
+                sem_tester_resultado.p();
+                Logger::notice("EL TESTER RESULTADO SE DESBLOQUEO", __FILE__);
             } else {
                 shm_planilla_local->estadoRes = OCUPADO;
-    //            sem_tester_resultado.v();
             }
         }
-
         mutex_planilla_local.v();
+        
     }
     return 0;
 }

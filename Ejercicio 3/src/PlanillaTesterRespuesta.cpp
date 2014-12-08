@@ -34,20 +34,12 @@ int main(int argc, char** argv) {
     Logger::notice("Entrando a loop principal", nombre.str().c_str());
     while (true) {
         
-    std::stringstream ss;
-    ss << "Se trata de recibir una instruccion con mtype: " << id ;
-    Logger::notice(ss.str().c_str(), __FILE__);
-    ss.str("");
     
         if (-1 == msgrcv(planilla.queue(), &requerimiento, sizeof (requerimiento_planilla_t) - sizeof (long), id, 0 )) {
             std::string error = std::string("Error al hacer msgrcv. Error: ") + std::string(strerror(errno));
             Logger::error(error.c_str(), __FILE__);
             exit(-1);
         }
-    
-      ss << "Se Recibio un requerimiento con mtype " << requerimiento.mtype << "y tipo: " << requerimiento.tipoReq ;
-    Logger::notice(ss.str().c_str(), __FILE__);
-    ss.str("");
     
         switch (requerimiento.tipoReq) {
             case REQUERIMIENTO_ELIMINAR_DISPOSITIVO:

@@ -39,6 +39,8 @@ void iPlanillaTesterRespuesta::eliminarDispositivo(int idDispositivo) {
         Logger::error(error.c_str(), __FILE__);
         exit(-1);
     }
+    
+    Logger::notice("se envio eliminarDispositivo", __FILE__);
     //Deberia esperar un ok?
 }
 
@@ -48,11 +50,6 @@ void iPlanillaTesterRespuesta::iniciarProcesamientoDeResultados() {
     requerimiento.tester = idTester;
     requerimiento.tipoReq = Constantes::REQUERIMIENTO_INICIAR_PROC_RESULTADOS;
     requerimiento.idDispositivo = 0;
-    
-    std::stringstream ss;
-    ss << "Se manda una instruccion con mtype: " << idTester ;
-    Logger::notice(ss.str().c_str(), __FILE__);
-    ss.str("");
 
     if (-1 == msgsnd(cola, &requerimiento, sizeof (requerimiento_planilla_t) - sizeof (long), 0)) {
 
@@ -74,22 +71,7 @@ void iPlanillaTesterRespuesta::procesarSiguiente() {
         std::string error = std::string("Error al hacer msgsnd. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
         exit(-1);
-    }
-}
-
-void iPlanillaTesterRespuesta::agregarResultado() {
-    requerimiento_planilla_t requerimiento;
-    requerimiento.mtype = idTester;
-    requerimiento.tester = idTester;
-    requerimiento.tipoReq = Constantes::REQUERIMIENTO_AGREGAR_RESULTADO;
-    requerimiento.idDispositivo = 0;
-
-    if (-1 == msgsnd(cola, &requerimiento, sizeof (requerimiento_planilla_t) - sizeof (long), 0)) {
-
-        std::string error = std::string("Error al hacer msgsnd. Error: ") + std::string(strerror(errno));
-        Logger::error(error.c_str(), __FILE__);
-        exit(-1);
-    }
+    }    
 }
 
 
