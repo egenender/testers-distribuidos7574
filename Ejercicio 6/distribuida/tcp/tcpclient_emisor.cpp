@@ -48,7 +48,7 @@ int main(int argc, char *argv[]){
 	if (ok_read == -1){
 		exit(0);
 	}
-	long id_tester = buffer->idDispositivo;
+	long id_tester = buffer->tester;
 	
 	
     while (true) {
