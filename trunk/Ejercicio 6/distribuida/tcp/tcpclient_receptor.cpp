@@ -43,7 +43,6 @@ int main(int argc, char *argv[]){
 	
 	//Envio por la cola al emisor, para que sepa el id del servidor/tester
 	buffer->mtype = id_dispositivo;
-		
 	int ok = msgsnd(cola_emisor, buffer, size - sizeof(long), 0);
 	if (ok == -1){
 		exit(1);

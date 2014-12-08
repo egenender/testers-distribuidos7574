@@ -1,7 +1,7 @@
 CC=g++
-CFLAGS=-Wall -pedantic -pedantic-errors -g -ggdb -DDEBUG
+CFLAGS=-Wall -pedantic -pedantic-errors -g -ggdb -DDEBUG -DVERSION_DISTRIBUIDA
 
-all: dispositivo tecnico testerComun testerEspecial iniciador terminador cleanO
+all: dispositivo tecnico testerComun testerEspecial server_emisor server_receptor cliente_emisor cliente_receptor iniciador terminador cleanO
 
 lockfile:
 	$(CC) $(CFLAGS) -c sync/LockFile.cpp
@@ -45,6 +45,18 @@ testerEspecial: programa resultado lockfile logger despachadorTester atendedorTe
 planilla: semaphore logger
 	$(CC) $(CFLAGS) -c common/Planilla.cpp	
 
+cliente_receptor:
+	$(CC) $(CFLAGS) tcp/tcpclient_receptor.cpp -o tcp/tcpclient_receptor 
+	
+cliente_emisor:
+	$(CC) $(CFLAGS) tcp/tcpclient_emisor.cpp -o tcp/tcpclient_emisor
+	
+server_receptor:
+	$(CC) $(CFLAGS) tcp/tcpserver_receptor.cpp -o tcp/tcpserver_receptor 
+	
+server_emisor:
+	$(CC) $(CFLAGS) tcp/tcpserver_emisor.cpp -o tcp/tcpserver_emisor
+
 iniciador: semaphore logger lockfile
 	$(CC) $(CFLAGS) Semaphore.o LockFile.o logger/Logger.o iniciador.cpp -o iniciador
 
@@ -59,5 +71,9 @@ clean: cleanO
 	rm -f Tecnico
 	rm -f TesterComun
 	rm -f TesterEspecial
+	rm -f tcp/tcpclient_receptor
+	rm -f tcp/tcpclient_emisor
+	rm -f tcp/tcpserver_receptor
+	rm -f tcp/tcpserver_emisor
 	rm -f iniciador
 	rm -f terminador

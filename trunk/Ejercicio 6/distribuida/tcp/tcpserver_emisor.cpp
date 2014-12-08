@@ -63,8 +63,8 @@ int main(int argc, char *argv[]){
 			key_t key = ftok(IPCS_FILE, MSGQUEUE_SERVER_RECEPTOR_EMISOR);
 			int cola_id_disp = msgget(key, 0660| IPC_CREAT);
 			
-			int ok_read = msgrcv(cola_id_disp, buffer, size - sizeof(long), id_tester, 0);
-				if (ok_read == -1){
+			int ok_read = msgrcv(cola_id_disp, buffer, sizeof(TMessageAtendedor) - sizeof(long), id_tester, 0);
+			if (ok_read == -1){
 					exit(0);
 			}
 					

@@ -23,7 +23,7 @@ private:
     
 public:
 
-    AtendedorDispositivos();
+    AtendedorDispositivos(int idDispositivo);
     AtendedorDispositivos(const AtendedorDispositivos& orig);    
     virtual ~AtendedorDispositivos();
         
