@@ -16,8 +16,8 @@
 
 class AtendedorDispositivos {
 private:
-    int cola_requerimiento;
-    int cola_tests;
+    int cola_envios;
+    int cola_recibos;
     
     int ultimoTester;
     
