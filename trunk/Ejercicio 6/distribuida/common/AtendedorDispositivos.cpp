@@ -21,7 +21,7 @@ AtendedorDispositivos::AtendedorDispositivos(int idDispositivo) {
         exit(1);
     }
     
-       
+    #ifdef VERSION_DISTRIBUIDA
     char param_id[10];
     sprintf(param_id, "%d", idDispositivo);
     char param_cola[10];
@@ -38,6 +38,7 @@ AtendedorDispositivos::AtendedorDispositivos(int idDispositivo) {
 		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",UBICACION_SERVER ,PUERTO_SERVER_RECEPTOR , param_id, param_cola, param_pid,(char*)0);
         exit(1);
 	}
+	#endif
 }
 
 AtendedorDispositivos::AtendedorDispositivos(const AtendedorDispositivos& orig) {

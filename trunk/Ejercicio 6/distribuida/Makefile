@@ -1,7 +1,8 @@
 CC=g++
 CFLAGS=-Wall -pedantic -pedantic-errors -g -ggdb -DDEBUG -DVERSION_DISTRIBUIDA
 
-all: dispositivo tecnico testerComun testerEspecial server_emisor server_receptor cliente_emisor cliente_receptor iniciador terminador cleanO
+all: dispositivo tecnico testerComun testerEspecial server_emisor server_receptor cliente_emisor cliente_receptor iniciador terminador destroy cleanO
+	@echo "Compilacion terminada"
 
 lockfile:
 	$(CC) $(CFLAGS) -c sync/LockFile.cpp
@@ -62,18 +63,22 @@ iniciador: semaphore logger lockfile
 
 terminador: semaphore lockfile logger
 	$(CC) $(CFLAGS) Semaphore.o LockFile.o logger/Logger.o terminador.cpp -o terminador
+
+destroy:
+	@echo "Creando script destructor"
+	@echo "./terminador" >> destroy.sh
+	@echo "killall tcpserver_receptor" >> destroy.sh
+	@echo "killall tcpserver_emisor" >> destroy.sh
+	@chmod +x destroy.sh
+
 cleanO:
-	rm -f *.o
+	@echo "Eliminando .o's"
+	@rm -f *.o
 
 clean: cleanO
-	rm -f log.txt
-	rm -f Dispositivo
-	rm -f Tecnico
-	rm -f TesterComun
-	rm -f TesterEspecial
-	rm -f tcp/tcpclient_receptor
-	rm -f tcp/tcpclient_emisor
-	rm -f tcp/tcpserver_receptor
-	rm -f tcp/tcpserver_emisor
-	rm -f iniciador
-	rm -f terminador
+	@echo "Eliminando log"
+	@rm -f log.txt
+	@echo "Eliminando ejecutables"
+	@rm -f Dispositivo Tecnico TesterComun TesterEspecial tcp/tcpclient_receptor tcp/tcpclient_emisor tcp/tcpserver_receptor tcp/tcpserver_emisor iniciador terminador
+	@echo "Eliminando script destructor"
+	@rm -f destroy.sh
