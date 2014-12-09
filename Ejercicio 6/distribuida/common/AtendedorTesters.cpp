@@ -28,6 +28,7 @@ AtendedorTesters::AtendedorTesters(int idTester): sem_cola_especiales(SEM_COLA_E
     }
     sem_cola_especiales.getSem();
     
+    #ifdef VERSION_DISTRIBUIDA
     if (idTester >= ID_TESTER_ESPECIAL_START) return;
     
     char param_id[10];
@@ -44,6 +45,7 @@ AtendedorTesters::AtendedorTesters(int idTester): sem_cola_especiales(SEM_COLA_E
 		execlp("./tcp/tcpserver_emisor", "tcpserver_emisor", PUERTO_SERVER_EMISOR ,param_cola , param_id,(char*)0);
         exit(1);
 	}
+	#endif
 }
 
 AtendedorTesters::AtendedorTesters(const AtendedorTesters& orig): sem_cola_especiales(SEM_COLA_ESPECIALES) {
