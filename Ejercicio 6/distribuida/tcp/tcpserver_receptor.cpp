@@ -47,12 +47,13 @@ int main(int argc, char *argv[]){
     int cant_atendidos = 0;
     
     while(true){
-		int clientfd = accept(fd, (struct sockaddr*)NULL, NULL);
 		//Verifico no estar atendiendo ya muchos clientes
 		while (cant_atendidos >= MAXIMOS_ATENDIDOS){
 			wait(NULL);
 			cant_atendidos--;
-		}
+		}		
+		
+		int clientfd = accept(fd, (struct sockaddr*)NULL, NULL);
 		cant_atendidos++;
 		
 		if (fork() == 0){

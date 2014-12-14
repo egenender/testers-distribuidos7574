@@ -46,7 +46,7 @@ int main(int argc, char *argv[]){
 	/* FIN del setup */
 	int cant_atendidos = 0;
 	
-    while(1){
+    while(true){
 		//Verifico no estar atendiendo ya muchos clientes
 		while (cant_atendidos >= MAXIMOS_ATENDIDOS){
 			wait(NULL);
