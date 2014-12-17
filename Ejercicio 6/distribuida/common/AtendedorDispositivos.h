@@ -20,6 +20,7 @@ private:
     int cola_recibos;
     
     int ultimoTester;
+    int idDispositivo;
     
 public:
 
@@ -27,10 +28,10 @@ public:
     AtendedorDispositivos(const AtendedorDispositivos& orig);    
     virtual ~AtendedorDispositivos();
         
-    void enviarRequerimiento(int idDispositivo); // Disp -> Tester
-    int recibirPrograma(int idDispositivo);
-    void enviarResultado(int idDispositivo, int resultado); // Disp -> Tester: Grave o no grave
-    int recibirOrden(int idDispositivo, int* cant);
+    void enviarRequerimiento(); // Disp -> Tester
+    int recibirPrograma();
+    void enviarResultado(int resultado); // Disp -> Tester: Grave o no grave
+    int recibirOrden(int* cant);
     
     void terminar_atencion();
 };

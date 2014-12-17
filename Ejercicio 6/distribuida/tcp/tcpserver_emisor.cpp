@@ -72,8 +72,6 @@ int main(int argc, char *argv[]){
 			pid_t receptor = buffer->value;
 			
 			buffer->tester = id_tester;
-			//Le envio al cliente para que sepa el id del servidor que tiene que esperar (para que se lo pase a su emisor)
-			enviar(buffer, clientfd);
 			
 			while (true){
 				//Espero un mensaje que deba ser enviado al dispositivo en cuestion

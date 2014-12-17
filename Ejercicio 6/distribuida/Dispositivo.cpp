@@ -38,9 +38,9 @@ int main(int argc, char** argv) {
 		ss << "El dispositivo " << id << " envia un requerimiento al sistema de testeo";
 		Logger::debug(ss.str().c_str(), __FILE__);
 		ss.str("");
-        atendedor.enviarRequerimiento(id);
+        atendedor.enviarRequerimiento();
         // Recibe programa, verificando que no sea un rechazo por parte del sistema
-        int program = atendedor.recibirPrograma(id);
+        int program = atendedor.recibirPrograma();
         if (program == -1) {
 	    ss << "El dispositivo " << id << " recibe indicacion de que no hay lugar en el sistema de testeo. Reintentara luego";
 	    Logger::debug(ss.str().c_str(), __FILE__);
@@ -64,11 +64,11 @@ int main(int argc, char** argv) {
         int resul = rand() % 10;
         resul = 0;
         if (resul >= 4){
-			atendedor.enviarResultado(id, SEGUIR_TESTEANDO);
+			atendedor.enviarResultado( SEGUIR_TESTEANDO);
 		}else if (resul >= 2){
-			atendedor.enviarResultado(id, RESULTADO_GRAVE);
+			atendedor.enviarResultado( RESULTADO_GRAVE);
 		}else{
-			atendedor.enviarResultado(id, RESULTADO_NO_GRAVE);
+			atendedor.enviarResultado( RESULTADO_NO_GRAVE);
 		}
         
         
@@ -78,7 +78,7 @@ int main(int argc, char** argv) {
 
         // Recibo la orden a seguir
         int cantidad;
-        int orden = atendedor.recibirOrden(id, &cantidad);
+        int orden = atendedor.recibirOrden(&cantidad);
         
         if (orden == ORDEN_APAGADO) {
 			ss << "El dispositivo " << id << " recibe la orden de apagado (" << orden << "). Byebye!";
@@ -96,13 +96,13 @@ int main(int argc, char** argv) {
             ss.str("");
 			
 			for (int i = 0; i < cantidad; i++){
-				program = atendedor.recibirPrograma(id);
+				program = atendedor.recibirPrograma();
 				ss << "El dispositivo " << id << " recibe el programa especial numero " << program << ". Enviando resultados...";
 				Logger::debug(ss.str().c_str(), __FILE__);;
 				ss.str("");
-				atendedor.enviarResultado(id, rand() % 2);
+				atendedor.enviarResultado( rand() % 2);
 			}
-			orden = atendedor.recibirOrden(id, &cantidad);
+			orden = atendedor.recibirOrden(&cantidad);
 			
 			if (orden == ORDEN_APAGADO) {
 				ss << "El dispositivo " << id << " recibe la orden de apagado (" << orden << "). Byebye!";

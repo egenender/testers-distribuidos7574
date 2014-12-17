@@ -21,12 +21,12 @@ void terminar_ejecucion(int sig){
 
 int main(int argc, char *argv[]){
 	
-    if(argc != 3){
-		printf("Uso: %s <puerto> <id_tester>\n", argv[0]);
+    if(argc != 4){
+		printf("Uso: %s <puerto> <id_server> <id_cola>\n", argv[0]);
 		return -1;
     }
 	int id_tester = atoi(argv[2]);
-
+	
     int fd = tcp_open_pasivo(atoi(argv[1]));
     if(fd < 0){
       perror("Error");
@@ -42,6 +42,8 @@ int main(int argc, char *argv[]){
 
     signal(SIGPIPE, SIG_IGN);
     signal(SIGHUP, terminar_ejecucion);
+    
+    int id_cola = atoi(argv[3]);
     /* FIN del setup */
     
     int cant_atendidos = 0;
@@ -74,13 +76,13 @@ int main(int argc, char *argv[]){
 				exit(1);
 			}
 								
+			key = ftok(IPCS_FILE, id_cola);
+			int cola = msgget(key, 0660);
 			while (true) {
 				//Espero por un mensaje desde el cliente
 				recibir(buffer, clientfd);
 				
 				//Mando el mensaje por la cola que el cliente me dice que tengo que usar
-				key_t key = ftok(IPCS_FILE, buffer->cola_a_usar);
-				int cola = msgget(key, 0660);
 				int ok = msgsnd(cola, buffer, sizeof(TMessageAtendedor) - sizeof(long), 0);
 				if (ok == -1){
 					exit(1);
