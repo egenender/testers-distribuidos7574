@@ -22,7 +22,8 @@ const int ID_DISPOSITIVO_START = 50;
 const int ID_TESTER_START = 1;
 const int ID_TESTER_ESPECIAL_START = ID_TESTER_START + CANT_TESTERS_COMUNES;
 const int MAX_DISPOSITIVOS_EN_SISTEMA = 100;
-const int MAX_TESTERS_EN_TOTAL = 10;
+const int MAX_TESTERS_COMUNES = 5;
+const int MAX_TESTERS_ESPECIALES = 5;
 
 // IDs de los IPC
 const int SEM_PLANILLA_GENERAL = 1;
@@ -31,17 +32,19 @@ const int SEM_COLA_ESPECIALES = 3;
 
 const int MSGQUEUE_DISPOSITIVOS_ENVIOS = 10;
 const int MSGQUEUE_DISPOSITIVOS_RECIBOS = 11;
-#ifdef VERSION_DISTRIBUIDA
 const int MSGQUEUE_TESTERS_ENVIOS = 12;
 const int MSGQUEUE_TESTERS_RECIBOS = 13;
-#else
-const int MSGQUEUE_TESTERS_ENVIOS = MSGQUEUE_DISPOSITIVOS_RECIBOS;
-const int MSGQUEUE_TESTERS_RECIBOS = MSGQUEUE_DISPOSITIVOS_ENVIOS;
-#endif
 const int MSGQUEUE_TESTERS_ESPECIALES = 14;
 const int MSGQUEUE_DESPACHADOR = 15;
-const int MSGQUEUE_DISPOSITIVO_RECEPTOR_EMISOR = 16;
-const int MSGQUEUE_SERVER_RECEPTOR_EMISOR = 17;
+const int MSGQUEUE_SERVER_RECEPTOR_EMISOR = 16;
+
+const int MSGQUEUE_BROKER_RECEPCION_MENSAJES_DISPOSITIVOS = 17;
+const int MSGQUEUE_BROKER_ENVIO_MENSAJES_TESTERS = 18;
+const int MSGQUEUE_BROKER_ATENCION_REQUERIMIENTOS_DISPOSITIVOS = 19;
+const int MSGQUEUE_BROKER_ENVIO_MENSAJES_DISPOSITIVOS = 20;	
+const int SEM_CANT_TESTERS_COMUNES = 21;
+const int SEM_TABLA_TESTERS = 22;
+const int SHM_TABLA_TESTERS = 22;
 
 const int MTYPE_REQUERIMIENTO = 1;
 
@@ -86,14 +89,26 @@ typedef struct posicion_en_shm{
 typedef struct message {
 		/* BEGIN HEADER */
         long mtype;
+        long mtype_envio;
         int finalizar_conexion;
-        int cola_a_usar;
+        int es_requerimiento;
+        int es_especial; //Solo por si acaso
         /* END HEADER */
         int idDispositivo;
         int tester;
         int value; // Este parametro posee el valor del requerimiento, del programa y del resultado
         int cant_testers;
+        int especiales[MAX_TESTERS_ESPECIALES];
 } TMessageAtendedor;
 
+typedef struct tabla_testers_disponibles(){
+	int testers_comunes[MAX_TESTERS_COMUNES];
+	int start;
+	int end;
+	int cant;
+	int testers_especiales[MAX_TESTERS_ESPECIALES];
+} tabla_testers_disponibles_t;
+
 #endif	/* COMMON_H */
+
 

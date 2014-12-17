@@ -19,7 +19,7 @@ void terminar_ejecucion(int sig){
  
 int main(int argc, char *argv[]){
 	if(argc != 4){
-        printf("%s <host> <port> <id_dispositivo>\n",argv[0]);
+        printf("%s <host> <port> <id_cola>\n",argv[0]);
         return -1;
     }
 	size_t size = sizeof(TMessageAtendedor);
@@ -30,33 +30,21 @@ int main(int argc, char *argv[]){
 		return -2;
     }
     
-    long id_dispositivo = atol(argv[3]);
+    int id_cola = atoi(argv[3]);
+    key_t key = ftok(IPCS_FILE, id_cola);
+	int cola = msgget(key, 0660| IPC_CREAT);
+    
 	signal(SIGHUP, terminar_ejecucion);
-	key_t key = ftok(IPCS_FILE, MSGQUEUE_DISPOSITIVO_RECEPTOR_EMISOR);
-	int cola_emisor = msgget(key, 0660 | IPC_CREAT);
-	
+		
 	/* FIN del setup */
 	
-	//Espero primer mensaje del servidor para saber quien es el tester que me atiende
 	TMessageAtendedor* buffer = (TMessageAtendedor*) malloc(size);
-	recibir(buffer, fd);
-	
-	//Envio por la cola al emisor, para que sepa el id del servidor/tester
-	buffer->mtype = id_dispositivo;
-	int ok = msgsnd(cola_emisor, buffer, size - sizeof(long), 0);
-	if (ok == -1){
-		exit(1);
-	}
-	
+		
 	//Ciclo general
     while (true) {
 		//Espero un mensaje desde el servidor
 		recibir(buffer, fd);
-		
-		//Mando el mensaje por la cola que me indique el server
-		key_t key = ftok(IPCS_FILE, buffer->cola_a_usar);
-		int cola = msgget(key, 0660| IPC_CREAT);
-		
+		//Mando el mensaje por la cola que me indique el server		
 		int ok = msgsnd(cola, buffer, size - sizeof(long), 0);
 		if (ok == -1){
 			exit(1);

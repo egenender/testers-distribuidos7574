@@ -9,6 +9,7 @@
 #include <cstdlib>
 
 AtendedorDispositivos::AtendedorDispositivos(int idDispositivo) { 
+	this->idDispositivo = idDispositivo;
     key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_DISPOSITIVOS_ENVIOS);
     this->cola_envios = msgget(key, 0666);
     if(this->cola_envios == -1) {
@@ -21,24 +22,23 @@ AtendedorDispositivos::AtendedorDispositivos(int idDispositivo) {
         exit(1);
     }
     
-    #ifdef VERSION_DISTRIBUIDA
     char param_id[10];
     sprintf(param_id, "%d", idDispositivo);
     char param_cola[10];
-    sprintf(param_cola, "%d", MSGQUEUE_DISPOSITIVOS_ENVIOS);
+    sprintf(param_cola, "%d", MSGQUEUE_DISPOSITIVOS_RECIBOS);
     pid_t receptor = fork();
     if (receptor == 0){
-		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",UBICACION_SERVER ,PUERTO_SERVER_EMISOR , param_id,(char*)0);
+		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",UBICACION_SERVER ,PUERTO_SERVER_EMISOR , param_cola,(char*)0);
         exit(1);
 	}
 	char param_pid[10];
 	sprintf(param_pid, "%d", receptor);
+	sprintf(param_cola, "%d", MSGQUEUE_DISPOSITIVOS_ENVIOS);
 	
 	if (fork() == 0){
 		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",UBICACION_SERVER ,PUERTO_SERVER_RECEPTOR , param_id, param_cola, param_pid,(char*)0);
         exit(1);
 	}
-	#endif
 }
 
 AtendedorDispositivos::AtendedorDispositivos(const AtendedorDispositivos& orig) {
@@ -47,13 +47,13 @@ AtendedorDispositivos::AtendedorDispositivos(const AtendedorDispositivos& orig) 
 AtendedorDispositivos::~AtendedorDispositivos() {
 }
     
-void AtendedorDispositivos::enviarRequerimiento(int idDispositivo) {
+void AtendedorDispositivos::enviarRequerimiento() {
 
     TMessageAtendedor msg;
-    msg.mtype = MTYPE_REQUERIMIENTO;
+    msg.mtype = this->idDispositivo;
+    msg.mtype_envio = MTYPE_REQUERIMIENTO;
     msg.idDispositivo = idDispositivo;
     msg.finalizar_conexion = 0;
-    msg.cola_a_usar = MSGQUEUE_TESTERS_RECIBOS;
     
     int ret = msgsnd(this->cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
@@ -63,9 +63,9 @@ void AtendedorDispositivos::enviarRequerimiento(int idDispositivo) {
     }
 }
 
-int AtendedorDispositivos::recibirPrograma(int idDispositivo) {
+int AtendedorDispositivos::recibirPrograma() {
     TMessageAtendedor msg;
-    int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
+    int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), this->idDispositivo, 0);
     if(ret == -1) {
         std::string error("Error al recibir programa del atendedor. Error: " + errno);
         Logger::error(error.c_str(), __FILE__);
@@ -75,14 +75,14 @@ int AtendedorDispositivos::recibirPrograma(int idDispositivo) {
     return msg.value;
 
 }
-void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {
+void AtendedorDispositivos::enviarResultado(int resultado) {
     TMessageAtendedor msg;
-    msg.mtype = (long) this->ultimoTester;
+    msg.mtype = this->idDispositivo;
+    msg.mtype_envio = (long) this->ultimoTester;
     msg.finalizar_conexion = 0;
     msg.tester = this->ultimoTester;
     msg.idDispositivo = idDispositivo;
     msg.value = resultado;
-    msg.cola_a_usar = MSGQUEUE_TESTERS_RECIBOS;
             
     int ret = msgsnd(this->cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
@@ -93,10 +93,10 @@ void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {
 
 }
 
-int AtendedorDispositivos::recibirOrden(int idDispositivo, int* cantidad) {
+int AtendedorDispositivos::recibirOrden(int* cantidad) {
 
     TMessageAtendedor msg;
-    int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
+    int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), this->idDispositivo, 0);
     if(ret == -1) {
         std::string error("Error al recibir orden del atendedor. Error: " + errno);
         Logger::error(error.c_str(), __FILE__);
@@ -109,7 +109,8 @@ int AtendedorDispositivos::recibirOrden(int idDispositivo, int* cantidad) {
 
 void AtendedorDispositivos::terminar_atencion(){
 	TMessageAtendedor msg;
-    msg.mtype = (long) this->ultimoTester;
+	msg.mtype = this->idDispositivo;
+    msg.mtype_envio = (long) this->ultimoTester;
     msg.finalizar_conexion = FINALIZAR_CONEXION;
                 
     int ret = msgsnd(this->cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);

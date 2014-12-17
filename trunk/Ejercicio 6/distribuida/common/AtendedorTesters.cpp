@@ -28,24 +28,23 @@ AtendedorTesters::AtendedorTesters(int idTester): sem_cola_especiales(SEM_COLA_E
     }
     sem_cola_especiales.getSem();
     
-    #ifdef VERSION_DISTRIBUIDA
     if (idTester >= ID_TESTER_ESPECIAL_START) return;
     
     char param_id[10];
     sprintf(param_id, "%d", idTester);
     char param_cola[10];
-    sprintf(param_cola, "%d", MSGQUEUE_TESTERS_ENVIOS);
+    sprintf(param_cola, "%d", MSGQUEUE_TESTERS_RECIBOS);
     if (fork() == 0){
-		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_SERVER_RECEPTOR , param_id,(char*)0);
+		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_SERVER_RECEPTOR , param_id, param_cola, (char*)0);
         exit(1);
 	}
-	
+	sprintf(param_cola, "%d", MSGQUEUE_TESTERS_ENVIOS);
 	
 	if (fork() == 0){
 		execlp("./tcp/tcpserver_emisor", "tcpserver_emisor", PUERTO_SERVER_EMISOR ,param_cola , param_id,(char*)0);
         exit(1);
 	}
-	#endif
+	
 }
 
 AtendedorTesters::AtendedorTesters(const AtendedorTesters& orig): sem_cola_especiales(SEM_COLA_ESPECIALES) {
@@ -73,7 +72,6 @@ void AtendedorTesters::enviarPrograma(int idDispositivo, int tester, int idProgr
     msg.finalizar_conexion = 0;
     msg.tester = tester;
     msg.value = idPrograma;
-    msg.cola_a_usar = MSGQUEUE_DISPOSITIVOS_RECIBOS;
     
     int ret = msgsnd(this->cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
@@ -105,7 +103,6 @@ void AtendedorTesters::enviarOrden(int idDispositivo, int orden, int cantidad) {
     msg.idDispositivo = idDispositivo;
     msg.value = orden;
     msg.cant_testers = cantidad;
-    msg.cola_a_usar = MSGQUEUE_DISPOSITIVOS_RECIBOS;
     
     int ret = msgsnd(this->cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
