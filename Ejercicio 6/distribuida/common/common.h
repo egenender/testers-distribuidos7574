@@ -44,7 +44,8 @@ const int MSGQUEUE_BROKER_ATENCION_REQUERIMIENTOS_DISPOSITIVOS = 19;
 const int MSGQUEUE_BROKER_ENVIO_MENSAJES_DISPOSITIVOS = 20;	
 const int SEM_CANT_TESTERS_COMUNES = 21;
 const int SEM_TABLA_TESTERS = 22;
-const int SHM_TABLA_TESTERS = 22;
+const int SHM_TABLA_TESTERS = 23;
+const int SEM_ESPECIAL_DISPONIBLE = 24; //siguiente debe ser + CANT_ESPECIALes
 
 const int MTYPE_REQUERIMIENTO = 1;
 
@@ -63,9 +64,12 @@ const int FINALIZAR_CONEXION = 1;
 const int MAXIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION = 4;
 const int MINIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION = 2;
 
-const char PUERTO_SERVER_EMISOR[] = "9000";
-const char PUERTO_SERVER_RECEPTOR[] = "9001";
-const char UBICACION_SERVER[] = "localhost";
+const char PUERTO_SERVER_RECEPTOR_TESTERS[] = "9000";
+const char PUERTO_SERVER_EMISOR_TESTERS[] = "9001";
+const char PUERTO_SERVER_RECEPTOR_DISPOSITIVOS[] = "9002";
+const char PUERTO_SERVER_EMISOR_DISPOSITIVOS[] = "9003";
+
+const char UBICACION_SERVER[] = "localhost"; //Cambiar
 
 // Archivos necesarios
 
@@ -99,6 +103,7 @@ typedef struct message {
         int value; // Este parametro posee el valor del requerimiento, del programa y del resultado
         int cant_testers;
         int especiales[MAX_TESTERS_ESPECIALES];
+        int pos_especial; //Para el caso de requerimiento especial
 } TMessageAtendedor;
 
 typedef struct tabla_testers_disponibles(){

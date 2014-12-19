@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
 	sem_cola_especiales.eliSem();
 	
     //Destruccion de colas
-    for (int q = MSGQUEUE_DISPOSITIVOS_ENVIOS; q <= MSGQUEUE_SERVER_RECEPTOR_EMISOR; q++){
+    for (int q = MSGQUEUE_DISPOSITIVOS_ENVIOS; q <= MSGQUEUE_BROKER_ENVIO_MENSAJES_DISPOSITIVOS; q++){
 		key = ftok(ipcFileName.c_str(), q);
 		int cola = msgget(key, 0660);
 		msgctl(cola ,IPC_RMID, NULL);
