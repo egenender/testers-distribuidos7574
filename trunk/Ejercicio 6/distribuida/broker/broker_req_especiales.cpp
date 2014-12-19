@@ -24,7 +24,7 @@ int main (void){
     
     Semaphore sem_tabla(SEM_TABLA_TESTERS);
     sem_tabla.getSem();
-	
+    
 	/* Fin Setup */
 	TMessageAtendedor msg;
 	cant_atendidos = 0;
@@ -46,17 +46,21 @@ int main (void){
 		for (int i = 0; i < MAX_TESTERS_ESPECIALES; i++){
 			if (fork() == 0 ){
 				if (! msg.especiales[i]) exit(0);
-				//pongo sem_especial[i].p();
-				sem_tabla.p();
+			
+				Semaphore sem_especial(SEM_ESPECIAL_DISPONIBLE + i);
+				sem_especial.getSem();
+				sem_especial.p();
 				
+				sem_tabla.p();
 				tabla->testers_especiales[i] = 0;
+				sem_tabla.v();
 				
 				msg.mtype = i + ID_TESTER_ESPECIAL_START;
 				int ret = msgsnd(cola_hacia_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
 				if(ret == -1) {
 					exit(1);
-					}
-				sem_tabla.v();
+				}
+				
 				exit(0);
 			}
 		}	

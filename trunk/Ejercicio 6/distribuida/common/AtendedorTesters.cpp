@@ -30,20 +30,7 @@ AtendedorTesters::AtendedorTesters(int idTester): sem_cola_especiales(SEM_COLA_E
     
     if (idTester >= ID_TESTER_ESPECIAL_START) return;
     
-    char param_id[10];
-    sprintf(param_id, "%d", idTester);
-    char param_cola[10];
-    sprintf(param_cola, "%d", MSGQUEUE_TESTERS_RECIBOS);
-    if (fork() == 0){
-		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_SERVER_RECEPTOR , param_id, param_cola, (char*)0);
-        exit(1);
-	}
-	sprintf(param_cola, "%d", MSGQUEUE_TESTERS_ENVIOS);
-	
-	if (fork() == 0){
-		execlp("./tcp/tcpserver_emisor", "tcpserver_emisor", PUERTO_SERVER_EMISOR ,param_cola , param_id,(char*)0);
-        exit(1);
-	}
+    //Crear clientes
 	
 }
 
@@ -113,6 +100,7 @@ void AtendedorTesters::enviarOrden(int idDispositivo, int orden, int cantidad) {
 }
 
 void AtendedorTesters::enviarAEspeciales(bool cuales[], int posicion){
+	// TODO: CAMBIAR ESTE METODO TOTALMENTE
 	sem_cola_especiales.p();
 	for (int i = 0; i < CANT_TESTERS_ESPECIALES; i++){
 		posicion_en_shm_t pos;
