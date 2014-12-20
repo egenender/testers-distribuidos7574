@@ -3,7 +3,9 @@
 #include <sys/shm.h>
 #include <cstdlib>
 #include <unistd.h>
+#include <sys/wait.h>
 #include "../common/common.h"
+#include "../ipc/Semaphore.h"
 
 
 int main (void){
@@ -27,7 +29,7 @@ int main (void){
     
 	/* Fin Setup */
 	TMessageAtendedor msg;
-	cant_atendidos = 0;
+	int cant_atendidos = 0;
 	
 	while (true){
 		if (cant_atendidos == 5){

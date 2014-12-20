@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-Wall -pedantic -pedantic-errors -g -ggdb -DDEBUG
 
-all: dispositivo tecnico testerComun testerEspecial server_emisor server_receptor cliente_emisor cliente_receptor iniciador terminador destroy cleanO
+all: dispositivo tecnico testerComun testerEspecial server_emisor server_receptor cliente_emisor cliente_receptor broker iniciador terminador destroy cleanO
 	@echo "Compilacion terminada"
 
 lockfile:
@@ -58,6 +58,12 @@ server_receptor:
 server_emisor:
 	$(CC) $(CFLAGS) tcp/tcpserver_emisor.cpp -o tcp/tcpserver_emisor
 
+broker: semaphore
+	$(CC) $(CFLAGS) broker/Broker.cpp Semaphore.o -o Broker
+	$(CC) $(CFLAGS) broker/broker_pasa_manos.cpp Semaphore.o -o broker/broker_pasa_manos
+	$(CC) $(CFLAGS) broker/broker_req_especiales.cpp Semaphore.o -o broker/broker_req_especiales
+	$(CC) $(CFLAGS) broker/broker_requerimientos.cpp Semaphore.o -o broker/broker_requerimientos
+
 iniciador: semaphore logger lockfile
 	$(CC) $(CFLAGS) Semaphore.o LockFile.o logger/Logger.o iniciador.cpp -o iniciador
 
@@ -66,7 +72,7 @@ terminador: semaphore lockfile logger
 
 destroy:
 	@echo "Creando script destructor"
-	@echo "./terminador" >> destroy.sh
+	@echo "./terminador" > destroy.sh
 	@echo "killall tcpserver_receptor" >> destroy.sh
 	@echo "killall tcpserver_emisor" >> destroy.sh
 	@chmod +x destroy.sh
@@ -79,6 +85,6 @@ clean: cleanO
 	@echo "Eliminando log"
 	@rm -f log.txt
 	@echo "Eliminando ejecutables"
-	@rm -f Dispositivo Tecnico TesterComun TesterEspecial tcp/tcpclient_receptor tcp/tcpclient_emisor tcp/tcpserver_receptor tcp/tcpserver_emisor iniciador terminador
+	@rm -f Dispositivo Tecnico TesterComun TesterEspecial tcp/tcpclient_receptor tcp/tcpclient_emisor tcp/tcpserver_receptor tcp/tcpserver_emisor Broker broker/broker_pasa_manos broker/broker_req_especiales broker/broker_requerimientos iniciador terminador
 	@echo "Eliminando script destructor"
 	@rm -f destroy.sh

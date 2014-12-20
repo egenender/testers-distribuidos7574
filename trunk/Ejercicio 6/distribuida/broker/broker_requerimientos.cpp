@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <unistd.h>
 #include "../common/common.h"
+#include "../ipc/Semaphore.h"
 
 int main (void){
 	key_t key;

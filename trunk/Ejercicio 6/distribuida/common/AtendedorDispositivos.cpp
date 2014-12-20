@@ -28,7 +28,7 @@ AtendedorDispositivos::AtendedorDispositivos(int idDispositivo) {
     sprintf(param_cola, "%d", MSGQUEUE_DISPOSITIVOS_RECIBOS);
     pid_t receptor = fork();
     if (receptor == 0){
-		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",UBICACION_SERVER ,PUERTO_SERVER_EMISOR , param_cola,(char*)0);
+		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",UBICACION_SERVER ,PUERTO_SERVER_EMISOR_DISPOSITIVOS , param_cola,(char*)0);
         exit(1);
 	}
 	char param_pid[10];
@@ -36,7 +36,7 @@ AtendedorDispositivos::AtendedorDispositivos(int idDispositivo) {
 	sprintf(param_cola, "%d", MSGQUEUE_DISPOSITIVOS_ENVIOS);
 	
 	if (fork() == 0){
-		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",UBICACION_SERVER ,PUERTO_SERVER_RECEPTOR , param_id, param_cola, param_pid,(char*)0);
+		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",UBICACION_SERVER ,PUERTO_SERVER_RECEPTOR_DISPOSITIVOS , param_id, param_cola, param_pid,(char*)0);
         exit(1);
 	}
 }
