@@ -103,10 +103,9 @@ typedef struct message {
         int value; // Este parametro posee el valor del requerimiento, del programa y del resultado
         int cant_testers;
         int especiales[MAX_TESTERS_ESPECIALES];
-        int pos_especial; //Para el caso de requerimiento especial
 } TMessageAtendedor;
 
-typedef struct tabla_testers_disponibles(){
+typedef struct tabla_testers_disponibles{
 	int testers_comunes[MAX_TESTERS_COMUNES];
 	int start;
 	int end;

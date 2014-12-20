@@ -41,6 +41,24 @@ int main(int argc, char** argv) {
 		int cola = msgget(key, 0660);
 		msgctl(cola ,IPC_RMID, NULL);
 	}
-       
+	
+	Semaphore sem_comunes(SEM_CANT_TESTERS_COMUNES);
+	sem_comunes.getSem();
+	sem_comunes.eliSem();
+	
+	for (int i = 0; i < MAX_TESTERS_ESPECIALES; i++){
+		Semaphore sem_especial(SEM_ESPECIAL_DISPONIBLE + i);
+		sem_especial.getSem();
+		sem_especial.eliSem();
+	}
+	
+	Semaphore sem_tabla(SEM_TABLA_TESTERS);
+	sem_tabla.getSem();
+	sem_tabla.eliSem();
+	
+	key = ftok(ipcFileName.c_str(), SHM_TABLA_TESTERS);
+    int shmtabla = shmget(key, sizeof(tabla_testers_disponibles_t) , 0660);
+    shmctl(shmtabla, IPC_RMID, NULL);
+	
     return 0;
 }

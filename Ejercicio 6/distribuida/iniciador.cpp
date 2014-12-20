@@ -91,6 +91,12 @@ void createIPCObjects() {
 }
 
 void createSystemProcesses(int cant_dispositivos, int min_lanzados, int max_lanzados, int micro_sim) {
+   if (fork() == 0){
+		execlp("./Broker", "Broker", (char*)0);
+        Logger::error("Error al ejecutar el programa broker", __FILE__);
+        exit(1);
+	}
+	sleep(3);
    
     // Creo testers
     int idTester = ID_TESTER_START;
@@ -127,7 +133,7 @@ void createSystemProcesses(int cant_dispositivos, int min_lanzados, int max_lanz
         Logger::error("Error al ejecutar el programa tecnico", __FILE__);
         exit(1);
     }
-		
+    		
 	//Creo dispositivos
     sleep(1);
     int idDispositivo = ID_DISPOSITIVO_START;

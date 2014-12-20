@@ -2,6 +2,7 @@
 #include <cstdlib>
 
 AtendedorTesters::AtendedorTesters(int idTester): sem_cola_especiales(SEM_COLA_ESPECIALES) {
+	this->idTester = idTester;
     key_t key;
     key = ftok(ipcFileName.c_str(), MSGQUEUE_TESTERS_RECIBOS);
     this->cola_recibos = msgget(key, 0666);
@@ -28,9 +29,23 @@ AtendedorTesters::AtendedorTesters(int idTester): sem_cola_especiales(SEM_COLA_E
     }
     sem_cola_especiales.getSem();
     
-    if (idTester >= ID_TESTER_ESPECIAL_START) return;
-    
-    //Crear clientes
+    char param_id[10];
+    sprintf(param_id, "%d", idTester);
+    char param_cola[10];
+    sprintf(param_cola, "%d", MSGQUEUE_TESTERS_RECIBOS);
+    pid_t receptor = fork();
+    if (receptor == 0){
+		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",UBICACION_SERVER ,PUERTO_SERVER_EMISOR_TESTERS , param_cola,(char*)0);
+        exit(1);
+	}
+	char param_pid[10];
+	sprintf(param_pid, "%d", receptor);
+	sprintf(param_cola, "%d", MSGQUEUE_TESTERS_ENVIOS);
+	
+	if (fork() == 0){
+		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",UBICACION_SERVER ,PUERTO_SERVER_RECEPTOR_TESTERS , param_id, param_cola, param_pid,(char*)0);
+        exit(1);
+	}
 	
 }
 
@@ -55,7 +70,8 @@ int AtendedorTesters::recibirRequerimiento() {
 void AtendedorTesters::enviarPrograma(int idDispositivo, int tester, int idPrograma) {
 
     TMessageAtendedor msg;
-    msg.mtype = idDispositivo;
+    msg.mtype = this->idTester;
+    msg.mtype_envio = idDispositivo;
     msg.finalizar_conexion = 0;
     msg.tester = tester;
     msg.value = idPrograma;
@@ -85,7 +101,8 @@ int AtendedorTesters::recibirResultado(int idTester) {
 
 void AtendedorTesters::enviarOrden(int idDispositivo, int orden, int cantidad) {
     TMessageAtendedor msg;
-    msg.mtype = idDispositivo;
+    msg.mtype = this->idTester;
+    msg.mtype_envio = idDispositivo;
     msg.finalizar_conexion = 0;
     msg.idDispositivo = idDispositivo;
     msg.value = orden;
@@ -100,33 +117,37 @@ void AtendedorTesters::enviarOrden(int idDispositivo, int orden, int cantidad) {
 }
 
 void AtendedorTesters::enviarAEspeciales(bool cuales[], int posicion){
-	// TODO: CAMBIAR ESTE METODO TOTALMENTE
-	sem_cola_especiales.p();
+	//sem_cola_especiales.p();
+	TMessageAtendedor msg;
+	msg.mtype = this->idTester;
+	msg.mtype_envio = 1; //ID_BROKER!!
+	msg.value = posicion;
 	for (int i = 0; i < CANT_TESTERS_ESPECIALES; i++){
-		posicion_en_shm_t pos;
-		pos.mtype = i + ID_TESTER_ESPECIAL_START ;
-		pos.lugar = posicion;
-		if (!cuales[i]) continue;
-		int ret = msgsnd(this->cola_testers_especiales, &pos, sizeof(posicion_en_shm_t) - sizeof(long), 0);
-		if(ret == -1) {
-			std::string error = std::string("Error al enviar orden al atendedor. Error: ") + std::string(strerror(errno));
-			Logger::error(error.c_str(), __FILE__);
-			exit(0);
-		}
+		msg.especiales[i] = cuales[i];
 	}
-	sem_cola_especiales.v();
+	for (int i = CANT_TESTERS_ESPECIALES; i < MAX_TESTERS_ESPECIALES; i++){
+		msg.especiales[i] = false;
+	}	
+	int ret = msgsnd(this->cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+	if(ret == -1) {
+		std::string error = std::string("Error al enviar orden al atendedor. Error: ") + std::string(strerror(errno));
+		Logger::error(error.c_str(), __FILE__);
+		exit(0);
+	}
+	
+	//sem_cola_especiales.v();
 }
 
 int AtendedorTesters::recibirRequerimientoEspecial(int idEsp) {
 
-    posicion_en_shm_t pos;
-    int ret = msgrcv(this->cola_testers_especiales, &pos, sizeof(posicion_en_shm_t) - sizeof(long), idEsp, 0);
+    TMessageAtendedor msg;
+    int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), idEsp, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir requerimiento del atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
-    return pos.lugar;
+    return msg.value;
 }
 
 void AtendedorTesters::terminar_atencion(int idDispositivo_atendido){

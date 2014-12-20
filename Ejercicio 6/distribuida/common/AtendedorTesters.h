@@ -15,6 +15,7 @@ private:
     int cola_recibos;
     int cola_testers_especiales;
     Semaphore sem_cola_especiales;
+    int idTester;
           
 public:
     AtendedorTesters(int idTester);

@@ -1,14 +1,15 @@
+#include <stdio.h>
 #include <iostream>
 #include <sys/msg.h>
 #include <sys/shm.h>
 #include <cstdlib>
 #include <unistd.h>
 
-#include "common/common.h"
-#include "ipc/Semaphore.h"
+#include "../common/common.h"
+#include "../ipc/Semaphore.h"
 
 void crear_ipcs(){
-	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_RECEPCION_MENSAJES_DISPOSITIVOS);
+	key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_RECEPCION_MENSAJES_DISPOSITIVOS);
 	msgget(key, 0660 |IPC_CREAT);
 	
 	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_ENVIO_MENSAJES_TESTERS);
