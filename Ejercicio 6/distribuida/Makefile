@@ -58,11 +58,11 @@ server_receptor:
 server_emisor:
 	$(CC) $(CFLAGS) tcp/tcpserver_emisor.cpp -o tcp/tcpserver_emisor
 
-broker: semaphore
-	$(CC) $(CFLAGS) broker/Broker.cpp Semaphore.o -o Broker
-	$(CC) $(CFLAGS) broker/broker_pasa_manos.cpp Semaphore.o -o broker/broker_pasa_manos
-	$(CC) $(CFLAGS) broker/broker_req_especiales.cpp Semaphore.o -o broker/broker_req_especiales
-	$(CC) $(CFLAGS) broker/broker_requerimientos.cpp Semaphore.o -o broker/broker_requerimientos
+broker: semaphore lockfile logger
+	$(CC) $(CFLAGS) broker/Broker.cpp LockFile.o logger/Logger.o Semaphore.o -o Broker
+	$(CC) $(CFLAGS) broker/broker_pasa_manos.cpp LockFile.o logger/Logger.o Semaphore.o -o broker/broker_pasa_manos
+	$(CC) $(CFLAGS) broker/broker_req_especiales.cpp LockFile.o logger/Logger.o Semaphore.o -o broker/broker_req_especiales
+	$(CC) $(CFLAGS) broker/broker_requerimientos.cpp LockFile.o logger/Logger.o Semaphore.o -o broker/broker_requerimientos
 
 iniciador: semaphore logger lockfile
 	$(CC) $(CFLAGS) Semaphore.o LockFile.o logger/Logger.o iniciador.cpp -o iniciador

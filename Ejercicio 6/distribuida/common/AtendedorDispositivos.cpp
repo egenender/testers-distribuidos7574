@@ -54,6 +54,7 @@ void AtendedorDispositivos::enviarRequerimiento() {
     msg.mtype_envio = MTYPE_REQUERIMIENTO;
     msg.idDispositivo = idDispositivo;
     msg.finalizar_conexion = 0;
+    msg.es_requerimiento = 1;
     
     int ret = msgsnd(this->cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
@@ -83,6 +84,7 @@ void AtendedorDispositivos::enviarResultado(int resultado) {
     msg.tester = this->ultimoTester;
     msg.idDispositivo = idDispositivo;
     msg.value = resultado;
+    msg.es_requerimiento = 0;
             
     int ret = msgsnd(this->cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {

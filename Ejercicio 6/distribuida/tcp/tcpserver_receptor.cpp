@@ -26,6 +26,7 @@ int main(int argc, char *argv[]){
 		return -1;
     }
 	int id_tester = atoi(argv[2]);
+	int id_cola = atoi(argv[3]);
 	
     int fd = tcp_open_pasivo(atoi(argv[1]));
     if(fd < 0){
@@ -42,8 +43,6 @@ int main(int argc, char *argv[]){
 
     signal(SIGPIPE, SIG_IGN);
     signal(SIGHUP, terminar_ejecucion);
-    
-    int id_cola = atoi(argv[3]);
     /* FIN del setup */
     
     int cant_atendidos = 0;

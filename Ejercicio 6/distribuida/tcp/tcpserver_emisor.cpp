@@ -16,12 +16,12 @@
 int main(int argc, char *argv[]){
 	
     if(argc != 4){
-		printf("Uso: %s <puerto> <id_cola> <id_tester>\n", argv[0]);
+		printf("Uso: %s <puerto> <id_server> <id_cola> \n", argv[0]);
 		return -1;
     }
 	
-	int id_cola = atoi(argv[2]);
-	long id_tester = atol(argv[3]);
+	long id_tester = atol(argv[2]);
+	int id_cola = atoi(argv[3]);
 	
     size_t size = sizeof(TMessageAtendedor);
    
