@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
+#include <stdio.h>
 
 
 #define MAX_TESTERS_COMUNES 5
@@ -91,8 +92,8 @@ get_id_tester_1_svc(int *argp, struct svc_req *rqstp)
 	
 	/* Para poder generalizar */
 	if (tipo == TIPO_COMUN){
-		inicio = siguiente_id_tester_especial;
-		siguiente = &siguiente_id_tester_especial;
+		inicio = siguiente_id_tester_comun;
+		siguiente = &siguiente_id_tester_comun;
 		offset = 0;
 		cantidad = MAX_TESTERS_COMUNES;
 	}else if (tipo == TIPO_ESPECIAL){
@@ -206,17 +207,18 @@ devolver_id_tester_1_svc(int *argp, struct svc_req *rqstp)
 	if (!inicializado) inicializar();
 	
 	int id = *argp;
+	
 	if (id <= 0 || id > MAX_TESTERS_COMUNES + MAX_TESTERS_ESPECIALES ){
 		result = -1;
 		return &result;
 	}
 	
-	if (ids_tester_disponibles[id]){
+	if (ids_tester_disponibles[id-1]){
 		result = -2; //El dispositivo estaba habilitado, asi que nadie lo pidio en realidad como para poder devolverlo...
 		return &result; 
 	}
 	
-	ids_tester_disponibles[id] = true;
+	ids_tester_disponibles[id-1] = true;
 	
 	result = 1;
 	return &result;

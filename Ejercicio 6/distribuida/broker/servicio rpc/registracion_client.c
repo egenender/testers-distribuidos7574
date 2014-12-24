@@ -1,12 +1,14 @@
 #include "registracion.h"
 
-const int MAX_TESTERS_COMUNES = 5;
-const int MAX_TESTERS_ESPECIALES = 5;
-const int MAX_DISPOSITIVOS_EN_SISTEMA = 100;
-const int SEM_CANT_TESTERS_COMUNES = 21;
-const int SEM_TABLA_TESTERS = 22;
-const int SHM_TABLA_TESTERS = 23;
-const int SEM_ESPECIAL_DISPONIBLE = 24;
+#define MAX_TESTERS_COMUNES 5
+#define MAX_TESTERS_ESPECIALES 5
+#define MAX_DISPOSITIVOS_EN_SISTEMA 100
+#define SEM_CANT_TESTERS_COMUNES 21
+#define SEM_TABLA_TESTERS 22
+#define SHM_TABLA_TESTERS 23
+#define SEM_ESPECIAL_DISPONIBLE 24
+#define TIPO_COMUN 0
+#define TIPO_ESPECIAL 1
 
 
 void
@@ -32,14 +34,18 @@ register_1(char *host)
 	}
 #endif	/* DEBUG */
 	int i;
-	for (i = 0; i < MAX_DISPOSITIVOS_EN_SISTEMA - 5; i++){
-		result_1 = devolver_id_dispositivo_1(&i, clnt);
+	int v = 0;
+	for (i = 0; i < MAX_TESTERS_COMUNES + 5; i++){
+		result_1 = get_id_tester_1(&v, clnt);
 		if (result_1 == (int *) NULL) {
 			clnt_perror (clnt, "call failed");
 		}
-		printf ("Resultado de devolver id %d: %d\n",i, *result_1);
+		printf ("Me dieron el id %d\n", *result_1);
 	}
-	result_1 = get_id_dispositivo_1((void*)&get_id_dispositivo_1_arg, clnt);
+	i = 4;
+	result_1 = devolver_id_tester_1(&i, clnt);
+	printf("Resultado de haber devuelto el id %d: %d\n", i, *result_1);
+	result_1 = get_id_tester_1(&v, clnt);
 	printf("Volvi a obtener un id: %d\n", *result_1);
 	
 #ifndef	DEBUG
