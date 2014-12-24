@@ -21,9 +21,13 @@ const int CANT_TESTERS_ESPECIALES = 1;
 const int ID_DISPOSITIVO_START = 50;
 const int ID_TESTER_START = 1;
 const int ID_TESTER_ESPECIAL_START = ID_TESTER_START + CANT_TESTERS_COMUNES;
+
 const int MAX_DISPOSITIVOS_EN_SISTEMA = 100;
-const int MAX_TESTERS_COMUNES = 5;
-const int MAX_TESTERS_ESPECIALES = 5;
+const int MAX_TESTERS_COMUNES = 10;
+const int MAX_TESTERS_ESPECIALES = 10;
+
+const int TIPO_COMUN = 0;
+const int TIPO_ESPECIAL = 1;
 
 // IDs de los IPC
 const int SEM_PLANILLA_GENERAL = 1;
@@ -46,6 +50,8 @@ const int SEM_CANT_TESTERS_COMUNES = 21;
 const int SEM_TABLA_TESTERS = 22;
 const int SHM_TABLA_TESTERS = 23;
 const int SEM_ESPECIAL_DISPONIBLE = 24; //siguiente debe ser + CANT_ESPECIALes
+
+// CONSTANTES DEL MANEJO DEL SISTEMA
 
 const int MTYPE_REQUERIMIENTO = 1;
 
@@ -111,6 +117,7 @@ typedef struct tabla_testers_disponibles{
 	int end;
 	int cant;
 	int testers_especiales[MAX_TESTERS_ESPECIALES];
+	int dispositivos_atendidos; //por ahora no se usa
 } tabla_testers_disponibles_t;
 
 #endif	/* COMMON_H */
