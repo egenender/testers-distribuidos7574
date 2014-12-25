@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-Wall -pedantic -pedantic-errors -g -ggdb
 
-all: dispositivo tecnico testerComun testerEspecial server_emisor server_receptor cliente_emisor cliente_receptor broker iniciador terminador destroy cleanO
+all: dispositivo tecnico testerComun testerEspecial server_emisor server_receptor cliente_emisor cliente_receptor broker rpc_services iniciador terminador destroy cleanO
 	@echo "Compilacion terminada"
 
 lockfile:
@@ -64,6 +64,9 @@ broker: semaphore lockfile logger
 	$(CC) $(CFLAGS) broker/broker_req_especiales.cpp LockFile.o logger/Logger.o Semaphore.o -o broker/broker_req_especiales
 	$(CC) $(CFLAGS) broker/broker_requerimientos.cpp LockFile.o logger/Logger.o Semaphore.o -o broker/broker_requerimientos
 
+rpc_services:
+	make -f broker/servicio_rpc/Makefile.registracion
+
 iniciador: semaphore logger lockfile
 	$(CC) $(CFLAGS) Semaphore.o LockFile.o logger/Logger.o iniciador.cpp -o iniciador
 
@@ -75,16 +78,18 @@ destroy:
 	@echo "./terminador" > destroy.sh
 	@echo "killall tcpserver_receptor" >> destroy.sh
 	@echo "killall tcpserver_emisor" >> destroy.sh
+	@echo "killall registracion_server" >> destroy.sh
 	@chmod +x destroy.sh
 
 cleanO:
 	@echo "Eliminando .o's"
 	@rm -f *.o
+	@rm -f broker/servicio_rpc/*.o
 
 clean: cleanO
 	@echo "Eliminando log"
 	@rm -f log.txt
 	@echo "Eliminando ejecutables"
-	@rm -f Dispositivo Tecnico TesterComun TesterEspecial tcp/tcpclient_receptor tcp/tcpclient_emisor tcp/tcpserver_receptor tcp/tcpserver_emisor Broker broker/broker_pasa_manos broker/broker_req_especiales broker/broker_requerimientos iniciador terminador
+	@rm -f Dispositivo Tecnico TesterComun TesterEspecial tcp/tcpclient_receptor tcp/tcpclient_emisor tcp/tcpserver_receptor tcp/tcpserver_emisor Broker broker/broker_pasa_manos broker/broker_req_especiales broker/broker_requerimientos broker/servicio_rpc/registracion_server broker/servicio_rpc/get_id iniciador terminador
 	@echo "Eliminando script destructor"
 	@rm -f destroy.sh

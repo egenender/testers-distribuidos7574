@@ -3,18 +3,18 @@
 
 # Parameters
 
-CLIENT = get_id
-SERVER = registracion_server
+CLIENT = broker/servicio_rpc/get_id
+SERVER = broker/servicio_rpc/registracion_server
 
 SOURCES_CLNT.c = 
 SOURCES_CLNT.h = 
 SOURCES_SVC.c = 
 SOURCES_SVC.h = 
-SOURCES.x = registracion.x
+SOURCES.x = broker/servicio_rpc/registracion.x
 
-TARGETS_SVC.c = registracion_svc.c registracion_server.c   
-TARGETS_CLNT.c = registracion_clnt.c get_id.c   
-TARGETS = registracion.h   registracion_clnt.c registracion_svc.c get_id.c registracion_server.c
+TARGETS_SVC.c = broker/servicio_rpc/registracion_svc.c broker/servicio_rpc/registracion_server.c   
+TARGETS_CLNT.c = broker/servicio_rpc/registracion_clnt.c broker/servicio_rpc/get_id.c   
+TARGETS = broker/servicio_rpc/registracion.h   broker/servicio_rpc/registracion_clnt.c broker/servicio_rpc/registracion_svc.c broker/servicio_rpc/get_id.c broker/servicio_rpc/registracion_server.c
 
 OBJECTS_CLNT = $(SOURCES_CLNT.c:%.c=%.o) $(TARGETS_CLNT.c:%.c=%.o)
 OBJECTS_SVC = $(SOURCES_SVC.c:%.c=%.o) $(TARGETS_SVC.c:%.c=%.o)
@@ -43,5 +43,5 @@ $(SERVER) : $(OBJECTS_SVC)
 
 clean:
 	rm *.o
-	rm -f get_id registracion_server
+	rm -f broker/servicio\ rpc/get_id broker/servicio\ rpc/registracion_server
 	
