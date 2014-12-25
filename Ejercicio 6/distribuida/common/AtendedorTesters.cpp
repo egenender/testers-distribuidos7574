@@ -55,7 +55,7 @@ AtendedorTesters::~AtendedorTesters() {
 int AtendedorTesters::recibirRequerimiento() {
 	activarTester(this->idTester);
     TMessageAtendedor msg;
-    int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), MTYPE_REQUERIMIENTO, 0);
+    int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), this->idTester, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir requerimiento del atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
