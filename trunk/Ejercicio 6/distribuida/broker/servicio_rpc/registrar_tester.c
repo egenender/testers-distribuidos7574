@@ -37,5 +37,5 @@ int main (int argc, char *argv[]) {
 	host = argv[1];
 	id = atoi(argv[2]);
 	
-	return registrar_id(host, id);
+	exit( registrar_id(host, id) );
 }

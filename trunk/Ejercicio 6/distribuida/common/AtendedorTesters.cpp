@@ -3,6 +3,7 @@
 #include <sys/wait.h>
 
 int getIdTester(int);
+void activarTester(int);
 
 AtendedorTesters::AtendedorTesters(int tipo): sem_cola_especiales(SEM_COLA_ESPECIALES) {
 	this->idTester = getIdTester(tipo);
@@ -52,7 +53,7 @@ AtendedorTesters::~AtendedorTesters() {
 }
 
 int AtendedorTesters::recibirRequerimiento() {
-
+	activarTester(this->idTester);
     TMessageAtendedor msg;
     int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), MTYPE_REQUERIMIENTO, 0);
     if(ret == -1) {
@@ -138,7 +139,7 @@ void AtendedorTesters::enviarAEspeciales(bool cuales[], int posicion){
 }
 
 int AtendedorTesters::recibirRequerimientoEspecial() {
-
+	activarTester(this->idTester);
     TMessageAtendedor msg;
     int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), this->idTester, 0);
     if(ret == -1) {
@@ -201,3 +202,21 @@ int getIdTester(int tipo){
 	return id;
 }
 
+void activarTester(int id){
+	char param_id[5];
+    sprintf(param_id, "%d",id);
+    
+	if (fork() == 0){
+		execlp("./broker/servicio_rpc/registrar_tester", "get_registrar_tester", UBICACION_SERVER ,param_id,(char*)0);
+		printf("ALGO NO ANDUVO\n");
+        exit(1);
+	}
+	int status;	
+	wait(&status);
+	
+	//printf("resultado de registracion: %d\n", status);
+	if (status < 0 ){ //Si no me puedo registrar, no puedo laburar (deberia devolver el id, lo dejo en TODO)
+		exit(status);
+	}
+	//printf("REGISTRACION EXITOSA de tester %d\n", id);
+}
