@@ -1,8 +1,11 @@
 #include "AtendedorTesters.h"
 #include <cstdlib>
+#include <sys/wait.h>
 
-AtendedorTesters::AtendedorTesters(int idTester): sem_cola_especiales(SEM_COLA_ESPECIALES) {
-	this->idTester = idTester;
+int getIdTester(int);
+
+AtendedorTesters::AtendedorTesters(int tipo): sem_cola_especiales(SEM_COLA_ESPECIALES) {
+	this->idTester = getIdTester(tipo);
     key_t key;
     key = ftok(ipcFileName.c_str(), MSGQUEUE_TESTERS_RECIBOS);
     this->cola_recibos = msgget(key, 0666);
@@ -60,13 +63,13 @@ int AtendedorTesters::recibirRequerimiento() {
     return msg.idDispositivo;
 }
 
-void AtendedorTesters::enviarPrograma(int idDispositivo, int tester, int idPrograma) {
+void AtendedorTesters::enviarPrograma(int idDispositivo, int idPrograma) {
 
     TMessageAtendedor msg;
     msg.mtype = this->idTester;
     msg.mtype_envio = idDispositivo;
     msg.finalizar_conexion = 0;
-    msg.tester = tester;
+    msg.tester = this->idTester;
     msg.value = idPrograma;
     msg.es_requerimiento = 0;
     
@@ -79,10 +82,10 @@ void AtendedorTesters::enviarPrograma(int idDispositivo, int tester, int idProgr
 
 }
 
-int AtendedorTesters::recibirResultado(int idTester) {
+int AtendedorTesters::recibirResultado() {
     TMessageAtendedor msg;
     
-    int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), idTester, 0);
+    int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), this->idTester, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir resultado del atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
@@ -115,7 +118,7 @@ void AtendedorTesters::enviarAEspeciales(bool cuales[], int posicion){
 	//sem_cola_especiales.p();
 	TMessageAtendedor msg;
 	msg.mtype = this->idTester;
-	msg.mtype_envio = 1; //ID_BROKER!!
+	msg.mtype_envio = MTYPE_REQUERIMIENTO; //ID_BROKER!!
 	msg.value = posicion;
 	msg.es_requerimiento = 1;
 	for (int i = 0; i < CANT_TESTERS_ESPECIALES; i++){
@@ -134,10 +137,10 @@ void AtendedorTesters::enviarAEspeciales(bool cuales[], int posicion){
 	//sem_cola_especiales.v();
 }
 
-int AtendedorTesters::recibirRequerimientoEspecial(int idEsp) {
+int AtendedorTesters::recibirRequerimientoEspecial() {
 
     TMessageAtendedor msg;
-    int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), idEsp, 0);
+    int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), this->idTester, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir requerimiento del atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
@@ -146,9 +149,9 @@ int AtendedorTesters::recibirRequerimientoEspecial(int idEsp) {
     return msg.value;
 }
 
-void AtendedorTesters::terminar_atencion(int idDispositivo_atendido){
+void AtendedorTesters::terminar_atencion(){
 	TMessageAtendedor msg;
-    msg.mtype = idDispositivo_atendido;
+    msg.mtype = this->idTester;
     msg.finalizar_conexion = FINALIZAR_CONEXION;
     
     int ret = msgsnd(this->cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
@@ -158,3 +161,43 @@ void AtendedorTesters::terminar_atencion(int idDispositivo_atendido){
         exit(0);
     }
 }
+
+
+int AtendedorTesters::obtenerIdTester(){
+	return this->idTester;
+}
+
+
+int getIdTester(int tipo){
+	if( tipo != TIPO_COMUN && tipo != TIPO_ESPECIAL) exit(1);
+	
+	key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_GETTING_IDS);
+    int cola_ids = msgget(key, 0666 | IPC_CREAT);
+    
+    char param_tipo[3];
+    sprintf(param_tipo, "%d",tipo);
+    
+	if (fork() == 0){
+		execlp("./broker/servicio_rpc/get_id", "get_id", UBICACION_SERVER ,param_tipo,(char*)0);
+		printf("ALGO NO ANDUVO\n");
+        exit(1);
+	}
+		
+	wait(NULL);
+	
+	TMessageAtendedor msg;
+    int ret = msgrcv(cola_ids, &msg, sizeof(TMessageAtendedor) - sizeof(long), tipo + 1, 0);
+    if (ret == -1){
+		//No se pudo conseguir id
+		exit(-1);
+	}
+	
+	int id = msg.value;
+
+	if (id <= 0){
+		//Algo salio mal, no quedan ids, o lo que fuere
+		exit(id);
+	}
+	return id;
+}
+

@@ -145,7 +145,7 @@ int getIdDispositivo(){
 	wait(NULL);
 	
 	TMessageAtendedor msg;
-    int ret = msgrcv(cola_ids, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0, 0);
+    int ret = msgrcv(cola_ids, &msg, sizeof(TMessageAtendedor) - sizeof(long), 3, 0);
     if (ret == -1){
 		//No se pudo conseguir id
 		exit(-1);

@@ -17,18 +17,19 @@ private:
     int idTester;
           
 public:
-    AtendedorTesters(int idTester);
+    AtendedorTesters(int tipo);
     AtendedorTesters(const AtendedorTesters& orig);
     virtual ~AtendedorTesters();
     
     int recibirRequerimiento();
-    void enviarPrograma(int idDispositivo, int tester, int idPrograma);  // Tester -> Disp
-    int recibirResultado(int idTester);
+    void enviarPrograma(int idDispositivo, int idPrograma);  // Tester -> Disp
+    int recibirResultado();
     void enviarOrden(int idDispositivo, int orden, int cant); // Tester -> Disp: Reinicio o apagado
     void enviarAEspeciales(bool cuales[], int posicion);
-	int recibirRequerimientoEspecial(int idEsp); 
+	int recibirRequerimientoEspecial(); 
+    int obtenerIdTester();
     
-    void terminar_atencion(int idDispositivo_atendido);
+    void terminar_atencion();
 
 };
 
