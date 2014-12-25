@@ -10,6 +10,7 @@
 #include <sys/wait.h>
 
 int getIdDispositivo();
+void devolverIdDispositivo(int);
 
 AtendedorDispositivos::AtendedorDispositivos() { 	
 	this->idDispositivo = getIdDispositivo();
@@ -113,6 +114,7 @@ int AtendedorDispositivos::recibirOrden(int* cantidad) {
 }
 
 void AtendedorDispositivos::terminar_atencion(){
+	devolverIdDispositivo(this->idDispositivo);
 	TMessageAtendedor msg;
 	msg.mtype = this->idDispositivo;
     msg.mtype_envio = (long) this->ultimoTester;
@@ -160,3 +162,15 @@ int getIdDispositivo(){
 	return id;
 }
 
+void devolverIdDispositivo(int id){
+	char param_id[5];
+	sprintf(param_id, "%d", id);
+	
+	if (fork() == 0){
+		execlp("./broker/servicio_rpc/devolver_id", "get_id", UBICACION_SERVER ,"2", param_id,(char*)0);
+		printf("ALGO NO ANDUVO\n");
+        exit(1);
+	}
+		
+	wait(NULL);
+}

@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
+#include <sys/msg.h>
 #include <stdio.h>
 #define SOLO_C
 #include "../../common/common.h"
@@ -162,6 +163,15 @@ registrar_tester_activo_1_svc(int *argp, struct svc_req *rqstp)
 	return &result;
 }
 
+int terminar_conexion(int id, int idcola){
+	key_t key = ftok("/tmp/buchwaldipcs", idcola);
+	int cola = msgget(key, 0666);
+	TMessageAtendedor msg;
+	msg.mtype = id;
+	msg.finalizar_conexion = FINALIZAR_CONEXION;
+	msgsnd(cola, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+}
+
 int *
 devolver_id_dispositivo_1_svc(int *argp, struct svc_req *rqstp)
 {
@@ -182,6 +192,10 @@ devolver_id_dispositivo_1_svc(int *argp, struct svc_req *rqstp)
 	ids_dispositivos_disponibles[id-1] = true;
 	
 	result = 1;
+	
+	//Mando mensaje de finalizacion para terminar la conexion con este dispositivo
+	terminar_conexion(id, MSGQUEUE_BROKER_ENVIO_MENSAJES_DISPOSITIVOS);
+	
 	return &result;
 }
 
@@ -198,13 +212,17 @@ devolver_id_tester_1_svc(int *argp, struct svc_req *rqstp)
 		return &result;
 	}
 	
-	if (ids_tester_disponibles[id-1]){
+	if (ids_tester_disponibles[id - 1]){
 		result = -2; //El dispositivo estaba habilitado, asi que nadie lo pidio en realidad como para poder devolverlo...
 		return &result; 
 	}
 	
-	ids_tester_disponibles[id-1] = true;
+	ids_tester_disponibles[id - 1] = true;
+	
+	//Mando mensaje de finalizacion para terminar la conexion con este tester
+	terminar_conexion(id, MSGQUEUE_BROKER_ENVIO_MENSAJES_TESTERS);
 	
 	result = 1;
 	return &result;
 }
+
