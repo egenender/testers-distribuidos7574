@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-Wall -pedantic -pedantic-errors -g -ggdb -DDEBUG
+CFLAGS=-Wall -pedantic -pedantic-errors -g -ggdb
 
 all: dispositivo tecnico testerComun testerEspecial server_emisor server_receptor cliente_emisor cliente_receptor broker iniciador terminador destroy cleanO
 	@echo "Compilacion terminada"
