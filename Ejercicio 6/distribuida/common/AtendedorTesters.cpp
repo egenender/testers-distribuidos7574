@@ -27,7 +27,7 @@ AtendedorTesters::AtendedorTesters(int tipo): sem_cola_especiales(SEM_COLA_ESPEC
     sem_cola_especiales.getSem();
     
     char param_id[10];
-    sprintf(param_id, "%d", idTester);
+    sprintf(param_id, "%d", this->idTester);
     char param_cola[10];
     sprintf(param_cola, "%d", MSGQUEUE_TESTERS_RECIBOS);
     pid_t receptor = fork();

@@ -26,7 +26,7 @@ AtendedorDispositivos::AtendedorDispositivos() {
     }
     
     char param_id[10];
-    sprintf(param_id, "%d", idDispositivo);
+    sprintf(param_id, "%d", this->idDispositivo);
     char param_cola[10];
     sprintf(param_cola, "%d", MSGQUEUE_DISPOSITIVOS_RECIBOS);
     pid_t receptor = fork();
