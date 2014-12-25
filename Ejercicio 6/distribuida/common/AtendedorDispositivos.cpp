@@ -7,10 +7,13 @@
 #include "AtendedorDispositivos.h"
 #include "../common/common.h"
 #include <cstdlib>
+#include <sys/wait.h>
 
-AtendedorDispositivos::AtendedorDispositivos(int idDispositivo) { 
-	this->idDispositivo = idDispositivo;
-    key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_DISPOSITIVOS_ENVIOS);
+int getIdDispositivo();
+
+AtendedorDispositivos::AtendedorDispositivos() { 	
+	this->idDispositivo = getIdDispositivo();
+	key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_DISPOSITIVOS_ENVIOS);
     this->cola_envios = msgget(key, 0666);
     if(this->cola_envios == -1) {
 		exit(1);
@@ -123,3 +126,37 @@ void AtendedorDispositivos::terminar_atencion(){
     }
 
 }
+
+int AtendedorDispositivos::obtenerIdDispositivo(){
+	return this->idDispositivo;
+}
+
+
+int getIdDispositivo(){
+	key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_GETTING_IDS);
+    int cola_ids = msgget(key, 0666 | IPC_CREAT);
+    
+	if (fork() == 0){
+		execlp("./broker/servicio rpc/get_id", "get_id", UBICACION_SERVER ,"2",(char*)0);
+		printf("ALGO NO ANDUVO\n");
+        exit(1);
+	}
+		
+	wait(NULL);
+	
+	TMessageAtendedor msg;
+    int ret = msgrcv(cola_ids, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0, 0);
+    if (ret == -1){
+		//No se pudo conseguir id
+		exit(-1);
+	}
+	
+	int id = msg.value;
+
+	if (id <= 0){
+		//Algo salio mal, no quedan ids, o lo que fuere
+		exit(id);
+	}
+	return id;
+}
+

@@ -3,27 +3,8 @@
 #include <sys/ipc.h>
 #include <sys/sem.h>
 #include <stdio.h>
-
-
-#define MAX_TESTERS_COMUNES 5
-#define MAX_TESTERS_ESPECIALES 5
-#define MAX_DISPOSITIVOS_EN_SISTEMA 100
-#define SEM_CANT_TESTERS_COMUNES 21
-#define SEM_TABLA_TESTERS 22
-#define SHM_TABLA_TESTERS 23
-#define SEM_ESPECIAL_DISPONIBLE 24
-#define TIPO_COMUN 0
-#define TIPO_ESPECIAL 1
-
-typedef struct tabla_testers_disponibles{
-	int testers_comunes[MAX_TESTERS_COMUNES];
-	int start;
-	int end;
-	int cant;
-	int testers_especiales[MAX_TESTERS_ESPECIALES];
-	int dispositivos_atendidos; //por ahora no se usa
-} tabla_testers_disponibles_t;
-
+#define SOLO_C
+#include "../../common/common.h"
 
 bool ids_dispositivos_disponibles[MAX_DISPOSITIVOS_EN_SISTEMA]; //ver si ampliamos los ids
 int siguiente_id_dispositivo;

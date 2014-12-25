@@ -7,11 +7,14 @@
  * Aqui se almacenan las constantes correspondientes a toda la app, incluido nombre de archivos para IPCs
  */
 
-#include <string>
-#include <stddef.h>
-
 #ifndef COMMON_H
 #define	COMMON_H
+
+#include <stddef.h>
+
+#ifndef SOLO_C
+#include "commonFiles.h"
+#endif
 
 // Constantes del sistema
 
@@ -20,14 +23,16 @@ const int CANT_TESTERS_COMUNES = 1;
 const int CANT_TESTERS_ESPECIALES = 1;
 const int ID_DISPOSITIVO_START = 50;
 const int ID_TESTER_START = 1;
-const int ID_TESTER_ESPECIAL_START = ID_TESTER_START + CANT_TESTERS_COMUNES;
 
-const int MAX_DISPOSITIVOS_EN_SISTEMA = 100;
-const int MAX_TESTERS_COMUNES = 10;
-const int MAX_TESTERS_ESPECIALES = 10;
+#define MAX_DISPOSITIVOS_EN_SISTEMA 100
+#define MAX_TESTERS_COMUNES  10
+#define MAX_TESTERS_ESPECIALES 10
+
+const int ID_TESTER_ESPECIAL_START = MAX_TESTERS_COMUNES;
 
 const int TIPO_COMUN = 0;
 const int TIPO_ESPECIAL = 1;
+const int TIPO_DISPOSITIVO = 2;
 
 // IDs de los IPC
 const int SEM_PLANILLA_GENERAL = 1;
@@ -41,19 +46,20 @@ const int MSGQUEUE_TESTERS_RECIBOS = 13;
 const int MSGQUEUE_TESTERS_ESPECIALES = 14;
 const int MSGQUEUE_DESPACHADOR = 15;
 const int MSGQUEUE_SERVER_RECEPTOR_EMISOR = 16;
+const int MSGQUEUE_GETTING_IDS = 17;
 
-const int MSGQUEUE_BROKER_RECEPCION_MENSAJES_DISPOSITIVOS = 17;
-const int MSGQUEUE_BROKER_ENVIO_MENSAJES_TESTERS = 18;
-const int MSGQUEUE_BROKER_ATENCION_REQUERIMIENTOS_DISPOSITIVOS = 19;
-const int MSGQUEUE_BROKER_ENVIO_MENSAJES_DISPOSITIVOS = 20;	
-const int SEM_CANT_TESTERS_COMUNES = 21;
-const int SEM_TABLA_TESTERS = 22;
-const int SHM_TABLA_TESTERS = 23;
-const int SEM_ESPECIAL_DISPONIBLE = 24; //siguiente debe ser + CANT_ESPECIALes
+const int MSGQUEUE_BROKER_RECEPCION_MENSAJES_DISPOSITIVOS = 18;
+const int MSGQUEUE_BROKER_ENVIO_MENSAJES_TESTERS = 19;
+const int MSGQUEUE_BROKER_ATENCION_REQUERIMIENTOS_DISPOSITIVOS = 20;
+const int MSGQUEUE_BROKER_ENVIO_MENSAJES_DISPOSITIVOS = 21;	
+const int SEM_CANT_TESTERS_COMUNES = 22;
+const int SEM_TABLA_TESTERS = 23;
+const int SHM_TABLA_TESTERS = 24;
+const int SEM_ESPECIAL_DISPONIBLE = 25; //siguiente debe ser + CANT_ESPECIALes
 
 // CONSTANTES DEL MANEJO DEL SISTEMA
 
-const int MTYPE_REQUERIMIENTO = 1;
+const int MTYPE_REQUERIMIENTO = MAX_TESTERS_COMUNES + MAX_TESTERS_ESPECIALES + 1;
 
 const int ORDEN_APAGADO = 0;
 const int ORDEN_REINICIO = 1;
@@ -77,13 +83,6 @@ const char PUERTO_SERVER_EMISOR_DISPOSITIVOS[] = "9003";
 
 const char UBICACION_SERVER[] = "localhost"; //Cambiar
 
-// Archivos necesarios
-
-const std::string ipcFileName = "/tmp/buchwaldipcs";
-
-const std::string logFileName = "log.txt";
-
-
 //Estructuras communes:
 typedef struct resultado{
 	int idDispositivo;
@@ -97,18 +96,18 @@ typedef struct posicion_en_shm{
 }posicion_en_shm_t;
 
 typedef struct message {
-		/* BEGIN HEADER */
-        long mtype;
-        long mtype_envio;
-        int finalizar_conexion;
-        int es_requerimiento;
-        int es_especial; //Solo por si acaso
-        /* END HEADER */
-        int idDispositivo;
-        int tester;
-        int value; // Este parametro posee el valor del requerimiento, del programa y del resultado
-        int cant_testers;
-        int especiales[MAX_TESTERS_ESPECIALES];
+	/* BEGIN HEADER */
+	long mtype;
+	long mtype_envio;
+	int finalizar_conexion;
+	int es_requerimiento;
+	int es_especial; //Solo por si acaso
+	/* END HEADER */
+	int idDispositivo;
+	int tester;
+	int value; // Este parametro posee el valor del requerimiento, del programa y del resultado
+	int cant_testers;
+	int especiales[MAX_TESTERS_ESPECIALES];
 } TMessageAtendedor;
 
 typedef struct tabla_testers_disponibles{
@@ -121,5 +120,3 @@ typedef struct tabla_testers_disponibles{
 } tabla_testers_disponibles_t;
 
 #endif	/* COMMON_H */
-
-

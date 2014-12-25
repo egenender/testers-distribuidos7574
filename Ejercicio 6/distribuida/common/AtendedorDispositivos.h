@@ -24,7 +24,7 @@ private:
     
 public:
 
-    AtendedorDispositivos(int idDispositivo);
+    AtendedorDispositivos();
     AtendedorDispositivos(const AtendedorDispositivos& orig);    
     virtual ~AtendedorDispositivos();
         
@@ -32,6 +32,7 @@ public:
     int recibirPrograma();
     void enviarResultado(int resultado); // Disp -> Tester: Grave o no grave
     int recibirOrden(int* cant);
+    int obtenerIdDispositivo();
     
     void terminar_atencion();
 };

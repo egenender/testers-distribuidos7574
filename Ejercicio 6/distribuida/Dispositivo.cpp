@@ -21,17 +21,17 @@ int main(int argc, char** argv) {
 	srand(time(NULL));
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
     // Por parametro se recibe el ID del dispositivo
-    int id = atoi(argv[1]);
-
+    //int id = atoi(argv[1]);
+	
+	// Comunicacion con el sistema de testeo
+    AtendedorDispositivos atendedor;
+    int id = atendedor.obtenerIdDispositivo();
+	
     std::stringstream ss;
     ss << "El dispositivo " << id << " se crea";
     Logger::debug(ss.str().c_str(), __FILE__);
     ss.str("");
-    
-    // Comunicacion con el sistema de testeo
-    AtendedorDispositivos atendedor(id);
-    // TODO: Log
-    
+       
     while(true) {
 	try {
         // Dispositivo envia requerimiento
