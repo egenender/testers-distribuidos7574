@@ -37,7 +37,7 @@ int main (void){
 			cant_atendidos--;
 		}
 	
-		int ok_read = msgrcv(cola_requerimiento_especiales, &msg, sizeof(TMessageAtendedor) - sizeof(long), 1, 0);
+		int ok_read = msgrcv(cola_requerimiento_especiales, &msg, sizeof(TMessageAtendedor) - sizeof(long), MTYPE_REQUERIMIENTO, 0);
 		if (ok_read == -1){
 			exit(0);
 		}

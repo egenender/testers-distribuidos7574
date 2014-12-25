@@ -42,9 +42,9 @@ int main(int argc, char** argv) {
         // Recibe programa, verificando que no sea un rechazo por parte del sistema
         int program = atendedor.recibirPrograma();
         if (program == -1) {
-	    ss << "El dispositivo " << id << " recibe indicacion de que no hay lugar en el sistema de testeo. Reintentara luego";
-	    Logger::debug(ss.str().c_str(), __FILE__);
-	    ss.str("");
+			ss << "El dispositivo " << id << " recibe indicacion de que no hay lugar en el sistema de testeo. Reintentara luego";
+			Logger::debug(ss.str().c_str(), __FILE__);
+			ss.str("");
             // Si no hay programa -> no hay lugar -> Duermo y envio otro req mas tarde
             usleep(rand() % 10000 + 10000);
             continue;
