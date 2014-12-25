@@ -17,16 +17,20 @@
 using namespace std;
 
 int main(int argc, char** argv) {    
-	srand(time(NULL));
+	srand(getpid());
+	Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
     // El primer parametro es el id del tester
-    int id = atoi(argv[1]);
-    Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
+    //int id = atoi(argv[1]);
+    
+    // Obtengo comunicacion con los dispositivos
+    AtendedorTesters atendedor(TIPO_COMUN);
+    int id = atendedor.obtenerIdTester();
+    
 	std::stringstream nombre;
 	nombre << __FILE__ << " " << id;
 	Logger::notice("Inicia el procesamiento, cargo el atendedor, despachador y Planilla" , nombre.str().c_str());
     
-    // Obtengo comunicacion con los dispositivos
-    AtendedorTesters atendedor(id);
+    
     // Obtengo comunicacion con los tecnicos
     DespachadorTesters despachador;
     // Obtengo planilla general de sync con otros tester
@@ -46,17 +50,17 @@ int main(int argc, char** argv) {
         if (! planilla.hayLugar()){
 			string mensaje = "No hay lugar para atender al dispositivo id ";
 			Logger::notice(mensaje + ss.str() , nombre.str().c_str());
-			atendedor.enviarPrograma(idDispositivo, id, SIN_LUGAR);
+			atendedor.enviarPrograma(idDispositivo, SIN_LUGAR);
 			continue;
 		}
         
         usleep( rand() % 1000 + 1000);
         Logger::notice(string("Envio programa a dispositivo ") + ss.str(), nombre.str().c_str());                  	
-        atendedor.enviarPrograma(idDispositivo, id, Programa::getPrograma());
+        atendedor.enviarPrograma(idDispositivo, Programa::getPrograma());
         
         Logger::notice(string("Espero resultado de dispositivo ") + ss.str(), nombre.str().c_str());                  	    
   
-        int result = atendedor.recibirResultado(id);
+        int result = atendedor.recibirResultado();
         Logger::notice(string("Recibi resultado del dispositivo ") + ss.str(), nombre.str().c_str());
         usleep( rand() % 1000 + 1000);
         
@@ -91,9 +95,9 @@ int main(int argc, char** argv) {
 		}else{
 			atendedor.enviarOrden(idDispositivo, ORDEN_REINICIO, 0);
 		}
-        atendedor.terminar_atencion(idDispositivo);      
     }
 
+	atendedor.terminar_atencion();
     return 0;
 }
 

@@ -17,15 +17,21 @@
 using namespace std;
 
 int main(int argc, char** argv) {    
-    // El primer parametro es el id del tester
-    int id = atoi(argv[1]);
+    
+       
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
+    
+    // El primer parametro es el id del tester
+    //int id = atoi(argv[1]);
+    // Obtengo comunicacion con los dispositivos
+    AtendedorTesters atendedor(TIPO_ESPECIAL);
+    int id = atendedor.obtenerIdTester();
+    
 	std::stringstream nombre;
 	nombre << __FILE__ << " " << id;
 	Logger::notice("Inicia el procesamiento, cargo el atendedor y despachador" , nombre.str().c_str());
     
-    // Obtengo comunicacion con los dispositivos
-    AtendedorTesters atendedor(id);
+    
     // Obtengo comunicacion con los tecnicos
     DespachadorTesters despachador;
     // Obtengo planilla general de sync con otros tester
@@ -36,7 +42,7 @@ int main(int argc, char** argv) {
     while(true) {
 		Logger::notice("Espero por un nuevo requerimiento de testeo especial" , nombre.str().c_str());
         // Espero un requerimiento
-        int posicion = atendedor.recibirRequerimientoEspecial(id);
+        int posicion = atendedor.recibirRequerimientoEspecial();
         int idDispositivo = planilla.dispositivoEnLugar(posicion);
         stringstream ss;
 		ss << idDispositivo;
@@ -46,11 +52,11 @@ int main(int argc, char** argv) {
         
         mensaje = "Envio programa de testeo especial al dispositivo id ";
         Logger::notice(mensaje + ss.str() , nombre.str().c_str());
-        atendedor.enviarPrograma(idDispositivo, id, Programa::getPrograma());
+        atendedor.enviarPrograma(idDispositivo, Programa::getPrograma());
         
         mensaje = "Espero resultado desde el dispositivo id ";
         Logger::notice(mensaje + ss.str() , nombre.str().c_str());
-        int result = atendedor.recibirResultado(id);
+        int result = atendedor.recibirResultado();
         mensaje = "Recibi resultado desde el dispositivo ";
         Logger::notice(mensaje + ss.str() , nombre.str().c_str());
         

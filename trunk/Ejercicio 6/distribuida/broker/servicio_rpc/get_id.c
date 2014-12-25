@@ -47,7 +47,7 @@ int main (int argc, char *argv[]) {
 	tipo = atoi(argv[2]);
 	
 	TMessageAtendedor msg;
-	msg.mtype = 1;
+	msg.mtype = tipo + 1;
 	msg.value = get_id(host, tipo);
 	
 	key_t key = ftok("/tmp/buchwaldipcs", MSGQUEUE_GETTING_IDS);

@@ -46,6 +46,13 @@ void crear_ipcs(){
 }
 
 void crear_sub_brokers(){
+	Logger::notice("Creo el servidor rpc", __FILE__);
+	if (fork() == 0){
+		execlp("./broker/servicio_rpc/registracion_server", "registracion_server", (char*)0);
+		Logger::notice ("Algo se rompio", __FILE__);
+        exit(1);
+	}
+	
 	Logger::notice("Creo el broker pasa manos", __FILE__);
 	if (fork() == 0){
 		execlp("./broker/broker_pasa_manos", "broker_pasa_manos", (char*)0);
