@@ -115,11 +115,15 @@ registrar_tester_activo_1_svc(int *argp, struct svc_req *rqstp)
 		return &result;
 	}
 	
+	if (ids_tester_disponibles[id-1]){
+		result = -2; //Si no lo pidio, como lo va a registrar?
+		return &result;
+	}
+	
 	/* OJO con esto, que es bloqueante, hay que ver si hay alguna otra forma de resolverlo */
 	key_t key = ftok("/tmp/buchwaldipcs",SEM_TABLA_TESTERS);
 	int semid = semget(key,1,0660);
-	
-	
+		
 	
 	key = ftok("/tmp/buchwaldipcs",SEM_CANT_TESTERS_COMUNES);
 	int semcomunes = semget(key,1,0660);
