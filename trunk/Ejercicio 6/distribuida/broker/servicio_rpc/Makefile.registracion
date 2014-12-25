@@ -5,6 +5,7 @@
 
 CLIENT = broker/servicio_rpc/get_id
 CLIENT2 = broker/servicio_rpc/registrar_tester
+CLIENT3 = broker/servicio_rpc/devolver_id
 SERVER = broker/servicio_rpc/registracion_server
 
 SOURCES_CLNT.c = 
@@ -16,12 +17,16 @@ SOURCES.x = broker/servicio_rpc/registracion.x
 TARGETS_SVC.c = broker/servicio_rpc/registracion_svc.c broker/servicio_rpc/registracion_server.c   
 TARGETS_CLNT.c = broker/servicio_rpc/registracion_clnt.c broker/servicio_rpc/get_id.c   
 TARGETS_CLNT2.c = broker/servicio_rpc/registracion_clnt.c broker/servicio_rpc/registrar_tester.c   
+TARGETS_CLNT3.c = broker/servicio_rpc/registracion_clnt.c broker/servicio_rpc/devolver_id.c   
 
 TARGETS = broker/servicio_rpc/registracion.h   broker/servicio_rpc/registracion_clnt.c broker/servicio_rpc/registracion_svc.c broker/servicio_rpc/get_id.c broker/servicio_rpc/registracion_server.c
 TARGETS2 = broker/servicio_rpc/registracion.h   broker/servicio_rpc/registracion_clnt.c broker/servicio_rpc/registracion_svc.c broker/servicio_rpc/registrar_tester.c broker/servicio_rpc/registracion_server.c
+TARGETS3 = broker/servicio_rpc/registracion.h   broker/servicio_rpc/registracion_clnt.c broker/servicio_rpc/registracion_svc.c broker/servicio_rpc/devolver_id.c broker/servicio_rpc/registracion_server.c
 
 OBJECTS_CLNT = $(SOURCES_CLNT.c:%.c=%.o) $(TARGETS_CLNT.c:%.c=%.o)
 OBJECTS_CLNT2 = $(SOURCES_CLNT.c:%.c=%.o) $(TARGETS_CLNT2.c:%.c=%.o)
+OBJECTS_CLNT3 = $(SOURCES_CLNT.c:%.c=%.o) $(TARGETS_CLNT3.c:%.c=%.o)
+
 OBJECTS_SVC = $(SOURCES_SVC.c:%.c=%.o) $(TARGETS_SVC.c:%.c=%.o)
 # Compiler flags 
 
@@ -31,7 +36,7 @@ RPCGENFLAGS =
 
 # Targets 
 
-all : $(CLIENT) $(CLIENT2) $(SERVER)
+all : $(CLIENT) $(CLIENT2) $(CLIENT3) $(SERVER)
 
 $(TARGETS) : $(SOURCES.x) 
 	rpcgen $(RPCGENFLAGS) $(SOURCES.x)
@@ -39,9 +44,14 @@ $(TARGETS) : $(SOURCES.x)
 $(TARGETS2): $(SOURCES.x)
 	rpcgen $(RPCGENFLAGS) $(SOURCES.x)
 
+$(TARGETS3): $(SOURCES.x)
+	rpcgen $(RPCGENFLAGS) $(SOURCES.x)
+
 $(OBJECTS_CLNT) : $(SOURCES_CLNT.c) $(SOURCES_CLNT.h) $(TARGETS_CLNT.c) 
 
 $(OBJECTS_CLNT2) : $(SOURCES_CLNT.c) $(SOURCES_CLNT.h) $(TARGETS_CLNT2.c) 
+
+$(OBJECTS_CLNT3) : $(SOURCES_CLNT.c) $(SOURCES_CLNT.h) $(TARGETS_CLNT3.c) 
 
 $(OBJECTS_SVC) : $(SOURCES_SVC.c) $(SOURCES_SVC.h) $(TARGETS_SVC.c) 
 
@@ -51,10 +61,9 @@ $(CLIENT) : $(OBJECTS_CLNT)
 $(CLIENT2) : $(OBJECTS_CLNT2) 
 	$(LINK.c) -o $(CLIENT2) $(OBJECTS_CLNT2) $(LDLIBS) 
 
+$(CLIENT3) : $(OBJECTS_CLNT3) 
+	$(LINK.c) -o $(CLIENT3) $(OBJECTS_CLNT3) $(LDLIBS) 
+
 $(SERVER) : $(OBJECTS_SVC) 
 	$(LINK.c) -o $(SERVER) $(OBJECTS_SVC) $(LDLIBS)
-
-clean:
-	rm *.o
-	rm -f broker/servicio\ rpc/get_id broker/servicio\ rpc/registracion_server
 	

@@ -168,18 +168,18 @@ devolver_id_dispositivo_1_svc(int *argp, struct svc_req *rqstp)
 	static int  result;
 	if (!inicializado) inicializar();
 	
-	int id = *argp;
+	int id = *argp;	
 	if (id <= 0 || id > MAX_DISPOSITIVOS_EN_SISTEMA ){
 		result = -1;
 		return &result;
 	}
 	
-	if (ids_dispositivos_disponibles[id]){
+	if (ids_dispositivos_disponibles[id-1]){
 		result = -2; //El dispositivo estaba habilitado, asi que nadie lo pidio en realidad como para poder devolverlo...
 		return &result; 
 	}
 	
-	ids_dispositivos_disponibles[id] = true;
+	ids_dispositivos_disponibles[id-1] = true;
 	
 	result = 1;
 	return &result;
