@@ -58,8 +58,7 @@ int AtendedorTesters::recibirRequerimiento() {
     TMessageAtendedor msg;
     int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), this->idTester, 0);
     if(ret == -1) {
-        std::string error = std::string("Error al recibir requerimiento del atendedor. Error: ") + std::string(strerror(errno));
-        Logger::error(error.c_str(), __FILE__);
+        this->terminar_atencion(TIPO_COMUN);
         exit(0);
     }
     return msg.idDispositivo;
@@ -144,8 +143,7 @@ int AtendedorTesters::recibirRequerimientoEspecial() {
     TMessageAtendedor msg;
     int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), this->idTester, 0);
     if(ret == -1) {
-        std::string error = std::string("Error al recibir requerimiento del atendedor. Error: ") + std::string(strerror(errno));
-        Logger::error(error.c_str(), __FILE__);
+        this->terminar_atencion(TIPO_ESPECIAL);
         exit(0);
     }
     return msg.value;
