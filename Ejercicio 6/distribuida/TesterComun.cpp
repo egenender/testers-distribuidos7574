@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
 		}
     }
 
-	atendedor.terminar_atencion();
+	atendedor.terminar_atencion(TIPO_COMUN);
     return 0;
 }
 
