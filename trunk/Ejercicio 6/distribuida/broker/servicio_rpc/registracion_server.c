@@ -111,10 +111,11 @@ registrar_tester_activo_1_svc(int *argp, struct svc_req *rqstp)
 	result = 1;
 	int id = *argp;
 	
-	if (id <= 0 || id > MAX_TESTERS_ESPECIALES){
+	if (id <= 0 || id > MAX_TESTERS_ESPECIALES + MAX_TESTERS_COMUNES){
 		result = -1;
 		return &result;
 	}
+	
 	
 	if (ids_tester_disponibles[id-1]){
 		result = -2; //Si no lo pidio, como lo va a registrar?
@@ -125,10 +126,6 @@ registrar_tester_activo_1_svc(int *argp, struct svc_req *rqstp)
 	key_t key = ftok("/tmp/buchwaldipcs",SEM_TABLA_TESTERS);
 	int semid = semget(key,1,0660);
 		
-	
-	key = ftok("/tmp/buchwaldipcs",SEM_CANT_TESTERS_COMUNES);
-	int semcomunes = semget(key,1,0660);
-	
 	//sem_tabla.p();
 	struct sembuf oper;
     oper.sem_num = 0;
@@ -137,24 +134,26 @@ registrar_tester_activo_1_svc(int *argp, struct svc_req *rqstp)
     semop(semid,&oper,1);
 	oper.sem_op = 1;
 	
-		if (id <= MAX_TESTERS_COMUNES){ //es id correspondiente a un tester comun
-			tabla->testers_comunes[tabla->end++] = id;
-			tabla->cant++;
+	if (id <= MAX_TESTERS_COMUNES){ //es id correspondiente a un tester comun
+		printf("Era un id de tester comun\n");
+		tabla->testers_comunes[tabla->end++] = id;
+		tabla->cant++;
+		
+		//sem_comunes.v();
+		key = ftok("/tmp/buchwaldipcs",SEM_CANT_TESTERS_COMUNES);
+		int semcomunes = semget(key,1,0660);
+		semop(semcomunes,&oper,1);
 			
-			//sem_comunes.v();
-			key = ftok("/tmp/buchwaldipcs",SEM_CANT_TESTERS_COMUNES);
-			int semcomunes = semget(key,1,0660);
-			semop(semcomunes,&oper,1);
-			
-		}else{ //es id correspondiente a un tester especial
-			tabla->testers_especiales[id - MAX_TESTERS_COMUNES] = true;
-			
-			key = ftok("/tmp/buchwaldipcs",SEM_ESPECIAL_DISPONIBLE + (id - MAX_TESTERS_COMUNES - 1));
-			int sem_especial = semget(key,1,0660);
-			semop(semcomunes,&oper,1);
-			//Semaphore sem_especial(SEM_ESPECIAL_DISPONIBLE + (id - MAX_TESTERS_COMUNES - 1));
-			//sem_especial.v();
-		}
+	}else{ //es id correspondiente a un tester especial
+		printf("Era un id de tester especial\n");
+		tabla->testers_especiales[id - MAX_TESTERS_COMUNES - 1] = true;
+		
+		key = ftok("/tmp/buchwaldipcs",SEM_ESPECIAL_DISPONIBLE + (id - MAX_TESTERS_COMUNES - 1));
+		int sem_especial = semget(key,1,0660);
+		semop(sem_especial,&oper,1);
+		//Semaphore sem_especial(SEM_ESPECIAL_DISPONIBLE + (id - MAX_TESTERS_COMUNES - 1));
+		//sem_especial.v();
+	}
 		
 	//sem_tabla.v();
 	oper.sem_op = 1;

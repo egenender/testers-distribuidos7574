@@ -72,10 +72,10 @@ int main(int argc, char** argv) {
 		}else if (result == SEGUIR_TESTEANDO){
 			//int cant_testers = rand() % (MAXIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION - MINIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION) + MINIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION;	
 			int cant_testers = 0;
-			bool los_testers[CANT_TESTERS_ESPECIALES];
+			bool los_testers[MAX_TESTERS_ESPECIALES];
 			while (cant_testers < 2 || cant_testers > 4){ //requerimientos
 				cant_testers = 0;
-				for (int i = 0; i < CANT_TESTERS_ESPECIALES; i++){
+				for (int i = 0; i < MAX_TESTERS_ESPECIALES; i++){
 					int random = rand() % 2;
 					cant_testers += random;
 					los_testers[i] = random;
@@ -86,7 +86,7 @@ int main(int argc, char** argv) {
 			atendedor.enviarOrden(idDispositivo, ORDEN_SEGUIR_TESTEANDO, cant_testers);
 			ss.str("");
 			ss << "Le envio los requerimientos a los " << cant_testers << " testers especiales, ";
-			for (int i = 0; i < CANT_TESTERS_ESPECIALES; i++){
+			for (int i = 0; i < MAX_TESTERS_ESPECIALES; i++){
 				if(los_testers[i])
 					ss << i+ID_TESTER_ESPECIAL_START << " ";
 			}
