@@ -135,7 +135,6 @@ registrar_tester_activo_1_svc(int *argp, struct svc_req *rqstp)
 	oper.sem_op = 1;
 	
 	if (id <= MAX_TESTERS_COMUNES){ //es id correspondiente a un tester comun
-		printf("Era un id de tester comun\n");
 		tabla->testers_comunes[tabla->end++] = id;
 		tabla->cant++;
 		
@@ -145,7 +144,6 @@ registrar_tester_activo_1_svc(int *argp, struct svc_req *rqstp)
 		semop(semcomunes,&oper,1);
 			
 	}else{ //es id correspondiente a un tester especial
-		printf("Era un id de tester especial\n");
 		tabla->testers_especiales[id - MAX_TESTERS_COMUNES - 1] = true;
 		
 		key = ftok("/tmp/buchwaldipcs",SEM_ESPECIAL_DISPONIBLE + (id - MAX_TESTERS_COMUNES - 1));
