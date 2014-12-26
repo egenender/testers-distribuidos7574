@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
     // Obtengo planilla general de sync con otros tester
     Planilla planilla;
     
-    srand(time(NULL));
+    srand(getpid());
     
     while(true) {
 		Logger::notice("Espero por un nuevo requerimiento de testeo especial" , nombre.str().c_str());

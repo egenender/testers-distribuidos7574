@@ -117,21 +117,24 @@ void AtendedorTesters::enviarOrden(int idDispositivo, int orden, int cantidad) {
 
 void AtendedorTesters::enviarAEspeciales(bool cuales[], int posicion){
 	//sem_cola_especiales.p();
+	Logger::notice("Voy a enviar mensaje a testers especiales", __FILE__);
 	TMessageAtendedor msg;
 	msg.mtype = this->idTester;
-	msg.mtype_envio = MTYPE_REQUERIMIENTO; //ID_BROKER!!
+	msg.mtype_envio = MTYPE_REQUERIMIENTO_ESPECIAL; //ID_BROKER!!
 	msg.value = posicion;
 	msg.es_requerimiento = 1;
-	for (int i = 0; i < CANT_TESTERS_ESPECIALES; i++){
+	Logger::notice("Pongo id de testers especiales que voy a usar", __FILE__);
+	for (int i = 0; i < MAX_TESTERS_ESPECIALES; i++){
+		if (cuales[i]){
+			std::stringstream ss;
+			ss << "Uso tester especial " << i + ID_TESTER_ESPECIAL_START;
+			Logger::notice(ss.str(), __FILE__);
+		}
 		msg.especiales[i] = cuales[i];
 	}
-	for (int i = CANT_TESTERS_ESPECIALES; i < MAX_TESTERS_ESPECIALES; i++){
-		msg.especiales[i] = false;
-	}	
 	int ret = msgsnd(this->cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
 	if(ret == -1) {
-		std::string error = std::string("Error al enviar orden al atendedor. Error: ") + std::string(strerror(errno));
-		Logger::error(error.c_str(), __FILE__);
+		Logger::notice("Algo no anduvo bien enviando el mensaje a testers especiales", __FILE__);
 		exit(0);
 	}
 	
