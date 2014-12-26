@@ -77,7 +77,9 @@ int main(int argc, char** argv) {
 			atendedor.enviarOrden(idDispositivo, ORDEN_REINICIO, 0);
 		}
     }
-
+	
+	atendedor.terminar_atencion(TIPO_ESPECIAL);
+	
     return 0;
 }
 

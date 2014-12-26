@@ -4,6 +4,7 @@
 
 int getIdTester(int);
 void activarTester(int);
+void devolverIdTester(int, int);
 
 AtendedorTesters::AtendedorTesters(int tipo): sem_cola_especiales(SEM_COLA_ESPECIALES) {
 	this->idTester = getIdTester(tipo);
@@ -150,7 +151,8 @@ int AtendedorTesters::recibirRequerimientoEspecial() {
     return msg.value;
 }
 
-void AtendedorTesters::terminar_atencion(){
+void AtendedorTesters::terminar_atencion(int tipo){
+	devolverIdTester(this->idTester, tipo);
 	TMessageAtendedor msg;
     msg.mtype = this->idTester;
     msg.finalizar_conexion = FINALIZAR_CONEXION;
@@ -214,9 +216,22 @@ void activarTester(int id){
 	int status;	
 	wait(&status);
 	
-	//printf("resultado de registracion: %d\n", status);
 	if (status < 0 ){ //Si no me puedo registrar, no puedo laburar (deberia devolver el id, lo dejo en TODO)
 		exit(status);
 	}
-	//printf("REGISTRACION EXITOSA de tester %d\n", id);
+}
+
+void devolverIdTester(int id, int tipo){
+	char param_id[5];
+	sprintf(param_id, "%d", id);
+	char param_tipo[3];
+	sprintf(param_tipo, "%d", tipo);
+	
+	if (fork() == 0){
+		execlp("./broker/servicio_rpc/devolver_id", "devolver_id", UBICACION_SERVER ,param_tipo, param_id,(char*)0);
+		printf("ALGO NO ANDUVO\n");
+        exit(1);
+	}
+		
+	wait(NULL);
 }

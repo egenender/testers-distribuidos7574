@@ -29,7 +29,7 @@ public:
 	int recibirRequerimientoEspecial(); 
     int obtenerIdTester();
     
-    void terminar_atencion();
+    void terminar_atencion(int tipo);
 
 };
 
