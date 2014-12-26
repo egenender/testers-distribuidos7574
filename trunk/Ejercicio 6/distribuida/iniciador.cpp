@@ -96,7 +96,7 @@ void createSystemProcesses(int cant_dispositivos, int min_lanzados, int max_lanz
         Logger::error("Error al ejecutar el programa broker", __FILE__);
         exit(1);
 	}
-	sleep(3);
+/*	sleep(3);
    
     // Creo testers
     int idTester = ID_TESTER_START;
@@ -159,7 +159,7 @@ void createSystemProcesses(int cant_dispositivos, int min_lanzados, int max_lanz
 		usleep(tiempo);
 	}
 
-	
+	*/
     Logger::debug("Programas iniciados correctamente...", __FILE__);
     
 }

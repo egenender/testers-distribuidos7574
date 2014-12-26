@@ -18,7 +18,7 @@
 using namespace std;
 
 int main(int argc, char** argv) {
-	srand(time(NULL));
+	srand(getpid());
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
     // Por parametro se recibe el ID del dispositivo
     //int id = atoi(argv[1]);
