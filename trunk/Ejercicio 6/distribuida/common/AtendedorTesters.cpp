@@ -123,6 +123,7 @@ void AtendedorTesters::enviarAEspeciales(bool cuales[], int posicion){
 	msg.mtype_envio = MTYPE_REQUERIMIENTO_ESPECIAL; //ID_BROKER!!
 	msg.value = posicion;
 	msg.es_requerimiento = 1;
+	msg.finalizar_conexion = 0;
 	Logger::notice("Pongo id de testers especiales que voy a usar", __FILE__);
 	for (int i = 0; i < MAX_TESTERS_ESPECIALES; i++){
 		if (cuales[i]){
