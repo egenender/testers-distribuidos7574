@@ -1,8 +1,11 @@
-CC=g++
+CC=@g++
 CFLAGS=-Wall -pedantic -pedantic-errors -g -ggdb
 
-all: dispositivo tecnico testerComun testerEspecial server_emisor server_receptor cliente_emisor cliente_receptor broker rpc_services iniciador lanzaDisp terminador destroy cleanO
+all: inicia_comp dispositivo tecnico testerComun testerEspecial server_emisor server_receptor cliente_emisor cliente_receptor broker rpc_services iniciador lanzaDisp terminador destroy cleanO
 	@echo "Compilacion terminada"
+
+inicia_comp:
+	@echo "Iniciando compilacion"
 
 lockfile:
 	$(CC) $(CFLAGS) -c sync/LockFile.cpp
@@ -65,7 +68,7 @@ broker: semaphore lockfile logger
 	$(CC) $(CFLAGS) broker/broker_requerimientos.cpp LockFile.o logger/Logger.o Semaphore.o -o broker/broker_requerimientos
 
 rpc_services:
-	make -f broker/servicio_rpc/Makefile.registracion
+	@make -f broker/servicio_rpc/Makefile.registracion
 
 iniciador: semaphore logger lockfile
 	$(CC) $(CFLAGS) Semaphore.o LockFile.o logger/Logger.o iniciador.cpp -o iniciador

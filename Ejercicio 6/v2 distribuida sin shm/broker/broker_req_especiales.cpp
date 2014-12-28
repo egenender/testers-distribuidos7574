@@ -61,7 +61,7 @@ int main (void){
 				Semaphore sem_especial(SEM_ESPECIAL_DISPONIBLE + i);
 				sem_especial.getSem();
 				sem_especial.p();
-				
+				ss.str("");
 				ss << "El tester especial " << i + ID_TESTER_ESPECIAL_START << " ya esta disponible";
 				Logger::notice(ss.str(), __FILE__);
 				
