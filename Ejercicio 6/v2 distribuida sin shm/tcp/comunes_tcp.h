@@ -16,7 +16,7 @@ void recibir (TMessageAtendedor* buffer, int fd){
 	}
 	// Si hubo algun error, salimos
 	if (acumulado != size){
-		perror("Error recibiendo mensaje desde el servidor");
+		perror("Error recibiendo mensaje");
 		exit(1);
 	}
 }
@@ -30,7 +30,7 @@ void enviar(TMessageAtendedor* buffer, int fd){
 		acumulado += enviado;
 	}
 	if (acumulado != size){
-		perror("Error al enviar el mensaje al cliente");
+		perror("Error al enviar el mensaje");
 		exit(1);
 	}
 }

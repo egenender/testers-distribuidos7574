@@ -65,7 +65,7 @@ int main(int argc, char *argv[]){
 			
 			int ok_read = msgrcv(cola_id_disp, buffer, sizeof(TMessageAtendedor) - sizeof(long), id_tester, 0);
 			if (ok_read == -1){
-					exit(0);
+				exit(0);
 			}
 					
 			long dispositivo_a_tratar = buffer->idDispositivo;
