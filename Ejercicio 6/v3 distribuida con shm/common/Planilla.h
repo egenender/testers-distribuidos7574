@@ -8,12 +8,13 @@
 class Planilla {
 private:
 	resultado_t* resultados;
-	Semaphore mutex_resul;
+	//Semaphore mutex_resul;
+	int tester;
 	
 	int obtenerLugar();
 	
 public:
-    Planilla();
+    Planilla(int tester);
     Planilla(const Planilla& orig);
     virtual ~Planilla();
     

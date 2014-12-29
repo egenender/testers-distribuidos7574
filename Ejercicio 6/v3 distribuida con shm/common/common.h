@@ -61,13 +61,15 @@ const int SEM_ESPECIAL_DISPONIBLE = 25; //siguiente debe ser + CANT_ESPECIALes
 
 const int MTYPE_REQUERIMIENTO = MAX_DISPOSITIVOS_EN_SISTEMA + 1;
 const int MTYPE_REQUERIMIENTO_ESPECIAL = MAX_DISPOSITIVOS_EN_SISTEMA + 2;
+const int MTYPE_REQUERIMIENTO_SHM_TESTERS = MAX_DISPOSITIVOS_EN_SISTEMA + 3;
+const int MTYPE_DEVOLUCION_SHM_TESTERS = MAX_DISPOSITIVOS_EN_SISTEMA + 4;
 
 const int ORDEN_APAGADO = 0;
 const int ORDEN_REINICIO = 1;
 const int ORDEN_SEGUIR_TESTEANDO = 2;
 const int SIN_LUGAR = -1;
 
-const int CANT_RESULTADOS = MAX_DISPOSITIVOS_EN_SISTEMA;
+#define CANT_RESULTADOS MAX_DISPOSITIVOS_EN_SISTEMA
 const int RESULTADO_GRAVE = 0;
 const int RESULTADO_NO_GRAVE = 1;
 const int SEGUIR_TESTEANDO = 2;
@@ -91,11 +93,6 @@ typedef struct resultado{
 	int resultadosGraves;
 }resultado_t;
 
-typedef struct posicion_en_shm{
-	long mtype;
-	int lugar;
-}posicion_en_shm_t;
-
 typedef struct message {
 	/* BEGIN HEADER */
 	long mtype;
@@ -109,6 +106,8 @@ typedef struct message {
 	int value; // Este parametro posee el valor del requerimiento, del programa y del resultado
 	int cant_testers;
 	int especiales[MAX_TESTERS_ESPECIALES];
+	/* SHM */
+	resultado_t resultados[CANT_RESULTADOS];
 } TMessageAtendedor;
 
 typedef struct tabla_testers_disponibles{
@@ -119,5 +118,6 @@ typedef struct tabla_testers_disponibles{
 	int testers_especiales[MAX_TESTERS_ESPECIALES];
 	int dispositivos_atendidos; //por ahora no se usa
 } tabla_testers_disponibles_t;
+
 
 #endif	/* COMMON_H */

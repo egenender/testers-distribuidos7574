@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
     // Obtengo comunicacion con los tecnicos
     DespachadorTesters despachador;
     // Obtengo planilla general de sync con otros tester
-    Planilla planilla;
+    Planilla planilla(id);
     
     srand(time(NULL));
     
@@ -47,12 +47,12 @@ int main(int argc, char** argv) {
 		string mensaje = "Recibido requerimiento desde dispositivo id ";
         Logger::notice(mensaje + ss.str() , nombre.str().c_str());
         
-        if (! planilla.hayLugar()){
+      /*  if (! planilla.hayLugar()){
 			string mensaje = "No hay lugar para atender al dispositivo id ";
 			Logger::notice(mensaje + ss.str() , nombre.str().c_str());
 			atendedor.enviarPrograma(idDispositivo, SIN_LUGAR);
 			continue;
-		}
+		}*/
         
         usleep( rand() % 1000 + 1000);
         Logger::notice(string("Envio programa a dispositivo ") + ss.str(), nombre.str().c_str());                  	
@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
 			//int cant_testers = rand() % (MAXIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION - MINIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION) + MINIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION;	
 			int cant_testers = 0;
 			bool los_testers[MAX_TESTERS_ESPECIALES];
-			while (cant_testers < 2 || cant_testers > 4){ //requerimientos
+			while (cant_testers < MINIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION || cant_testers > MAXIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION){ //requerimientos
 				cant_testers = 0;
 				for (int i = 0; i < MAX_TESTERS_ESPECIALES; i++){
 					int random = rand() % 2;

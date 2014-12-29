@@ -62,7 +62,7 @@ int main(int argc, char** argv) {
 		
         // Le envio resultado del primer programa de testeo
         int resul = rand() % 10;
-        //resul = 0;
+        resul = 5;
         if (resul >= 4){
 			atendedor.enviarResultado( SEGUIR_TESTEANDO);
 		}else if (resul >= 2){
