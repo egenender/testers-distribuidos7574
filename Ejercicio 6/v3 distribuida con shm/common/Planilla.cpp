@@ -5,7 +5,6 @@
 #include <sys/msg.h>
 #include "../ipc/Semaphore.h"
 #include <string.h>
-#include <stdio.h>
 
 void semaforoDistribuido_P(resultado_t* resultados, int tester);
 void semaforoDistribuido_V(resultado_t* resultados, int tester);
@@ -129,13 +128,9 @@ void semaforoDistribuido_V(resultado_t* resultados, int tester){
 	msg.mtype_envio = MTYPE_DEVOLUCION_SHM_TESTERS;
 	msg.finalizar_conexion = 0;
 	msg.es_requerimiento = 1;
-	msg.tester = tester;
-	printf("Testeos necesarios %d para id %d\n", resultados[0].resultadosPendientes  ,resultados[0].idDispositivo);
-	
+	msg.tester = tester;	
 	//memcpy(msg.resultados, resultados, sizeof(resultados));
 	copiarResultado(msg.resultados, resultados);
-	
-	printf("Testeos necesarios %d para id %d\n", msg.resultados[0].resultadosPendientes  ,msg.resultados[0].idDispositivo);
 	
 	key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_TESTERS_ENVIOS);
     int cola_envios = msgget(key, 0666);

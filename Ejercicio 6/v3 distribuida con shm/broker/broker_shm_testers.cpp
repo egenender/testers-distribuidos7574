@@ -9,12 +9,6 @@
 #include "../logger/Logger.h"
 #include <string.h>
 
-void imprimir_shm(resultado_t* resultados){
-	std::stringstream ss;
-	ss << "SHM "<< 0 << ": Dispositivo " << resultados[0].idDispositivo << " Resultados pendientes: " << resultados[0].resultadosPendientes << " Resultados graves: " << resultados[0].resultadosGraves;
-	Logger::notice(ss.str(), __FILE__);
-}
-
 void copiarResultado(resultado_t* destino, resultado_t* origen){
 	for (int i = 0; i < CANT_RESULTADOS; i++){
 		destino[i].idDispositivo = origen[i].idDispositivo;
@@ -63,7 +57,6 @@ int main (void){
 		msg.mtype = msg.tester;
 		//memcpy(msg.resultados, resultados, sizeof(resultados));
 		copiarResultado(msg.resultados, resultados);
-		imprimir_shm(resultados);
 		/* */
 		int ret = msgsnd(cola_hacia_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
 		if(ret == -1) {
@@ -84,7 +77,6 @@ int main (void){
 		/* Actualizo shm */
 		//memcpy(resultados, msg.resultados, sizeof(resultados));
 		copiarResultado(resultados, msg.resultados);
-		imprimir_shm(resultados);
 	}
 }
 
