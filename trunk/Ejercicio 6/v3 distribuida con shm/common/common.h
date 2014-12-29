@@ -11,6 +11,7 @@
 #define	COMMON_H
 
 #include <stddef.h>
+#include <stdint.h>
 
 #ifndef SOLO_C
 #include "commonFiles.h"
@@ -88,35 +89,35 @@ const char UBICACION_SERVER[] = "localhost"; //Cambiar
 
 //Estructuras communes:
 typedef struct resultado{
-	int idDispositivo;
-	int resultadosPendientes;
-	int resultadosGraves;
+	int32_t idDispositivo;
+	int32_t resultadosPendientes;
+	int32_t resultadosGraves;
 }resultado_t;
 
 typedef struct message {
 	/* BEGIN HEADER */
-	long mtype;
-	long mtype_envio;
-	int finalizar_conexion;
-	int es_requerimiento;
-	int es_especial; //Solo por si acaso
+	int64_t mtype;
+	int64_t mtype_envio;
+	int32_t finalizar_conexion;
+	int32_t es_requerimiento;
+	int32_t es_especial; //Solo por si acaso
 	/* END HEADER */
-	int idDispositivo;
-	int tester;
-	int value; // Este parametro posee el valor del requerimiento, del programa y del resultado
-	int cant_testers;
-	int especiales[MAX_TESTERS_ESPECIALES];
+	int32_t idDispositivo;
+	int32_t tester;
+	int32_t value; // Este parametro posee el valor del requerimiento, del programa y del resultado
+	int32_t cant_testers;
+	int32_t especiales[MAX_TESTERS_ESPECIALES];
 	/* SHM */
 	resultado_t resultados[CANT_RESULTADOS];
 } TMessageAtendedor;
 
 typedef struct tabla_testers_disponibles{
-	int testers_comunes[MAX_TESTERS_COMUNES];
-	int start;
-	int end;
-	int cant;
-	int testers_especiales[MAX_TESTERS_ESPECIALES];
-	int dispositivos_atendidos; //por ahora no se usa
+	int32_t testers_comunes[MAX_TESTERS_COMUNES];
+	int32_t start;
+	int32_t end;
+	int32_t cant;
+	int32_t testers_especiales[MAX_TESTERS_ESPECIALES];
+	int32_t dispositivos_atendidos; //por ahora no se usa
 } tabla_testers_disponibles_t;
 
 
