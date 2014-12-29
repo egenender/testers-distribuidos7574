@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
     // Obtengo comunicacion con los tecnicos
     DespachadorTesters despachador;
     // Obtengo planilla general de sync con otros tester
-    Planilla planilla;
+    Planilla planilla(id);
     
     srand(getpid());
     
