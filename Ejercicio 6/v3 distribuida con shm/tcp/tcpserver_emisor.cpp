@@ -76,11 +76,9 @@ int main(int argc, char *argv[]){
 			while (true){
 				//Espero un mensaje que deba ser enviado al dispositivo en cuestion
 				int ok_read = msgrcv(cola, buffer, size - sizeof(long), dispositivo_a_tratar, 0);
-				if (ok_read == -1){
-					exit(1);
-				}
+				
 				//Si el mensaje era de finalizacion, entonces 'mato' al receptor y termino mi labor
-				if (buffer->finalizar_conexion){
+				if (ok_read == -1 || buffer->finalizar_conexion){
 					kill(receptor, SIGHUP);
 					free(buffer);
 					close(clientfd);
