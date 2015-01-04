@@ -54,7 +54,7 @@ AtendedorTesters::~AtendedorTesters() {
 }
 
 int AtendedorTesters::recibirRequerimiento() {
-	activarTester(this->idTester);
+	activarTester();
     TMessageAtendedor msg;
     int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), this->idTester, 0);
     if(ret == -1) {
@@ -143,7 +143,7 @@ void AtendedorTesters::enviarAEspeciales(bool cuales[], int posicion){
 }
 
 int AtendedorTesters::recibirRequerimientoEspecial() {
-	activarTester(this->idTester);
+	activarTester();
     TMessageAtendedor msg;
     int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), this->idTester, 0);
     if(ret == -1) {
@@ -207,8 +207,21 @@ int getIdTester(int tipo){
 	return id;
 }
 
-void activarTester(int id){
-	char param_id[5];
+void AtendedorTesters::activarTester(){
+	TMessageAtendedor msg;
+    msg.mtype = this->idTester;
+    msg.mtype_envio = MTYPE_TESTER_DISPONIBLE;
+    msg.finalizar_conexion = 0;
+    msg.tester = this->idTester;
+    msg.es_requerimiento = 0;
+    
+    int ret = msgsnd(this->cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    if(ret == -1) {
+        std::string error = std::string("Error al enviar programa al atendedor. Error: ") + std::string(strerror(errno));
+        Logger::error(error.c_str(), __FILE__);
+        exit(0);
+    }
+	/*char param_id[5];
     sprintf(param_id, "%d",id);
     
 	if (fork() == 0){
@@ -221,7 +234,7 @@ void activarTester(int id){
 	
 	if (status < 0 ){ //Si no me puedo registrar, no puedo laburar (deberia devolver el id, lo dejo en TODO)
 		exit(status);
-	}
+	}*/
 }
 
 void devolverIdTester(int id, int tipo){

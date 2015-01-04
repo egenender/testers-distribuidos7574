@@ -77,6 +77,12 @@ void crear_sub_brokers(){
 		execlp("./broker/broker_shm_testers", "broker_shm_testers", (char*)0);
         exit(1);
 	}
+	
+	Logger::notice("Creo el broker de disponibilidad de testers", __FILE__);
+	if (fork() == 0){
+		execlp("./broker/broker_disponibilidad_testers", "broker_disponibilidad_testers", (char*)0);
+        exit(1);
+	}
 }
 
 void crear_servers(){
