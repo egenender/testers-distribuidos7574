@@ -221,20 +221,6 @@ void AtendedorTesters::activarTester(){
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
-	/*char param_id[5];
-    sprintf(param_id, "%d",id);
-    
-	if (fork() == 0){
-		execlp("./broker/servicio_rpc/registrar_tester", "get_registrar_tester", UBICACION_SERVER ,param_id,(char*)0);
-		printf("ALGO NO ANDUVO\n");
-        exit(1);
-	}
-	int status;	
-	wait(&status);
-	
-	if (status < 0 ){ //Si no me puedo registrar, no puedo laburar (deberia devolver el id, lo dejo en TODO)
-		exit(status);
-	}*/
 }
 
 void devolverIdTester(int id, int tipo){
