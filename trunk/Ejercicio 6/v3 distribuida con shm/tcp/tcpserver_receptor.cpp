@@ -21,12 +21,13 @@ void terminar_ejecucion(int sig){
 
 int main(int argc, char *argv[]){
 	
-    if(argc != 4){
-		printf("Uso: %s <puerto> <id_server> <id_cola>\n", argv[0]);
+    if(argc != 5){
+		printf("Uso: %s <puerto> <id_server> <id_cola> <id_cola_emisor>\n", argv[0]);
 		return -1;
     }
 	int id_tester = atoi(argv[2]);
 	int id_cola = atoi(argv[3]);
+	int id_cola_emisor = atoi(argv[4]);
 	
     int fd = tcp_open_pasivo(atoi(argv[1]));
     if(fd < 0){
@@ -62,7 +63,7 @@ int main(int argc, char *argv[]){
 			
 			//Espero primer mensaje, que el cliente me tiene que decir su ID.
 			recibir(buffer, clientfd);
-						
+									
 			key_t key = ftok(IPCS_FILE, MSGQUEUE_SERVER_RECEPTOR_EMISOR);
 			int cola_id_disp = msgget(key, 0660| IPC_CREAT);
 			//Mando Primer mensaje, que me dice el identificador del cliente (al emisor) 
@@ -77,12 +78,18 @@ int main(int argc, char *argv[]){
 								
 			key = ftok(IPCS_FILE, id_cola);
 			int cola = msgget(key, 0660);
+			key = ftok(IPCS_FILE, id_cola_emisor);
+			int cola_emisor = msgget(key, 0660);
 			while (true) {
 				//Espero por un mensaje desde el cliente
 				recibir(buffer, clientfd);
 				
+				int cola_envio = cola;
+				if(buffer->finalizar_conexion){
+					cola_envio = cola_emisor;
+				}
 				//Mando el mensaje por la cola que el cliente me dice que tengo que usar
-				int ok = msgsnd(cola, buffer, sizeof(TMessageAtendedor) - sizeof(long), 0);
+				int ok = msgsnd(cola_envio, buffer, sizeof(TMessageAtendedor) - sizeof(long), 0);
 				if (ok == -1){
 					exit(1);
 				}

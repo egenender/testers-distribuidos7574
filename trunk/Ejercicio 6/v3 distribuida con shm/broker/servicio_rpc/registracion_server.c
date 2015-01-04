@@ -191,7 +191,7 @@ devolver_id_dispositivo_1_svc(int *argp, struct svc_req *rqstp)
 	result = 1;
 	
 	//Mando mensaje de finalizacion para terminar la conexion con este dispositivo
-	terminar_conexion(id, MSGQUEUE_BROKER_ENVIO_MENSAJES_DISPOSITIVOS);
+	//terminar_conexion(id, MSGQUEUE_BROKER_ENVIO_MENSAJES_DISPOSITIVOS);
 	
 	return &result;
 }
@@ -217,7 +217,7 @@ devolver_id_tester_1_svc(int *argp, struct svc_req *rqstp)
 	ids_tester_disponibles[id - 1] = true;
 	
 	//Mando mensaje de finalizacion para terminar la conexion con este tester
-	terminar_conexion(id, MSGQUEUE_BROKER_ENVIO_MENSAJES_TESTERS);
+	//terminar_conexion(id, MSGQUEUE_BROKER_ENVIO_MENSAJES_TESTERS);
 	
 	result = 1;
 	return &result;
