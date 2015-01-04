@@ -157,6 +157,7 @@ void AtendedorTesters::terminar_atencion(int tipo){
 	devolverIdTester(this->idTester, tipo);
 	TMessageAtendedor msg;
     msg.mtype = this->idTester;
+    msg.mtype_envio = this->idTester;
     msg.finalizar_conexion = FINALIZAR_CONEXION;
     
     int ret = msgsnd(this->cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);

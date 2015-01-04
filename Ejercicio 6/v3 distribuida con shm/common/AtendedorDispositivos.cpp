@@ -117,7 +117,7 @@ void AtendedorDispositivos::terminar_atencion(){
 	devolverIdDispositivo(this->idDispositivo);
 	TMessageAtendedor msg;
 	msg.mtype = this->idDispositivo;
-    msg.mtype_envio = (long) this->ultimoTester;
+    msg.mtype_envio = this->idDispositivo;
     msg.finalizar_conexion = FINALIZAR_CONEXION;
                 
     int ret = msgsnd(this->cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);

@@ -84,12 +84,14 @@ void crear_servers(){
 	char param_id[10];
     sprintf(param_id, "%d", 1);
     char param_cola[10];
+    char param_cola2[10];
     
     // HACIA TESTERS
     sprintf(param_cola, "%d", MSGQUEUE_BROKER_ENVIO_MENSAJES_DISPOSITIVOS);
+    sprintf(param_cola2, "%d", MSGQUEUE_BROKER_ENVIO_MENSAJES_TESTERS);
     Logger::notice("Creo el servidor receptor de mensajes de testers", __FILE__);
 	if (fork() == 0){
-		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_SERVER_RECEPTOR_TESTERS , param_id, param_cola, (char*)0);
+		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_SERVER_RECEPTOR_TESTERS , param_id, param_cola,param_cola2 ,(char*)0);
         exit(1);
 	}
 	
@@ -103,10 +105,10 @@ void crear_servers(){
 	// HACIA DISPOSITIVOS
 	
 	sprintf(param_cola, "%d", MSGQUEUE_BROKER_RECEPCION_MENSAJES_DISPOSITIVOS);
-    
+    sprintf(param_cola2, "%d", MSGQUEUE_BROKER_ENVIO_MENSAJES_DISPOSITIVOS);
     Logger::notice("Creo el servidor receptor de mensajes de dispositivos", __FILE__);
 	if (fork() == 0){
-		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_SERVER_RECEPTOR_DISPOSITIVOS , param_id, param_cola, (char*)0);
+		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_SERVER_RECEPTOR_DISPOSITIVOS , param_id, param_cola, param_cola2, (char*)0);
         exit(1);
 	}
 	
