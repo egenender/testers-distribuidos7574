@@ -45,9 +45,9 @@ int main (void){
 		Logger::notice("Ya hay un tester comun, entonces puedo enviar el requerimiento", __FILE__);
 		
 		sem_tabla.p();
-			if (tabla->dispositivos_atendidos == MAX_DISPOSITIVOS_EN_SISTEMA) {
+			//if (tabla->dispositivos_atendidos == MAX_DISPOSITIVOS_EN_SISTEMA) {
 				//ver de mandar mensaje de "no te atiendo un carajo" con program = -1
-			}
+			//}
 			msg.mtype = tabla->testers_comunes[tabla->start];
 			tabla->start = (tabla->start + 1) % MAX_TESTERS_COMUNES;
 			tabla->cant--;
