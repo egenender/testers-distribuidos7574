@@ -102,6 +102,15 @@ typedef struct resultado{
 	int32_t resultadosGraves;
 }resultado_t;
 
+typedef struct tabla_testers_disponibles{
+	int32_t testers_comunes[MAX_TESTERS_COMUNES];
+	int32_t start;
+	int32_t end;
+	int32_t cant;
+	int32_t testers_especiales[MAX_TESTERS_ESPECIALES];
+	//int32_t dispositivos_atendidos; //por ahora no se usa
+} tabla_testers_disponibles_t;
+
 typedef struct message {
 	/* BEGIN HEADER */
 	int64_t mtype;
@@ -116,17 +125,11 @@ typedef struct message {
 	int32_t cant_testers;
 	int32_t especiales[MAX_TESTERS_ESPECIALES];
 	/* SHM */
+	int version;
 	resultado_t resultados[CANT_RESULTADOS];
+	tabla_testers_disponibles_t tabla;
 } TMessageAtendedor;
 
-typedef struct tabla_testers_disponibles{
-	int32_t testers_comunes[MAX_TESTERS_COMUNES];
-	int32_t start;
-	int32_t end;
-	int32_t cant;
-	int32_t testers_especiales[MAX_TESTERS_ESPECIALES];
-	int32_t dispositivos_atendidos; //por ahora no se usa
-} tabla_testers_disponibles_t;
 
 
 #endif	/* COMMON_H */

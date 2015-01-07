@@ -84,6 +84,7 @@ void crear_ipcs(){
 		msg.resultados[i].resultadosGraves = 0;
     }
 	msg.mtype = ID_BROKER;
+	msg.version = 1;
 	
 	int ret = msgsnd(cola_shm_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
 	if (ret == -1) exit(0);

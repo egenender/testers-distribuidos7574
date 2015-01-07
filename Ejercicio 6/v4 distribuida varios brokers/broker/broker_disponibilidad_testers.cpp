@@ -21,6 +21,8 @@ int main (void){
     int shmtabla = shmget(key, sizeof(tabla_testers_disponibles_t) , IPC_CREAT | 0660);
     tabla_testers_disponibles_t* tabla = (tabla_testers_disponibles_t*)shmat(shmtabla, NULL, 0);
     
+    //tabla_testers_disponibles_t* tabla = malloc (sizeof(tabla_testers_disponibles_t));
+    
     Semaphore sem_tabla(SEM_TABLA_TESTERS);
     sem_tabla.getSem();
 		    

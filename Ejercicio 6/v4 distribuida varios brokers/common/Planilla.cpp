@@ -122,7 +122,6 @@ void semaforoDistribuido_P(resultado_t* resultados, int tester){
     
     //memcpy(resultados, msg.resultados, sizeof(msg.resultados));
     copiarResultado(resultados, msg.resultados);
-    printf("Recibi shm!!!\n");
 }
 
 void semaforoDistribuido_V(resultado_t* resultados, int tester){
@@ -139,6 +138,5 @@ void semaforoDistribuido_V(resultado_t* resultados, int tester){
     int cola_envios = msgget(key, 0666);
    
 	msgsnd(cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);   
-	printf("Devolvi la shm!!\n");
 }
 
