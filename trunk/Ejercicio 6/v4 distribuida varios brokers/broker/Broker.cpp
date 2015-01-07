@@ -32,7 +32,7 @@ void crear_ipcs(){
 	sem_comunes.creaSem();
 	sem_comunes.iniSem(0);
 	
-	key = ftok(ipcFileName.c_str(), SHM_TABLA_TESTERS);
+	/*key = ftok(ipcFileName.c_str(), SHM_TABLA_TESTERS);
     int shmtabla = shmget(key, sizeof(tabla_testers_disponibles_t) , IPC_CREAT | 0660);
     tabla_testers_disponibles_t* tabla = (tabla_testers_disponibles_t*)shmat(shmtabla, NULL, 0);
     
@@ -47,7 +47,7 @@ void crear_ipcs(){
 	
 	Semaphore sem_tabla(SEM_TABLA_TESTERS);
 	sem_tabla.creaSem();
-	sem_tabla.iniSem(1);
+	sem_tabla.iniSem(1);*/
 	
 	Semaphore puedo_buscar(SEM_SHM_TESTERS_REQUERIMIENTO);
 	puedo_buscar.creaSem();
@@ -84,6 +84,15 @@ void crear_ipcs(){
 		msg.resultados[i].resultadosGraves = 0;
     }
 	msg.mtype = ID_BROKER;
+	
+	msg.tabla.start = msg.tabla.end = msg.tabla.cant = 0;
+    for (int i = 0; i < MAX_TESTERS_ESPECIALES; i++){
+		msg.tabla.testers_especiales[i] = 0;
+		Semaphore sem_especial(SEM_ESPECIAL_DISPONIBLE + i);
+		sem_especial.creaSem();
+		sem_especial.iniSem(0);
+	}
+	
 	msg.version = 1;
 	
 	int ret = msgsnd(cola_shm_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
@@ -134,6 +143,16 @@ void crear_sub_brokers(){
 	Logger::notice("Creo el broker de disponibilidad de testers", __FILE__);
 	if (fork() == 0){
 		execlp("./broker/broker_disponibilidad_testers", "broker_disponibilidad_testers", (char*)0);
+        exit(1);
+	}
+	
+	if (fork() == 0){
+		execlp("./broker/broker_cola_shm", "broker_cola_shm","103" ,(char*)0);
+        exit(1);
+	}
+	
+	if (fork() == 0){
+		execlp("./broker/broker_cola_shm", "broker_cola_shm","104" ,(char*)0);
         exit(1);
 	}
 }
