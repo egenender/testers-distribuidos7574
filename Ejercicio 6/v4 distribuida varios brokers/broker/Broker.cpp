@@ -9,8 +9,11 @@
 #include "../ipc/Semaphore.h"
 #include "../logger/Logger.h"
 
+#define ID_BROKER 1
+
 void crear_ipcs(){
 	Logger::notice("Creo las colas necesarias", __FILE__);
+	
 	key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_RECEPCION_MENSAJES_DISPOSITIVOS);
 	msgget(key, 0660 |IPC_CREAT);
 	
@@ -23,6 +26,7 @@ void crear_ipcs(){
 	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_ENVIO_MENSAJES_DISPOSITIVOS);
 	msgget(key, 0660 |IPC_CREAT);
 	
+		
 	Logger::notice("Creo los semaforos y shm necesarias", __FILE__);
 	Semaphore sem_comunes(SEM_CANT_TESTERS_COMUNES);
 	sem_comunes.creaSem();
@@ -39,10 +43,50 @@ void crear_ipcs(){
 		sem_especial.creaSem();
 		sem_especial.iniSem(0);
 	}
+	shmdt((void*)tabla);
 	
 	Semaphore sem_tabla(SEM_TABLA_TESTERS);
 	sem_tabla.creaSem();
 	sem_tabla.iniSem(1);
+	
+	Semaphore puedo_buscar(SEM_SHM_TESTERS_REQUERIMIENTO);
+	puedo_buscar.creaSem();
+	puedo_buscar.iniSem(1);
+	
+	key = ftok(ipcFileName.c_str(), SHM_TESTER_QUIERE_SHM);
+    int shmtester = shmget(key, sizeof(int) , 0660 | IPC_CREAT);
+    int* tester_shm = (int*)shmat(shmtester, NULL, 0);   
+    *tester_shm = 0;
+    shmdt((void*)tester_shm);
+    
+    Semaphore sem_tester_shm(SEM_MUTEX_TESTER_QUIERE_SHM);
+	sem_tester_shm.creaSem();
+	sem_tester_shm.iniSem(1);
+	
+	key = ftok(ipcFileName.c_str(), SHM_NEXT_BROKER);
+    int shmnext = shmget(key, sizeof(int) , 0660 | IPC_CREAT);
+    int* next = (int*)shmat(shmnext, NULL, 0);   
+	*next = ID_BROKER; //por ahora es el broker 1, y listo TODO
+	shmdt((void*) next);
+	
+	Semaphore sem_next(SEM_MUTEX_NEXT_BROKER);
+	sem_next.creaSem();
+	sem_next.iniSem(1);
+	
+	/* Pongo a circular la shm de testers*/
+	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_SHM_TESTERS);
+	int cola_shm_testers = msgget(key, 0660 | IPC_CREAT);
+	
+	TMessageAtendedor msg;
+	for (int i = 0; i < CANT_RESULTADOS; i++){
+		msg.resultados[i].resultadosPendientes = 0;
+		msg.resultados[i].idDispositivo = 0;
+		msg.resultados[i].resultadosGraves = 0;
+    }
+	msg.mtype = ID_BROKER;
+	
+	int ret = msgsnd(cola_shm_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+	if (ret == -1) exit(0);
 }
 
 void crear_sub_brokers(){
@@ -74,7 +118,15 @@ void crear_sub_brokers(){
 	
 	Logger::notice("Creo el broker de requerimientos de shm de testers", __FILE__);
 	if (fork() == 0){
-		execlp("./broker/broker_shm_testers", "broker_shm_testers", (char*)0);
+		execlp("./broker/broker_shm_testers_req", "broker_shm_testers_req", (char*)0);
+        exit(1);
+	}
+	
+	Logger::notice("Creo el broker de otorgamiento de shm de testers", __FILE__);
+	if (fork() == 0){
+		char param_id[2];
+		sprintf(param_id, "%d", ID_BROKER);
+		execlp("./broker/broker_shm_testers_otorga", "broker_shm_testers_otorga", param_id,(char*)0);
         exit(1);
 	}
 	

@@ -60,28 +60,29 @@ void createIPCObjects() {
         throw err;
     }
     ipcFile.close();
-       
+    
+    key_t key;   
     // Creo semaforo para la shmem de la planilla
-    Semaphore semPlanillaGeneral(SEM_PLANILLA_GENERAL);
+/*    Semaphore semPlanillaGeneral(SEM_PLANILLA_GENERAL);
     semPlanillaGeneral.creaSem();
     semPlanillaGeneral.iniSem(1); // Inicializa el semaforo en 1
     
     Semaphore sem_cola_especiales(SEM_COLA_ESPECIALES);
     sem_cola_especiales.creaSem();
-    sem_cola_especiales.iniSem(1);
+    sem_cola_especiales.iniSem(1);*/
 
-    key_t key = ftok(ipcFileName.c_str(), SHM_PLANILLA_GENERAL);
+/*    key_t key = ftok(ipcFileName.c_str(), SHM_PLANILLA_GENERAL);
     int shmgeneralid = shmget(key, sizeof(resultado_t) * CANT_RESULTADOS, IPC_CREAT | IPC_EXCL | 0660);
     resultado_t* resultados = (resultado_t*)shmat(shmgeneralid, NULL, 0);
     
     for (int i = 0; i < CANT_RESULTADOS; i++){
 		resultados[i].resultadosPendientes = 0;
     }
-    shmdt(resultados);
+    shmdt(resultados);*/
     
     
     //creacion de colas
-    for (int q = MSGQUEUE_DISPOSITIVOS_ENVIOS; q <= MSGQUEUE_SERVER_RECEPTOR_EMISOR; q++){
+    for (int q = MSGQUEUE_DISPOSITIVOS_ENVIOS; q <= MSGQUEUE_BROKER_SHM_TESTERS; q++){
 			key = ftok(ipcFileName.c_str(), q);
 		if (msgget(key, 0660 | IPC_CREAT | IPC_EXCL) == -1){
 			std::cout << "No se pudo crear una cola: " << strerror(errno)<< std::endl;
