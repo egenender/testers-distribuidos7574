@@ -6,6 +6,7 @@
 #include "../common/common.h"
 #include "../ipc/Semaphore.h"
 #include "../logger/Logger.h"
+#include "../ipc/semaforos_distribuidos.h"
 
 int main (void){
 	Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
@@ -21,12 +22,14 @@ int main (void){
 	Semaphore sem_comunes(SEM_CANT_TESTERS_COMUNES);
 	sem_comunes.getSem();
 	
-	key = ftok(ipcFileName.c_str(), SHM_TABLA_TESTERS);
+	/*key = ftok(ipcFileName.c_str(), SHM_TABLA_TESTERS);
     int shmtabla = shmget(key, sizeof(tabla_testers_disponibles_t) , IPC_CREAT | 0660);
     tabla_testers_disponibles_t* tabla = (tabla_testers_disponibles_t*)shmat(shmtabla, NULL, 0);
     
     Semaphore sem_tabla(SEM_TABLA_TESTERS);
-    sem_tabla.getSem();
+    sem_tabla.getSem();*/
+    tabla_testers_disponibles_t* tabla = (tabla_testers_disponibles_t*) malloc(sizeof(tabla_testers_disponibles_t));
+    
 	Logger::notice("Termino la obtencion de ipcs", __FILE__);
 	/* Fin Setup */
 	TMessageAtendedor msg;
@@ -40,18 +43,26 @@ int main (void){
 		std::stringstream ss;
 		ss << "Me llego un requerimiento desde el dispositivo " << msg.idDispositivo;
 		Logger::notice(ss.str(), __FILE__);
-		Logger::notice("Obtengo semaforo para actuar, esperando que haya testers comunes", __FILE__);
-		sem_comunes.p();
-		Logger::notice("Ya hay un tester comun, entonces puedo enviar el requerimiento", __FILE__);
+		ss.str("");
+		//Logger::notice("Obtengo semaforo para actuar, esperando que haya testers comunes", __FILE__);
+		//sem_comunes.p();
+		//Logger::notice("Ya hay un tester comun, entonces puedo enviar el requerimiento", __FILE__);
 		
-		sem_tabla.p();
-			//if (tabla->dispositivos_atendidos == MAX_DISPOSITIVOS_EN_SISTEMA) {
-				//ver de mandar mensaje de "no te atiendo un carajo" con program = -1
-			//}
-			msg.mtype = tabla->testers_comunes[tabla->start];
-			tabla->start = (tabla->start + 1) % MAX_TESTERS_COMUNES;
-			tabla->cant--;
-		sem_tabla.v();
+		//sem_tabla.p();
+		msg.mtype = 0;
+		while (msg.mtype == 0){
+			semaforoDistribuido_P(tabla, 158);
+			ss << "Tengo la shm!";
+			Logger::notice (ss.str(), __FILE__);
+			ss.str("");
+			
+			if (tabla->cant > 0){
+				msg.mtype = tabla->testers_comunes[tabla->start];
+				tabla->start = (tabla->start + 1) % MAX_TESTERS_COMUNES;
+				tabla->cant--;
+			}
+			semaforoDistribuido_V(tabla, 158);
+		}
 		
 		int ret = msgsnd(cola_hacia_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
 		if(ret == -1) {

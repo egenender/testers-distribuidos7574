@@ -15,7 +15,7 @@ int main (void){
 	Logger::notice("Creo los ipcs necesarias", __FILE__);
 	key_t key;
 	
-	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_ENVIO_MENSAJES_DISPOSITIVOS);
+	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_REQUERIMIENTOS_SHM);
 	int cola_requerimiento_shm = msgget(key, 0660);
 	
 	Semaphore puedo_buscar(SEM_SHM_TESTERS_REQUERIMIENTO);

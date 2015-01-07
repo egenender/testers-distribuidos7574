@@ -7,6 +7,7 @@
 #include "../common/common.h"
 #include "../ipc/Semaphore.h"
 #include "../logger/Logger.h"
+#include "../ipc/semaforos_distribuidos.h"
 
 
 int main (void){
@@ -23,12 +24,13 @@ int main (void){
 	Semaphore sem_comunes(SEM_CANT_TESTERS_COMUNES);
 	sem_comunes.getSem();
 	
-	key = ftok(ipcFileName.c_str(), SHM_TABLA_TESTERS);
+	/*key = ftok(ipcFileName.c_str(), SHM_TABLA_TESTERS);
     int shmtabla = shmget(key, sizeof(tabla_testers_disponibles_t) , IPC_CREAT | 0660);
     tabla_testers_disponibles_t* tabla = (tabla_testers_disponibles_t*)shmat(shmtabla, NULL, 0);
     
     Semaphore sem_tabla(SEM_TABLA_TESTERS);
-    sem_tabla.getSem();
+    sem_tabla.getSem();*/
+    tabla_testers_disponibles_t* tabla = (tabla_testers_disponibles_t*) malloc(sizeof(tabla_testers_disponibles_t));
     
     Logger::notice("Termino la obtencion de ipcs", __FILE__);
     
@@ -60,16 +62,26 @@ int main (void){
 				
 				Semaphore sem_especial(SEM_ESPECIAL_DISPONIBLE + i);
 				sem_especial.getSem();
-				sem_especial.p();
+				/*sem_especial.p();
 				ss.str("");
 				ss << "El tester especial " << i + ID_TESTER_ESPECIAL_START << " ya esta disponible";
 				Logger::notice(ss.str(), __FILE__);
 				
 				sem_tabla.p();
 				tabla->testers_especiales[i] = 0;
-				sem_tabla.v();
+				sem_tabla.v();*/
 				
-				msg.mtype = i + ID_TESTER_ESPECIAL_START;
+				msg.mtype = 0;
+				while (msg.mtype == 0){
+					semaforoDistribuido_P(tabla, 152);
+					if (tabla->testers_especiales[i]){
+						tabla->testers_especiales[i] = 0;
+						msg.mtype = i + ID_TESTER_ESPECIAL_START;
+					}
+					semaforoDistribuido_V(tabla, 152);
+				}
+				
+				//msg.mtype = i + ID_TESTER_ESPECIAL_START;
 				int ret = msgsnd(cola_hacia_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
 				if(ret == -1) {
 					exit(1);
