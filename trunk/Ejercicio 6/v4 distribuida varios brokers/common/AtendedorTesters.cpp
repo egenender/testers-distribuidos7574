@@ -6,7 +6,7 @@ int getIdTester(int);
 void activarTester(int);
 void devolverIdTester(int, int);
 
-AtendedorTesters::AtendedorTesters(int tipo): sem_cola_especiales(SEM_COLA_ESPECIALES) {
+AtendedorTesters::AtendedorTesters(int tipo){
 	this->idTester = getIdTester(tipo);
     key_t key;
     key = ftok(ipcFileName.c_str(), MSGQUEUE_TESTERS_RECIBOS);
@@ -24,9 +24,7 @@ AtendedorTesters::AtendedorTesters(int tipo): sem_cola_especiales(SEM_COLA_ESPEC
         Logger::error(err, __FILE__);
         exit(1);
     }
-  
-    sem_cola_especiales.getSem();
-    
+      
     char param_id[10];
     sprintf(param_id, "%d", this->idTester);
     char param_cola[10];
@@ -47,7 +45,7 @@ AtendedorTesters::AtendedorTesters(int tipo): sem_cola_especiales(SEM_COLA_ESPEC
 	
 }
 
-AtendedorTesters::AtendedorTesters(const AtendedorTesters& orig): sem_cola_especiales(SEM_COLA_ESPECIALES) {
+AtendedorTesters::AtendedorTesters(const AtendedorTesters& orig) {
 }
 
 AtendedorTesters::~AtendedorTesters() {

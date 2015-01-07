@@ -7,13 +7,11 @@
 
 #include "../logger/Logger.h"
 #include "common.h"
-#include "../ipc/Semaphore.h"
 
 class AtendedorTesters {
 private:
     int cola_envios;
     int cola_recibos;
-    Semaphore sem_cola_especiales;
     int idTester;
     
     void activarTester();  

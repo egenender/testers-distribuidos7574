@@ -5,20 +5,22 @@
 #include <sys/msg.h>
 #include "../ipc/Semaphore.h"
 #include <string.h>
+#include <stdio.h>
 
 void semaforoDistribuido_P(resultado_t* resultados, int tester);
 void semaforoDistribuido_V(resultado_t* resultados, int tester);
 
-Planilla::Planilla(int tester)/*: mutex_resul(SEM_PLANILLA_GENERAL)*/{
-	key_t key = ftok(ipcFileName.c_str(), SHM_PLANILLA_GENERAL);
+Planilla::Planilla(int tester){
+	/*key_t key = ftok(ipcFileName.c_str(), SHM_PLANILLA_GENERAL);
     int shmlocalid = shmget(key, sizeof(resultado_t) * CANT_RESULTADOS, 0660);
-    this->resultados = (resultado_t*)shmat(shmlocalid, NULL, 0);
+    this->resultados = (resultado_t*)shmat(shmlocalid, NULL, 0);*/
     //mutex_resul.getSem();
+    this->resultados = (resultado_t*)malloc(sizeof(resultado_t) * CANT_RESULTADOS);
     
     this->tester = tester;
 }
 
-Planilla::Planilla(const Planilla& orig)/* : mutex_resul(SEM_PLANILLA_GENERAL)*/{
+Planilla::Planilla(const Planilla& orig){
 }
 
 Planilla::~Planilla() {
@@ -120,6 +122,7 @@ void semaforoDistribuido_P(resultado_t* resultados, int tester){
     
     //memcpy(resultados, msg.resultados, sizeof(msg.resultados));
     copiarResultado(resultados, msg.resultados);
+    printf("Recibi shm!!!\n");
 }
 
 void semaforoDistribuido_V(resultado_t* resultados, int tester){
@@ -128,7 +131,7 @@ void semaforoDistribuido_V(resultado_t* resultados, int tester){
 	msg.mtype_envio = MTYPE_DEVOLUCION_SHM_TESTERS;
 	msg.finalizar_conexion = 0;
 	msg.es_requerimiento = 1;
-	msg.tester = tester;	
+	msg.tester = tester;
 	//memcpy(msg.resultados, resultados, sizeof(resultados));
 	copiarResultado(msg.resultados, resultados);
 	
@@ -136,5 +139,6 @@ void semaforoDistribuido_V(resultado_t* resultados, int tester){
     int cola_envios = msgget(key, 0666);
    
 	msgsnd(cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);   
+	printf("Devolvi la shm!!\n");
 }
 
