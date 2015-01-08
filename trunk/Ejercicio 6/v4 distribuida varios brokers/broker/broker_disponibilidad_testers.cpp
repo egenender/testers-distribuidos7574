@@ -10,9 +10,11 @@
 #include "../ipc/semaforos_distribuidos.h"
 #include <string.h>
 
-int main (void){
+int main (int argc, char** argv){	
 	Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
 	Logger::notice("Creo los ipcs necesarias", __FILE__);
+	int id_broker = atoi(argv[1]);
+	
 	key_t key;
 	
 	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_ENVIO_MENSAJES_DISPOSITIVOS);
@@ -41,8 +43,19 @@ int main (void){
 		}
 		
 		std::stringstream ss;
-		ss << "Me llega un requerimiento de disponibilidad desde tester " << msg.tester << ". Espero por memoria compartida de tabla";
+		ss << "Me llega un requerimiento de disponibilidad desde tester " << msg.tester << ". Lo registro en el servidor rpc como conectado a este broker";
 		Logger::notice(ss.str(), __FILE__);
+		
+		
+		char param_id[4];
+		sprintf(param_id, "%d", msg.tester);
+		if (fork() == 0){
+			execlp("./servicio_rpc/registrar_tester", "registrar_tester", UBICACION_SERVER ,argv[1], param_id,(char*)0);
+			printf("ALGO NO ANDUVO\n");
+			exit(1);
+		}
+		wait(NULL);
+		Logger::notice("Registracion completa, espero por memoria compartida");
 		
 		//sem_tabla.p();
 		semaforoDistribuido_P(tabla, ID_SUB_BROKER_DISPONIBILIDAD);

@@ -104,11 +104,10 @@ registrar_tester_activo_1_svc(par_broker_tester *argp, struct svc_req *rqstp)
 {
 	static int  result;
 	if (!inicializado) inicializar();
-	if (argp->id_broker > MAX_BROKERS || argp->id_tester > MAX_TESTERS_COMUNES + MAX_TESTERS_ESPECIALES){
+	if (argp->id_tester > MAX_TESTERS_COMUNES + MAX_TESTERS_ESPECIALES){
 		result = -2;
 		return &result;
 	}
-	
 	tester_en_broker[argp->id_tester - 1] = argp->id_broker;
 	result = 1;
 	
