@@ -59,6 +59,7 @@ int AtendedorTesters::recibirRequerimiento() {
         this->terminar_atencion(TIPO_COMUN);
         exit(0);
     }
+    this->broker_ultimo_disp = msg.broker;
     return msg.idDispositivo;
 }
 
@@ -70,6 +71,7 @@ void AtendedorTesters::enviarPrograma(int idDispositivo, int idPrograma) {
     msg.finalizar_conexion = 0;
     msg.tester = this->idTester;
     msg.value = idPrograma;
+    msg.broker = this->broker_ultimo_disp;
     msg.es_requerimiento = 0;
     
     int ret = msgsnd(this->cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
@@ -83,7 +85,7 @@ void AtendedorTesters::enviarPrograma(int idDispositivo, int idPrograma) {
 
 int AtendedorTesters::recibirResultado() {
     TMessageAtendedor msg;
-    
+   
     int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), this->idTester, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir resultado del atendedor. Error: ") + std::string(strerror(errno));
@@ -104,6 +106,7 @@ void AtendedorTesters::enviarOrden(int idDispositivo, int orden, int cantidad) {
     msg.value = orden;
     msg.cant_testers = cantidad;
     msg.es_requerimiento = 0;
+    msg.broker = this->broker_ultimo_disp;
     
     int ret = msgsnd(this->cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
@@ -122,6 +125,7 @@ void AtendedorTesters::enviarAEspeciales(bool cuales[], int posicion){
 	msg.value = posicion;
 	msg.es_requerimiento = 1;
 	msg.finalizar_conexion = 0;
+	msg.broker = this->broker_ultimo_disp;
 	Logger::notice("Pongo id de testers especiales que voy a usar", __FILE__);
 	for (int i = 0; i < MAX_TESTERS_ESPECIALES; i++){
 		if (cuales[i]){
@@ -148,6 +152,7 @@ int AtendedorTesters::recibirRequerimientoEspecial() {
         this->terminar_atencion(TIPO_ESPECIAL);
         exit(0);
     }
+    this->broker_ultimo_disp = msg.broker;
     return msg.value;
 }
 
