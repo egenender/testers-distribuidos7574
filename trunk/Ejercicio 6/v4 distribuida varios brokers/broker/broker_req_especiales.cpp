@@ -24,12 +24,6 @@ int main (void){
 	Semaphore sem_comunes(SEM_CANT_TESTERS_COMUNES);
 	sem_comunes.getSem();
 	
-	/*key = ftok(ipcFileName.c_str(), SHM_TABLA_TESTERS);
-    int shmtabla = shmget(key, sizeof(tabla_testers_disponibles_t) , IPC_CREAT | 0660);
-    tabla_testers_disponibles_t* tabla = (tabla_testers_disponibles_t*)shmat(shmtabla, NULL, 0);
-    
-    Semaphore sem_tabla(SEM_TABLA_TESTERS);
-    sem_tabla.getSem();*/
     tabla_testers_disponibles_t* tabla = (tabla_testers_disponibles_t*) malloc(sizeof(tabla_testers_disponibles_t));
     
     Logger::notice("Termino la obtencion de ipcs", __FILE__);
@@ -73,12 +67,12 @@ int main (void){
 				
 				msg.mtype = 0;
 				while (msg.mtype == 0){
-					semaforoDistribuido_P(tabla, 152);
+					semaforoDistribuido_P(tabla, ID_SUB_BROKER_REQUERIMIENTOS_ESPECIALES);
 					if (tabla->testers_especiales[i]){
 						tabla->testers_especiales[i] = 0;
 						msg.mtype = i + ID_TESTER_ESPECIAL_START;
 					}
-					semaforoDistribuido_V(tabla, 152);
+					semaforoDistribuido_V(tabla, ID_SUB_BROKER_REQUERIMIENTOS_ESPECIALES);
 				}
 				
 				//msg.mtype = i + ID_TESTER_ESPECIAL_START;

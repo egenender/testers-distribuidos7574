@@ -45,7 +45,7 @@ int main (void){
 		Logger::notice(ss.str(), __FILE__);
 		
 		//sem_tabla.p();
-		semaforoDistribuido_P(tabla, 153);
+		semaforoDistribuido_P(tabla, ID_SUB_BROKER_DISPONIBILIDAD);
 		if (msg.tester <= MAX_TESTERS_COMUNES){
 			Logger::notice("Era un tester comun, lo agrego a cola de testers comunes", __FILE__);
 			tabla->testers_comunes[tabla->end++] = msg.tester;
@@ -62,7 +62,7 @@ int main (void){
 		}
 		Logger::notice("Libero la memoria compartida de tabla", __FILE__);
 		//sem_tabla.v();
-		semaforoDistribuido_V(tabla, 153);
+		semaforoDistribuido_V(tabla, ID_SUB_BROKER_DISPONIBILIDAD);
 	}
 }
 
