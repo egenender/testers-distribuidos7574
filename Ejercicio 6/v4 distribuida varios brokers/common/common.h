@@ -124,6 +124,7 @@ typedef struct message {
 	int32_t finalizar_conexion;
 	int32_t es_requerimiento;
 	int32_t es_especial; //Solo por si acaso
+	int32_t broker;
 	/* END HEADER */
 	int32_t idDispositivo;
 	int32_t tester;
