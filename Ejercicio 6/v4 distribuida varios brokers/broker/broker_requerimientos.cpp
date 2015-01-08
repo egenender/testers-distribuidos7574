@@ -8,7 +8,7 @@
 #include "../logger/Logger.h"
 #include "../ipc/semaforos_distribuidos.h"
 
-int main (void){
+int main (int argc, char** argv){
 	Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
 	Logger::notice("Creo los ipcs necesarias", __FILE__);
 	key_t key;
@@ -23,6 +23,8 @@ int main (void){
 	sem_comunes.getSem();
 	
     tabla_testers_disponibles_t* tabla = (tabla_testers_disponibles_t*) malloc(sizeof(tabla_testers_disponibles_t));
+    
+    int id_broker = atoi(argv[1]);
     
 	Logger::notice("Termino la obtencion de ipcs", __FILE__);
 	/* Fin Setup */
@@ -57,7 +59,7 @@ int main (void){
 			}
 			semaforoDistribuido_V(tabla, ID_SUB_BROKER_REQUERIMIENTOS);
 		}
-		
+		msg.broker = id_broker;
 		int ret = msgsnd(cola_hacia_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
 		if(ret == -1) {
 			exit(1);
