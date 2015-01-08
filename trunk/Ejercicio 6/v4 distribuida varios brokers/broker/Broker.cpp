@@ -100,6 +100,9 @@ void crear_ipcs(){
 }
 
 void crear_sub_brokers(){	
+	char param_id[5];
+	sprintf(param_id, "%d", ID_BROKER);
+	
 	Logger::notice("Creo el broker pasa manos", __FILE__);
 	if (fork() == 0){
 		execlp("./broker/broker_pasa_manos", "broker_pasa_manos", (char*)0);
@@ -109,7 +112,7 @@ void crear_sub_brokers(){
 	
 	Logger::notice("Creo el broker de nuevos requerimientos", __FILE__);
 	if (fork() == 0){
-		execlp("./broker/broker_requerimientos", "broker_requerimientos", (char*)0);
+		execlp("./broker/broker_requerimientos", "broker_requerimientos", param_id, (char*)0);
         exit(1);
 	}
 	
@@ -124,9 +127,6 @@ void crear_sub_brokers(){
 		execlp("./broker/broker_shm_testers_req", "broker_shm_testers_req", (char*)0);
         exit(1);
 	}
-	
-	char param_id[5];
-	sprintf(param_id, "%d", ID_BROKER);
 	
 	Logger::notice("Creo el broker de otorgamiento de shm de testers", __FILE__);
 	if (fork() == 0){
