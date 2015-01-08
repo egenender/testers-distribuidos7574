@@ -73,6 +73,7 @@ broker: semaphore distributed_semaphore lockfile logger
 	$(CC) $(CFLAGS) broker/broker_shm_testers_otorga.cpp LockFile.o logger/Logger.o Semaphore.o -o broker/broker_shm_testers_otorga
 	$(CC) $(CFLAGS) broker/broker_disponibilidad_testers.cpp LockFile.o logger/Logger.o Semaphore.o semaforos_distribuidos.o -o broker/broker_disponibilidad_testers
 	$(CC) $(CFLAGS) broker/broker_cola_shm.cpp LockFile.o logger/Logger.o Semaphore.o -o broker/broker_cola_shm
+	$(CC) $(CFLAGS) broker/broker_pasa_brokers.cpp LockFile.o logger/Logger.o Semaphore.o -o broker/broker_pasa_brokers
 
 rpc_services:
 	@make -f servicio_rpc/Makefile.registracion
@@ -103,6 +104,6 @@ clean: cleanO
 	@echo "Eliminando log"
 	@rm -f log.txt
 	@echo "Eliminando ejecutables"
-	@rm -f Dispositivo Tecnico TesterComun TesterEspecial tcp/tcpclient_receptor tcp/tcpclient_emisor tcp/tcpserver_receptor tcp/tcpserver_emisor Broker broker/broker_pasa_manos broker/broker_req_especiales broker/broker_requerimientos broker/broker_shm_testers_req broker/broker_shm_testers_otorga broker/broker_disponibilidad_testers broker/broker_cola_shm servicio_rpc/registracion_server servicio_rpc/get_id servicio_rpc/devolver_id servicio_rpc/registrar_tester iniciador LanzaDisp terminador
+	@rm -f Dispositivo Tecnico TesterComun TesterEspecial tcp/tcpclient_receptor tcp/tcpclient_emisor tcp/tcpserver_receptor tcp/tcpserver_emisor Broker broker/broker_pasa_manos broker/broker_req_especiales broker/broker_requerimientos broker/broker_shm_testers_req broker/broker_shm_testers_otorga broker/broker_disponibilidad_testers broker/broker_cola_shm broker/broker_pasa_brokers servicio_rpc/registracion_server servicio_rpc/get_id servicio_rpc/devolver_id servicio_rpc/registrar_tester servicio_rpc/consultar_broker_tester iniciador LanzaDisp terminador
 	@echo "Eliminando script destructor"
 	@rm -f destroy.sh

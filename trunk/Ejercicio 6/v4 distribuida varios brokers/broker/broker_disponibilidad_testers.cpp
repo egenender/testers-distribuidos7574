@@ -13,7 +13,7 @@
 int main (int argc, char** argv){	
 	Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
 	Logger::notice("Creo los ipcs necesarias", __FILE__);
-	int id_broker = atoi(argv[1]);
+	char* id_broker = argv[1];
 	
 	key_t key;
 	
@@ -50,7 +50,7 @@ int main (int argc, char** argv){
 		char param_id[4];
 		sprintf(param_id, "%d", msg.tester);
 		if (fork() == 0){
-			execlp("./servicio_rpc/registrar_tester", "registrar_tester", UBICACION_SERVER ,argv[1], param_id,(char*)0);
+			execlp("./servicio_rpc/registrar_tester", "registrar_tester", UBICACION_SERVER ,id_broker, param_id,(char*)0);
 			printf("ALGO NO ANDUVO\n");
 			exit(1);
 		}
@@ -61,7 +61,8 @@ int main (int argc, char** argv){
 		semaforoDistribuido_P(tabla, ID_SUB_BROKER_DISPONIBILIDAD);
 		if (msg.tester <= MAX_TESTERS_COMUNES){
 			Logger::notice("Era un tester comun, lo agrego a cola de testers comunes", __FILE__);
-			tabla->testers_comunes[tabla->end++] = msg.tester;
+			tabla->testers_comunes[tabla->end] = msg.tester;
+			tabla->end = (tabla->end + 1) % MAX_TESTERS_COMUNES;
 			tabla->cant++;
 			Semaphore sem_comunes(SEM_CANT_TESTERS_COMUNES);
 			sem_comunes.getSem();

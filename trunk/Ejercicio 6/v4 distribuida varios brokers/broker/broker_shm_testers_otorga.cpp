@@ -132,8 +132,9 @@ int main (int argc, char** argv){
 		int ret = msgsnd(cola_shm_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
 		if (ret == -1) exit(0);
 		
+		
 		if ( siguiente == broker_id ){
-			sleep(1); //Esperamos para el caso que hay un solo broker, para que no termine consumiendo el procesador
+			usleep(100); //Esperamos para el caso que hay un solo broker, para que no termine consumiendo el procesador
 		}
 		
 	}

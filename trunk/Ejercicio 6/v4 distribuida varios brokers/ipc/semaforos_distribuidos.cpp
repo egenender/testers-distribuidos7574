@@ -6,7 +6,7 @@
 
 void semaforoDistribuido_P(tabla_testers_disponibles_t* tabla, int id_sub_broker){
 	key_t key;
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_ENVIO_MENSAJES_TESTERS);
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_ENVIO_MENSAJES_TESTERS_FINAL);
 	int cola_recibos = msgget(key, 0666);
         
     key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_REQUERIMIENTOS_SHM);
