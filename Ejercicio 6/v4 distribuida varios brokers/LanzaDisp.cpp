@@ -99,6 +99,7 @@ void createSystemProcesses(int cant_dispositivos, int min_lanzados, int max_lanz
 				Logger::error("Error al ejecutar el programa dispositivo de ID" + idDispositivo, __FILE__);
 				exit(1);
 			}
+			usleep(10);
 		}
 		cantidad_lanzada += cantidad_a_lanzar;
 		long tiempo = micro_sim * 1000;

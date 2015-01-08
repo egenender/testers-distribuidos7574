@@ -140,6 +140,12 @@ void crear_sub_brokers(){
         exit(1);
 	}
 	
+	Logger::notice("Creo el broker pasa manos a otros brokers", __FILE__);
+	if (fork() == 0){
+		execlp("./broker/broker_pasa_brokers", "broker_pasa_brokers", param_id, (char*)0);
+        exit(1);
+	}
+	
 	if (fork() == 0){
 		execlp("./broker/broker_cola_shm", "broker_cola_shm","103" ,(char*)0);
         exit(1);
@@ -160,7 +166,7 @@ void crear_servers(){
     
     // HACIA TESTERS
     sprintf(param_cola, "%d", MSGQUEUE_BROKER_ENVIO_MENSAJES_DISPOSITIVOS);
-    sprintf(param_cola2, "%d", MSGQUEUE_BROKER_ENVIO_MENSAJES_TESTERS);
+    sprintf(param_cola2, "%d", MSGQUEUE_BROKER_ENVIO_MENSAJES_TESTERS_FINAL);
     Logger::notice("Creo el servidor receptor de mensajes de testers", __FILE__);
 	if (fork() == 0){
 		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_SERVER_RECEPTOR_TESTERS , param_id, param_cola,param_cola2 ,(char*)0);
@@ -168,7 +174,7 @@ void crear_servers(){
 	}
 	
 	Logger::notice("Creo el servidor emisor de mensajes a testers", __FILE__);
-	sprintf(param_cola, "%d", MSGQUEUE_BROKER_ENVIO_MENSAJES_TESTERS);
+	sprintf(param_cola, "%d", MSGQUEUE_BROKER_ENVIO_MENSAJES_TESTERS_FINAL);
 	if (fork() == 0){
 		execlp("./tcp/tcpserver_emisor", "tcpserver_emisor", PUERTO_SERVER_EMISOR_TESTERS ,param_id, param_cola,(char*)0);
         exit(1);
