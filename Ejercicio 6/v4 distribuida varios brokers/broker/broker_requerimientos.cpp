@@ -22,12 +22,6 @@ int main (void){
 	Semaphore sem_comunes(SEM_CANT_TESTERS_COMUNES);
 	sem_comunes.getSem();
 	
-	/*key = ftok(ipcFileName.c_str(), SHM_TABLA_TESTERS);
-    int shmtabla = shmget(key, sizeof(tabla_testers_disponibles_t) , IPC_CREAT | 0660);
-    tabla_testers_disponibles_t* tabla = (tabla_testers_disponibles_t*)shmat(shmtabla, NULL, 0);
-    
-    Semaphore sem_tabla(SEM_TABLA_TESTERS);
-    sem_tabla.getSem();*/
     tabla_testers_disponibles_t* tabla = (tabla_testers_disponibles_t*) malloc(sizeof(tabla_testers_disponibles_t));
     
 	Logger::notice("Termino la obtencion de ipcs", __FILE__);
@@ -51,7 +45,7 @@ int main (void){
 		//sem_tabla.p();
 		msg.mtype = 0;
 		while (msg.mtype == 0){
-			semaforoDistribuido_P(tabla, 158);
+			semaforoDistribuido_P(tabla, ID_SUB_BROKER_REQUERIMIENTOS);
 			ss << "Tengo la shm!";
 			Logger::notice (ss.str(), __FILE__);
 			ss.str("");
@@ -61,7 +55,7 @@ int main (void){
 				tabla->start = (tabla->start + 1) % MAX_TESTERS_COMUNES;
 				tabla->cant--;
 			}
-			semaforoDistribuido_V(tabla, 158);
+			semaforoDistribuido_V(tabla, ID_SUB_BROKER_REQUERIMIENTOS);
 		}
 		
 		int ret = msgsnd(cola_hacia_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
