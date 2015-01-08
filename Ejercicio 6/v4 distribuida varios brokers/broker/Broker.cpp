@@ -9,7 +9,7 @@
 #include "../ipc/Semaphore.h"
 #include "../logger/Logger.h"
 
-#define ID_BROKER 1
+#define ID_BROKER 1001
 
 void crear_ipcs(){
 	Logger::notice("Creo las colas necesarias", __FILE__);
@@ -125,17 +125,18 @@ void crear_sub_brokers(){
         exit(1);
 	}
 	
+	char param_id[5];
+	sprintf(param_id, "%d", ID_BROKER);
+	
 	Logger::notice("Creo el broker de otorgamiento de shm de testers", __FILE__);
 	if (fork() == 0){
-		char param_id[2];
-		sprintf(param_id, "%d", ID_BROKER);
 		execlp("./broker/broker_shm_testers_otorga", "broker_shm_testers_otorga", param_id,(char*)0);
         exit(1);
 	}
 	
 	Logger::notice("Creo el broker de disponibilidad de testers", __FILE__);
 	if (fork() == 0){
-		execlp("./broker/broker_disponibilidad_testers", "broker_disponibilidad_testers", (char*)0);
+		execlp("./broker/broker_disponibilidad_testers", "broker_disponibilidad_testers", param_id, (char*)0);
         exit(1);
 	}
 	
