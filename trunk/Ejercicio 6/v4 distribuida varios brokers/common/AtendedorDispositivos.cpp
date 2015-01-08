@@ -139,7 +139,7 @@ int getIdDispositivo(){
     int cola_ids = msgget(key, 0666 | IPC_CREAT);
     
 	if (fork() == 0){
-		execlp("./broker/servicio_rpc/get_id", "get_id", UBICACION_SERVER ,"2",(char*)0);
+		execlp("./servicio_rpc/get_id", "get_id", UBICACION_SERVER ,"2",(char*)0);
 		printf("ALGO NO ANDUVO\n");
         exit(1);
 	}
@@ -167,7 +167,7 @@ void devolverIdDispositivo(int id){
 	sprintf(param_id, "%d", id);
 	
 	if (fork() == 0){
-		execlp("./broker/servicio_rpc/devolver_id", "devolver_id", UBICACION_SERVER ,"2", param_id,(char*)0);
+		execlp("./servicio_rpc/devolver_id", "devolver_id", UBICACION_SERVER ,"2", param_id,(char*)0);
 		printf("ALGO NO ANDUVO\n");
         exit(1);
 	}

@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #define SOLO_C
-#include "../../common/common.h"
+#include "../common/common.h"
 
 bool ids_dispositivos_disponibles[MAX_DISPOSITIVOS_EN_SISTEMA]; //ver si ampliamos los ids
 int siguiente_id_dispositivo;

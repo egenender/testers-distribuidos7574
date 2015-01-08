@@ -21,13 +21,9 @@
 #include "logger/Logger.h"
 
 void createIPCObjects();
-void createSystemProcesses(int, int, int, int);
+void createSystemProcesses();
 
 int main(int argc, char** argv) {
-    if (argc != 5){
-		printf("Uso: %s <CANT_DISPOSITIVOS> <MIN_DISP> <MAX_DISP> <TIEMPO_SEP_SIM_MILISEC>\n", argv[0]);
-		exit(0);
-	}
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
     Logger::error("Logger inicializado. Inicializando IPCs...", __FILE__);
     
@@ -40,7 +36,7 @@ int main(int argc, char** argv) {
     }
     Logger::debug("Objetos IPC inicializados correctamente. Iniciando procesos...", __FILE__);
     
-    createSystemProcesses(atoi(argv[1]), atoi(argv[2]), atoi(argv[3]), atoi(argv[4]));
+    createSystemProcesses();
     Logger::debug("Procesos iniciados correctamente...", __FILE__);
     
     Logger::notice("Sistema inicializado correctamente...", __FILE__);
@@ -91,8 +87,15 @@ void createIPCObjects() {
    
 }
 
-void createSystemProcesses(int cant_dispositivos, int min_lanzados, int max_lanzados, int micro_sim) {
-   if (fork() == 0){
+void createSystemProcesses() {
+	Logger::notice("Creo el servidor rpc", __FILE__);
+	if (fork() == 0){
+		execlp("./servicio_rpc/registracion_server", "registracion_server", (char*)0);
+		Logger::notice ("Algo se rompio", __FILE__);
+        exit(1);
+	}
+	
+	if (fork() == 0){
 		execlp("./Broker", "Broker", (char*)0);
         Logger::error("Error al ejecutar el programa broker", __FILE__);
         exit(1);

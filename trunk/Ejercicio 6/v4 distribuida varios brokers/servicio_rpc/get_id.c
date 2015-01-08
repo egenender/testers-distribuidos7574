@@ -1,6 +1,6 @@
 #include "registracion.h"
 #define SOLO_C
-#include "../../common/common.h"
+#include "../common/common.h"
 #include <sys/msg.h>
 
 int get_id(char *host, int tipo) {

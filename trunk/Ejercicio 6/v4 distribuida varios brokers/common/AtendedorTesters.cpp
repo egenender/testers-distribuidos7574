@@ -182,7 +182,7 @@ int getIdTester(int tipo){
     sprintf(param_tipo, "%d",tipo);
     
 	if (fork() == 0){
-		execlp("./broker/servicio_rpc/get_id", "get_id", UBICACION_SERVER ,param_tipo,(char*)0);
+		execlp("./servicio_rpc/get_id", "get_id", UBICACION_SERVER ,param_tipo,(char*)0);
 		printf("ALGO NO ANDUVO\n");
         exit(1);
 	}
@@ -228,7 +228,7 @@ void devolverIdTester(int id, int tipo){
 	sprintf(param_tipo, "%d", tipo);
 	
 	if (fork() == 0){
-		execlp("./broker/servicio_rpc/devolver_id", "devolver_id", UBICACION_SERVER ,param_tipo, param_id,(char*)0);
+		execlp("./servicio_rpc/devolver_id", "devolver_id", UBICACION_SERVER ,param_tipo, param_id,(char*)0);
 		printf("ALGO NO ANDUVO\n");
         exit(1);
 	}

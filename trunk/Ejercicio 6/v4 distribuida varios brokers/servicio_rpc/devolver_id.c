@@ -1,6 +1,6 @@
 #include "registracion.h"
 #define SOLO_C
-#include "../../common/common.h"
+#include "../common/common.h"
 #include <sys/msg.h>
 
 int devolver_id(char *host, int tipo, int id) {
