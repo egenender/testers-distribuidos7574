@@ -13,12 +13,12 @@ SOURCES_SVC.c =
 SOURCES_SVC.h = 
 SOURCES.x = broker/servicio_rpc/registracion.x
 
-TARGETS_SVC.c = broker/servicio_rpc/registracion_svc.c broker/servicio_rpc/registracion_server.c   
-TARGETS_CLNT.c = broker/servicio_rpc/registracion_clnt.c broker/servicio_rpc/get_id.c   
-TARGETS_CLNT2.c = broker/servicio_rpc/registracion_clnt.c broker/servicio_rpc/devolver_id.c   
+TARGETS_SVC.c = broker/servicio_rpc/registracion_svc.c broker/servicio_rpc/registracion_server.c broker/servicio_rpc/registracion_xdr.c 
+TARGETS_CLNT.c = broker/servicio_rpc/registracion_clnt.c broker/servicio_rpc/get_id.c broker/servicio_rpc/registracion_xdr.c 
+TARGETS_CLNT2.c = broker/servicio_rpc/registracion_clnt.c broker/servicio_rpc/devolver_id.c broker/servicio_rpc/registracion_xdr.c 
 
-TARGETS = broker/servicio_rpc/registracion.h   broker/servicio_rpc/registracion_clnt.c broker/servicio_rpc/registracion_svc.c broker/servicio_rpc/get_id.c broker/servicio_rpc/registracion_server.c
-TARGETS2 = broker/servicio_rpc/registracion.h   broker/servicio_rpc/registracion_clnt.c broker/servicio_rpc/registracion_svc.c broker/servicio_rpc/devolver_id.c broker/servicio_rpc/registracion_server.c
+TARGETS = broker/servicio_rpc/registracion.h   broker/servicio_rpc/registracion_clnt.c broker/servicio_rpc/registracion_svc.c broker/servicio_rpc/get_id.c broker/servicio_rpc/registracion_server.c broker/servicio_rpc/registracion_xdr.c 
+TARGETS2 = broker/servicio_rpc/registracion.h   broker/servicio_rpc/registracion_clnt.c broker/servicio_rpc/registracion_svc.c broker/servicio_rpc/devolver_id.c broker/servicio_rpc/registracion_server.c broker/servicio_rpc/registracion_xdr.c 
 
 OBJECTS_CLNT = $(SOURCES_CLNT.c:%.c=%.o) $(TARGETS_CLNT.c:%.c=%.o)
 OBJECTS_CLNT2 = $(SOURCES_CLNT.c:%.c=%.o) $(TARGETS_CLNT2.c:%.c=%.o)
