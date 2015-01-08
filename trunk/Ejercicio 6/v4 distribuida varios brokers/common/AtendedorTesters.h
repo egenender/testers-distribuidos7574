@@ -13,7 +13,8 @@ private:
     int cola_envios;
     int cola_recibos;
     int idTester;
-    
+	
+	int broker_ultimo_disp;
     void activarTester();  
 public:
     AtendedorTesters(int tipo);
