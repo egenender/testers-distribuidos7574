@@ -14,6 +14,12 @@ extern "C" {
 #endif
 
 
+struct par_broker_tester {
+	int id_broker;
+	int id_tester;
+};
+typedef struct par_broker_tester par_broker_tester;
+
 #define REGISTER 0x2fffffff
 #define REGISTER_V1 1
 
@@ -25,14 +31,17 @@ extern  int * get_id_dispositivo_1_svc(void *, struct svc_req *);
 extern  int * get_id_tester_1(int *, CLIENT *);
 extern  int * get_id_tester_1_svc(int *, struct svc_req *);
 #define REGISTRAR_TESTER_ACTIVO 3
-extern  int * registrar_tester_activo_1(int *, CLIENT *);
-extern  int * registrar_tester_activo_1_svc(int *, struct svc_req *);
+extern  int * registrar_tester_activo_1(par_broker_tester *, CLIENT *);
+extern  int * registrar_tester_activo_1_svc(par_broker_tester *, struct svc_req *);
 #define DEVOLVER_ID_DISPOSITIVO 4
 extern  int * devolver_id_dispositivo_1(int *, CLIENT *);
 extern  int * devolver_id_dispositivo_1_svc(int *, struct svc_req *);
 #define DEVOLVER_ID_TESTER 5
 extern  int * devolver_id_tester_1(int *, CLIENT *);
 extern  int * devolver_id_tester_1_svc(int *, struct svc_req *);
+#define BROKER_DE_TESTER 6
+extern  int * broker_de_tester_1(int *, CLIENT *);
+extern  int * broker_de_tester_1_svc(int *, struct svc_req *);
 extern int register_1_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
 
 #else /* K&R C */
@@ -51,7 +60,20 @@ extern  int * devolver_id_dispositivo_1_svc();
 #define DEVOLVER_ID_TESTER 5
 extern  int * devolver_id_tester_1();
 extern  int * devolver_id_tester_1_svc();
+#define BROKER_DE_TESTER 6
+extern  int * broker_de_tester_1();
+extern  int * broker_de_tester_1_svc();
 extern int register_1_freeresult ();
+#endif /* K&R C */
+
+/* the xdr functions */
+
+#if defined(__STDC__) || defined(__cplusplus)
+extern  bool_t xdr_par_broker_tester (XDR *, par_broker_tester*);
+
+#else /* K&R C */
+extern bool_t xdr_par_broker_tester ();
+
 #endif /* K&R C */
 
 #ifdef __cplusplus

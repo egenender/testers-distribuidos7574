@@ -6,12 +6,12 @@
 
 bool ids_dispositivos_disponibles[MAX_DISPOSITIVOS_EN_SISTEMA]; //ver si ampliamos los ids
 int siguiente_id_dispositivo;
-bool ids_tester_disponibles[MAX_TESTERS_COMUNES + MAX_TESTERS_ESPECIALES]; //ver si ampliamos los ids
+bool ids_tester_disponibles[MAX_TESTERS_COMUNES + MAX_TESTERS_ESPECIALES];
+int tester_en_broker[MAX_TESTERS_COMUNES + MAX_TESTERS_ESPECIALES];
 int siguiente_id_tester_comun;
 int siguiente_id_tester_especial;
 bool inicializado = false;
 
-tabla_testers_disponibles_t* tabla;
 
 void inicializar(){
 	int i;
@@ -22,6 +22,7 @@ void inicializar(){
 	
 	for (i = 0; i < MAX_TESTERS_COMUNES + MAX_TESTERS_ESPECIALES; i++){
 		ids_tester_disponibles[i] = true;
+		tester_en_broker[i] = 0;
 	}
 	siguiente_id_tester_comun = 0; //idem
 	siguiente_id_tester_especial = MAX_TESTERS_COMUNES; //idem
@@ -97,11 +98,20 @@ get_id_tester_1_svc(int *argp, struct svc_req *rqstp)
 	return &result;
 }
 
+
 int *
-registrar_tester_activo_1_svc(int *argp, struct svc_req *rqstp)
+registrar_tester_activo_1_svc(par_broker_tester *argp, struct svc_req *rqstp)
 {
 	static int  result;
-	// Deprecated. Hay que ver de generar una nueva version en todo caso. Cuando se vea el tema de los nuevos servicios de localizacion
+	if (!inicializado) inicializar();
+	if (argp->id_broker > MAX_BROKERS || argp->id_tester > MAX_TESTERS_COMUNES + MAX_TESTERS_ESPECIALES){
+		result = -2;
+		return &result;
+	}
+	
+	tester_en_broker[argp->id_tester - 1] = argp->id_broker;
+	result = 1;
+	
 	return &result;
 }
 
@@ -152,3 +162,18 @@ devolver_id_tester_1_svc(int *argp, struct svc_req *rqstp)
 	return &result;
 }
 
+
+int *
+broker_de_tester_1_svc(int *argp, struct svc_req *rqstp)
+{
+	static int  result;
+	if (!inicializado) inicializar();	
+	int tester = *argp;
+	if (tester < 1 || tester > MAX_TESTERS_COMUNES + MAX_TESTERS_ESPECIALES){
+		result = -1;
+		return &result;
+	}
+	
+	result = tester_en_broker[tester - 1];
+	return &result;
+}

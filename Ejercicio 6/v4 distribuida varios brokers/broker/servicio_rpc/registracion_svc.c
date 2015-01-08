@@ -21,9 +21,10 @@ register_1(struct svc_req *rqstp, register SVCXPRT *transp)
 {
 	union {
 		int get_id_tester_1_arg;
-		int registrar_tester_activo_1_arg;
+		par_broker_tester registrar_tester_activo_1_arg;
 		int devolver_id_dispositivo_1_arg;
 		int devolver_id_tester_1_arg;
+		int broker_de_tester_1_arg;
 	} argument;
 	char *result;
 	xdrproc_t _xdr_argument, _xdr_result;
@@ -47,7 +48,7 @@ register_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		break;
 
 	case REGISTRAR_TESTER_ACTIVO:
-		_xdr_argument = (xdrproc_t) xdr_int;
+		_xdr_argument = (xdrproc_t) xdr_par_broker_tester;
 		_xdr_result = (xdrproc_t) xdr_int;
 		local = (char *(*)(char *, struct svc_req *)) registrar_tester_activo_1_svc;
 		break;
@@ -62,6 +63,12 @@ register_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		_xdr_argument = (xdrproc_t) xdr_int;
 		_xdr_result = (xdrproc_t) xdr_int;
 		local = (char *(*)(char *, struct svc_req *)) devolver_id_tester_1_svc;
+		break;
+
+	case BROKER_DE_TESTER:
+		_xdr_argument = (xdrproc_t) xdr_int;
+		_xdr_result = (xdrproc_t) xdr_int;
+		local = (char *(*)(char *, struct svc_req *)) broker_de_tester_1_svc;
 		break;
 
 	default:

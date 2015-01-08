@@ -40,13 +40,13 @@ get_id_tester_1(int *argp, CLIENT *clnt)
 }
 
 int *
-registrar_tester_activo_1(int *argp, CLIENT *clnt)
+registrar_tester_activo_1(par_broker_tester *argp, CLIENT *clnt)
 {
 	static int clnt_res;
 
 	memset((char *)&clnt_res, 0, sizeof(clnt_res));
 	if (clnt_call (clnt, REGISTRAR_TESTER_ACTIVO,
-		(xdrproc_t) xdr_int, (caddr_t) argp,
+		(xdrproc_t) xdr_par_broker_tester, (caddr_t) argp,
 		(xdrproc_t) xdr_int, (caddr_t) &clnt_res,
 		TIMEOUT) != RPC_SUCCESS) {
 		return (NULL);
@@ -76,6 +76,21 @@ devolver_id_tester_1(int *argp, CLIENT *clnt)
 
 	memset((char *)&clnt_res, 0, sizeof(clnt_res));
 	if (clnt_call (clnt, DEVOLVER_ID_TESTER,
+		(xdrproc_t) xdr_int, (caddr_t) argp,
+		(xdrproc_t) xdr_int, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+int *
+broker_de_tester_1(int *argp, CLIENT *clnt)
+{
+	static int clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, BROKER_DE_TESTER,
 		(xdrproc_t) xdr_int, (caddr_t) argp,
 		(xdrproc_t) xdr_int, (caddr_t) &clnt_res,
 		TIMEOUT) != RPC_SUCCESS) {
