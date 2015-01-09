@@ -17,7 +17,7 @@ int main (int argc, char** argv){
 	
 	key_t key;
 	
-	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_ENVIO_MENSAJES_DISPOSITIVOS);
+	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_ENVIO_MENSAJES_DISPOSITIVOS_FINAL);
 	int cola_disponibilidad = msgget(key, 0660 );
 	
 	/*key = ftok(ipcFileName.c_str(), SHM_TABLA_TESTERS);

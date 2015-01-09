@@ -18,7 +18,7 @@ int main (void){
 	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_ENVIO_MENSAJES_TESTERS);
 	int cola_hacia_testers = msgget(key, 0660 );
 	
-	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_ENVIO_MENSAJES_DISPOSITIVOS);
+	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_ENVIO_MENSAJES_DISPOSITIVOS_FINAL);
 	int cola_requerimiento_especiales = msgget(key, 0660);
 	
 	Semaphore sem_comunes(SEM_CANT_TESTERS_COMUNES);

@@ -10,7 +10,7 @@ int main(int argc, char** argv){
 	Logger::notice("Creo las colas necesarias", __FILE__);
 	key_t key;
 	
-	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_ENVIO_MENSAJES_DISPOSITIVOS);
+	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_ENVIO_MENSAJES_DISPOSITIVOS_FINAL);
 	int cola_hacia_dispositivos = msgget(key, 0660 );
 	
 	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_REQUERIMIENTOS_SHM);
