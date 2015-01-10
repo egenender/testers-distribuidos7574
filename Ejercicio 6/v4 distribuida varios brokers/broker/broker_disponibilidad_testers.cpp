@@ -50,7 +50,7 @@ int main (int argc, char** argv){
 		char param_id[4];
 		sprintf(param_id, "%d", msg.tester);
 		if (fork() == 0){
-			execlp("./servicio_rpc/registrar_tester", "registrar_tester", UBICACION_SERVER ,id_broker, param_id,(char*)0);
+			execlp("./servicio_rpc/registrar_tester", "registrar_tester", UBICACION_SERVER_RPC ,id_broker, param_id,(char*)0);
 			printf("ALGO NO ANDUVO\n");
 			exit(1);
 		}

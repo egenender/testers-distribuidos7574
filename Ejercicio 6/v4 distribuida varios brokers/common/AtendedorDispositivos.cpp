@@ -32,7 +32,7 @@ AtendedorDispositivos::AtendedorDispositivos() {
     sprintf(param_cola, "%d", MSGQUEUE_DISPOSITIVOS_RECIBOS);
     pid_t receptor = fork();
     if (receptor == 0){
-		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",UBICACION_SERVER ,PUERTO_SERVER_EMISOR_DISPOSITIVOS , param_cola,(char*)0);
+		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",UBICACION_BROKER ,PUERTO_SERVER_EMISOR_DISPOSITIVOS , param_cola,(char*)0);
         exit(1);
 	}
 	char param_pid[10];
@@ -40,7 +40,7 @@ AtendedorDispositivos::AtendedorDispositivos() {
 	sprintf(param_cola, "%d", MSGQUEUE_DISPOSITIVOS_ENVIOS);
 	
 	if (fork() == 0){
-		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",UBICACION_SERVER ,PUERTO_SERVER_RECEPTOR_DISPOSITIVOS , param_id, param_cola, param_pid,(char*)0);
+		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",UBICACION_BROKER ,PUERTO_SERVER_RECEPTOR_DISPOSITIVOS , param_id, param_cola, param_pid,(char*)0);
         exit(1);
 	}
 }
@@ -139,7 +139,7 @@ int getIdDispositivo(){
     int cola_ids = msgget(key, 0666 | IPC_CREAT);
     
 	if (fork() == 0){
-		execlp("./servicio_rpc/get_id", "get_id", UBICACION_SERVER ,"2",(char*)0);
+		execlp("./servicio_rpc/get_id", "get_id", UBICACION_SERVER_RPC ,"2",(char*)0);
 		printf("ALGO NO ANDUVO\n");
         exit(1);
 	}
@@ -167,7 +167,7 @@ void devolverIdDispositivo(int id){
 	sprintf(param_id, "%d", id);
 	
 	if (fork() == 0){
-		execlp("./servicio_rpc/devolver_id", "devolver_id", UBICACION_SERVER ,"2", param_id,(char*)0);
+		execlp("./servicio_rpc/devolver_id", "devolver_id", UBICACION_SERVER_RPC ,"2", param_id,(char*)0);
 		printf("ALGO NO ANDUVO\n");
         exit(1);
 	}

@@ -31,7 +31,7 @@ AtendedorTesters::AtendedorTesters(int tipo){
     sprintf(param_cola, "%d", MSGQUEUE_TESTERS_RECIBOS);
     pid_t receptor = fork();
     if (receptor == 0){
-		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",UBICACION_SERVER ,PUERTO_SERVER_EMISOR_TESTERS , param_cola,(char*)0);
+		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",UBICACION_BROKER ,PUERTO_SERVER_EMISOR_TESTERS , param_cola,(char*)0);
         exit(1);
 	}
 	char param_pid[10];
@@ -39,7 +39,7 @@ AtendedorTesters::AtendedorTesters(int tipo){
 	sprintf(param_cola, "%d", MSGQUEUE_TESTERS_ENVIOS);
 	
 	if (fork() == 0){
-		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",UBICACION_SERVER ,PUERTO_SERVER_RECEPTOR_TESTERS , param_id, param_cola, param_pid,(char*)0);
+		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",UBICACION_BROKER ,PUERTO_SERVER_RECEPTOR_TESTERS , param_id, param_cola, param_pid,(char*)0);
         exit(1);
 	}
 	
@@ -187,7 +187,7 @@ int getIdTester(int tipo){
     sprintf(param_tipo, "%d",tipo);
     
 	if (fork() == 0){
-		execlp("./servicio_rpc/get_id", "get_id", UBICACION_SERVER ,param_tipo,(char*)0);
+		execlp("./servicio_rpc/get_id", "get_id", UBICACION_SERVER_RPC ,param_tipo,(char*)0);
 		printf("ALGO NO ANDUVO\n");
         exit(1);
 	}
@@ -233,7 +233,7 @@ void devolverIdTester(int id, int tipo){
 	sprintf(param_tipo, "%d", tipo);
 	
 	if (fork() == 0){
-		execlp("./servicio_rpc/devolver_id", "devolver_id", UBICACION_SERVER ,param_tipo, param_id,(char*)0);
+		execlp("./servicio_rpc/devolver_id", "devolver_id", UBICACION_SERVER_RPC ,param_tipo, param_id,(char*)0);
 		printf("ALGO NO ANDUVO\n");
         exit(1);
 	}
