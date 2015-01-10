@@ -208,10 +208,9 @@ void crear_servers(){
 void crear_clientes_a_brokers(){
 	//TODO ESTO DEBERIA ESTAR EN UN FOR, y probablemente habria que pedir los ids del servicio rpc
 	char otro_broker[] = "localhost"; //cambiar
-	int otro_id = 1002;
 	
 	char param_id[10];
-    sprintf(param_id, "%d", 1002);
+    sprintf(param_id, "%d", ID_OTRO_BROKER);
     char param_cola[10];
     sprintf(param_cola, "%d", MSGQUEUE_BROKER_ENVIO_MENSAJES_DISPOSITIVOS_FINAL);
   	
@@ -238,6 +237,8 @@ int main (void){
 	crear_ipcs();
 	crear_servers();
 	crear_sub_brokers();
+	
+	sleep(5);
 	//crear_clientes_a_brokers();
 	exit(0);
 }

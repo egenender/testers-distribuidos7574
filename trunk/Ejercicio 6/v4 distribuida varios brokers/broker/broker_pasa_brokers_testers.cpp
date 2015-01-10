@@ -52,7 +52,7 @@ int main(int argc, char** argv){
 		if (fork() == 0){
 			char param_tester[4];
 			sprintf(param_tester, "%d",id_tester);
-			execlp("./servicio_rpc/consultar_broker_tester", "consultar_broker_tester", UBICACION_SERVER , param_tester ,(char*)0);
+			execlp("./servicio_rpc/consultar_broker_tester", "consultar_broker_tester", UBICACION_SERVER_RPC , param_tester ,(char*)0);
 			printf("ALGO NO ANDUVO\n");
 			exit(1);
 		}
