@@ -83,6 +83,8 @@ int main(int argc, char** argv){
 			ss << "El tester pertenecia esta conectado a este broker (" << id_broker_of_tester << ") asi que hago de pasamanos";
 			Logger::notice(ss.str(), __FILE__);
 			ss.str("");	
+			
+			msg.mtype = id_tester;
 		}
 		
 		int ret = msgsnd(cola_hacia_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);

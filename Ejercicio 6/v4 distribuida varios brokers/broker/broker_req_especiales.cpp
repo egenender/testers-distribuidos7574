@@ -45,6 +45,7 @@ int main (void){
 		
 		std::stringstream ss;
 		Logger::notice("Me llega un requerimiento especial", __FILE__);
+		msg.es_requerimiento = 0;
 		cant_atendidos++;
 		if (fork() != 0) continue;
 		

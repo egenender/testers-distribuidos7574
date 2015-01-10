@@ -10,7 +10,7 @@
 #include "../logger/Logger.h"
 
 #define ID_BROKER 1001
-#define ID_OTRO_BROKER 1001
+#define ID_OTRO_BROKER 1002
 
 void crear_ipcs(){
 	
@@ -208,7 +208,7 @@ void crear_servers(){
 
 void crear_clientes_a_brokers(){
 	//TODO ESTO DEBERIA ESTAR EN UN FOR, y probablemente habria que pedir los ids del servicio rpc
-	char otro_broker[] = "localhost"; //cambiar
+	char otro_broker[] = "192.168.1.102"; //cambiar
 	
 	char param_id[10];
     sprintf(param_id, "%d", ID_OTRO_BROKER);

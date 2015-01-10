@@ -88,12 +88,12 @@ void createIPCObjects() {
 }
 
 void createSystemProcesses() {
-	Logger::notice("Creo el servidor rpc", __FILE__);
+	/*Logger::notice("Creo el servidor rpc", __FILE__);
 	if (fork() == 0){
 		execlp("./servicio_rpc/registracion_server", "registracion_server", (char*)0);
 		Logger::notice ("Algo se rompio", __FILE__);
         exit(1);
-	}
+	}*/
 	
 	if (fork() == 0){
 		execlp("./Broker", "Broker", (char*)0);
