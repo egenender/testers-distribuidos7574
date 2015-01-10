@@ -84,7 +84,7 @@ int main(int argc, char** argv){
 			Logger::notice(ss.str(), __FILE__);
 			ss.str("");	
 			
-			msg.mtype = id_tester;
+			msg.mtype = id_tester; // No deberia ser necesario
 		}
 		
 		int ret = msgsnd(cola_hacia_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);

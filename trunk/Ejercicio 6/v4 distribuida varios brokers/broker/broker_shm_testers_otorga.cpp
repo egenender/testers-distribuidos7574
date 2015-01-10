@@ -136,7 +136,6 @@ int main (int argc, char** argv){
 		if ( siguiente == broker_id ){
 			usleep(100); //Esperamos para el caso que hay un solo broker, para que no termine consumiendo el procesador
 		}
-		sleep(3);
 		
 	}
 }
