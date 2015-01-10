@@ -44,7 +44,9 @@ int main(int argc, char *argv[]){
 		//Espero mensaje de la cola
 		int ok_read = msgrcv(cola, buffer, size - sizeof(long), id, 0);			
 		if (ok_read == -1){
-			kill(receptor, SIGHUP);
+			if (receptor != 0){
+				kill(receptor, SIGHUP);
+			}
 			close(fd);
 			free(buffer);
 			exit(0);
@@ -55,7 +57,9 @@ int main(int argc, char *argv[]){
 		
 		//Si era un mensaje de finalizacion, 'mato' al receptor, y termino mi labor
 		if (buffer->finalizar_conexion){
-			kill(receptor, SIGHUP);
+			if (receptor != 0){
+				kill(receptor, SIGHUP);
+			}
 			close(fd);
 			free(buffer);
 			exit(0);

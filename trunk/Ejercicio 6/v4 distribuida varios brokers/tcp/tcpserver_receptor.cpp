@@ -61,7 +61,7 @@ int main(int argc, char *argv[]){
 		if (fork() == 0){
 			TMessageAtendedor* buffer = (TMessageAtendedor*) malloc(sizeof(TMessageAtendedor));
 			
-			//Espero primer mensaje, que el cliente me tiene que decir su ID.
+			//Espero primer mensaje, que el cliente me tiene que decir su ID.			
 			recibir(buffer, clientfd);
 									
 			key_t key = ftok(IPCS_FILE, MSGQUEUE_SERVER_RECEPTOR_EMISOR);
@@ -71,11 +71,12 @@ int main(int argc, char *argv[]){
 			buffer->mtype = id_tester;
 			buffer->value = getpid();
 			
-			int ok = msgsnd(cola_id_disp, buffer, sizeof(TMessageAtendedor) - sizeof(long), 0);
-			if (ok == -1){
-				exit(1);
-			}
-								
+			if (buffer->idDispositivo <= MAX_DISPOSITIVOS_EN_SISTEMA){
+				int ok = msgsnd(cola_id_disp, buffer, sizeof(TMessageAtendedor) - sizeof(long), 0);
+				if (ok == -1){
+					exit(1);
+				}
+			}					
 			key = ftok(IPCS_FILE, id_cola);
 			int cola = msgget(key, 0660);
 			key = ftok(IPCS_FILE, id_cola_emisor);

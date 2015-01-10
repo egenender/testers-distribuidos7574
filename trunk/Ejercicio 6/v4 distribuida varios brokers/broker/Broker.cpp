@@ -10,7 +10,7 @@
 #include "../logger/Logger.h"
 
 #define ID_BROKER 1001
-#define ID_OTRO_BROKER 1002
+#define ID_OTRO_BROKER 1001
 
 void crear_ipcs(){
 	
@@ -82,6 +82,7 @@ void crear_ipcs(){
 	}
 	
 	msg.version = 1;
+	msg.finalizar_conexion = 0;
 	
 	int ret = msgsnd(cola_shm_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
 	if (ret == -1) exit(0);
@@ -239,7 +240,7 @@ int main (void){
 	crear_sub_brokers();
 	
 	sleep(5);
-	//crear_clientes_a_brokers();
+	crear_clientes_a_brokers();
 	exit(0);
 }
 
