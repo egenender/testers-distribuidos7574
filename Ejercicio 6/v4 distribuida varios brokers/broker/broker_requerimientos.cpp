@@ -40,6 +40,8 @@ int main (int argc, char** argv){
 		ss << "Me llego un requerimiento desde el dispositivo " << msg.idDispositivo;
 		Logger::notice(ss.str(), __FILE__);
 		ss.str("");
+		
+		msg.es_requerimiento = 0;
 		//Logger::notice("Obtengo semaforo para actuar, esperando que haya testers comunes", __FILE__);
 		//sem_comunes.p();
 		//Logger::notice("Ya hay un tester comun, entonces puedo enviar el requerimiento", __FILE__);

@@ -69,6 +69,7 @@ int main(int argc, char *argv[]){
 			}
 					
 			long dispositivo_a_tratar = buffer->idDispositivo;
+		
 			pid_t receptor = buffer->value;
 			
 			buffer->tester = id_tester;
@@ -79,7 +80,9 @@ int main(int argc, char *argv[]){
 				
 				//Si el mensaje era de finalizacion, entonces 'mato' al receptor y termino mi labor
 				if (ok_read == -1 || buffer->finalizar_conexion){
-					kill(receptor, SIGHUP);
+					if (receptor != 0){
+						kill(receptor, SIGHUP);
+					}
 					free(buffer);
 					close(clientfd);
 					exit(0);
