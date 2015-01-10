@@ -104,7 +104,7 @@ const char PUERTO_SERVER_EMISOR_DISPOSITIVOS[] = "9003";
 const char PUERTO_SERVER_RECEPTOR_SHM[] = "9004";
 
 const char UBICACION_BROKER[] = "localhost"; //Cambiar
-const char UBICACION_SERVER_RPC[] = "192.168.1.102"; //Cambiar
+const char UBICACION_SERVER_RPC[] = "localhost"; //Cambiar
 
 //Estructuras communes:
 typedef struct resultado{
