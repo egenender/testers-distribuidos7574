@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-Wall -pedantic -pedantic-errors -g -ggdb
 
-all: inicia_comp dispositivo tecnico testerComun testerEspecial server_emisor server_receptor cliente_emisor cliente_receptor broker rpc_services iniciador lanzaDisp terminador destroy cleanO
+all: inicia_comp dispositivo tecnico testerComun testerEspecial tcp broker rpc_services iniciador lanzaDisp terminador destroy cleanO
 	@echo "Compilacion terminada"
 
 inicia_comp:
@@ -63,6 +63,8 @@ server_receptor:
 	
 server_emisor:
 	$(CC) $(CFLAGS) tcp/tcpserver_emisor.cpp -o tcp/tcpserver_emisor
+
+tcp: cliente_receptor cliente_emisor server_receptor server_emisor
 
 broker: semaphore distributed_semaphore lockfile logger
 	$(CC) $(CFLAGS) broker/Broker.cpp LockFile.o logger/Logger.o Semaphore.o -o Broker
