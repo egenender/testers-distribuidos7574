@@ -144,14 +144,18 @@ void crear_sub_brokers(){
 	if (fork() == 0){
 		char param_mtype[4];
 		sprintf(param_mtype, "%d", MTYPE_REQUERIMIENTO_SHM_TESTERS);
-		execlp("./broker/broker_cola_shm", "broker_cola_shm", param_mtype ,(char*)0);
+		char param_cola[4];
+		sprintf(param_cola, "%d", MSGQUEUE_BROKER_REQUERIMIENTOS_SHM);
+		execlp("./broker/broker_cola_shm", "broker_cola_shm", param_mtype,param_cola ,(char*)0);
         exit(1);
 	}
 	
 	if (fork() == 0){
 		char param_mtype[4];
 		sprintf(param_mtype, "%d", MTYPE_DEVOLUCION_SHM_TESTERS);
-		execlp("./broker/broker_cola_shm", "broker_cola_shm",param_mtype,(char*)0);
+		char param_cola[4];
+		sprintf(param_cola, "%d", MSGQUEUE_BROKER_DEVOLUCION_SHM);
+		execlp("./broker/broker_cola_shm", "broker_cola_shm",param_mtype,param_cola,(char*)0);
         exit(1);
 	}
 }
