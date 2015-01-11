@@ -55,7 +55,7 @@ int main (int argc, char** argv){
 			exit(1);
 		}
 		wait(NULL);
-		Logger::notice("Registracion completa, espero por memoria compartida");
+		Logger::notice("Registracion completa, espero por memoria compartida", __FILE__);
 		
 		//sem_tabla.p();
 		semaforoDistribuido_P(tabla, ID_SUB_BROKER_DISPONIBILIDAD);

@@ -39,7 +39,7 @@ void semaforoDistribuido_V(tabla_testers_disponibles_t* tabla, int id_sub_broker
 	//copiarResultado(msg.resultados, resultados);
 	memcpy( &msg.tabla,tabla, sizeof(tabla_testers_disponibles_t));
 	
-	key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_REQUERIMIENTOS_SHM);
+	key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_DEVOLUCION_SHM);
     int cola_envios = msgget(key, 0666);
    
 	msgsnd(cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);   

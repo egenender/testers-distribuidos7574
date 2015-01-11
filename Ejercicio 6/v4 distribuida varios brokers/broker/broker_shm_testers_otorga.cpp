@@ -31,7 +31,7 @@ int main (int argc, char** argv){
 	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_SHM_TESTERS);
 	int cola_shm_testers = msgget(key, 0660 );
 	
-	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_REQUERIMIENTOS_SHM);
+	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_DEVOLUCION_SHM);
 	int cola_requerimiento_shm = msgget(key, 0660);
 	
 	Semaphore puede_buscar(SEM_SHM_TESTERS_REQUERIMIENTO);
