@@ -109,8 +109,8 @@ const char UBICACION_SERVER_RPC[] = "localhost"; //Cambiar
 //Estructuras communes:
 typedef struct resultado{
 	int32_t idDispositivo;
-	int32_t resultadosPendientes;
-	int32_t resultadosGraves;
+	int8_t resultadosPendientes;
+	int8_t resultadosGraves;
 }resultado_t;
 
 typedef struct tabla_testers_disponibles{
@@ -126,9 +126,8 @@ typedef struct message {
 	/* BEGIN HEADER */
 	int64_t mtype;
 	int64_t mtype_envio;
-	int32_t finalizar_conexion;
-	int32_t es_requerimiento;
-	int32_t es_especial; //Solo por si acaso
+	int8_t finalizar_conexion;
+	int8_t es_requerimiento;
 	int32_t broker;
 	/* END HEADER */
 	int32_t idDispositivo;
@@ -137,7 +136,7 @@ typedef struct message {
 	int32_t cant_testers;
 	int32_t especiales[MAX_TESTERS_ESPECIALES];
 	/* SHM */
-	int version;
+	int64_t version;
 	resultado_t resultados[CANT_RESULTADOS];
 	tabla_testers_disponibles_t tabla;
 } TMessageAtendedor;
