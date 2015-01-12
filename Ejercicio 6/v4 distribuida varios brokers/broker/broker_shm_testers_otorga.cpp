@@ -60,14 +60,14 @@ int main (int argc, char** argv){
 	while (true){
 		std::stringstream ss;
 		ss << "Espero por la shm para " << broker_id;
-		//Logger::notice(ss.str(), __FILE__);
+		Logger::notice(ss.str(), __FILE__);
 		ss.str("");
 		
 		int ok_read = msgrcv(cola_shm_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), broker_id, 0);
 		if (ok_read == -1){
 			exit(0);
 		}
-		//Logger::notice("Obtengo shm. Reviso si hay un pedido de shm", __FILE__);
+		Logger::notice("Obtengo shm. Reviso si hay un pedido de shm", __FILE__);
 				
 		sem_tester_shm.p();
 		int id_tester_espera = *tester_shm;
@@ -78,7 +78,7 @@ int main (int argc, char** argv){
 			puede_buscar.v();//Permito al par de requerimiento que busque
 				
 			ss << "Tengo que enviarle al tester/broker " << id_tester_espera << " la shm";
-			//Logger::notice(ss.str(), __FILE__);
+			Logger::notice(ss.str(), __FILE__);
 			ss.str("");
 			
 			TMessageAtendedor msg_envio;
@@ -99,7 +99,7 @@ int main (int argc, char** argv){
 				exit(1);
 			}
 			ss << "Envie shm a tester/broker " << id_tester_espera << ". Espero que me la devuelva";
-			//Logger::notice(ss.str(), __FILE__);
+			Logger::notice(ss.str(), __FILE__);
 			ss.str("");
 			
 			ok_read = msgrcv(cola_requerimiento_shm, &msg_envio, sizeof(TMessageAtendedor) - sizeof(long), MTYPE_DEVOLUCION_SHM_TESTERS, 0);
@@ -107,7 +107,7 @@ int main (int argc, char** argv){
 				exit(0);
 			}
 			ss << "El tester/broker " << id_tester_espera << " me devolvio la shm";
-			//Logger::notice(ss.str(), __FILE__);
+			Logger::notice(ss.str(), __FILE__);
 			ss.str("");
 			
 			if (id_tester_espera < MAX_DISPOSITIVOS_EN_SISTEMA){ // ->Es un tester!
@@ -124,7 +124,7 @@ int main (int argc, char** argv){
 		sem_next.v();
 		
 		ss << "Paso la shm al siguiente broker: " << siguiente << ". SHM-version: " << msg.version;	
-		//Logger::notice (ss.str(), __FILE__);
+		Logger::notice (ss.str(), __FILE__);
 		
 		msg.mtype = siguiente;
 		msg.mtype_envio = siguiente;
