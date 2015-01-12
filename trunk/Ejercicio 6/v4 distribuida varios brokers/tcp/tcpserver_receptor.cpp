@@ -68,7 +68,7 @@ int main(int argc, char *argv[]){
 			int cola_id_disp = msgget(key, 0660| IPC_CREAT);
 			//Mando Primer mensaje, que me dice el identificador del cliente (al emisor) 
 			//y tambien mi pid para que el emisor me 'mate' cuando todo se termine
-			buffer->mtype = id_tester;
+			buffer->mtype = id_cola_emisor;
 			buffer->value = getpid();
 			
 			if (buffer->idDispositivo <= MAX_DISPOSITIVOS_EN_SISTEMA){
