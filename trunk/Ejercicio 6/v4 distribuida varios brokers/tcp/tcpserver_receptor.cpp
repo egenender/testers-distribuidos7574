@@ -25,7 +25,7 @@ int main(int argc, char *argv[]){
 		printf("Uso: %s <puerto> <id_server> <id_cola> <id_cola_emisor>\n", argv[0]);
 		return -1;
     }
-	int id_tester = atoi(argv[2]);
+	//int id_tester = atoi(argv[2]);
 	int id_cola = atoi(argv[3]);
 	int id_cola_emisor = atoi(argv[4]);
 	
