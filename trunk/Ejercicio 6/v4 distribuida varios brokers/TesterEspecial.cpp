@@ -43,6 +43,7 @@ int main(int argc, char** argv) {
 		Logger::notice("Espero por un nuevo requerimiento de testeo especial" , nombre.str().c_str());
         // Espero un requerimiento
         int posicion = atendedor.recibirRequerimientoEspecial();
+        if (posicion < 0) continue;
         int idDispositivo = planilla.dispositivoEnLugar(posicion);
         stringstream ss;
 		ss << idDispositivo;
@@ -57,6 +58,7 @@ int main(int argc, char** argv) {
         mensaje = "Espero resultado desde el dispositivo id ";
         Logger::notice(mensaje + ss.str() , nombre.str().c_str());
         int result = atendedor.recibirResultado();
+        if (result < 0) continue;
         mensaje = "Recibi resultado desde el dispositivo ";
         Logger::notice(mensaje + ss.str() , nombre.str().c_str());
         
