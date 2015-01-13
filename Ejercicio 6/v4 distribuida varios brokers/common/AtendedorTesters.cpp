@@ -1,12 +1,30 @@
 #include "AtendedorTesters.h"
 #include <cstdlib>
 #include <sys/wait.h>
+#include <sys/types.h>
+#include <signal.h>
 
 int getIdTester(int);
 void activarTester(int);
 void devolverIdTester(int, int);
 
+AtendedorTesters* at;
+
+bool espera;
+
+void terminar(int sig){
+	wait(NULL);
+	espera = true;
+}
+
+void restart_padre(pid_t pid){
+	sleep(TIEMPO_ESPERA_RESTART);
+	kill(pid, SIGHUP);
+	exit(0);	
+}
+
 AtendedorTesters::AtendedorTesters(int tipo){
+	at = this;
 	this->idTester = getIdTester(tipo);
     key_t key;
     key = ftok(ipcFileName.c_str(), MSGQUEUE_TESTERS_RECIBOS);
@@ -24,6 +42,8 @@ AtendedorTesters::AtendedorTesters(int tipo){
         Logger::error(err, __FILE__);
         exit(1);
     }
+      
+    signal(SIGHUP, terminar);  
       
     char param_id[10];
     sprintf(param_id, "%d", this->idTester);
@@ -54,10 +74,11 @@ AtendedorTesters::~AtendedorTesters() {
 int AtendedorTesters::recibirRequerimiento() {
 	activarTester();
     TMessageAtendedor msg;
+  
     int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), this->idTester, 0);
     if(ret == -1) {
-        this->terminar_atencion(TIPO_COMUN);
-        exit(0);
+		this->terminar_atencion(TIPO_COMUN);
+		exit(0);
     }
     this->broker_ultimo_disp = msg.broker;
     return msg.idDispositivo;
@@ -86,13 +107,23 @@ void AtendedorTesters::enviarPrograma(int idDispositivo, int idPrograma) {
 int AtendedorTesters::recibirResultado() {
     TMessageAtendedor msg;
    
+	espera = false;
+    pid_t hijo = fork();
+    if (hijo == 0){
+		restart_padre(getppid());
+	}
+	
     int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), this->idTester, 0);
     if(ret == -1) {
-        std::string error = std::string("Error al recibir resultado del atendedor. Error: ") + std::string(strerror(errno));
-        Logger::error(error.c_str(), __FILE__);
-        exit(0);
+		if (espera){
+			return -1;
+		}else{
+			this->terminar_atencion(TIPO_COMUN); //REVISAR
+			exit(0);
+		}
     }
-        
+    kill(hijo, SIGINT);
+    wait(NULL);    
     return msg.value;
 
 }
@@ -147,10 +178,11 @@ void AtendedorTesters::enviarAEspeciales(bool cuales[], int posicion){
 int AtendedorTesters::recibirRequerimientoEspecial() {
 	activarTester();
     TMessageAtendedor msg;
+        
     int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), this->idTester, 0);
     if(ret == -1) {
-        this->terminar_atencion(TIPO_ESPECIAL);
-        exit(0);
+		this->terminar_atencion(TIPO_ESPECIAL);
+		exit(0);
     }
     this->broker_ultimo_disp = msg.broker;
     return msg.value;

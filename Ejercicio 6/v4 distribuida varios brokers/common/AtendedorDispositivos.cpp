@@ -8,11 +8,31 @@
 #include "../common/common.h"
 #include <cstdlib>
 #include <sys/wait.h>
+#include <sys/types.h>
+#include <signal.h>
 
 int getIdDispositivo();
 void devolverIdDispositivo(int);
 
+AtendedorDispositivos* at;
+pid_t receptor;
+
+void terminar(int sig){
+	at->terminar_atencion();
+	kill(receptor, SIGHUP);
+	wait(NULL);
+	execlp("./Dispositivo", "",(char*)0);
+	exit(1);
+}
+
+void restart_padre(pid_t pid){
+	sleep(TIEMPO_ESPERA_RESTART);
+	kill(pid, SIGHUP);
+	exit(0);	
+}
+
 AtendedorDispositivos::AtendedorDispositivos() { 	
+	at = this;
 	this->idDispositivo = getIdDispositivo();
 	key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_DISPOSITIVOS_ENVIOS);
     this->cola_envios = msgget(key, 0666);
@@ -26,11 +46,13 @@ AtendedorDispositivos::AtendedorDispositivos() {
         exit(1);
     }
     
+    signal(SIGHUP, terminar);
+    
     char param_id[10];
     sprintf(param_id, "%d", this->idDispositivo);
     char param_cola[10];
     sprintf(param_cola, "%d", MSGQUEUE_DISPOSITIVOS_RECIBOS);
-    pid_t receptor = fork();
+    receptor = fork();
     if (receptor == 0){
 		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",UBICACION_BROKER ,PUERTO_SERVER_EMISOR_DISPOSITIVOS , param_cola,(char*)0);
         exit(1);
@@ -70,12 +92,19 @@ void AtendedorDispositivos::enviarRequerimiento() {
 
 int AtendedorDispositivos::recibirPrograma() {
     TMessageAtendedor msg;
+    
+    pid_t hijo = fork();
+    if (hijo == 0){
+		restart_padre(getppid());
+	}
     int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), this->idDispositivo, 0);
     if(ret == -1) {
         std::string error("Error al recibir programa del atendedor. Error: " + errno);
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
+    kill(hijo, SIGINT);
+    wait(NULL);
     this->ultimoTester = msg.tester;
     return msg.value;
 
@@ -102,12 +131,18 @@ void AtendedorDispositivos::enviarResultado(int resultado) {
 int AtendedorDispositivos::recibirOrden(int* cantidad) {
 
     TMessageAtendedor msg;
+    pid_t hijo = fork();
+    if (hijo == 0){
+		restart_padre(getppid());
+	}
     int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), this->idDispositivo, 0);
     if(ret == -1) {
         std::string error("Error al recibir orden del atendedor. Error: " + errno);
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
+    kill(hijo, SIGINT);
+    wait(NULL);
     *cantidad = msg.cant_testers;
     return msg.value;
 

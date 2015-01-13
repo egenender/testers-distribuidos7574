@@ -61,6 +61,7 @@ int main(int argc, char** argv) {
         Logger::notice(string("Espero resultado de dispositivo ") + ss.str(), nombre.str().c_str());                  	    
   
         int result = atendedor.recibirResultado();
+        if (result == -1) continue;
         Logger::notice(string("Recibi resultado del dispositivo ") + ss.str(), nombre.str().c_str());
         usleep( rand() % 1000 + 1000);
         
