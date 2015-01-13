@@ -2,6 +2,7 @@
 #include <sys/msg.h>
 #include <sys/ipc.h>
 #include <string.h>
+#include <cstdlib>
 
 
 void semaforoDistribuido_P(tabla_testers_disponibles_t* tabla, int id_sub_broker){
@@ -19,9 +20,13 @@ void semaforoDistribuido_P(tabla_testers_disponibles_t* tabla, int id_sub_broker
 	msg.es_requerimiento = 1;
 	msg.tester = id_sub_broker;
 	
-	msgsnd(cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
-        
-    msgrcv(cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), id_sub_broker, 0);
+	if (msgsnd(cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0) == -1){
+		exit(0);
+	}
+	
+    if (msgrcv(cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), id_sub_broker, 0) == 1){
+		exit(0);
+    }
     
     //memcpy(resultados, msg.resultados, sizeof(msg.resultados));
     //copiar(resultados, msg.resultados);
@@ -42,7 +47,9 @@ void semaforoDistribuido_V(tabla_testers_disponibles_t* tabla, int id_sub_broker
 	key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_DEVOLUCION_SHM);
     int cola_envios = msgget(key, 0666);
    
-	msgsnd(cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);   
+	if (msgsnd(cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0) == -1 ){
+		exit(0);
+	} 
 }
 
 
