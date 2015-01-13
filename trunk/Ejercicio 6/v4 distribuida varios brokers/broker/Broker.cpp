@@ -215,7 +215,7 @@ void crear_clientes_a_brokers(){
 	char param_cola_shm[10];
 	sprintf(param_cola_shm, "%d", MSGQUEUE_BROKER_SHM_TESTERS);
 	
-	for (int i = 0; i < sizeof(BROKERS); i++){
+	for (size_t i = 0; i < sizeof(BROKERS); i++){
 		if (BROKERS[i].id == ID_BROKER) continue; //no tiene sentido conectarse con uno mismo
 		
 		char param_id[10];
