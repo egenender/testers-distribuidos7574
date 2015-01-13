@@ -17,7 +17,7 @@ typedef struct broker_id_ip{
 broker_id_ip_t BROKERS[] = { 
 	{1001, "192.168.1.104"},
 	{1002, "192.168.1.102"},
-	{1003, "192.168.1.100"}
+	{1003, "192.168.1.101"}
 };
 
 #define ID_BROKER 1001
