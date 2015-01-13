@@ -9,8 +9,19 @@
 #include "../ipc/Semaphore.h"
 #include "../logger/Logger.h"
 
+typedef struct broker_id_ip{
+	int id;
+	char ip[16];
+}broker_id_ip_t;
+
+broker_id_ip_t BROKERS[] = { 
+	{1001, "192.168.1.104"},
+	{1002, "192.168.1.102"},
+	{1003, "192.168.1.100"}
+};
+
 #define ID_BROKER 1001
-#define ID_OTRO_BROKER 1001
+#define ID_NEXT_BROKER 1001
 
 void crear_ipcs(){
 	
@@ -19,24 +30,7 @@ void crear_ipcs(){
 	Semaphore sem_comunes(SEM_CANT_TESTERS_COMUNES);
 	sem_comunes.creaSem();
 	sem_comunes.iniSem(0);
-	
-	/*key = ftok(ipcFileName.c_str(), SHM_TABLA_TESTERS);
-    int shmtabla = shmget(key, sizeof(tabla_testers_disponibles_t) , IPC_CREAT | 0660);
-    tabla_testers_disponibles_t* tabla = (tabla_testers_disponibles_t*)shmat(shmtabla, NULL, 0);
-    
-    tabla->start = tabla->end = tabla->cant = 0;
-    for (int i = 0; i < MAX_TESTERS_ESPECIALES; i++){
-		tabla->testers_especiales[i] = 0;
-		Semaphore sem_especial(SEM_ESPECIAL_DISPONIBLE + i);
-		sem_especial.creaSem();
-		sem_especial.iniSem(0);
-	}
-	shmdt((void*)tabla);
-	
-	Semaphore sem_tabla(SEM_TABLA_TESTERS);
-	sem_tabla.creaSem();
-	sem_tabla.iniSem(1);*/
-	
+		
 	Semaphore puedo_buscar(SEM_SHM_TESTERS_REQUERIMIENTO);
 	puedo_buscar.creaSem();
 	puedo_buscar.iniSem(1);
@@ -54,7 +48,7 @@ void crear_ipcs(){
 	key = ftok(ipcFileName.c_str(), SHM_NEXT_BROKER);
     int shmnext = shmget(key, sizeof(int) , 0660 | IPC_CREAT);
     int* next = (int*)shmat(shmnext, NULL, 0);   
-	*next = ID_OTRO_BROKER; //por ahora es el broker 1, y listo TODO
+	*next = ID_NEXT_BROKER;
 	shmdt((void*) next);
 	
 	Semaphore sem_next(SEM_MUTEX_NEXT_BROKER);
@@ -84,8 +78,10 @@ void crear_ipcs(){
 	msg.version = 1;
 	msg.finalizar_conexion = 0;
 	
-	int ret = msgsnd(cola_shm_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
-	if (ret == -1) exit(0);
+	if (ID_BROKER == 1001){ //Solo el "lider" pone a circular
+		int ret = msgsnd(cola_shm_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+		if (ret == -1) exit(0);
+	}
 }
 
 void crear_sub_brokers(){	
@@ -212,28 +208,33 @@ void crear_servers(){
 
 void crear_clientes_a_brokers(){
 	//TODO ESTO DEBERIA ESTAR EN UN FOR, y probablemente habria que pedir los ids del servicio rpc
-	char otro_broker[] = "localhost"; //cambiar
+	char param_cola_dispositivos[10];
+	sprintf(param_cola_dispositivos, "%d", MSGQUEUE_BROKER_ENVIO_MENSAJES_DISPOSITIVOS_FINAL);
+	char param_cola_testers[10];
+	sprintf(param_cola_testers, "%d", MSGQUEUE_BROKER_ENVIO_MENSAJES_TESTERS_FINAL);
+	char param_cola_shm[10];
+	sprintf(param_cola_shm, "%d", MSGQUEUE_BROKER_SHM_TESTERS);
 	
-	char param_id[10];
-    sprintf(param_id, "%d", ID_OTRO_BROKER);
-    char param_cola[10];
-    sprintf(param_cola, "%d", MSGQUEUE_BROKER_ENVIO_MENSAJES_DISPOSITIVOS_FINAL);
-  	
-	if (fork() == 0){													//Se hace pasar por un tester que viene "de mas alla"
-		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",otro_broker ,PUERTO_SERVER_RECEPTOR_TESTERS , param_id, param_cola, "0",(char*)0);
-        exit(1);
-	}
+	for (int i = 0; i < sizeof(BROKERS); i++){
+		if (BROKERS[i].id == ID_BROKER) continue; //no tiene sentido conectarse con uno mismo
+		
+		char param_id[10];
+		sprintf(param_id, "%d", BROKERS[i].id);
+		
+		if (fork() == 0){													//Se hace pasar por un tester que viene "de mas alla"
+			execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",BROKERS[i].ip ,PUERTO_SERVER_RECEPTOR_TESTERS , param_id, param_cola_dispositivos, "0",(char*)0);
+			exit(1);
+		}
 	
-	sprintf(param_cola, "%d", MSGQUEUE_BROKER_ENVIO_MENSAJES_TESTERS_FINAL);
-	if (fork() == 0){													//Se hace pasar por un dispositivo que viene "de mas alla"
-		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",otro_broker ,PUERTO_SERVER_RECEPTOR_DISPOSITIVOS , param_id, param_cola, "0",(char*)0);
-        exit(1);
-	}
+		if (fork() == 0){													//Se hace pasar por un dispositivo que viene "de mas alla"
+			execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",BROKERS[i].ip ,PUERTO_SERVER_RECEPTOR_DISPOSITIVOS , param_id, param_cola_testers, "0",(char*)0);
+			exit(1);
+		}
 	
-	sprintf(param_cola, "%d", MSGQUEUE_BROKER_SHM_TESTERS);
-	if (fork() == 0){													
-		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",otro_broker ,PUERTO_SERVER_RECEPTOR_SHM , param_id, param_cola, "0",(char*)0);
-        exit(1);
+		if (fork() == 0){													
+			execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",BROKERS[i].ip ,PUERTO_SERVER_RECEPTOR_SHM , param_id, param_cola_shm, "0",(char*)0);
+			exit(1);
+		}		
 	}
 }
 
