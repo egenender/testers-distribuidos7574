@@ -4,21 +4,13 @@
 #include <sys/shm.h>
 #include <cstdlib>
 #include <unistd.h>
+#include <sys/wait.h>
+#include <string>
 
 #include "../common/common.h"
 #include "../ipc/Semaphore.h"
 #include "../logger/Logger.h"
-
-typedef struct broker_id_ip{
-	int id;
-	char ip[16];
-}broker_id_ip_t;
-
-broker_id_ip_t BROKERS[] = { 
-	{1001, "192.168.1.104"},
-	{1002, "192.168.1.102"},
-	{1003, "192.168.1.101"}
-};
+#include "ids_brokers.h"
 
 #define ID_BROKER 1001
 #define ID_NEXT_BROKER 1001
@@ -46,11 +38,8 @@ void crear_ipcs(){
 	sem_tester_shm.iniSem(1);
 	
 	key = ftok(ipcFileName.c_str(), SHM_NEXT_BROKER);
-    int shmnext = shmget(key, sizeof(int) , 0660 | IPC_CREAT);
-    int* next = (int*)shmat(shmnext, NULL, 0);   
-	*next = ID_NEXT_BROKER;
-	shmdt((void*) next);
-	
+    shmget(key, sizeof(int) , 0660 | IPC_CREAT);
+    	
 	Semaphore sem_next(SEM_MUTEX_NEXT_BROKER);
 	sem_next.creaSem();
 	sem_next.iniSem(1);
@@ -78,10 +67,36 @@ void crear_ipcs(){
 	msg.version = 1;
 	msg.finalizar_conexion = 0;
 	
-	if (ID_BROKER == 1001){ //Solo el "lider" pone a circular
+	key = ftok(ipcFileName.c_str(), SHM_LIDER);
+    int shmlider = shmget(key, sizeof(int) , 0660 | IPC_CREAT);
+    int* soy_lider = (int*)shmat(shmlider, NULL, 0);   
+    *soy_lider = 0;
+	
+	std::string programa;
+	
+	if ( ID_BROKER == 1001 ) { //FIX condicion del if por algo por parametro
+		programa = "sender";		
+	} else {
+		programa = "listener";
+	}
+	
+	std::string ubicacion = "./Anillo/";
+	std::string ejecucion = ubicacion + programa;
+	std::stringstream id;
+	id << ID_BROKER;
+	
+	if (fork() == 0){
+		execlp(ejecucion.c_str(), programa.c_str(), id.str().c_str(),(char*)0);
+	}
+	wait(NULL);
+	
+	if (*soy_lider){ //Solo el "lider" pone a circular
 		int ret = msgsnd(cola_shm_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
 		if (ret == -1) exit(0);
 	}
+	
+	shmdt((void*)tester_shm);
+	
 }
 
 void crear_sub_brokers(){	

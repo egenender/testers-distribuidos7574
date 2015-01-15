@@ -3,6 +3,7 @@
 #include "tcpoppas.cpp"
 #include "enviar.cpp"
 #include "recibir.cpp"
+#include "siguiente.h"
 
 extern int tcpopact(char *, int);
 extern int tcpoppas(int);
@@ -70,7 +71,7 @@ main(int argc, char *argv[])
     int nbytes;
     u_int yes = 1;
     
-    char ipBrokerSiguiente[15];
+    char ipBrokerSiguiente[16];
 
     /* create what looks like an ordinary UDP socket */
     if ((fdMulticast=socket(AF_INET,SOCK_DGRAM,0)) < 0) {
@@ -141,6 +142,7 @@ main(int argc, char *argv[])
        
        //Guardo la direccion del que me contesto primero. Es mi siguiente.
        strcpy(ipBrokerSiguiente,inet_ntoa(addr.sin_addr));
+       set_siguiente(ipBrokerSiguiente);
        sprintf(mostrar,"[MASTER] --> Ip del Broker Siguiente: %s\n",ipBrokerSiguiente);
        write(fileno(stdout),mostrar,strlen(mostrar));
        
@@ -255,6 +257,7 @@ main(int argc, char *argv[])
        }while((msgLider.estado != LIDER) && (msgLider.estado!=FIN));
        
        sprintf(mostrar, "[MASTER] --> ID LIDER ENCONTRADO: %d\t%s\n", msgLider.idBroker, imprimirCodigo(msgLider.estado));
+       set_lider(msgLider.idBroker == id);
        write(fileno(stdout), mostrar, strlen(mostrar));
        
        sprintf(mostrar, "::::: QUEDA ESTABLECIDO EL ANILLO :::::\n", msgLider.idBroker, imprimirCodigo(msgLider.estado));
