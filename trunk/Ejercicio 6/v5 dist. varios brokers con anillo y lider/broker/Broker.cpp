@@ -259,7 +259,7 @@ int main (void){
 	crear_servers();
 	crear_sub_brokers();
 	
-	sleep(5);
+	sleep(10);
 	crear_clientes_a_brokers();
 	exit(0);
 }

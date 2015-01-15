@@ -45,7 +45,7 @@ main(int argc, char *argv[])
     int portUdp;
    	
 	
-    FILE * fdConfig = fopen("config", "r");
+    FILE * fdConfig = fopen("Anillo/config", "r");
     if(fdConfig==NULL){
         perror("fopen");
         exit(1);
@@ -172,7 +172,7 @@ main(int argc, char *argv[])
         if(childpid<0) {
             perror("Error en el fork\n");
         } else if (childpid==0) {
-            execlp("./timeout", "timeout", s_pid, (char*)0);
+            execlp("./Anillo/timeout", "timeout", s_pid, (char*)0);
             perror("Error al lanzar el proceso timeout");
             exit(1);
         }
@@ -245,7 +245,7 @@ main(int argc, char *argv[])
         if(childpid<0) {
             perror("Error en el fork\n");
         } else if (childpid==0) {
-            execlp("./timeout", "timeout", s_pid, (char*)0);
+            execlp("./Anillo/timeout", "timeout", s_pid, (char*)0);
             perror("Error al lanzar el proceso timeout");
             exit(1);
         }

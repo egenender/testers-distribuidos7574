@@ -42,7 +42,7 @@ main(int argc, char *argv[])
     char puertoUdp[50];
     int portUdp;
     
-    FILE * fdConfig = fopen("config", "r");
+    FILE * fdConfig = fopen("Anillo/config", "r");
     if(fdConfig==NULL){
         perror("fopen");
         exit(1);
