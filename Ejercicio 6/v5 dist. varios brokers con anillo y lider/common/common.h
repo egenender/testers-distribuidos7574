@@ -45,6 +45,7 @@ const int SEM_TABLA_TESTERS = 4;
 const int SEM_MUTEX_NEXT_BROKER = 5;
 const int SEM_ESPECIAL_DISPONIBLE = 6; //siguiente debe ser + CANT_ESPECIALes
 
+const int SHM_LIDER = 26;
 const int SHM_TESTER_QUIERE_SHM = 27;
 const int SHM_TABLA_TESTERS = 28;
 const int SHM_NEXT_BROKER = 29;

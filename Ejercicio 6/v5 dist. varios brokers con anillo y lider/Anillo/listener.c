@@ -3,6 +3,7 @@
 #include "tcpoppas.cpp"
 #include "enviar.cpp"
 #include "recibir.cpp"
+#include "siguiente.h"
 
 #define MSGBUFSIZE 256
 
@@ -24,7 +25,7 @@ main(int argc, char *argv[])
     struct sigaction sa; 
     int fdSiguiente;
     int fdAnterior;
-    char ipBrokerSiguiente[15];
+    char ipBrokerSiguiente[16];
     
     memset(&sa, 0, sizeof(sa));
     sa.sa_handler=&sig_handler; 
@@ -42,8 +43,8 @@ main(int argc, char *argv[])
     int portMulticast;
     char puertoUdp[50];
     int portUdp;
-    
-    
+   	
+	
     FILE * fdConfig = fopen("config", "r");
     if(fdConfig==NULL){
         perror("fopen");
@@ -266,7 +267,8 @@ main(int argc, char *argv[])
 
              sprintf(mostrar,"[ENVIADO] --> %s\t%s\n",inet_ntoa(addrMulticast.sin_addr),imprimirCodigo(CERRAR));
             write(fileno(stdout),mostrar,strlen(mostrar));
-            strcpy(ipBrokerSiguiente, inet_ntoa(addr.sin_addr));              
+            strcpy(ipBrokerSiguiente, inet_ntoa(addr.sin_addr));
+			set_siguiente(ipBrokerSiguiente);
           }        
         } else {
 			sprintf(mostrar,"kill -9 %d",childpid);
@@ -278,6 +280,7 @@ main(int argc, char *argv[])
             strcpy(msgInvitacion.direccionMaster, ipMaster);
              
             strcpy(ipBrokerSiguiente, inet_ntoa(addr.sin_addr));
+            set_siguiente(ipBrokerSiguiente);
             sprintf(mostrar, "[BROKER] --> Ip del Broker siguiente: %s\n", ipBrokerSiguiente);
             write(fileno(stdout), mostrar, strlen(mostrar));
             if (sendto(fd,&msgInvitacion,sizeof(MsgInvitacion_t),0,(struct sockaddr *) &addr,(socklen_t)addrlen) < 0) {
@@ -362,6 +365,7 @@ main(int argc, char *argv[])
        } while((msgLider.estado != LIDER) && (msgLider.estado!=FIN));
        
        sprintf(mostrar,"[BROKER] --> ID LIDER ENCONTRADO: %d\t%s\n",msgLider.idBroker, imprimirCodigo(msgLider.estado));
+       set_lider(msgLider.idBroker == id);
 	   write(fileno(stdout), mostrar, strlen(mostrar));
 	   
 	   sprintf(mostrar,"::::: QUEDA ESTABLECIDO EL ANILLO :::::\n");

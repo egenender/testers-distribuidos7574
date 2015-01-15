@@ -54,5 +54,9 @@ int main(int argc, char** argv) {
     int shmnext = shmget(key, sizeof(int) , 0660);
     shmctl(shmnext, IPC_RMID, NULL);
 	
+	key = ftok(ipcFileName.c_str(), SHM_LIDER);
+    int shmlider = shmget(key, sizeof(int),  0660);
+    shmctl(shmlider, IPC_RMID, NULL);
+	
     return 0;
 }
