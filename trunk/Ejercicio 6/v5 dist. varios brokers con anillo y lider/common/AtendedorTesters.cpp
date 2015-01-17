@@ -50,7 +50,7 @@ AtendedorTesters::AtendedorTesters(int tipo){
     }
       
     signal(SIGHUP, terminar);  
-    signal(SIGINT, finalizar_tarea);
+   // signal(SIGINT, finalizar_tarea);
     
     char param_id[10];
     sprintf(param_id, "%d", this->idTester);
