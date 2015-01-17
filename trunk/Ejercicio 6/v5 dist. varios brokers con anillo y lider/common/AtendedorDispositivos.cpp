@@ -26,7 +26,7 @@ void terminar(int sig){
 }
 
 void restart_padre(pid_t pid){
-	sleep(TIEMPO_ESPERA_RESTART);
+	sleep(TIEMPO_ESPERA_RESTART_DISPOSITIVOS);
 	kill(pid, SIGHUP);
 	exit(0);	
 }
