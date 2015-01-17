@@ -75,6 +75,7 @@ void crear_ipcs(){
 	std::string programa;
 	
 	if ( ID_BROKER == 1001 ) { //FIX condicion del if por algo por parametro
+		sleep(3);
 		programa = "sender";		
 	} else {
 		programa = "listener";
@@ -259,7 +260,7 @@ int main (void){
 	crear_servers();
 	crear_sub_brokers();
 	
-	sleep(10);
+	sleep(1);
 	crear_clientes_a_brokers();
 	exit(0);
 }
