@@ -78,7 +78,8 @@ void AtendedorDispositivos::enviarRequerimiento() {
     TMessageAtendedor msg;
     msg.mtype = this->idDispositivo;
     msg.mtype_envio = MTYPE_REQUERIMIENTO;
-    msg.idDispositivo = idDispositivo;
+    msg.idDispositivo = this->idDispositivo;
+    msg.tester = this->idDispositivo;
     msg.finalizar_conexion = 0;
     msg.es_requerimiento = 1;
     
@@ -115,7 +116,7 @@ void AtendedorDispositivos::enviarResultado(int resultado) {
     msg.mtype_envio = (long) this->ultimoTester;
     msg.finalizar_conexion = 0;
     msg.tester = this->ultimoTester;
-    msg.idDispositivo = idDispositivo;
+    msg.idDispositivo = this->idDispositivo;
     msg.value = resultado;
     msg.es_requerimiento = 0;
             
