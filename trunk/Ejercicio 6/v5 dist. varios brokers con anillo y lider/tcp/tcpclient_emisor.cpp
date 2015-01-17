@@ -25,7 +25,7 @@ int main(int argc, char *argv[]){
 	
     int fd = tcp_open_activo(argv[1], atoi(argv[2]));
     if(fd < 0){
-      perror("Error");
+      //perror("Error");
       return -2;
     }
     
