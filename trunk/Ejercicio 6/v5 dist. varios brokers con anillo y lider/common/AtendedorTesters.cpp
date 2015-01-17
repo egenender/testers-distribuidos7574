@@ -12,6 +12,12 @@ AtendedorTesters* at;
 
 bool espera;
 
+void finalizar_tarea(int sig){
+	int tipo = at->obtenerIdTester() <= MAX_TESTERS_COMUNES ? TIPO_COMUN : TIPO_ESPECIAL;
+	at->terminar_atencion(tipo);
+	exit(0);
+}
+
 void terminar(int sig){
 	wait(NULL);
 	espera = true;
@@ -44,7 +50,8 @@ AtendedorTesters::AtendedorTesters(int tipo){
     }
       
     signal(SIGHUP, terminar);  
-      
+    signal(SIGINT, finalizar_tarea);
+    
     char param_id[10];
     sprintf(param_id, "%d", this->idTester);
     char param_cola[10];
