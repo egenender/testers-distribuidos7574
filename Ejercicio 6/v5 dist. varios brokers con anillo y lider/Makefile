@@ -99,6 +99,7 @@ destroy:
 	@echo "Creando script destructor"
 	@echo "./terminador" > destroy.sh
 	@echo "killall tcpserver_receptor" >> destroy.sh
+	@echo "killall tcpclient_receptor" >> destroy.sh
 	@echo "killall tcpserver_emisor" >> destroy.sh
 	@echo "killall registracion_server" >> destroy.sh
 	@chmod +x destroy.sh
