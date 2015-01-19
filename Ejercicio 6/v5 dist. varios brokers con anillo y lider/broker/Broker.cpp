@@ -12,7 +12,7 @@
 #include "../logger/Logger.h"
 #include "ids_brokers.h"
 
-#define ID_BROKER 1001
+#define ID_BROKER 1002
 
 void crear_ipcs(int master){
 	
@@ -256,7 +256,7 @@ void crear_clientes_a_brokers(){
 int main (int argc, char** argv){
 	Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
 	crear_servers();
-	crear_ipcs(argc == 2);	
+	crear_ipcs(argc == 2 && atoi(argv[1]) );	
 	crear_sub_brokers();
 	
 	sleep(1);
