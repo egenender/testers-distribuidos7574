@@ -9,3 +9,5 @@ broker_id_ip_t BROKERS[] = {
 	{1002, "192.168.1.106"},
 	{1003, "192.168.1.108"}
 };
+
+#define CANT_BROKERS 3

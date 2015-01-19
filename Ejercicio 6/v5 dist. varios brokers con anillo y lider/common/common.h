@@ -26,8 +26,8 @@ const int ID_DISPOSITIVO_START = 50;
 const int ID_TESTER_START = 1;
 
 #define MAX_DISPOSITIVOS_EN_SISTEMA 100
-#define MAX_TESTERS_COMUNES  5
-#define MAX_TESTERS_ESPECIALES 5
+#define MAX_TESTERS_COMUNES 10
+#define MAX_TESTERS_ESPECIALES 2
 
 const int ID_TESTER_ESPECIAL_START = MAX_TESTERS_COMUNES + 1;
 
@@ -43,7 +43,9 @@ const int SEM_MUTEX_TESTER_QUIERE_SHM = 2;
 const int SEM_CANT_TESTERS_COMUNES = 3;
 const int SEM_TABLA_TESTERS = 4;
 const int SEM_MUTEX_NEXT_BROKER = 5;
-const int SEM_ESPECIAL_DISPONIBLE = 6; //siguiente debe ser + CANT_ESPECIALes
+const int SEM_ANILLO_FORMANDO = 6;
+const int SEM_ESPECIAL_DISPONIBLE = 7; //siguiente debe ser + CANT_ESPECIALes
+
 
 const int SHM_LIDER = 26;
 const int SHM_TESTER_QUIERE_SHM = 27;
@@ -107,7 +109,7 @@ const char PUERTO_SERVER_EMISOR_DISPOSITIVOS[] = "9003";
 const char PUERTO_SERVER_RECEPTOR_SHM[] = "9004";
 
 const char UBICACION_BROKER[] = "localhost"; //Cambiar
-const char UBICACION_SERVER_RPC[] = "192.168.1.104"; //Cambiar
+const char UBICACION_SERVER_RPC[] = "192.168.1.106"; //Cambiar
 
 //Estructuras communes:
 typedef struct resultado{

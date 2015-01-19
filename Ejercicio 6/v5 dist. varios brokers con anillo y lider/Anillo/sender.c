@@ -262,7 +262,16 @@ main(int argc, char *argv[])
        
        sprintf(mostrar, "::::: QUEDA ESTABLECIDO EL ANILLO :::::\n", msgLider.idBroker, imprimirCodigo(msgLider.estado));
        write(fileno(stdout), mostrar, strlen(mostrar));
-       
+	
+		key_t key = ftok("/tmp/buchwaldipcs",SEM_ANILLO_FORMANDO);
+		int semid = semget(key,1, IPC_CREAT| 0660);
+		struct sembuf oper;
+		oper.sem_num = 0;
+		oper.sem_op = 1;
+		oper.sem_flg = 0;
+		semop(semid,&oper,1);
+		
+		execlp("./Anillo/listener", "listener", argv[1],(char*)0);
 }
 
 
