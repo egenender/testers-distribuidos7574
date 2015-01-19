@@ -1,0 +1,108 @@
+18/11/2014 00:33:05 [ TesterEspecial.cpp 10 ] Inicia el procesamiento, cargo el atendedor y despachador
+18/11/2014 00:33:05 [ TesterEspecial.cpp 10 ] Espero por un nuevo requerimiento de testeo especial
+18/11/2014 00:33:05 [ TesterEspecial.cpp 7 ] Inicia el procesamiento, cargo el atendedor y despachador
+18/11/2014 00:33:05 [ TesterEspecial.cpp 12 ] Inicia el procesamiento, cargo el atendedor y despachador
+18/11/2014 00:33:05 [ TesterEspecial.cpp 12 ] Espero por un nuevo requerimiento de testeo especial
+18/11/2014 00:33:05 [ TesterEspecial.cpp 19 ] Inicia el procesamiento, cargo el atendedor y despachador
+18/11/2014 00:33:05 [ TesterEspecial.cpp 7 ] Espero por un nuevo requerimiento de testeo especial
+18/11/2014 00:33:05 [ TesterEspecial.cpp 19 ] Espero por un nuevo requerimiento de testeo especial
+18/11/2014 00:33:06 [ TesterEspecial.cpp 19 ] Recibido requerimiento desde dispositivo id 54
+18/11/2014 00:33:06 [ TesterEspecial.cpp 10 ] Recibido requerimiento desde dispositivo id 54
+18/11/2014 00:33:06 [ TesterEspecial.cpp 7 ] Recibido requerimiento desde dispositivo id 54
+18/11/2014 00:33:06 [ TesterEspecial.cpp 12 ] Recibido requerimiento desde dispositivo id 54
+18/11/2014 00:33:06 [ TesterEspecial.cpp 19 ] Envio programa de testeo especial 58 al dispositivo 54
+18/11/2014 00:33:06 [ TesterEspecial.cpp 19 ] Aviso que termine de enviar las 1 tareas especiales
+18/11/2014 00:33:06 [ TesterEspecial.cpp 10 ] Envio programa de testeo especial 58 al dispositivo 54
+18/11/2014 00:33:06 [ TesterEspecial.cpp 10 ] Aviso que termine de enviar las 1 tareas especiales
+18/11/2014 00:33:06 [ TesterEspecial.cpp 7 ] Envio programa de testeo especial 58 al dispositivo 54
+18/11/2014 00:33:06 [ TesterEspecial.cpp 7 ] Aviso que termine de enviar las 1 tareas especiales
+18/11/2014 00:33:06 [ TesterEspecial.cpp 12 ] Envio programa de testeo especial 58 al dispositivo 54
+18/11/2014 00:33:06 [ TesterEspecial.cpp 12 ] Aviso que termine de enviar las 1 tareas especiales
+18/11/2014 00:33:06 [ TesterEspecial.cpp 7 ] Espero por un nuevo requerimiento de testeo especial
+18/11/2014 00:33:06 [ TesterEspecial.cpp 7 ] Recibido requerimiento desde dispositivo id 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 10 ] Espero por un nuevo requerimiento de testeo especial
+18/11/2014 00:33:06 [ TesterEspecial.cpp 12 ] Espero por un nuevo requerimiento de testeo especial
+18/11/2014 00:33:06 [ TesterEspecial.cpp 10 ] Recibido requerimiento desde dispositivo id 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 19 ] Espero por un nuevo requerimiento de testeo especial
+18/11/2014 00:33:06 [ TesterEspecial.cpp 12 ] Recibido requerimiento desde dispositivo id 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 19 ] Recibido requerimiento desde dispositivo id 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 19 ] Envio programa de testeo especial 43 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 12 ] Envio programa de testeo especial 43 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 19 ] Envio programa de testeo especial 58 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 10 ] Envio programa de testeo especial 43 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 12 ] Envio programa de testeo especial 58 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 19 ] Envio programa de testeo especial 17 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 12 ] Envio programa de testeo especial 17 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 19 ] Envio programa de testeo especial 1 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 12 ] Envio programa de testeo especial 1 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 10 ] Envio programa de testeo especial 58 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 10 ] Envio programa de testeo especial 17 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 7 ] Envio programa de testeo especial 43 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 10 ] Envio programa de testeo especial 1 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 7 ] Envio programa de testeo especial 58 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 19 ] Envio programa de testeo especial 86 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 10 ] Envio programa de testeo especial 86 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 7 ] Envio programa de testeo especial 17 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 10 ] Envio programa de testeo especial 23 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 10 ] Envio programa de testeo especial 76 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 7 ] Envio programa de testeo especial 1 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 10 ] Aviso que termine de enviar las 7 tareas especiales
+18/11/2014 00:33:06 [ TesterEspecial.cpp 19 ] Envio programa de testeo especial 23 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 19 ] Envio programa de testeo especial 76 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 19 ] Aviso que termine de enviar las 7 tareas especiales
+18/11/2014 00:33:06 [ TesterEspecial.cpp 7 ] Envio programa de testeo especial 86 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 7 ] Envio programa de testeo especial 23 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 7 ] Envio programa de testeo especial 76 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 7 ] Aviso que termine de enviar las 7 tareas especiales
+18/11/2014 00:33:06 [ TesterEspecial.cpp 12 ] Envio programa de testeo especial 86 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 12 ] Envio programa de testeo especial 23 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 12 ] Envio programa de testeo especial 76 al dispositivo 50
+18/11/2014 00:33:06 [ TesterEspecial.cpp 12 ] Aviso que termine de enviar las 7 tareas especiales
+18/11/2014 00:33:06 [ TesterEspecial.cpp 7 ] Espero por un nuevo requerimiento de testeo especial
+18/11/2014 00:33:06 [ TesterEspecial.cpp 10 ] Espero por un nuevo requerimiento de testeo especial
+18/11/2014 00:33:06 [ TesterEspecial.cpp 7 ] Recibido requerimiento desde dispositivo id 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 10 ] Recibido requerimiento desde dispositivo id 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 19 ] Espero por un nuevo requerimiento de testeo especial
+18/11/2014 00:33:06 [ TesterEspecial.cpp 19 ] Recibido requerimiento desde dispositivo id 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 12 ] Espero por un nuevo requerimiento de testeo especial
+18/11/2014 00:33:06 [ TesterEspecial.cpp 12 ] Recibido requerimiento desde dispositivo id 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 7 ] Envio programa de testeo especial 81 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 10 ] Envio programa de testeo especial 81 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 7 ] Envio programa de testeo especial 61 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 10 ] Envio programa de testeo especial 61 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 7 ] Envio programa de testeo especial 9 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 10 ] Envio programa de testeo especial 9 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 7 ] Envio programa de testeo especial 4 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 10 ] Envio programa de testeo especial 4 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 7 ] Envio programa de testeo especial 29 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 10 ] Envio programa de testeo especial 29 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 7 ] Envio programa de testeo especial 64 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 10 ] Envio programa de testeo especial 64 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 19 ] Envio programa de testeo especial 81 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 10 ] Envio programa de testeo especial 14 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 19 ] Envio programa de testeo especial 61 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 10 ] Envio programa de testeo especial 48 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 19 ] Envio programa de testeo especial 9 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 7 ] Envio programa de testeo especial 14 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 19 ] Envio programa de testeo especial 4 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 10 ] Envio programa de testeo especial 39 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 19 ] Envio programa de testeo especial 29 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 10 ] Aviso que termine de enviar las 9 tareas especiales
+18/11/2014 00:33:06 [ TesterEspecial.cpp 19 ] Envio programa de testeo especial 64 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 7 ] Envio programa de testeo especial 48 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 19 ] Envio programa de testeo especial 14 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 12 ] Envio programa de testeo especial 81 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 19 ] Envio programa de testeo especial 48 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 7 ] Envio programa de testeo especial 39 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 7 ] Aviso que termine de enviar las 9 tareas especiales
+18/11/2014 00:33:06 [ TesterEspecial.cpp 12 ] Envio programa de testeo especial 61 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 19 ] Envio programa de testeo especial 39 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 12 ] Envio programa de testeo especial 9 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 19 ] Aviso que termine de enviar las 9 tareas especiales
+18/11/2014 00:33:06 [ TesterEspecial.cpp 12 ] Envio programa de testeo especial 4 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 12 ] Envio programa de testeo especial 29 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 12 ] Envio programa de testeo especial 64 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 12 ] Envio programa de testeo especial 14 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 12 ] Envio programa de testeo especial 48 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 12 ] Envio programa de testeo especial 39 al dispositivo 51
+18/11/2014 00:33:06 [ TesterEspecial.cpp 12 ] Aviso que termine de enviar las 9 tareas especiales
