@@ -1,3 +1,4 @@
+#include <sys/wait.h>
 #include "inet.h"
 #include "tcpopact.cpp"
 #include "tcpoppas.cpp"
@@ -188,6 +189,7 @@ main(int argc, char *argv[])
         } else {
 			sprintf(mostrar,"kill -9 %d",childpid);
 			system(mostrar);
+			wait(NULL);
 			write(fileno(stdout),mostrar,strlen(mostrar));
         }
         
@@ -273,6 +275,7 @@ main(int argc, char *argv[])
         } else {
 			sprintf(mostrar,"kill -9 %d",childpid);
 			system(mostrar);
+			wait(NULL);
 			write(fileno(stdout),mostrar,strlen(mostrar));
 		    sprintf(mostrar,"\n[RECIBIDO] <-- %s\t%s\n",inet_ntoa(addr.sin_addr), imprimirCodigo(msgInvitacion.tipo));
 		    write(fileno(stdout),mostrar,strlen(mostrar));
@@ -370,13 +373,23 @@ main(int argc, char *argv[])
 	   
 	   sprintf(mostrar,"::::: QUEDA ESTABLECIDO EL ANILLO :::::\n");
 	   write(fileno(stdout), mostrar, strlen(mostrar));
-
+		
+		key_t key = ftok("/tmp/buchwaldipcs",SEM_ANILLO_FORMANDO);
+		int semid = semget(key,1, IPC_CREAT| 0660);
+		struct sembuf oper;
+		oper.sem_num = 0;
+		oper.sem_op = 1;
+		oper.sem_flg = 0;
+		semop(semid,&oper,1);
+		
+		execlp("./Anillo/listener", "listener", argv[1],(char*)0);
 }
 
 void sig_handler(int sig) {
     char mostrar[50]; 
     sprintf(mostrar,"Se recibio el timeout\n");
     write(fileno(stdout), mostrar, strlen(mostrar));
+    wait(NULL);
 }
 
 

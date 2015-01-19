@@ -102,6 +102,7 @@ destroy:
 	@echo "killall tcpclient_receptor" >> destroy.sh
 	@echo "killall tcpserver_emisor" >> destroy.sh
 	@echo "killall registracion_server" >> destroy.sh
+	@echo "killall listener" >> destroy.sh
 	@chmod +x destroy.sh
 
 cleanO:

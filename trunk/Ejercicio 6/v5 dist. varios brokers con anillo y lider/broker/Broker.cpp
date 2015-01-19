@@ -43,6 +43,10 @@ void crear_ipcs(int master){
 	sem_next.creaSem();
 	sem_next.iniSem(1);
 	
+	Semaphore sem_anillo(SEM_ANILLO_FORMANDO);
+	sem_anillo.creaSem();
+	sem_anillo.iniSem(0);
+	
 	/* Pongo a circular la shm de testers*/
 	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_SHM_TESTERS);
 	int cola_shm_testers = msgget(key, 0660 | IPC_CREAT);
@@ -88,7 +92,7 @@ void crear_ipcs(int master){
 	if (fork() == 0){
 		execlp(ejecucion.c_str(), programa.c_str(), id.str().c_str(),(char*)0);
 	}
-	wait(NULL);
+	sem_anillo.p();
 	
 	if (*soy_lider){ //Solo el "lider" pone a circular
 		int ret = msgsnd(cola_shm_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
@@ -230,7 +234,7 @@ void crear_clientes_a_brokers(){
 	char param_cola_shm[10];
 	sprintf(param_cola_shm, "%d", MSGQUEUE_BROKER_SHM_TESTERS);
 	
-	for (size_t i = 0; i < sizeof(BROKERS); i++){
+	for (size_t i = 0; i < CANT_BROKERS; i++){
 		if (BROKERS[i].id == ID_BROKER) continue; //no tiene sentido conectarse con uno mismo
 		
 		char param_id[10];
