@@ -21,7 +21,7 @@
 #include "logger/Logger.h"
 
 void createIPCObjects();
-void createSystemProcesses();
+void createSystemProcesses(int);
 
 int main(int argc, char** argv) {
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
@@ -36,7 +36,19 @@ int main(int argc, char** argv) {
     }
     Logger::debug("Objetos IPC inicializados correctamente. Iniciando procesos...", __FILE__);
     
-    createSystemProcesses();
+    if (argc == 1){
+		Logger::destroy();
+		return 0;
+	}
+	
+	int ser_master;
+	if (argc == 2){
+		ser_master = 0;
+	} else {
+		ser_master = 1;
+	}
+	
+    createSystemProcesses(ser_master);
     Logger::debug("Procesos iniciados correctamente...", __FILE__);
     
     Logger::notice("Sistema inicializado correctamente...", __FILE__);
@@ -87,7 +99,7 @@ void createIPCObjects() {
    
 }
 
-void createSystemProcesses() {
+void createSystemProcesses(int ser_master) {
 	Logger::notice("Creo el servidor rpc", __FILE__);
 	if (fork() == 0){
 		execlp("./servicio_rpc/registracion_server", "registracion_server", (char*)0);
@@ -95,8 +107,11 @@ void createSystemProcesses() {
         exit(1);
 	}
 	
+	char param_master[5];
+	sprintf(param_master, "%d", ser_master); 
+	
 	if (fork() == 0){
-		execlp("./Broker", "Broker", (char*)0);
+		execlp("./Broker", "Broker", param_master, (char*)0);
         Logger::error("Error al ejecutar el programa broker", __FILE__);
         exit(1);
 	}

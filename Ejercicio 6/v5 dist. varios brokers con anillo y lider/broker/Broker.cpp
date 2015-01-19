@@ -14,7 +14,7 @@
 
 #define ID_BROKER 1001
 
-void crear_ipcs(){
+void crear_ipcs(int master){
 	
 	key_t key;	
 	Logger::notice("Creo los semaforos y shm necesarias", __FILE__);
@@ -73,7 +73,7 @@ void crear_ipcs(){
 	
 	std::string programa;
 	
-	if ( ID_BROKER == 1001 ) { //FIX condicion del if por algo por parametro
+	if ( master ) { //FIX condicion del if por algo por parametro
 		sleep(3);
 		programa = "sender";		
 	} else {
@@ -253,10 +253,10 @@ void crear_clientes_a_brokers(){
 	}
 }
 
-int main (void){
+int main (int argc, char** argv){
 	Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
-	crear_ipcs();
 	crear_servers();
+	crear_ipcs(argc == 2);	
 	crear_sub_brokers();
 	
 	sleep(1);
