@@ -13,7 +13,6 @@
 #include "ids_brokers.h"
 
 #define ID_BROKER 1001
-#define ID_NEXT_BROKER 1001
 
 void crear_ipcs(){
 	
