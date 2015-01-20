@@ -47,6 +47,12 @@ void crear_ipcs(int master){
 	sem_anillo.creaSem();
 	sem_anillo.iniSem(0);
 	
+	key = ftok(ipcFileName.c_str(), SHM_VERSION);
+    int shmversion = shmget(key, sizeof(int) , 0660 | IPC_CREAT);
+    int* version_id = (int*)shmat(shmversion, NULL, 0);   
+    *version_id = ID_BROKER;
+    shmdt((void*)version_id);
+	
 	/* Pongo a circular la shm de testers*/
 	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_SHM_TESTERS);
 	int cola_shm_testers = msgget(key, 0660 | IPC_CREAT);
