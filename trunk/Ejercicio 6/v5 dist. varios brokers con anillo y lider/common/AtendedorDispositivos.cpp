@@ -16,17 +16,20 @@ void devolverIdDispositivo(int);
 
 AtendedorDispositivos* at;
 pid_t receptor;
+bool espera;
 
 void terminar(int sig){
+	Logger::debug("Reiniciando dispositivo", __FILE__);
 	at->terminar_atencion();
 	kill(receptor, SIGHUP);
 	wait(NULL);
-	execlp("./Dispositivo", "",(char*)0);
-	exit(1);
+	wait(NULL);
+	espera = true;
 }
 
 void restart_padre(pid_t pid){
 	sleep(TIEMPO_ESPERA_RESTART_DISPOSITIVOS);
+	Logger::debug("Tiempo de espera finalizado", __FILE__);
 	kill(pid, SIGHUP);
 	exit(0);	
 }
@@ -94,12 +97,18 @@ void AtendedorDispositivos::enviarRequerimiento() {
 int AtendedorDispositivos::recibirPrograma() {
     TMessageAtendedor msg;
     
+    pid_t padre = getpid();
     pid_t hijo = fork();
     if (hijo == 0){
-		restart_padre(getppid());
+		restart_padre(padre);
 	}
+	espera = false;
     int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), this->idDispositivo, 0);
     if(ret == -1) {
+		if (espera){
+			execlp("./Dispositivo", "Dispositivo",(char*)0);
+			exit(1);
+		}
         std::string error("Error al recibir programa del atendedor. Error: " + errno);
         Logger::error(error.c_str(), __FILE__);
         exit(0);
@@ -132,12 +141,18 @@ void AtendedorDispositivos::enviarResultado(int resultado) {
 int AtendedorDispositivos::recibirOrden(int* cantidad) {
 
     TMessageAtendedor msg;
+    pid_t padre = getpid();
     pid_t hijo = fork();
     if (hijo == 0){
-		restart_padre(getppid());
+		restart_padre(padre);
 	}
+	espera = false;
     int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), this->idDispositivo, 0);
     if(ret == -1) {
+		if (espera){
+			execlp("./Dispositivo", "Dispositivo",(char*)0);
+			exit(1);
+		}
         std::string error("Error al recibir orden del atendedor. Error: " + errno);
         Logger::error(error.c_str(), __FILE__);
         exit(0);
