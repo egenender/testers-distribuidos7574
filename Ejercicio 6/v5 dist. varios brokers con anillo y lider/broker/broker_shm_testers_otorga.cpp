@@ -17,9 +17,9 @@ void copiarResultado(resultado_t* destino, resultado_t* origen){
 	}
 }
 
-/*void rearmar_anillo(int sig){
+void rearmar_anillo(int sig){
 	Logger::error("Se cayo el anillo", __FILE__);
-}*/
+}
 
 int main (int argc, char** argv){
 	Logger::initialize(logFileName.c_str(), Logger::LOG_NOTICE);
@@ -54,7 +54,7 @@ int main (int argc, char** argv){
 	Semaphore sem_next(SEM_MUTEX_NEXT_BROKER);
 	sem_next.getSem();
 	
-	//signal(SIGUSR1, rearmar_anillo);
+	signal(SIGUSR1, rearmar_anillo);
 	
     Logger::notice("Termino la obtencion de ipcs", __FILE__);
     
@@ -67,19 +67,19 @@ int main (int argc, char** argv){
 		Logger::debug(ss.str(), __FILE__);
 		ss.str("");
 		
-		/*pid_t padre = getpid();
+		pid_t padre = getpid();
 		pid_t timer = fork();
 		if (timer == 0){
 			sleep(TIEMPO_ESPERA_ANILLO);
 			kill(padre, SIGUSR1);
 			exit(0);
-		}*/
+		}
 		int ok_read = msgrcv(cola_shm_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), broker_id, 0);
 		if (ok_read == -1){
 			exit(0);
 		}
-		//kill(timer, SIGKILL);
-		//wait(NULL);
+		kill(timer, SIGINT);
+		wait(NULL);
 		Logger::debug("Obtengo shm. Reviso si hay un pedido de shm", __FILE__);
 				
 		sem_tester_shm.p();
