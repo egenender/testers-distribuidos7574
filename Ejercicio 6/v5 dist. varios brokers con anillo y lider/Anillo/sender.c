@@ -15,9 +15,12 @@ char* imprimirCodigo(int codigo);
 main(int argc, char *argv[])
 {
     char mostrar[300];
-    int id;
-    id = atoi(argv[1]);
-    sprintf(mostrar,"[MASTER] --> ID: %d\t| pid: %d\n",id, getpid());
+    
+    key_t key = ftok("/tmp/buchwaldipcs", SHM_VERSION);
+    int shmversion = shmget(key, sizeof(int) , 0660 | IPC_CREAT);
+    int* id = (int*)shmat(shmversion, NULL, 0);   
+    
+    sprintf(mostrar,"[MASTER] --> ID: %d\t| pid: %d\n",*id, getpid());
     write(fileno(stdout),mostrar,strlen(mostrar));
     
     struct sockaddr_in addrMulticast;
@@ -191,7 +194,7 @@ main(int argc, char *argv[])
        
        //Comienza el algoritmo para elegir al lider
        //El master pone un mensaje en el anillo con su id y estado DESCONOCIDO (no se sabe quien es el lider)
-       msgLider.idBroker = id;
+       msgLider.idBroker = *id;
        msgLider.estado = DESCONOCIDO;
        
        sleep(7);
@@ -220,14 +223,14 @@ main(int argc, char *argv[])
                sprintf(mostrar, "[RECIBIDO] <-- ID: %d\t%s\n",msgLider.idBroker,imprimirCodigo(msgLider.estado));
 	       write(fileno(stdout), mostrar, strlen(mostrar));
 	       //Si el id que le llego es mayor que el del actual entonces se lo envia a su siguiente
-               if((msgLider.idBroker > id) && (msgLider.estado!=FIN)){
+               if((msgLider.idBroker > *id) && (msgLider.estado!=FIN)){
 		   msgLider.estado=DESCONOCIDO;
                    if((nbytes=enviar(fdSiguiente,&msgLider,sizeof(msgLider))) != sizeof(msgLider)){
                         sprintf(mostrar,"Error al enviar msgLider\n");
                         write(fileno(stdout),mostrar,strlen(mostrar));
                         exit(1);
                    }
-               }else if(msgLider.idBroker == id){
+               }else if(msgLider.idBroker == *id){
 		 //Si el id es igual al actual, entonces es el lider. Envia un mensaje indicando que es el fin de la busqueda
                    msgLider.estado = FIN;
                    if((nbytes=enviar(fdSiguiente,&msgLider,sizeof(msgLider))) != sizeof(MsgLider_t)){
@@ -243,8 +246,8 @@ main(int argc, char *argv[])
                         exit(1);
                    }
                }
-               else if(msgLider.idBroker < id) {
-		   msgLider.idBroker=id;
+               else if(msgLider.idBroker < *id) {
+		   msgLider.idBroker=*id;
 		   msgLider.estado=DESCONOCIDO;
                    if((nbytes=enviar(fdSiguiente,&msgLider,sizeof(msgLider))) != sizeof(MsgLider_t)){
                         sprintf(mostrar,"Error al enviar msgLider\n");
@@ -257,13 +260,13 @@ main(int argc, char *argv[])
        }while((msgLider.estado != LIDER) && (msgLider.estado!=FIN));
        
        sprintf(mostrar, "[MASTER] --> ID LIDER ENCONTRADO: %d\t%s\n", msgLider.idBroker, imprimirCodigo(msgLider.estado));
-       set_lider(msgLider.idBroker == id);
+       set_lider(msgLider.idBroker == *id);
        write(fileno(stdout), mostrar, strlen(mostrar));
        
        sprintf(mostrar, "::::: QUEDA ESTABLECIDO EL ANILLO :::::\n", msgLider.idBroker, imprimirCodigo(msgLider.estado));
        write(fileno(stdout), mostrar, strlen(mostrar));
 	
-		key_t key = ftok("/tmp/buchwaldipcs",SEM_ANILLO_FORMANDO);
+		key = ftok("/tmp/buchwaldipcs",SEM_ANILLO_FORMANDO);
 		int semid = semget(key,1, IPC_CREAT| 0660);
 		struct sembuf oper;
 		oper.sem_num = 0;
@@ -271,6 +274,7 @@ main(int argc, char *argv[])
 		oper.sem_flg = 0;
 		semop(semid,&oper,1);
 		
+		shmdt((void*)id);
 		execlp("./Anillo/listener", "listener", argv[1],(char*)0);
 }
 
