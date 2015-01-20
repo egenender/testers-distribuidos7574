@@ -54,9 +54,9 @@ int main (int argc, char** argv){
 	Semaphore sem_next(SEM_MUTEX_NEXT_BROKER);
 	sem_next.getSem();
 	
-	//key = ftok(ipcFileName.c_str(), SHM_VERSION);
-    //int shmversion = shmget(key, sizeof(int) , 0660 | IPC_CREAT);
-    //int* version_id = (int*)shmat(shmversion, NULL, 0);   
+	key = ftok(ipcFileName.c_str(), SHM_VERSION);
+    int shmversion = shmget(key, sizeof(int) , 0660 | IPC_CREAT);
+    int* version_id = (int*)shmat(shmversion, NULL, 0);   
 	
 	signal(SIGUSR1, rearmar_anillo);
 	
@@ -136,7 +136,7 @@ int main (int argc, char** argv){
 		} 
 		
 		msg.version++;
-		//*version_id = msg.version;
+		*version_id = msg.version;
 		
 		sem_next.p();
 		int siguiente = *next;
