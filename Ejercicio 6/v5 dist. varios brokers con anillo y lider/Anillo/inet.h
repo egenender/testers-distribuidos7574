@@ -67,7 +67,7 @@ typedef struct{
 
 
 typedef struct{
-    int idBroker;
+    uint64_t idBroker;
     int estado;
 }MsgLider_t;
 
