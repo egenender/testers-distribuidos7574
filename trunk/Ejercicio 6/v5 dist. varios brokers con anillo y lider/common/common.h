@@ -142,7 +142,7 @@ typedef struct message {
 	int32_t cant_testers;
 	int32_t especiales[MAX_TESTERS_ESPECIALES];
 	/* SHM */
-	uint64_t version;
+	int64_t version;
 	resultado_t resultados[CANT_RESULTADOS];
 	tabla_testers_disponibles_t tabla;
 } TMessageAtendedor;
