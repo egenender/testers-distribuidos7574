@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
     shmctl(shmlider, IPC_RMID, NULL);
     
     key = ftok(ipcFileName.c_str(), SHM_VERSION);
-    int shmversion = shmget(key, sizeof(int),  0660);
+    int shmversion = shmget(key, sizeof(uint64_t),  0660);
     shmctl(shmversion, IPC_RMID, NULL);
 	
     return 0;
