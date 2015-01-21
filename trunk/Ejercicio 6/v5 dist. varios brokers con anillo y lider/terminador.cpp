@@ -61,6 +61,10 @@ int main(int argc, char** argv) {
     key = ftok(ipcFileName.c_str(), SHM_VERSION);
     int shmversion = shmget(key, sizeof(int),  0660);
     shmctl(shmversion, IPC_RMID, NULL);
+    
+    key = ftok(ipcFileName.c_str(), SHM_LISTENER_ACTUANDO);
+    int shmlisteneractuando = shmget(key, sizeof(int),  0660);
+    shmctl(shmlisteneractuando, IPC_RMID, NULL);
 	
     return 0;
 }
