@@ -50,6 +50,10 @@ int main (int argc, char** argv){
 	key = ftok(ipcFileName.c_str(), SHM_NEXT_BROKER);
     int shmnext = shmget(key, sizeof(int) , 0660);
     int* next = (int*)shmat(shmnext, NULL, 0);   
+    
+    key = ftok(ipcFileName.c_str(), SHM_VERSION);
+    int shmversion = shmget(key, sizeof(int) , 0660 | IPC_CREAT);
+    int* version_id = (int*)shmat(shmversion, NULL, 0);   
 	
 	Semaphore sem_next(SEM_MUTEX_NEXT_BROKER);
 	sem_next.getSem();
@@ -129,9 +133,11 @@ int main (int argc, char** argv){
 			} else { // -> es un sub broker
 				memcpy(&msg.tabla, &msg_envio.tabla, sizeof(tabla_testers_disponibles_t));
 			}
-			msg.version++;
-		} 
 			
+		} 
+		msg.version++;
+		*version_id = msg.version;
+		
 		sem_next.p();
 		int siguiente = *next;
 		sem_next.v();
