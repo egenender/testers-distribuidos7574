@@ -104,7 +104,7 @@ void crear_ipcs(int master){
 		int ret = msgsnd(cola_shm_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
 		if (ret == -1) exit(0);
 	}
-	
+	shmdt((void*) soy_lider);
 	shmdt((void*)tester_shm);
 	
 }
