@@ -275,7 +275,7 @@ main(int argc, char *argv[])
 		semop(semid,&oper,1);
 		
 		shmdt((void*)id);
-		execlp("./Anillo/listener", "listener", argv[1],(char*)0);
+		execlp("./Anillo/listener", "listener", (char*)0);
 }
 
 

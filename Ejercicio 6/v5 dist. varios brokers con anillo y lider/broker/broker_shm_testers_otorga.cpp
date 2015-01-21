@@ -9,6 +9,9 @@
 #include "../logger/Logger.h"
 #include <string.h>
 
+TMessageAtendedor msg;
+bool rearmado;
+
 void copiarResultado(resultado_t* destino, resultado_t* origen){
 	for (int i = 0; i < CANT_RESULTADOS; i++){
 		destino[i].idDispositivo = origen[i].idDispositivo;
@@ -18,11 +21,42 @@ void copiarResultado(resultado_t* destino, resultado_t* origen){
 }
 
 void rearmar_anillo(int sig){
+	rearmado = true;
 	Logger::error("Se cayo el anillo", __FILE__);
+	key_t key = ftok(ipcFileName.c_str(), SHM_LISTENER_ACTUANDO);
+    int shmlisteneractuando = shmget(key, sizeof(int) , 0660 | IPC_CREAT);
+    int* listener_actuando = (int*)shmat(shmlisteneractuando, NULL, 0);
+    int actuando = *listener_actuando;
+    shmdt((void*)listener_actuando);
+    if (!actuando){
+		system("killall listener");
+		wait(NULL);
+		if (fork() == 0){
+			execlp("./Anillo/sender", "sender",(char*)0);
+			exit(1);
+		}		
+	}
+    
+    Semaphore sem_anillo(SEM_ANILLO_FORMANDO);
+    sem_anillo.getSem();
+    sem_anillo.p();
+    
+    key = ftok(ipcFileName.c_str(), SHM_LIDER);
+    int shmlider = shmget(key, sizeof(int) , 0660 | IPC_CREAT);
+    int* soy_lider = (int*)shmat(shmlider, NULL, 0);   
+    
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_SHM_TESTERS);
+	int cola_shm_testers = msgget(key, 0660 | IPC_CREAT);
+    
+    if (*soy_lider){ //Solo el "lider" pone a circular
+		int ret = msgsnd(cola_shm_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+		if (ret == -1) exit(0);
+	}
+	shmdt((void*)soy_lider);
 }
 
 int main (int argc, char** argv){
-	Logger::initialize(logFileName.c_str(), Logger::LOG_NOTICE);
+	Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
 	Logger::notice("Creo los ipcs necesarias", __FILE__);
 	
 	int broker_id = atoi(argv[1]);
@@ -63,7 +97,6 @@ int main (int argc, char** argv){
     Logger::notice("Termino la obtencion de ipcs", __FILE__);
     
 	/* Fin Setup */
-	TMessageAtendedor msg;
 	
 	while (true){
 		std::stringstream ss;
@@ -78,9 +111,12 @@ int main (int argc, char** argv){
 			kill(padre, SIGUSR1);
 			exit(0);
 		}
+		rearmado = false;
 		int ok_read = msgrcv(cola_shm_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), broker_id, 0);
 		if (ok_read == -1){
-			exit(0);
+			if (!rearmado){
+				exit(0);
+			}
 		}
 		kill(timer, SIGINT);
 		wait(NULL);
