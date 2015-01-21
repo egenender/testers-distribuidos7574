@@ -19,7 +19,12 @@ main(int argc, char *argv[])
 {
     key_t key = ftok("/tmp/buchwaldipcs", SHM_VERSION);
     int shmversion = shmget(key, sizeof(int) , 0660 | IPC_CREAT);
-    int* id = (int*)shmat(shmversion, NULL, 0);   
+    int* id = (int*)shmat(shmversion, NULL, 0);
+    
+    key = ftok("/tmp/buchwaldipcs", SHM_LISTENER_ACTUANDO);
+    int shmlisteneractuando = shmget(key, sizeof(int) , 0660 | IPC_CREAT);
+    int* listener_actuando = (int*)shmat(shmlisteneractuando, NULL, 0);
+    *listener_actuando = 0;
     
     char mostrar[300];
     
@@ -151,7 +156,8 @@ main(int argc, char *argv[])
           if ((nbytes=recvfrom(fdMulticast,&msgMulticast,sizeof(MsgMulticast_t),0,(struct sockaddr *) &addrMulticast,&addrlen)) < 0) {
 	       perror("recvfrom");
 	       exit(1);
-	  }
+	  }		
+		*listener_actuando = 1;
           sprintf(mostrar,"[RECIBIDO] <-- %s\t%s\n",inet_ntoa(addrMulticast.sin_addr), imprimirCodigo(msgMulticast.tipo));
           write(fileno(stdout),mostrar,strlen(mostrar));
 
