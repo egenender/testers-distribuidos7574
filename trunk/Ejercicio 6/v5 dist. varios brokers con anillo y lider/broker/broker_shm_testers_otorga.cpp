@@ -11,6 +11,7 @@
 
 TMessageAtendedor msg;
 bool rearmado;
+int broker_id;
 
 void copiarResultado(resultado_t* destino, resultado_t* origen){
 	for (int i = 0; i < CANT_RESULTADOS; i++){
@@ -49,6 +50,7 @@ void rearmar_anillo(int sig){
 	int cola_shm_testers = msgget(key, 0660 | IPC_CREAT);
     
     if (*soy_lider){ //Solo el "lider" pone a circular
+		msg.mtype = broker_id;
 		int ret = msgsnd(cola_shm_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
 		if (ret == -1) exit(0);
 	}
@@ -59,7 +61,7 @@ int main (int argc, char** argv){
 	Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
 	Logger::notice("Creo los ipcs necesarias", __FILE__);
 	
-	int broker_id = atoi(argv[1]);
+	broker_id = atoi(argv[1]);
 	key_t key;
 	
 	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_ENVIO_MENSAJES_TESTERS);
@@ -183,6 +185,13 @@ int main (int argc, char** argv){
 		
 		msg.mtype = siguiente;
 		msg.mtype_envio = siguiente;
+		
+		/*int random_falla = rand() % 100;
+		bool hubo_falla = random_falla < PROBABILIDAD_FALLA_BROKER;
+		if (hubo_falla){
+			Logger::error("El broker descarta la shm (pruebas de caidas)", __FILE__);
+			continue;
+		}*/
 				
 		int ret = msgsnd(cola_shm_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
 		if (ret == -1) exit(0);
