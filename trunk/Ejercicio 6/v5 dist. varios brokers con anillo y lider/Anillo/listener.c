@@ -394,8 +394,8 @@ main(int argc, char *argv[])
 		
 		shmdt((void*)id);
 		shmdt((void*)listener_actuando);
-		execlp("./Anillo/listener", "listener", (char*)0);
-		exit(1);
+		close(fdAnterior);
+		close(fdSiguiente);
 }
 
 void sig_handler(int sig) {
