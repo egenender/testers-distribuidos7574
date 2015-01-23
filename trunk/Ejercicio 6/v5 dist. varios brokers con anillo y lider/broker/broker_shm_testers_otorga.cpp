@@ -200,17 +200,17 @@ int main (int argc, char** argv){
 		msg.mtype = siguiente;
 		msg.mtype_envio = siguiente;
 		
-		/*int random_falla = rand() % 10000;
-		bool hubo_falla = random_falla < PROBABILIDAD_FALLA_BROKER;
-		if (hubo_falla){
+		//int random_falla = rand() % 1000;
+		//bool hubo_falla = random_falla < PROBABILIDAD_FALLA_BROKER;
+		if (msg.version % 500 == 0 || msg.version % 501 == 0 || msg.version % 502 == 0){	
 			Logger::error("El broker descarta la shm (pruebas de caidas)", __FILE__);
 			sleep(5);
 			continue;
-		}*/
+		}
 				
+		usleep(100000);
 		int ret = msgsnd(cola_shm_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
-		if (ret == -1) exit(0);
-		
+		if (ret == -1) exit(0);		
 		
 		if ( siguiente == broker_id ){
 			usleep(1000); //Esperamos para el caso que hay un solo broker, para que no termine consumiendo el procesador
