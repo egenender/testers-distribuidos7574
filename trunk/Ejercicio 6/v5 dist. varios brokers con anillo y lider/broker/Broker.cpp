@@ -103,7 +103,7 @@ void crear_ipcs(int master){
 	sem_anillo.p();
 	wait(NULL);
 	//Logger::notice("Se termino de armar el anillo, esperando a cierre de conexion para finalizar configuracion", __FILE__);
-	sleep(20);
+	sleep(30);
 	
 	if (fork() == 0){
 		execlp("./Anillo/listener", "listener",(char*)0);

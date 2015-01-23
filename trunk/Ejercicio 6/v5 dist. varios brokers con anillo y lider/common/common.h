@@ -100,7 +100,7 @@ const int FINALIZAR_CONEXION = 1;
 const int TIEMPO_ESPERA_RESTART_DISPOSITIVOS = 10;
 const int TIEMPO_ESPERA_RESTART_TESTERS = 3;
 const int TIEMPO_ESPERA_ANILLO = 2;
-const int PROBABILIDAD_FALLA_BROKER = 10;
+const int PROBABILIDAD_FALLA_BROKER = 1;
 
 const int MAXIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION = 4;
 const int MINIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION = 2;
@@ -112,7 +112,7 @@ const char PUERTO_SERVER_EMISOR_DISPOSITIVOS[] = "9003";
 const char PUERTO_SERVER_RECEPTOR_SHM[] = "9004";
 
 const char UBICACION_BROKER[] = "localhost"; //Cambiar
-const char UBICACION_SERVER_RPC[] = "192.168.1.106"; //Cambiar
+const char UBICACION_SERVER_RPC[] = "192.168.1.104"; //Cambiar
 
 //Estructuras communes:
 typedef struct resultado{
