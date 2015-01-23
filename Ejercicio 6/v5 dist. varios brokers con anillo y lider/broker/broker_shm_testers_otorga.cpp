@@ -47,7 +47,7 @@ void rearmar_anillo(int sig){
     
     wait(NULL);
     //Logger::notice("Se termino de armar el anillo, esperando a cierre de conexion para finalizar configuracion", __FILE__);
-    sleep(20);
+    sleep(30);
     if (fork() == 0){
 		execlp("./Anillo/listener", "listener",(char*)0);
 		exit(1);
@@ -70,6 +70,7 @@ void rearmar_anillo(int sig){
 }
 
 int main (int argc, char** argv){
+	srand(getpid());
 	Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
 	Logger::notice("Creo los ipcs necesarias", __FILE__);
 	
@@ -106,7 +107,7 @@ int main (int argc, char** argv){
 	Semaphore sem_next(SEM_MUTEX_NEXT_BROKER);
 	sem_next.getSem();
 	
-	signal(SIGUSR1, rearmar_anillo);
+	signal(SIGQUIT, rearmar_anillo);
 	
     Logger::notice("Termino la obtencion de ipcs", __FILE__);
     
@@ -122,7 +123,7 @@ int main (int argc, char** argv){
 		pid_t timer = fork();
 		if (timer == 0){
 			sleep(5);
-			kill(padre, SIGUSR1);
+			kill(padre, SIGQUIT);
 			exit(0);
 		}
 		rearmado = false;
@@ -199,13 +200,13 @@ int main (int argc, char** argv){
 		msg.mtype = siguiente;
 		msg.mtype_envio = siguiente;
 		
-		int random_falla = rand() % 1000;
+		/*int random_falla = rand() % 10000;
 		bool hubo_falla = random_falla < PROBABILIDAD_FALLA_BROKER;
 		if (hubo_falla){
 			Logger::error("El broker descarta la shm (pruebas de caidas)", __FILE__);
 			sleep(5);
 			continue;
-		}
+		}*/
 				
 		int ret = msgsnd(cola_shm_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
 		if (ret == -1) exit(0);
