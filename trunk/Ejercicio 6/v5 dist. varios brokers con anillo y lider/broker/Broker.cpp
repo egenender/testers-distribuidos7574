@@ -97,8 +97,18 @@ void crear_ipcs(int master){
 	
 	if (fork() == 0){
 		execlp(ejecucion.c_str(), programa.c_str(), id.str().c_str(),(char*)0);
+		exit(1);
 	}
+	
 	sem_anillo.p();
+	wait(NULL);
+	//Logger::notice("Se termino de armar el anillo, esperando a cierre de conexion para finalizar configuracion", __FILE__);
+	sleep(20);
+	
+	if (fork() == 0){
+		execlp("./Anillo/listener", "listener",(char*)0);
+		exit(1);
+	}
 	
 	if (*soy_lider){ //Solo el "lider" pone a circular
 		int ret = msgsnd(cola_shm_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
@@ -266,7 +276,7 @@ void crear_clientes_a_brokers(){
 int main (int argc, char** argv){
 	Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
 	crear_servers();
-	crear_ipcs(argc == 2 && atoi(argv[1]) );	
+	crear_ipcs(argc == 2 && atoi(argv[1]) );
 	crear_sub_brokers();
 	
 	sleep(1);

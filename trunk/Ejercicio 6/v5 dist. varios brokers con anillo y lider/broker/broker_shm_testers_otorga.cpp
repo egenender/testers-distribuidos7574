@@ -30,22 +30,33 @@ void rearmar_anillo(int sig){
     int actuando = *listener_actuando;
     shmdt((void*)listener_actuando);
     if (!actuando){
+		Logger::notice("El listener no estaba actuando, asi que creo el sender", __FILE__);
 		system("killall listener");
 		wait(NULL);
 		if (fork() == 0){
 			execlp("./Anillo/sender", "sender",(char*)0);
 			exit(1);
 		}		
+	}else {
+		Logger::notice("El listener estaba actuando, asi que lo dejo trabajar", __FILE__);
 	}
     
     Semaphore sem_anillo(SEM_ANILLO_FORMANDO);
     sem_anillo.getSem();
     sem_anillo.p();
     
+    wait(NULL);
+    //Logger::notice("Se termino de armar el anillo, esperando a cierre de conexion para finalizar configuracion", __FILE__);
+    sleep(20);
+    if (fork() == 0){
+		execlp("./Anillo/listener", "listener",(char*)0);
+		exit(1);
+	}
+    
     key = ftok(ipcFileName.c_str(), SHM_LIDER);
     int shmlider = shmget(key, sizeof(int) , 0660 | IPC_CREAT);
     int* soy_lider = (int*)shmat(shmlider, NULL, 0);   
-    
+     
     key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_SHM_TESTERS);
 	int cola_shm_testers = msgget(key, 0660 | IPC_CREAT);
     
@@ -55,6 +66,7 @@ void rearmar_anillo(int sig){
 		if (ret == -1) exit(0);
 	}
 	shmdt((void*)soy_lider);
+	Logger::notice("Terminada reconfiguracion del anillo", __FILE__);
 }
 
 int main (int argc, char** argv){
@@ -109,16 +121,17 @@ int main (int argc, char** argv){
 		pid_t padre = getpid();
 		pid_t timer = fork();
 		if (timer == 0){
-			sleep(TIEMPO_ESPERA_ANILLO);
+			sleep(5);
 			kill(padre, SIGUSR1);
 			exit(0);
 		}
 		rearmado = false;
 		int ok_read = msgrcv(cola_shm_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), broker_id, 0);
 		if (ok_read == -1){
-			if (!rearmado){
-				exit(0);
+			if (rearmado){
+				continue;
 			}
+			exit(0);
 		}
 		kill(timer, SIGINT);
 		wait(NULL);
@@ -186,12 +199,13 @@ int main (int argc, char** argv){
 		msg.mtype = siguiente;
 		msg.mtype_envio = siguiente;
 		
-		/*int random_falla = rand() % 100;
+		int random_falla = rand() % 1000;
 		bool hubo_falla = random_falla < PROBABILIDAD_FALLA_BROKER;
 		if (hubo_falla){
 			Logger::error("El broker descarta la shm (pruebas de caidas)", __FILE__);
+			sleep(5);
 			continue;
-		}*/
+		}
 				
 		int ret = msgsnd(cola_shm_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
 		if (ret == -1) exit(0);
