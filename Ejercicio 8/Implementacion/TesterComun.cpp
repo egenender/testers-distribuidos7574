@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
             Logger::notice(mensaje + ss.str() , nombre.str().c_str());
             atendedor.enviarPrograma(idDispositivo, id, SIN_LUGAR);
             continue;
-	}
+        }
         
         usleep( rand() % 1000 + 1000);
         Logger::notice(string("Envio programa a dispositivo ") + ss.str(), nombre.str().c_str());                  	

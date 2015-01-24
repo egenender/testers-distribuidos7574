@@ -7,26 +7,19 @@
 #include "AtendedorDispositivos.h"
 
 AtendedorDispositivos::AtendedorDispositivos() { 
-    key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_DISPOSITIVOS);
-    this->cola_requerimiento = msgget(key, 0666);
-    if(this->cola_requerimiento == -1) {
-        std::string err = std::string("Error al obtener la cola para enviar requerimientos. Errno: ") + std::string(strerror(errno));
+
+    key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_ENVIOS_DISP);
+    this->cola_envioS = msgget(key, 0666);
+    if(this->cola_envios == -1) {
+        std::string err = std::string("Error al obtener la cola para enviar mensajes. Errno: ") + std::string(strerror(errno));
         Logger::error(err, __FILE__);
         exit(1);
     }
     
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_TESTERS);
-    this->cola_tests = msgget(key, 0666);
-    if(this->cola_tests == -1) {
-        std::string err = std::string("Error al obtener la cola para enviar testeos a los dispositivos. Errno: ") + std::string(strerror(errno));
-        Logger::error(err, __FILE__);
-        exit(1);
-    }
-    
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_DISPOSITIVOS_TESTERS_ESPECIALES);
-    this->cola_tests_especiales = msgget(key, 0666);
-    if(this->cola_tests_especiales == -1) {
-        std::string err = std::string("Error al obtener la cola para enviar tareas especiales a los dispositivos. Errno: ") + std::string(strerror(errno));
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_RECEPCIONES_DISP);
+    this->cola_recepciones = msgget(key, 0666);
+    if(this->cola_recepciones == -1) {
+        std::string err = std::string("Error al obtener la cola para recibir mensajes. Errno: ") + std::string(strerror(errno));
         Logger::error(err, __FILE__);
         exit(1);
     }
@@ -34,51 +27,35 @@ AtendedorDispositivos::AtendedorDispositivos() {
     /**
      * Refactor que queda horrible esto aca
      */
-    // Set up socket: toma del socket el programa enviado por el tester y lo pone en la cola de
-    //respuestas de los Testers
+
     char param_cola[10];
-	sprintf(param_cola, "%d", MSGQUEUE_TESTERS);
+    char param_id[10];
+    char param_pid[10];
+
+    // RECIBIR PROGRAMA, ORDEN, PROGRAMA ESPECIAL
+	sprintf(param_cola, "%d", MSGQUEUE_RECEPCIONES_DISP);
+
 	pid_t receptor = fork();
 	if (receptor == 0) {
 		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",
-				UBICACION_SERVER, PUERTO_SERVER_EMISOR_DISPOSITIVOS, param_cola,
+				UBICACION_SERVER,
+				PUERTO_SERVER_RECEPTOR_DISP,
+				param_cola,
 				(char*) 0);
 		exit(1);
 	}
-	// Set up socket: toma el requerimiento puesto por el disp en la cola de req y lo manda por el
-	//socket hacia los testers
-	char param_id[10];
+
+
+	// ENVIAR REQUERIMIENTO, RESULTADO, RESULTADO ESPECIAL
 	sprintf(param_id, "%d", this->idDispositivo);
-	char param_pid[10];
 	sprintf(param_pid, "%d", receptor);
-	sprintf(param_cola, "%d", MSGQUEUE_DISPOSITIVOS);
+	sprintf(param_cola, "%d", MSGQUEUE_ENVIOS_DISP);
 
 	if (fork() == 0) {
-		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor", UBICACION_SERVER,
-				PUERTO_SERVER_RECEPTOR_DISPOSITIVOS, param_id, param_cola,
-				param_pid, (char*) 0);
-		exit(1);
-	}
-
-	//set up socket: toma del socket las pruebas especiales de los testers especiales y las coloca
-	// en la cola de testers especiales
-	sprintf(param_cola, "%d", MSGQUEUE_DISPOSITIVOS_TESTERS_ESPECIALES);
-	pid_t receptorEspeciales = fork();
-	if (receptorEspeciales == 0) {
-		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",
-				UBICACION_SERVER, PUERTO_SERVER_EMISOR_DISPOSITIVOS, param_cola,
-				(char*) 0);
-		exit(1);
-	}
-
-	//Set up socket: toma los resultados especiales del dispositivo y los manda al socket
-	sprintf(param_id, "%d", this->idDispositivo);
-	sprintf(param_pid, "%d", receptorEspeciales);
-	sprintf(param_cola, "%d", MSGQUEUE_DISPOSITIVOS_TESTERS_ESPECIALES);
-
-	if (fork() == 0) {
-		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor", UBICACION_SERVER,
-				PUERTO_SERVER_RECEPTOR_DISPOSITIVOS, param_id, param_cola,
+		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",
+				UBICACION_SERVER,
+				PUERTO_SERVER_EMISOR_DISP,
+				param_id, param_cola,
 				param_pid, (char*) 0);
 		exit(1);
 	}
@@ -99,7 +76,7 @@ void AtendedorDispositivos::enviarRequerimiento(int idDispositivo) {
     msg.idTester = 0;
     msg.value = 0;
     
-    int ret = msgsnd(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    int ret = msgsnd(this->cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
         std::string error = std::string("Error al enviar requerimiento al sistema de testeo. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
@@ -109,7 +86,7 @@ void AtendedorDispositivos::enviarRequerimiento(int idDispositivo) {
 
 int AtendedorDispositivos::recibirPrograma(int idDispositivo) {
     TMessageAtendedor msg;
-    int ret = msgrcv(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
+    int ret = msgrcv(this->cola_recepciones, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir programa del sistema de testeo. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
@@ -127,7 +104,7 @@ void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {
     resultado_test.idDispositivo = idDispositivo;
     resultado_test.result = resultado;
             
-    int ret = msgsnd(this->cola_tests, &resultado_test, sizeof(resultado_test_t) - sizeof(long), 0);
+    int ret = msgsnd(this->cola_envios, &resultado_test, sizeof(resultado_test_t) - sizeof(long), 0);
     if(ret == -1) {
         std::string error = std::string("Error al enviar resultado al sistema de testeo. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
@@ -139,7 +116,7 @@ void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {
 int AtendedorDispositivos::recibirProgramaEspecial(int idDispositivo) {
 
     TMessageAtendedor msg;
-    int ret = msgrcv(this->cola_tests_especiales, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
+    int ret = msgrcv(this->cola_recepciones, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir programa especial del sistema de testeo. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
@@ -161,7 +138,7 @@ void AtendedorDispositivos::enviarResultadoEspecial(int idDispositivo, int resul
     resultadoTestEspecial.posicionDispositivo = this->posicionDispositivo;
     resultadoTestEspecial.resultado = resultado;
             
-    int ret = msgsnd(this->cola_tests_especiales, &resultadoTestEspecial, sizeof(TResultadoEspecial) - sizeof(long), 0);
+    int ret = msgsnd(this->cola_envios, &resultadoTestEspecial, sizeof(TResultadoEspecial) - sizeof(long), 0);
     if(ret == -1) {
         std::string error = std::string("Error al enviar resultado especial al sistema de testeo. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
@@ -172,7 +149,7 @@ void AtendedorDispositivos::enviarResultadoEspecial(int idDispositivo, int resul
 int AtendedorDispositivos::recibirOrden(int idDispositivo) {
 
     TMessageAtendedor msg;
-    int ret = msgrcv(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
+    int ret = msgrcv(this->cola_recepciones, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir orden del sistema de testeo. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
