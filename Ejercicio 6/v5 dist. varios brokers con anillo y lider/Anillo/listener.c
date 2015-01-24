@@ -18,8 +18,8 @@ extern int recibir (int, void*, size_t);
 main(int argc, char *argv[])
 {
     key_t key = ftok("/tmp/buchwaldipcs", SHM_VERSION);
-    int shmversion = shmget(key, sizeof(int) , 0660 | IPC_CREAT);
-    int* id = (int*)shmat(shmversion, NULL, 0);
+    int shmversion = shmget(key, sizeof(uint64_t) , 0660 | IPC_CREAT);
+    uint64_t* id = (uint64_t*)shmat(shmversion, NULL, 0);
     
     key = ftok("/tmp/buchwaldipcs", SHM_LISTENER_ACTUANDO);
     int shmlisteneractuando = shmget(key, sizeof(int) , 0660 | IPC_CREAT);

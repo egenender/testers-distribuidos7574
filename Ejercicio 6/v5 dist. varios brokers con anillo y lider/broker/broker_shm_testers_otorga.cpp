@@ -101,8 +101,8 @@ int main (int argc, char** argv){
     int* next = (int*)shmat(shmnext, NULL, 0);   
     
     key = ftok(ipcFileName.c_str(), SHM_VERSION);
-    int shmversion = shmget(key, sizeof(int) , 0660 | IPC_CREAT);
-    int* version_id = (int*)shmat(shmversion, NULL, 0);   
+    int shmversion = shmget(key, sizeof(uint64_t) , 0660 | IPC_CREAT);
+    uint64_t* version_id = (uint64_t*)shmat(shmversion, NULL, 0);   
 	
 	Semaphore sem_next(SEM_MUTEX_NEXT_BROKER);
 	sem_next.getSem();
