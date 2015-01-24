@@ -85,6 +85,9 @@ ring:
 	gcc  Anillo/sender.c -o Anillo/sender 
 	gcc  Anillo/listener.c -o Anillo/listener 
 	gcc  Anillo/timeout.c -o Anillo/timeout
+	
+setup:
+	$(CC) $(CFLAGS) setUp.cpp -o setUp
 
 iniciador: semaphore logger lockfile
 	$(CC) $(CFLAGS) Semaphore.o LockFile.o logger/Logger.o iniciador.cpp -o iniciador
@@ -94,6 +97,7 @@ lanzaDisp: semaphore logger lockfile
 
 terminador: semaphore lockfile logger
 	$(CC) $(CFLAGS) Semaphore.o LockFile.o logger/Logger.o terminador.cpp -o terminador
+
 
 destroy:
 	@echo "Creando script destructor"
@@ -114,6 +118,6 @@ clean: cleanO
 	@echo "Eliminando log"
 	@rm -f log.txt
 	@echo "Eliminando ejecutables"
-	@rm -f Dispositivo Tecnico TesterComun TesterEspecial tcp/tcpclient_receptor tcp/tcpclient_emisor tcp/tcpserver_receptor tcp/tcpserver_emisor Broker broker/broker_pasa_manos broker/broker_req_especiales broker/broker_requerimientos broker/broker_shm_testers_req broker/broker_shm_testers_otorga broker/broker_disponibilidad_testers broker/broker_cola_shm broker/broker_pasa_brokers_testers broker/broker_pasa_brokers_dispositivos servicio_rpc/registracion_server servicio_rpc/get_id servicio_rpc/devolver_id servicio_rpc/registrar_tester servicio_rpc/consultar_broker_tester Anillo/sender Anillo/listener Anillo/timeout iniciador LanzaDisp terminador
+	@rm -f Dispositivo Tecnico TesterComun TesterEspecial tcp/tcpclient_receptor tcp/tcpclient_emisor tcp/tcpserver_receptor tcp/tcpserver_emisor Broker broker/broker_pasa_manos broker/broker_req_especiales broker/broker_requerimientos broker/broker_shm_testers_req broker/broker_shm_testers_otorga broker/broker_disponibilidad_testers broker/broker_cola_shm broker/broker_pasa_brokers_testers broker/broker_pasa_brokers_dispositivos servicio_rpc/registracion_server servicio_rpc/get_id servicio_rpc/devolver_id servicio_rpc/registrar_tester servicio_rpc/consultar_broker_tester Anillo/sender Anillo/listener Anillo/timeout iniciador LanzaDisp terminador setUp
 	@echo "Eliminando script destructor"
 	@rm -f destroy.sh
