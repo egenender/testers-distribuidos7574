@@ -143,6 +143,8 @@ int main (int argc, char** argv){
 		*tester_shm = 0;
 		sem_tester_shm.v();
 		
+		usleep(100000);
+		
 		if (id_tester_espera != 0){
 			puede_buscar.v();//Permito al par de requerimiento que busque
 				
@@ -171,10 +173,25 @@ int main (int argc, char** argv){
 			Logger::debug(ss.str(), __FILE__);
 			ss.str("");
 			
-			ok_read = msgrcv(cola_requerimiento_shm, &msg_envio, sizeof(TMessageAtendedor) - sizeof(long), MTYPE_DEVOLUCION_SHM_TESTERS, 0);
-			if (ok_read == -1){
+			
+			pid_t padre = getpid();
+			pid_t timer = fork();
+			if (timer == 0){
+				sleep(5);
+				kill(padre, SIGQUIT);
 				exit(0);
 			}
+			rearmado = false;
+			ok_read = msgrcv(cola_requerimiento_shm, &msg_envio, sizeof(TMessageAtendedor) - sizeof(long), MTYPE_DEVOLUCION_SHM_TESTERS, 0);
+			if (ok_read == -1){
+			if (rearmado){
+				continue;
+			}
+				exit(0);
+			}
+			kill(timer, SIGINT);
+			wait(NULL);
+			
 			ss << "El tester/broker " << id_tester_espera << " me devolvio la shm";
 			Logger::debug(ss.str(), __FILE__);
 			ss.str("");
@@ -208,7 +225,6 @@ int main (int argc, char** argv){
 			continue;
 		}*/
 				
-		usleep(100000);
 		int ret = msgsnd(cola_shm_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
 		if (ret == -1) exit(0);		
 		
