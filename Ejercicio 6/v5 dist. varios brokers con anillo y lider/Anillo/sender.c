@@ -11,6 +11,8 @@ extern int recibir(int, void *, size_t);
 extern int enviar(int, void *, size_t);
 
 char* imprimirCodigo(int codigo);
+void sig_handler(int sig);
+char dirMaster[50];
 
 main(int argc, char *argv[])
 {
@@ -35,8 +37,7 @@ main(int argc, char *argv[])
     MsgMulticast_t msgMulticast; 
     MsgInvitacion_t msgInvitacion;
     MsgLider_t msgLider;
-     
-    char dirMaster[50];
+    
     char puerto[50];
     int portTcp;
     char dirMulticast[50];
@@ -44,6 +45,11 @@ main(int argc, char *argv[])
     int portMulticast;
     char puertoUdp[50];
     int portUdp;
+    
+    struct sigaction sa;    
+    memset(&sa, 0, sizeof(sa));
+    sa.sa_handler=&sig_handler; 
+    sigaction(SIGUSR1, &sa, NULL); 
     
     FILE * fdConfig = fopen("Anillo/config", "r");
     if(fdConfig==NULL){
@@ -127,11 +133,27 @@ main(int argc, char *argv[])
        sprintf(mostrar,"[ESPERANDO] --> Respuesta de algun broker\n");
        write(fileno(stdout),mostrar,strlen(mostrar));
        
+       /** En caso de no querer que se auto-cierre con un solo broker, comentar este codigo (o solo el exec) **/
+       char s_pid[8];
+       sprintf(s_pid, "%d", getpid());
+       pid_t childpid = fork();
+        if(childpid<0) {
+            perror("Error en el fork\n");
+        } else if (childpid==0) {
+			execlp("./Anillo/timeout", "timeout", s_pid, (char*)0);
+            perror("Error al lanzar el proceso timeout");
+            exit(1);
+        }
+        /**/
+       
        //Espero que alguno de los que se quiere unir me responda
        if((nbytes = recvfrom(fd,&msgInvitacion,sizeof(MsgInvitacion_t),0,(struct sockaddr *)&addr,(socklen_t *)&addrlen)) < 0){
            perror("recvfrom\n");
            exit(1);
        }
+       kill(childpid, SIGINT);
+       wait(NULL);
+       
        sprintf(mostrar,"[RECIBIDO] <-- %s\t%s\n",inet_ntoa(addr.sin_addr),imprimirCodigo(msgInvitacion.tipo));
        write(fileno(stdout),mostrar,strlen(mostrar));
        
@@ -302,4 +324,26 @@ char* imprimirCodigo(int codigo){
         default:
             return "CODIGO NO VALIDO";
     }
+}
+
+void sig_handler(int sig) {
+    char mostrar[100]; 
+    sprintf(mostrar,"Se recibio el timeout\n");
+    write(fileno(stdout), mostrar, strlen(mostrar));
+    wait(NULL);
+    set_siguiente(dirMaster);
+    set_lider(1);
+        
+    key_t key = ftok("/tmp/buchwaldipcs",SEM_ANILLO_FORMANDO);
+	int semid = semget(key,1, IPC_CREAT| 0660);
+	struct sembuf oper;
+	oper.sem_num = 0;
+	oper.sem_op = 1;
+	oper.sem_flg = 0;
+	semop(semid,&oper,1);
+	
+	sprintf(mostrar, "::::: QUEDA ESTABLECIDO EL ANILLO CON SOLO ESTE BROKER %s:::::\n", dirMaster);
+    write(fileno(stdout), mostrar, strlen(mostrar));
+	
+    exit(0);
 }
