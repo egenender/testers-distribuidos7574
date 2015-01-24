@@ -44,10 +44,15 @@ int main(int argc, char *argv[]){
     while (true) {
 		//Espero un mensaje desde el servidor
 		recibir(buffer, fd);
-		//Mando el mensaje por la cola que me indique el server		
-		int ok = msgsnd(cola, buffer, size - sizeof(long), 0);
-		if (ok == -1){
-			exit(1);
+		if (buffer->finalizar_conexion) {
+			exit(0);
+		}
+		else {
+			//Mando el mensaje por la cola que me indique el server
+			int ok = msgsnd(cola, buffer, size - sizeof(long), 0);
+			if (ok == -1){
+				exit(1);
+			}
 		}
 	}
 	close(fd);
