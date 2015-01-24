@@ -12,7 +12,7 @@
 #include "../logger/Logger.h"
 #include "ids_brokers.h"
 
-#define ID_BROKER 1002
+#define ID_BROKER 1001
 
 void crear_ipcs(int master){
 	
@@ -103,7 +103,7 @@ void crear_ipcs(int master){
 	sem_anillo.p();
 	wait(NULL);
 	//Logger::notice("Se termino de armar el anillo, esperando a cierre de conexion para finalizar configuracion", __FILE__);
-	sleep(30);
+	sleep(TIEMPO_FORMAR_ANILLO);
 	
 	if (fork() == 0){
 		execlp("./Anillo/listener", "listener",(char*)0);

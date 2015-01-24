@@ -47,7 +47,7 @@ void rearmar_anillo(int sig){
     
     wait(NULL);
     //Logger::notice("Se termino de armar el anillo, esperando a cierre de conexion para finalizar configuracion", __FILE__);
-    sleep(30);
+    sleep(TIEMPO_FORMAR_ANILLO);
     if (fork() == 0){
 		execlp("./Anillo/listener", "listener",(char*)0);
 		exit(1);
@@ -70,7 +70,7 @@ void rearmar_anillo(int sig){
 }
 
 int main (int argc, char** argv){
-	srand(getpid());
+	//srand(getpid());
 	Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
 	Logger::notice("Creo los ipcs necesarias", __FILE__);
 	
@@ -202,6 +202,7 @@ int main (int argc, char** argv){
 		
 		/*int random_falla = rand() % 1000;
 		bool hubo_falla = random_falla < PROBABILIDAD_FALLA_BROKER;
+		if (hubo_falla){
 			Logger::error("El broker descarta la shm (pruebas de caidas)", __FILE__);
 			sleep(5);
 			continue;
