@@ -23,11 +23,18 @@ int main(int argc, char *argv[]){
 	
 	pid_t receptor = atoi(argv[5]);
 	
-    int fd = tcp_open_activo(argv[1], atoi(argv[2]));
-    if(fd < 0){
-      //perror("Error");
-      return -2;
-    }
+	int fd;
+	do{
+		fd = tcp_open_activo(argv[1], atoi(argv[2]));
+		if(fd < 0){
+			//perror("Error");
+			if (receptor != 0){
+				return -2;
+			}else{
+				sleep(30);
+			}
+		}
+	} while (fd < 0 && receptor == 0);
     
     key_t key = ftok(IPCS_FILE, id_cola);
     int cola = msgget(key, 0660);
