@@ -13,7 +13,7 @@ int main(int argc, char *argv[]){
   char mostrar[300];
   sprintf(mostrar,"[TIMEOUT] --> Lanzado para %d\t| pid: %d\n",pidPadre,getpid());
   write(fileno(stdout),mostrar,strlen(mostrar));
-  sleep(10);
+  sleep(5);
   sprintf(mostrar,"[TIMEOUT] --> Expiro");
   write(fileno(stdout),mostrar,strlen(mostrar));
   kill(pidPadre,SIGUSR1);
