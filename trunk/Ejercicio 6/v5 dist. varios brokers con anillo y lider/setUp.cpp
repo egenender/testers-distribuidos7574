@@ -4,6 +4,7 @@
 #include <string>
 #include <string.h>
 #include <sstream>
+#include "common/commonFiles.h"
 
 #define MAXIMOS_BROKERS 10
 #define SALIDA "0"
@@ -74,6 +75,12 @@ int main(void){
 	float prob_falla_f = atof(prob_falla_c);
 	int prob_falla = prob_falla_f * 10;
 	free(prob_falla_c);
+	
+	//Por si acaso, pongo la creacion del archivo de ipcs!
+	printf("Creando archivo de ipcs\n");
+	char touch[100];
+	sprintf(touch, "touch %s", ipcFileName.c_str());
+	system(touch);
 	
 	char sed[300];
 	/* Cambio Anillo/config, ip del equipo*/ 
