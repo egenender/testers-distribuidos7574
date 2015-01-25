@@ -1,9 +1,15 @@
+#include <stdlib.h>
 
 typedef struct broker_id_ip{
 	int id;
 	char ip[16];
 }broker_id_ip_t;
 
-broker_id_ip_t BROKERS[] = {{1001, "192.168.1.104"},{1002, "192.168.1.101"},{1003, "192.168.1.108"}};
+broker_id_ip_t BROKERS[] = {{201, "192.168.1.101"}};
 
-#define CANT_BROKERS 3
+#define CANT_BROKERS 1
+
+char* obtener_broker_random(){
+	int random_index = rand() % CANT_BROKERS;
+	return BROKERS[random_index].ip;
+}

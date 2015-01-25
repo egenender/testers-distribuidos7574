@@ -24,7 +24,13 @@ int main(int argc, char** argv) {
     //int id = atoi(argv[1]);
 	
 	// Comunicacion con el sistema de testeo
-    AtendedorDispositivos atendedor;
+	char* connect_to;
+	if (argc > 1){
+		connect_to = argv[1];
+	} else {
+		connect_to = NULL;
+	}
+    AtendedorDispositivos atendedor(connect_to);
     int id = atendedor.obtenerIdDispositivo();
 	
     std::stringstream ss;
