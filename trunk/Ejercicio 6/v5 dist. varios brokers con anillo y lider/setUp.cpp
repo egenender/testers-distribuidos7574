@@ -47,7 +47,7 @@ int main(void){
 			- common/common.h (ubicacion de servidor rpc)
 	*/ 
 	
-	//Por ahora lo hacemos mas user friendly, despues le metemos para hacerlo por consola
+	//Por ahora lo hacemos mas user friendly.
 	
 	printf("Ingrese las direcciones de los brokers (en orden), %s para finalizar la entrada. Maximo %d\n",SALIDA ,MAXIMOS_BROKERS);
 	char* brokers[MAXIMOS_BROKERS];
@@ -63,11 +63,17 @@ int main(void){
 		brokers[cant_brokers++] = linea;
 	}
 	
-	printf("\nIngrese ip del equipo (si no va a ser broker, se puede escribir cualquiera)\n");
+	printf("\nIngrese ip del equipo\n");
 	char* ip_equipo = leer_linea();
 	
 	printf("\nIngrese ip del servidor RPC\n");
 	char* ip_rpc = leer_linea();
+	
+	printf("\nIngrese probabilidad de fallas del broker\n");
+	char* prob_falla_c = leer_linea();
+	float prob_falla_f = atof(prob_falla_c);
+	int prob_falla = prob_falla_f * 10;
+	free(prob_falla_c);
 	
 	char sed[300];
 	/* Cambio Anillo/config, ip del equipo*/ 
@@ -90,6 +96,7 @@ int main(void){
 		if (strcmp(brokers[i], ip_equipo) == 0){
 			id_equipo = num_broker;
 		}
+		free(brokers[i]);
 	}
 	sprintf(sed, "sed 's/broker_id_ip_t BROKERS\\[\\] = {.*};/broker_id_ip_t BROKERS[] = {%s};/' broker/ids_brokers.h > broker/ids_brokers.h.tmp", ss.str().c_str());
 	system(sed);
@@ -106,10 +113,13 @@ int main(void){
 	
 	/* Configuro el common/common.h (rpc server)*/
 	printf("Configurando ip servidor rpc\n");
-	system("cp common/common.h common/common.h.tmp");
+	sprintf(sed, "sed 's/const int PROBABILIDAD_FALLA_BROKER = .*;/const int PROBABILIDAD_FALLA_BROKER = %d;/' common/common.h > common/common.h.tmp", prob_falla);
+	system(sed);
 	sprintf(sed, "sed 's/const char UBICACION_SERVER_RPC\\[\\].*/const char UBICACION_SERVER_RPC[] = \"%s\";/' common/common.h.tmp > common/common.h", ip_rpc);
 	system(sed);
 	system("rm -f common/common.h.tmp");
+	
+	
 	
 	return 0;
 }

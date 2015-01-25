@@ -217,13 +217,13 @@ int main (int argc, char** argv){
 		msg.mtype = siguiente;
 		msg.mtype_envio = siguiente;
 		
-		/*int random_falla = rand() % 1000;
+		int random_falla = rand() % 1000;
 		bool hubo_falla = random_falla < PROBABILIDAD_FALLA_BROKER;
 		if (hubo_falla){
 			Logger::error("El broker descarta la shm (pruebas de caidas)", __FILE__);
 			sleep(5);
 			continue;
-		}*/
+		}
 				
 		int ret = msgsnd(cola_shm_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
 		if (ret == -1) exit(0);		
