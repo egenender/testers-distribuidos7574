@@ -6,6 +6,7 @@
  */
 #include "AtendedorDispositivos.h"
 #include "../common/common.h"
+#include "../broker/ids_brokers.h"
 #include <cstdlib>
 #include <sys/wait.h>
 #include <sys/types.h>
@@ -34,9 +35,10 @@ void restart_padre(pid_t pid){
 	exit(0);	
 }
 
-AtendedorDispositivos::AtendedorDispositivos() { 	
+AtendedorDispositivos::AtendedorDispositivos(char* connect_to) { 	
 	at = this;
 	this->idDispositivo = getIdDispositivo();
+	this->connect_to = connect_to;
 	key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_DISPOSITIVOS_ENVIOS);
     this->cola_envios = msgget(key, 0666);
     if(this->cola_envios == -1) {
@@ -51,13 +53,20 @@ AtendedorDispositivos::AtendedorDispositivos() {
     
     signal(SIGHUP, terminar);
     
+    if (connect_to == NULL){
+		connect_to = obtener_broker_random();
+		std::stringstream ss;
+		ss << "Me conecto a broker en " << connect_to;
+		Logger::notice(ss.str(), __FILE__);
+	}
+    
     char param_id[10];
     sprintf(param_id, "%d", this->idDispositivo);
     char param_cola[10];
     sprintf(param_cola, "%d", MSGQUEUE_DISPOSITIVOS_RECIBOS);
     receptor = fork();
     if (receptor == 0){
-		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",UBICACION_BROKER ,PUERTO_SERVER_EMISOR_DISPOSITIVOS , param_cola,(char*)0);
+		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",connect_to ,PUERTO_SERVER_EMISOR_DISPOSITIVOS , param_cola,(char*)0);
         exit(1);
 	}
 	char param_pid[10];
@@ -65,7 +74,7 @@ AtendedorDispositivos::AtendedorDispositivos() {
 	sprintf(param_cola, "%d", MSGQUEUE_DISPOSITIVOS_ENVIOS);
 	
 	if (fork() == 0){
-		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",UBICACION_BROKER ,PUERTO_SERVER_RECEPTOR_DISPOSITIVOS , param_id, param_cola, param_pid,(char*)0);
+		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",connect_to ,PUERTO_SERVER_RECEPTOR_DISPOSITIVOS , param_id, param_cola, param_pid,(char*)0);
         exit(1);
 	}
 }
@@ -106,7 +115,7 @@ int AtendedorDispositivos::recibirPrograma() {
     int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), this->idDispositivo, 0);
     if(ret == -1) {
 		if (espera){
-			execlp("./Dispositivo", "Dispositivo",(char*)0);
+			execlp("./Dispositivo", "Dispositivo",connect_to, (char*)0);
 			exit(1);
 		}
         std::string error("Error al recibir programa del atendedor. Error: " + errno);
@@ -150,7 +159,7 @@ int AtendedorDispositivos::recibirOrden(int* cantidad) {
     int ret = msgrcv(this->cola_recibos, &msg, sizeof(TMessageAtendedor) - sizeof(long), this->idDispositivo, 0);
     if(ret == -1) {
 		if (espera){
-			execlp("./Dispositivo", "Dispositivo",(char*)0);
+			execlp("./Dispositivo", "Dispositivo",connect_to,(char*)0);
 			exit(1);
 		}
         std::string error("Error al recibir orden del atendedor. Error: " + errno);

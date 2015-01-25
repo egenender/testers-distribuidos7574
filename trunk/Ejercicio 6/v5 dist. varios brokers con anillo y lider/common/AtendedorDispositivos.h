@@ -22,9 +22,10 @@ private:
     int ultimoTester;
     int idDispositivo;
     
+    char* connect_to;
 public:
 
-    AtendedorDispositivos();
+    AtendedorDispositivos(char* connect_to);
     AtendedorDispositivos(const AtendedorDispositivos& orig);    
     virtual ~AtendedorDispositivos();
         
