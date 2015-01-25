@@ -1,8 +1,14 @@
-CC=g++
+CC=@g++
 CFLAGS=-Wall -pedantic -pedantic-errors -g -ggdb
 
 all: inicia_comp dispositivo tecnico testerComun testerEspecial tcp broker rpc_services ring iniciador lanzaDisp terminador destroy cleanO
 	@echo "Compilacion terminada"
+
+full_install:
+	make setup
+	./setUp
+	rm -f setUp
+	make all
 
 inicia_comp:
 	@echo "Iniciando compilacion"
@@ -82,9 +88,9 @@ rpc_services:
 	@make -f servicio_rpc/Makefile.registracion
 	
 ring:
-	gcc  Anillo/sender.c -o Anillo/sender 
-	gcc  Anillo/listener.c -o Anillo/listener 
-	gcc  Anillo/timeout.c -o Anillo/timeout
+	@gcc  Anillo/sender.c -o Anillo/sender 
+	@gcc  Anillo/listener.c -o Anillo/listener 
+	@gcc  Anillo/timeout.c -o Anillo/timeout
 	
 setup:
 	$(CC) $(CFLAGS) setUp.cpp -o setUp
