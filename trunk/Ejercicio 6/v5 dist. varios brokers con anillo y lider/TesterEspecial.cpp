@@ -24,7 +24,13 @@ int main(int argc, char** argv) {
     // El primer parametro es el id del tester
     //int id = atoi(argv[1]);
     // Obtengo comunicacion con los dispositivos
-    AtendedorTesters atendedor(TIPO_ESPECIAL);
+    char* connect_to;
+    if (argc > 1){
+		connect_to = argv[1];
+	}else{
+		connect_to = NULL;
+	}
+    AtendedorTesters atendedor(TIPO_COMUN, connect_to);
     int id = atendedor.obtenerIdTester();
     
 	std::stringstream nombre;

@@ -17,7 +17,7 @@ private:
 	int broker_ultimo_disp;
     void activarTester();  
 public:
-    AtendedorTesters(int tipo);
+    AtendedorTesters(int tipo, const char* conectarse_a);
     AtendedorTesters(const AtendedorTesters& orig);
     virtual ~AtendedorTesters();
     
