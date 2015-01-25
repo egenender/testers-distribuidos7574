@@ -29,7 +29,7 @@ void restart_padre(pid_t pid){
 	exit(0);	
 }
 
-AtendedorTesters::AtendedorTesters(int tipo){
+AtendedorTesters::AtendedorTesters(int tipo, const char* conectarse_a){
 	at = this;
 	this->idTester = getIdTester(tipo);
     key_t key;
@@ -52,13 +52,17 @@ AtendedorTesters::AtendedorTesters(int tipo){
     signal(SIGHUP, terminar);  
     //signal(SIGQUIT, finalizar_tarea);
     
+    if (conectarse_a == NULL){
+		conectarse_a = UBICACION_BROKER;
+	}
+    
     char param_id[10];
     sprintf(param_id, "%d", this->idTester);
     char param_cola[10];
     sprintf(param_cola, "%d", MSGQUEUE_TESTERS_RECIBOS);
     pid_t receptor = fork();
     if (receptor == 0){
-		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",UBICACION_BROKER ,PUERTO_SERVER_EMISOR_TESTERS , param_cola,(char*)0);
+		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",conectarse_a ,PUERTO_SERVER_EMISOR_TESTERS , param_cola,(char*)0);
         exit(1);
 	}
 	char param_pid[10];
@@ -66,7 +70,7 @@ AtendedorTesters::AtendedorTesters(int tipo){
 	sprintf(param_cola, "%d", MSGQUEUE_TESTERS_ENVIOS);
 	
 	if (fork() == 0){
-		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",UBICACION_BROKER ,PUERTO_SERVER_RECEPTOR_TESTERS , param_id, param_cola, param_pid,(char*)0);
+		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",conectarse_a ,PUERTO_SERVER_RECEPTOR_TESTERS , param_id, param_cola, param_pid,(char*)0);
         exit(1);
 	}
 	
