@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
 	}else{
 		connect_to = NULL;
 	}
-    AtendedorTesters atendedor(TIPO_COMUN, connect_to);
+    AtendedorTesters atendedor(TIPO_ESPECIAL, connect_to);
     int id = atendedor.obtenerIdTester();
     
 	std::stringstream nombre;

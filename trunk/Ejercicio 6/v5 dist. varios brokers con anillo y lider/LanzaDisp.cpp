@@ -95,7 +95,7 @@ void createSystemProcesses(int cant_dispositivos, int min_lanzados, int max_lanz
 			pid_t newPid = fork();
 			if(newPid == 0) {
 				// Inicio el programa correspondiente
-				execlp("./Dispositivo", "Dispositivo", param, (char*)0);
+				execlp("./Dispositivo", "Dispositivo", (char*)0);
 				Logger::error("Error al ejecutar el programa dispositivo de ID" + idDispositivo, __FILE__);
 				exit(1);
 			}
