@@ -55,7 +55,7 @@ int Planilla::setRequerimiento(int idDispositivo, int cant_resultados_necesarios
 int Planilla::terminarProcesamiento(int req, bool resulGrave){
 	int devolucion;
 	//mutex_resul.p();
-	semaforoDistribuido_P(resultados, tester);
+	//semaforoDistribuido_P(resultados, tester);
 	this->resultados[req].resultadosPendientes--;
 	if (resulGrave){
 		this->resultados[req].resultadosGraves++;
@@ -78,7 +78,7 @@ int Planilla::dispositivoEnLugar(int lugar){
 	semaforoDistribuido_P(resultados, tester);
 	int idDispositivo = this->resultados[lugar].idDispositivo;
 	//mutex_resul.v();
-	semaforoDistribuido_V(resultados, tester);
+	//semaforoDistribuido_V(resultados, tester);
 	return idDispositivo;
 }
 
