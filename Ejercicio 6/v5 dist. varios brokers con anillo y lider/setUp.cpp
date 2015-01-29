@@ -70,6 +70,9 @@ int main(void){
 	printf("\nIngrese ip del servidor RPC\n");
 	char* ip_rpc = leer_linea();
 	
+	printf("\nIngrese direccion default de broker\n");
+	char* ip_broker_default = leer_linea();
+	
 	printf("\nIngrese probabilidad de fallas del broker\n");
 	char* prob_falla_c = leer_linea();
 	float prob_falla_f = atof(prob_falla_c);
@@ -111,6 +114,8 @@ int main(void){
 	system(sed);
 	system("rm -f broker/ids_brokers.h.tmp");
 	
+	free(ip_equipo);
+	
 	/* Configuro el id del broker (broker/Broker.cpp) */ 
 	printf("Configurando id broker\n");
 	system("cp broker/Broker.cpp broker/Broker.cpp.tmp");
@@ -120,11 +125,17 @@ int main(void){
 	
 	/* Configuro el common/common.h (rpc server)*/
 	printf("Configurando ip servidor rpc\n");
-	sprintf(sed, "sed 's/const int PROBABILIDAD_FALLA_BROKER = .*;/const int PROBABILIDAD_FALLA_BROKER = %d;/' common/common.h > common/common.h.tmp", prob_falla);
+	sprintf(sed, "sed 's/const char UBICACION_BROKER\\[\\] = .*;/const char UBICACION_BROKER[] = \"%s\";/' common/common.h > common/common.h.tmp", ip_broker_default);
 	system(sed);
-	sprintf(sed, "sed 's/const char UBICACION_SERVER_RPC\\[\\].*/const char UBICACION_SERVER_RPC[] = \"%s\";/' common/common.h.tmp > common/common.h", ip_rpc);
+	sprintf(sed, "sed 's/const int PROBABILIDAD_FALLA_BROKER = .*;/const int PROBABILIDAD_FALLA_BROKER = %d;/' common/common.h.tmp > common/common.h", prob_falla);
 	system(sed);
+	sprintf(sed, "sed 's/const char UBICACION_SERVER_RPC\\[\\].*/const char UBICACION_SERVER_RPC[] = \"%s\";/' common/common.h > common/common.h.tmp", ip_rpc);
+	system(sed);
+	system("cp common/common.h.tmp common/common.h");
 	system("rm -f common/common.h.tmp");
+	
+	free(ip_broker_default);
+	free(ip_rpc);
 	
 	/* Compilando el logger */
 	printf("Compilando el logger\n");
