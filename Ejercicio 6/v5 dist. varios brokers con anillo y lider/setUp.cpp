@@ -126,7 +126,10 @@ int main(void){
 	system(sed);
 	system("rm -f common/common.h.tmp");
 	
-	
+	/* Compilando el logger */
+	printf("Compilando el logger\n");
+	system("g++ -c logger/Logger.cpp");
+	system("mv Logger.o logger/Logger.o");
 	
 	return 0;
 }
