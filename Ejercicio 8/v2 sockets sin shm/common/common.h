@@ -37,9 +37,14 @@ const int SHM_PLANILLA_CANT_TESTER_ASIGNADOS = 6;
 const int SHM_PLANILLA_CANT_TAREAS_ASIGNADAS = 7;
 const int SHM_PLANILLA_GENERAL_POSICIONES = 8;
 
-const int MSGQUEUE_DISPOSITIVOS = 20;
-const int MSGQUEUE_TESTERS = 21;
-const int MSGQUEUE_TESTERS_ESPECIALES = 22;
+//Confirmado que si va
+const int MSGQUEUE_ENVIOS_DISP = 20;
+const int MSGQUEUE_RECEPCIONES_DISP = 21;
+const int MSGQUEUE_ENVIOS_TESTER = 22;
+const int MSGQUEUE_RECEPCIONES_TESTER = 23;
+const int MSGQUEUE_TESTERS_ESPECIALES = 24;
+
+//en duda
 const int MSGQUEUE_DESPACHADOR = 23;
 const int MSGQUEUE_DISPOSITIVOS_TESTERS_ESPECIALES = 24;
 const int MSGQUEUE_REINICIO_TESTEO = 25;
@@ -70,12 +75,11 @@ const std::string ipcFileName = "/tmp/pereira-ipcs";
 const std::string logFileName = "log.txt";
 
 // Para los sockets
+const char PUERTO_SERVER_RECEPTOR_DISP[] = "9003";
+const char PUERTO_SERVER_EMISOR_DISP[] = "9002";
+
 const char PUERTO_SERVER_RECEPTOR_TESTERS[] = "9000";
 const char PUERTO_SERVER_EMISOR_TESTERS[] = "9001";
-const char PUERTO_SERVER_RECEPTOR_DISPOSITIVOS[] = "9002";
-const char PUERTO_SERVER_EMISOR_DISPOSITIVOS[] = "9003";
-const char PUERTO_SERVER_RECEPTOR_TESTERS_ESP[] = "9004";
-const char PUERTO_SERVER_EMISOR_TESTERS_ESP[] = "9005";
 
 const char UBICACION_SERVER[] = "localhost"; //Cambiar
 
@@ -90,7 +94,7 @@ typedef struct resultado{
 typedef struct TMessageAssignTE{
 	long mtype;
 	int idDispositivo;
-        int posicionDispositivo;
+    int posicionDispositivo;
 } TMessageAssignTE;
 
 typedef struct resultado_test{
@@ -123,11 +127,19 @@ typedef struct TMessageReinicioTest {
 } TMessageReinicioTest;
 
 typedef struct message {
-    long mtype;
-    int idDispositivo;
-    int idTester;
-    int value; // Este parametro posee el valor del requerimiento, del programa y del resultado
-    int posicionDispositivo;
+	/* BEGIN HEADER */
+	long mtype;
+	long mtype_envio;
+	int finalizar_conexion;
+	int es_requerimiento;
+	int es_especial; //Solo por si acaso
+	/* END HEADER */
+	int idDispositivo;
+	int tester;
+	int value; // Este parametro posee el valor del requerimiento, del programa y del resultado
+	int cant_testers;
+	int posicionDispositivo;
+	int especiales[MAX_TESTERS_ESPECIALES];
 } TMessageAtendedor;
 
 #endif	/* COMMON_H */

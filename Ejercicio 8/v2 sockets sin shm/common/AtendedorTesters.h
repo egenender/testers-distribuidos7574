@@ -12,9 +12,7 @@
 
 class AtendedorTesters {
 private:
-    //int cola_requerimiento;
-    //int cola_recibos_tests;
-    //int cola_testers_especiales;
+    int cola_testers_especiales;
     //int cola_tareas_especiales;
     int cola_envios;
     int cola_recepciones;
@@ -31,7 +29,7 @@ public:
      */
     int recibirRequerimiento();
     void enviarPrograma(int idDispositivo, int tester, int idPrograma);  // Tester -> Disp
-    resultado_test_t recibirResultado(int idTester);
+    int recibirResultado(int idTester);
     void enviarOrden(int idDispositivo, int orden); // Tester -> Disp: Reinicio o apagado
 
     /**
@@ -46,7 +44,7 @@ public:
     void enviarTareaEspecial(int idDispositivo, int idTester, int tarea, int posicionDispositivo);
 
     bool destruirComunicacion();
-
+    int obtenerIdTester();
 };
 
 #endif	/* ATENDEDORTESTERS_H */
