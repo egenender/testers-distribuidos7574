@@ -8,6 +8,7 @@
 
 AtendedorDispositivos::AtendedorDispositivos() { 
 
+	this->idDispositivo = getIdDispositivo();
     key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_ENVIOS_DISP);
     this->cola_envioS = msgget(key, 0666);
     if(this->cola_envios == -1) {
@@ -24,10 +25,6 @@ AtendedorDispositivos::AtendedorDispositivos() {
         exit(1);
     }
 
-    /**
-     * Refactor que queda horrible esto aca
-     */
-
     char param_cola[10];
     char param_id[10];
     char param_pid[10];
@@ -39,7 +36,7 @@ AtendedorDispositivos::AtendedorDispositivos() {
 	if (receptor == 0) {
 		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",
 				UBICACION_SERVER,
-				PUERTO_SERVER_RECEPTOR_DISP,
+				PUERTO_SERVER_EMISOR_DISP,
 				param_cola,
 				(char*) 0);
 		exit(1);
@@ -54,7 +51,7 @@ AtendedorDispositivos::AtendedorDispositivos() {
 	if (fork() == 0) {
 		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",
 				UBICACION_SERVER,
-				PUERTO_SERVER_EMISOR_DISP,
+				PUERTO_SERVER_RECEPTOR_DISP,
 				param_id, param_cola,
 				param_pid, (char*) 0);
 		exit(1);
@@ -71,10 +68,11 @@ AtendedorDispositivos::~AtendedorDispositivos() {
 void AtendedorDispositivos::enviarRequerimiento(int idDispositivo) {
 
     TMessageAtendedor msg;
-    msg.mtype = MTYPE_REQUERIMIENTO;
+    msg.mtype = this->idDispositivo;
+    msg.mtype_envio = MTYPE_REQUERIMIENTO;
     msg.idDispositivo = idDispositivo;
-    msg.idTester = 0;
-    msg.value = 0;
+    msg.finalizar_conexion = 0;
+    msg.es_requerimiento = 1;
     
     int ret = msgsnd(this->cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
@@ -98,13 +96,16 @@ int AtendedorDispositivos::recibirPrograma(int idDispositivo) {
 
 void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {
 
-    resultado_test_t resultado_test;
-    
-    resultado_test.mtype = this->idTester;
-    resultado_test.idDispositivo = idDispositivo;
-    resultado_test.result = resultado;
+	TMessageAtendedor msg;
+	msg.mtype = this->idDispositivo;
+	msg.mtype_envio = (long) this->idTester;
+	msg.finalizar_conexion = 0;
+	msg.tester = this->idTester;
+	msg.idDispositivo = idDispositivo;
+	msg.value = resultado;
+	msg.es_requerimiento = 0;
             
-    int ret = msgsnd(this->cola_envios, &resultado_test, sizeof(resultado_test_t) - sizeof(long), 0);
+    int ret = msgsnd(this->cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
         std::string error = std::string("Error al enviar resultado al sistema de testeo. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
@@ -130,15 +131,15 @@ int AtendedorDispositivos::recibirProgramaEspecial(int idDispositivo) {
 // El resultado especial se envia solo al Equipo Especial, por lo que el mtype influye poco
 void AtendedorDispositivos::enviarResultadoEspecial(int idDispositivo, int resultado) {
 
-    TResultadoEspecial resultadoTestEspecial;
-    
-    resultadoTestEspecial.mtype = MTYPE_RESULTADO_ESPECIAL;
-    resultadoTestEspecial.idDispositivo = idDispositivo;
-    resultadoTestEspecial.idTester = this->idTester;
-    resultadoTestEspecial.posicionDispositivo = this->posicionDispositivo;
-    resultadoTestEspecial.resultado = resultado;
+	TMessageAtendedor msg;
+		msg.mtype = idDispositivo;
+		msg.mtype_envio = MTYPE_RESULTADO_ESPECIAL;
+		msg.idDispositivo = idDispositivo;
+		msg.idTester = idTester;
+		msg.value = resultado;
+		msg.posicionDisp = this->posicionDispositivo;
             
-    int ret = msgsnd(this->cola_envios, &resultadoTestEspecial, sizeof(TResultadoEspecial) - sizeof(long), 0);
+    int ret = msgsnd(this->cola_envios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
         std::string error = std::string("Error al enviar resultado especial al sistema de testeo. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);

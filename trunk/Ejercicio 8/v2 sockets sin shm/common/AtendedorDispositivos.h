@@ -19,14 +19,12 @@
 
 class AtendedorDispositivos {
 private:
-//    int cola_requerimiento;
-//    int cola_tests;
-//   int cola_tests_especiales;
 	int cola_envios;
 	int cola_recepciones;
     
     int idTester;
     int posicionDispositivo;
+    int idDispositivo;
     
 public:
 
