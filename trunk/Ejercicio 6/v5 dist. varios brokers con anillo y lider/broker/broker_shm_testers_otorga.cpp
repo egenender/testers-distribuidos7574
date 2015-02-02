@@ -61,7 +61,7 @@ void rearmar_anillo(int sig){
 	int cola_shm_testers = msgget(key, 0660 | IPC_CREAT);
     
     if (*soy_lider){ //Solo el "lider" pone a circular
-		msg.tabla.start = 0;
+		/*msg.tabla.start = 0;
 		msg.tabla.end = MAX_TESTERS_COMUNES - 1;
 		msg.tabla.cant = MAX_TESTERS_COMUNES;
 		for (int i = 0; i < MAX_TESTERS_COMUNES; i++){
@@ -69,7 +69,7 @@ void rearmar_anillo(int sig){
 		}
 		for (int i = 0; i < MAX_TESTERS_ESPECIALES; i++){
 			msg.tabla.testers_especiales[i] = 1;
-		}
+		}*/
 		
 		msg.mtype = broker_id;
 		int ret = msgsnd(cola_shm_testers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
@@ -132,7 +132,7 @@ int main (int argc, char** argv){
 		pid_t padre = getpid();
 		pid_t timer = fork();
 		if (timer == 0){
-			sleep(5);
+			sleep(10);
 			kill(padre, SIGQUIT);
 			exit(0);
 		}
