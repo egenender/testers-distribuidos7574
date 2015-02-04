@@ -13,14 +13,18 @@
 #include "logger/Logger.h"
 #include "common/Planilla.h"
 #include "common/PlanillaAsignacionTesterComun.h"
+#include "identificador/identificador.h"
 #include <string>
 
 using namespace std;
 
+int getIdTesterComun();
+int desregistrarTesterComun(int id);
+
 int main(int argc, char** argv) {    
 	srand(time(NULL));
     // El primer parametro es el id del tester
-    int id = atoi(argv[1]);
+    int id = getIdTesterComun();
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
 	std::stringstream nombre;
 	nombre << __FILE__ << " " << id;
@@ -87,7 +91,7 @@ int main(int argc, char** argv) {
             ss << "Le envio los requerimientos a los " << cant_testers << " testers especiales, ";
             for (int i = 0; i < CANT_TESTERS_ESPECIALES; i++){
                     if(los_testers[i])
-                            ss << i+ID_TESTER_ESPECIAL_START << " ";
+                            ss << i << " ";
             }
             Logger::notice(ss.str() , nombre.str().c_str());
             planillaAsignacion.asignarCantTestersEspeciales(posicionDispositivo, cant_testers);
@@ -98,7 +102,62 @@ int main(int argc, char** argv) {
         }
                
     }
+    
+    desregistrarTesterComun(id);
 
     return 0;
 }
 
+int getIdTesterComun() {
+
+    CLIENT *clnt;
+    int  *result_2;
+    char *getidtestercomun_1_arg;
+
+#ifndef DEBUG
+    clnt = clnt_create (UBICACION_SERVER_IDENTIFICADOR, IDENTIFICADORPROG, IDENTIFICADORVERS, "udp");
+    if (clnt == NULL) {
+        clnt_pcreateerror (UBICACION_SERVER_IDENTIFICADOR);
+        exit (1);
+    }
+#endif
+    
+    result_2 = getidtestercomun_1((void*)&getidtestercomun_1_arg, clnt);
+    if (result_2 == (int *) NULL) {
+        // TODO: Log!
+        clnt_perror (clnt, "call failed");
+    }
+
+#ifndef DEBUG
+    clnt_destroy (clnt);
+#endif
+    
+    return *result_2;
+}
+
+int desregistrarTesterComun(int id) {
+
+    CLIENT *clnt;
+    int  *result_4;
+    int  desregistrartestercomun_1_arg = id;
+
+#ifndef DEBUG
+    clnt = clnt_create (UBICACION_SERVER_IDENTIFICADOR, IDENTIFICADORPROG, IDENTIFICADORVERS, "udp");
+    if (clnt == NULL) {
+        clnt_pcreateerror (UBICACION_SERVER_IDENTIFICADOR);
+        exit (1);
+    }
+#endif
+    
+    result_4 = getidtesterespecial_1((void*)&desregistrartestercomun_1_arg, clnt);
+    if (result_4 == (int *) NULL) {
+        // TODO: Log!
+        clnt_perror (clnt, "call failed");
+    }
+
+#ifndef DEBUG
+    clnt_destroy (clnt);
+#endif
+    
+    return *result_4;
+}

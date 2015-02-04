@@ -16,7 +16,7 @@ private:
     //int cola_tareas_especiales;
     int cola_envios;
     int cola_recepciones;
-
+    
     Semaphore sem_cola_especiales;
     
 public:

@@ -18,9 +18,6 @@
 const int CANT_DISPOSITIVOS = 101;
 const int CANT_TESTERS_COMUNES = 5;
 const int CANT_TESTERS_ESPECIALES = 15;
-const int ID_DISPOSITIVO_START = 50;
-const int ID_TESTER_START = 1;
-const int ID_TESTER_ESPECIAL_START = ID_TESTER_START + CANT_TESTERS_COMUNES;
 const int MAX_DISPOSITIVOS_EN_SISTEMA = 100;
 const int MAX_TAREAS_ESPECIALES = 10;
 
@@ -36,6 +33,9 @@ const int SEM_PLANILLA_CANT_TAREAS_ASIGNADAS = 5;
 const int SHM_PLANILLA_CANT_TESTER_ASIGNADOS = 6;
 const int SHM_PLANILLA_CANT_TAREAS_ASIGNADAS = 7;
 const int SHM_PLANILLA_GENERAL_POSICIONES = 8;
+
+const int SHM_TESTERS_COMUNES_DISPONIBLES = 9;
+const int SHM_TESTERS_ESPECIALES_DISPONIBLES = 10;
 
 //Confirmado que si va
 const int MSGQUEUE_ENVIOS_DISP = 20;
@@ -82,7 +82,14 @@ const char PUERTO_SERVER_RECEPTOR_TESTERS[] = "9000";
 const char PUERTO_SERVER_EMISOR_TESTERS[] = "9001";
 
 const char UBICACION_SERVER[] = "localhost"; //Cambiar
+const char UBICACION_SERVER_IDENTIFICADOR[] = "localhost";
 
+/*
+ *      BROKER COMMON
+ */
+
+const int MAX_TESTERS_COMUNES = 100;
+const int MAX_TESTERS_ESPECIALES = 100;
 
 //Estructuras communes:
 typedef struct resultado{
