@@ -16,16 +16,19 @@
 
 #include "../logger/Logger.h"
 #include "common.h"
+#include "identificador/identificador.h"
 
 class AtendedorDispositivos {
 private:
-	int cola_envios;
-	int cola_recepciones;
-    
+    int cola_envios;
+    int cola_recepciones;
+
     int idTester;
     int posicionDispositivo;
     int idDispositivo;
     
+    int getIdDispositivo(); // Request al server RPC de identificadores
+
 public:
 
     AtendedorDispositivos();

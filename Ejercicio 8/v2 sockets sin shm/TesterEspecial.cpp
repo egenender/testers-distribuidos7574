@@ -15,17 +15,21 @@
 #include "common/PlanillaReinicioTesterEspecial.h"
 #include "logger/Logger.h"
 #include "common/TareaEspecial.h"
+#include "identificador/identificador.h"
 #include <string>
 
 using namespace std;
 
+int getIdTesterEspecial();
+int desregistrarTesterEspecial(int id);
+
 int main(int argc, char** argv) {    
     // El primer parametro es el id del tester
-    int id = atoi(argv[1]);
+    int id = getIdTesterEspecial();
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
-	std::stringstream nombre;
-	nombre << __FILE__ << " " << id;
-	Logger::notice("Inicia el procesamiento, cargo el atendedor y despachador" , nombre.str().c_str());
+    std::stringstream nombre;
+    nombre << __FILE__ << " " << id;
+    Logger::notice("Inicia el procesamiento, cargo el atendedor y despachador" , nombre.str().c_str());
     
     // Obtengo comunicacion con los dispositivos
     AtendedorTesters atendedor;
@@ -74,5 +78,61 @@ int main(int argc, char** argv) {
         } while (planillaReinicio.hayQueReiniciar(id));
     }
 
+    desregistrarTesterEspecial(id);
+    
     return 0;
+}
+
+int getIdTesterEspecial() {
+
+    CLIENT *clnt;
+    int  *result_3;
+    char *getidtesterespecial_1_arg;
+
+#ifndef DEBUG
+    clnt = clnt_create (UBICACION_SERVER_IDENTIFICADOR, IDENTIFICADORPROG, IDENTIFICADORVERS, "udp");
+    if (clnt == NULL) {
+        clnt_pcreateerror (UBICACION_SERVER_IDENTIFICADOR);
+        exit (1);
+    }
+#endif
+    
+    result_3 = getidtesterespecial_1((void*)&getidtesterespecial_1_arg, clnt);
+    if (result_3 == (int *) NULL) {
+        // TODO: Log!
+        clnt_perror (clnt, "call failed");
+    }
+
+#ifndef DEBUG
+    clnt_destroy (clnt);
+#endif
+    
+    return *result_3;
+}
+
+int desregistrarTesterEspecial(int id) {
+
+    CLIENT *clnt;
+    int  *result_5;
+    int  desregistrartesterespecial_1_arg = id;
+
+#ifndef DEBUG
+    clnt = clnt_create (UBICACION_SERVER_IDENTIFICADOR, IDENTIFICADORPROG, IDENTIFICADORVERS, "udp");
+    if (clnt == NULL) {
+        clnt_pcreateerror (UBICACION_SERVER_IDENTIFICADOR);
+        exit (1);
+    }
+#endif
+    
+    result_5 = getidtesterespecial_1((void*)&desregistrartesterespecial_1_arg, clnt);
+    if (result_5 == (int *) NULL) {
+        // TODO: Log!
+        clnt_perror (clnt, "call failed");
+    }
+
+#ifndef DEBUG
+    clnt_destroy (clnt);
+#endif
+    
+    return *result_5;
 }

@@ -8,7 +8,7 @@
 
 AtendedorDispositivos::AtendedorDispositivos() { 
 
-	this->idDispositivo = getIdDispositivo();
+    getIdDispositivo();
     key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_ENVIOS_DISP);
     this->cola_envioS = msgget(key, 0666);
     if(this->cola_envios == -1) {
@@ -158,4 +158,32 @@ int AtendedorDispositivos::recibirOrden(int idDispositivo) {
     }
     return msg.value;
 
+}
+
+int AtendedorDispositivos::getIdDispositivo() {
+    
+    CLIENT *clnt;
+    int  *result_1;
+    char *getiddispositivo_1_arg;
+    
+#ifndef DEBUG
+    clnt = clnt_create (UBICACION_SERVER_IDENTIFICADOR, IDENTIFICADORPROG, IDENTIFICADORVERS, "udp");
+    if (clnt == NULL) {
+        // TODO: Log
+        clnt_pcreateerror (UBICACION_SERVER_IDENTIFICADOR);
+        exit (1);
+    }
+#endif  /* DEBUG */
+    
+    result_1 = getiddispositivo_1((void*)&getiddispositivo_1_arg, clnt);
+    if (result_1 == (int *) NULL) {
+        // TODO: Log
+        clnt_perror (clnt, "call failed");
+    }
+    
+#ifndef DEBUG
+    clnt_destroy (clnt);
+#endif
+    
+    this->idDispositivo = *result_1;
 }
