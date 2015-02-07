@@ -70,7 +70,7 @@ const std::string logFileName = "log.txt";
 
 
 //Estructuras communes:
-typedef struct resultado{
+typedef struct resultado_t{
     int idDispositivo;
     int resultadosPendientes;
     int resultadosGraves;
@@ -80,6 +80,7 @@ typedef struct TMessageAssignTE{
     long mtype;
     int idDispositivo;
     int posicionDispositivo;
+    int tipoDispositivo;
 } TMessageAssignTE;
 
 typedef struct resultado_test{
@@ -111,10 +112,23 @@ typedef struct TMessageReinicioTest {
     bool hayQueReiniciar;
 } TMessageReinicioTest;
 
-typedef struct message {
+typedef struct TMessageAtendedor {
     long mtype;
     int idDispositivo;
     int idTester;
     int value; // Este parametro posee el valor del requerimiento, del programa y del resultado
     int posicionDispositivo;
 } TMessageAtendedor;
+
+typedef struct TMessageConfigTest {
+    long mtype;
+    int idDispositivo;
+    int TipoDispositivo;
+    //int idTester;
+    //int value; // Este parametro posee el valor del requerimiento, del programa y del resultado
+    //int posicionDispositivo;
+} TMessageConfigTest;
+
+typedef struct TMessageResultadoConfigTest{
+    long mtype;
+} TMessageResultadoConfigTest;

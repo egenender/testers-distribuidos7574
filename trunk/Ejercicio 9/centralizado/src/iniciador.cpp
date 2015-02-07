@@ -19,6 +19,7 @@
 #include "common/common.h"
 #include "ipc/Semaphore.h"
 #include "logger/Logger.h"
+#include "common/Configuracion.h"
 #include "common/Planilla.h"
 #include "common/PlanillaAsignacionEquipoEspecial.h"
 
@@ -29,7 +30,13 @@ int main(int argc, char** argv) {
     
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
     Logger::error("Logger inicializado. Inicializando IPCs...", __FILE__);
-    
+
+    Configuracion config;
+    if( !config.LeerDeArchivo() ){
+        Logger::error("Archivo de configuracion no encontrado", __FILE__);
+        return 1;
+    }
+
     try {
         createIPCObjects();
     } catch(std::string err) {
@@ -54,7 +61,7 @@ void createIPCObjects() {
     // Creo el archivo que se usara para obtener las keys
     std::fstream ipcFile(ipcFileName.c_str(), std::ios::out);
     if (ipcFile.bad() || ipcFile.fail()) {
-	std::string err = std::string("Error creando el archivo de IPCs. Error: ") + std::string(strerror(errno));
+    std::string err = std::string("Error creando el archivo de IPCs. Error: ") + std::string(strerror(errno));
         Logger::error(err.c_str(), __FILE__);
         throw err;
     }

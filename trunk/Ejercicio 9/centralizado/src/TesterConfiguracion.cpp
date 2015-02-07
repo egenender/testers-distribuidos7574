@@ -1,12 +1,6 @@
-/* 
- * File:   Tester.cpp
- * Author: knoppix
- *
- * Created on October 4, 2014, 8:46 PM
- */
-
 #include "logger/Logger.h"
 #include "common/AtendedorTesters.h"
+#include "TestConfiguracion.h"
 #include <cstdlib>
 
 int main(int argc, char** argv) {
@@ -22,9 +16,10 @@ int main(int argc, char** argv) {
     while(true) {
         TMessageConfigTest reqTest = atendedor.recibirReqTestConfiguracion();
         TestConfiguracion test( reqTest.TipoDispositivo );
-        for( int i=0; i<test.CantVariables; i++ ){
+        for( int i=0; i<test.CantVariables(); i++ ){
             atendedor.enviarTestConfiguracion( reqTest.idDispositivo, test.getVariable(i) );
-            atendedor.recibirResultadoTestConfig( reqTest.idDispositivo );
+            TMessageResultadoConfigTest resultado = atendedor.recibirResultadoTestConfig( reqTest.idDispositivo );
+            //TODO <NIM> Procesar resultado del test
         }
     }
 }

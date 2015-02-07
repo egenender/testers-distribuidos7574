@@ -31,7 +31,7 @@ EQUIPOESP_SOURCES=src/EquipoEspecial.cpp
 EQUIPOESP_OBJ=$(EQUIPOESP_SOURCES:.cpp=.o)
 EQUIPOESP_BIN=$(BINF)/equipoEspecial
 
-TESTERCONFIG_SOURCES=src/TesterConfiguracion.cpp
+TESTERCONFIG_SOURCES=src/TesterConfiguracion.cpp src/TestConfiguracion.cpp
 TESTERCONFIG_OBJ=$(TESTERCONFIG_SOURCES:.cpp=.o)
 TESTERCONFIG_BIN=$(BINF)/testerConfig
 

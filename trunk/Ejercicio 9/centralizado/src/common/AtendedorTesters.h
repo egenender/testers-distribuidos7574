@@ -33,6 +33,10 @@ public:
     
     void enviarReqTestConfig( int idDispositivo, int idTester, int tipoDispositivo );
 
+    TMessageConfigTest recibirReqTestConfiguracion();
+    void enviarTestConfiguracion( int idDispositivo, int idVariable );
+    TMessageResultadoConfigTest recibirResultadoTestConfig( int idDispositivo );
+
     bool destruirComunicacion();
 
 };

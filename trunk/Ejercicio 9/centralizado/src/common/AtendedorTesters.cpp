@@ -1,13 +1,14 @@
 #include "AtendedorTesters.h"
 #include <cstdlib>
+#include <stdexcept>
 
 AtendedorTesters::AtendedorTesters(): sem_cola_especiales(SEM_COLA_ESPECIALES) {
     key_t key;
     key = ftok(ipcFileName.c_str(), MSGQUEUE_DISPOSITIVOS);
     this->cola_requerimiento = msgget(key, 0666);
     if(this->cola_requerimiento == -1) {
-		std::string err = std::string("Error al obtener la cola de requerimientos del atendedor de testers. Errno: ") + std::string(strerror(errno));
-		Logger::error(err, __FILE__);
+        std::string err = std::string("Error al obtener la cola de requerimientos del atendedor de testers. Errno: ") + std::string(strerror(errno));
+        Logger::error(err, __FILE__);
         exit(1);
     }
     
@@ -158,5 +159,20 @@ bool AtendedorTesters::destruirComunicacion() {
 
 void AtendedorTesters::enviarReqTestConfig( int idDispositivo, int idTester, int tipoDispositivo ){
     //TODO <NIM>
-    throw std::exception( "Not implemented" );
+    throw std::runtime_error( std::string("Not implemented").c_str() );
+}
+
+TMessageConfigTest AtendedorTesters::recibirReqTestConfiguracion(){
+    //TODO <NIM>
+    throw std::runtime_error( std::string("Not implemented").c_str() );
+}
+
+void AtendedorTesters::enviarTestConfiguracion( int idDispositivo, int idVariable ){
+    //TODO <NIM>
+    throw std::runtime_error( std::string("Not implemented").c_str() );
+}
+
+TMessageResultadoConfigTest AtendedorTesters::recibirResultadoTestConfig( int idDispositivo ){
+    //TODO <NIM>
+    throw std::runtime_error( std::string("Not implemented").c_str() );
 }
