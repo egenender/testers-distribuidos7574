@@ -17,16 +17,14 @@ identificadorprog_1(char *host)
 	char *getidtestercomun_1_arg;
 	int  *result_3;
 	char *getidtesterespecial_1_arg;
-	int  *result_4;
-	char *getidequipoespecial_1_arg;
 
-#ifndef	DEBUG
+//#ifndef	DEBUG
 	clnt = clnt_create (host, IDENTIFICADORPROG, IDENTIFICADORVERS, "udp");
 	if (clnt == NULL) {
 		clnt_pcreateerror (host);
 		exit (1);
 	}
-#endif	/* DEBUG */
+//#endif	/* DEBUG */
 
 	result_1 = getiddispositivo_1((void*)&getiddispositivo_1_arg, clnt);
 	if (result_1 == (int *) NULL) {
@@ -40,12 +38,8 @@ identificadorprog_1(char *host)
 	if (result_3 == (int *) NULL) {
 		clnt_perror (clnt, "call failed");
 	}
-	result_4 = getidequipoespecial_1((void*)&getidequipoespecial_1_arg, clnt);
-	if (result_4 == (int *) NULL) {
-		clnt_perror (clnt, "call failed");
-	}
 
-	printf("Los resultados fueron: %d, %d, %d, %d\n", *result_1, *result_2, *result_3, *result_4);
+	printf("Los resultados fueron: %d, %d, %d\n", *result_1, *result_2, *result_3);
 
 #ifndef	DEBUG
 	clnt_destroy (clnt);
@@ -56,7 +50,7 @@ identificadorprog_1(char *host)
 int
 main (int argc, char *argv[])
 {
-	char *host = "127.0.0.1";
+	char host[] = "127.0.0.1";
 	identificadorprog_1 (host);
 exit (0);
 }

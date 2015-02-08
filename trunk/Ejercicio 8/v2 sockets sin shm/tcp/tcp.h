@@ -11,10 +11,14 @@
 #include <arpa/inet.h>
 #include <netinet/tcp.h>
 
+const int MAX_BACKLOG = 20;
+
+void tcpDisableNagle(int sock);
+
 /**
  * Abre un socket y lo conecta a un host y puerto.
  */
-int tcp_open_activo(const char* host_name, uint16_t port){
+int tcpOpenActivo(const char* host_name, uint16_t port){
     int fd = 0;
     struct sockaddr_in server;
     struct hostent *host;
@@ -39,26 +43,37 @@ int tcp_open_activo(const char* host_name, uint16_t port){
     return fd;
 }
 
-
 /**
  * Abre un socket y lo deja listo para recibir conexiones entrantes en un puerto.
  */
-int tcp_open_pasivo(uint16_t port){
+int tcpOpenPasivo(uint16_t port){
     struct sockaddr_in serv_addr; 
     int fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (fd < 0) {
+        // Error!
+        return -1;
+    }
     memset(&serv_addr, 0, sizeof(serv_addr));
-    
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     serv_addr.sin_port = htons(port);
     
-    if(bind(fd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) != 0)
+    if(bind(fd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
+        perror("Error en el bind del socket\n");
         return -1;
+    }
+    
+    tcpDisableNagle(fd);
+    
+    if (listen(fd, MAX_BACKLOG) < 0) {
+        perror("Error en el listen del socket\n");
+        return -1;
+    }
 
     return fd;
 }
 
-void tcp_disable_nagle(int sock){
+void tcpDisableNagle(int sock) {
     int flag = 1;
     /*int result =*/ setsockopt(sock,            /* socket affected */
                             IPPROTO_TCP,     /* set option at TCP level */

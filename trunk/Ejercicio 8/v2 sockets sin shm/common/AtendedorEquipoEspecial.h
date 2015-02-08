@@ -26,7 +26,7 @@ public:
     void enviarFinTestEspecialADispositivo(int idDispositivo);
     void enviarOrden(int idDispositivo, int orden);
 private:
-    int colaDispTesterEsp, colaReinicioTestEsp, colaOrdenDispositivos;
+    int colaRecepciones, /*colaReinicioTestEsp, */colaEnvios;
 
 };
 

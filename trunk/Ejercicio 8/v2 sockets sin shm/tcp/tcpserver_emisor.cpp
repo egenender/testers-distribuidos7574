@@ -4,92 +4,90 @@
 #include <stddef.h>
 #include <sys/msg.h>
 #include <sys/wait.h>
-#include "../common/common.h"
+#include "common/common.h"
 #include "comunes_tcp.h"
-
+#include "logger/Logger.h"
+/*
 #ifdef EJEMPLO_TEST
 #define IPCS_FILE "ipcs-prueba"
 #else
-#define IPCS_FILE "/tmp/buchwaldipcs"
+#define IPCS_FILE "/tmp/pereira-ipcs"
 #endif
-
-int main(int argc, char *argv[]){
+*/
+int main(int argc, char *argv[]) {
+    
+    Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
 	
-    if(argc != 4){
-		printf("Uso: %s <puerto> <id_server> <id_cola> \n", argv[0]);
-		return -1;
+    if(argc != 4) {
+        printf("Uso: %s <puerto> <idMsgQueue> \n", argv[0]);
+        Logger::error("Bad arguments!", __FILE__);
+        return -1;
     }
 	
-	long id_tester = atol(argv[2]);
-	int id_cola = atoi(argv[3]);
+    int idMsgQueue = atoi(argv[2]);
 	
     size_t size = sizeof(TMessageAtendedor);
    
-    int fd = tcp_open_pasivo(atoi(argv[1]));
-    if(fd < 0){
-      perror("Error");
-      return -3;
-    }
-    
-    tcp_disable_nagle(fd);
-
-    if(listen(fd, 10) != 0){
-      perror("Error en el listen");
-      return -4;
+    int fd = tcpOpenPasivo(atoi(argv[1]));
+    if(fd < 0) {
+        Logger::error("Error creating server socket", __FILE__);
+        return -2;
     }
 
-    signal(SIGPIPE, SIG_IGN);
+//    signal(SIGPIPE, SIG_IGN);
 	
-    key_t key = ftok(IPCS_FILE, id_cola);
-    int cola = msgget(key, 0660);
+    key_t key = ftok(ipcFileName.c_str(), idMsgQueue);
+    int msgQueue = msgget(key, 0660);
 	
-	/* FIN del setup */
-	int cant_atendidos = 0;
+    /* FIN del setup */
+    //int cant_atendidos = 0;
 	
-    while(true){
-		//Verifico no estar atendiendo ya muchos clientes
-		while (cant_atendidos >= MAXIMOS_ATENDIDOS){
-			wait(NULL);
-			cant_atendidos--;
-		}
-		
-		int clientfd = accept(fd, (struct sockaddr*)NULL, NULL);
-		cant_atendidos++;
-		
-		if (fork() == 0){
-			TMessageAtendedor* buffer = (TMessageAtendedor*) malloc(size);
-			
-			//Espero Primer mensaje, que me dice el identificador del cliente + pid del receptor, para poder 'matarlo'
-			key_t key = ftok(IPCS_FILE, MSGQUEUE_SERVER_RECEPTOR_EMISOR);
-			int cola_id_disp = msgget(key, 0660| IPC_CREAT);
-			
-			int ok_read = msgrcv(cola_id_disp, buffer, sizeof(TMessageAtendedor) - sizeof(long), id_tester, 0);
-			if (ok_read == -1){
-				exit(0);
-			}
-					
-			long dispositivo_a_tratar = buffer->idDispositivo;
-			pid_t receptor = buffer->value;
-			
-			buffer->tester = id_tester;
-			
-			while (true){
-				//Espero un mensaje que deba ser enviado al dispositivo en cuestion
-				int ok_read = msgrcv(cola, buffer, size - sizeof(long), dispositivo_a_tratar, 0);
-				if (ok_read == -1){
-					exit(1);
-				}
-				//Si el mensaje era de finalizacion, entonces 'mato' al receptor y termino mi labor
-				if (buffer->finalizar_conexion){
-					kill(receptor, SIGHUP);
-					free(buffer);
-					close(clientfd);
-					exit(0);
-				}				
-				enviar(buffer, clientfd);
-			}			
-		}
-		close(clientfd);
-	}
+    while(true) {
+        //Verifico no estar atendiendo ya muchos clientes
+        /*while (cant_atendidos >= MAXIMOS_ATENDIDOS) {
+            wait(NULL);
+            cant_atendidos--;
+        }*/
+
+        int clientFd = accept(fd, (struct sockaddr*)NULL, NULL);
+        //cant_atendidos++;
+
+        if (fork() == 0) {
+            TMessageAtendedor* buffer = (TMessageAtendedor*) malloc(size);
+
+            //Espero Primer mensaje, que me dice el identificador del cliente
+            TFirstMessage firstMsg;
+            recibir(clientFd, &firstMsg, sizeof(TFirstMessage));
+            int idCliente = firstMsg.identificador;
+/*
+            int ok_read = msgrcv(cola_id_disp, buffer, sizeof(TMessageAtendedor) - sizeof(long), id_tester, 0);
+            if (ok_read == -1) {
+                exit(0);
+            }
+
+            long dispositivo_a_tratar = buffer->idDispositivo;
+            pid_t receptor = buffer->value;
+
+            buffer->tester = id_tester;
+*/
+            while (true) {
+                //Espero un mensaje que deba ser enviado al dispositivo en cuestion
+                int okRead = msgrcv(msgQueue, buffer, size - sizeof(long), idCliente, 0);
+                if (okRead == -1) {
+                    Logger::error("Error recibiendo mensaje de la cola", __FILE__);
+                    exit(1);
+                }
+                //Si el mensaje era de finalizacion, entonces 'mato' al receptor y termino mi labor
+                /*if (buffer->finalizar_conexion) {
+                    kill(receptor, SIGHUP);
+                    free(buffer);
+                    close(clientFd);
+                    exit(0);
+                }*/				
+                enviar(clientFd, buffer, sizeof(TMessageAtendedor));
+            }			
+        }
+        close(clientFd);
+    }
 	
 }
