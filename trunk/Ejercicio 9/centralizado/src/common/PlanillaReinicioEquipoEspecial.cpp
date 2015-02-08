@@ -6,9 +6,14 @@
  */
 
 #include "PlanillaReinicioEquipoEspecial.h"
+#include "Configuracion.h"
 #include "common.h"
 
-PlanillaReinicioEquipoEspecial::PlanillaReinicioEquipoEspecial() {
+using namespace Constantes::NombresDeParametros;
+using std::string;
+
+PlanillaReinicioEquipoEspecial::PlanillaReinicioEquipoEspecial( const Configuracion& config ) {
+    const string ipcFileName = config.ObtenerParametroString( ARCHIVO_IPCS );
     this->msgqReinicioKey = ftok(ipcFileName.c_str(), MSGQUEUE_REINICIO_TESTEO);
     this->msgqReinicioId = msgget(this->msgqReinicioKey, 0666);
     if(this->msgqReinicioId == -1) {

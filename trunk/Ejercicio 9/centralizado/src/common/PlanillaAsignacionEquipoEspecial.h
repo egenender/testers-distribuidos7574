@@ -5,21 +5,22 @@
  * Created on November 16, 2014, 7:56 PM
  */
 
-#ifndef PLANILLAASIGNACIONEQUIPOESPECIAL_H
-#define	PLANILLAASIGNACIONEQUIPOESPECIAL_H
+#pragma once
 
 #include "ipc/Semaphore.h"
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <errno.h>
 #include <cstring>
-
 #include "logger/Logger.h"
+#include "common.h"
+
+class Configuracion;
 
 class PlanillaAsignacionEquipoEspecial {
 public:
-    PlanillaAsignacionEquipoEspecial();
-    virtual ~PlanillaAsignacionEquipoEspecial();
+    PlanillaAsignacionEquipoEspecial( const Configuracion& config );
+    ~PlanillaAsignacionEquipoEspecial();
     
     void registrarTareaEspecialFinalizada(int idDispositivo);
     bool terminoTesteoEspecial(int idDispositivo);
@@ -37,6 +38,3 @@ private:
     TContadorTareaEspecial* cantTareasEspecialesAsignadas;
 
 };
-
-#endif	/* PLANILLAASIGNACIONEQUIPOESPECIAL_H */
-

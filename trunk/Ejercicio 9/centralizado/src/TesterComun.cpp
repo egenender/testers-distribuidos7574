@@ -5,7 +5,6 @@
  * Created on October 4, 2014, 8:46 PM
  */
 
-#include <cstdlib>
 #include "common/AtendedorTesters.h"
 #include "common/Programa.h"
 #include "common/Resultado.h"
@@ -13,26 +12,34 @@
 #include "logger/Logger.h"
 #include "common/Planilla.h"
 #include "common/PlanillaAsignacionTesterComun.h"
+#include "common/Configuracion.h"
 #include <string>
+#include <cstdlib>
 
 using namespace std;
 
-int main(int argc, char** argv) {    
-	srand(time(NULL));
+int main(int argc, char** argv) {
+    srand(time(NULL));
     // El primer parametro es el id del tester
     int id = atoi(argv[1]);
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
-	std::stringstream nombre;
-	nombre << __FILE__ << " " << id;
-	Logger::notice("Inicia el procesamiento, cargo el atendedor, despachador y Planilla" , nombre.str().c_str());
+    std::stringstream nombre;
+    nombre << __FILE__ << " " << id;
+    Logger::notice("Inicia el procesamiento, cargo el atendedor, despachador y Planilla" , nombre.str().c_str());
+    
+    Configuracion config;
+    if( !config.LeerDeArchivo() ){
+        Logger::error("Archivo de configuracion no encontrado", __FILE__);
+        return 1;
+    }
     
     // Obtengo comunicacion con los dispositivos
-    AtendedorTesters atendedor;
+    AtendedorTesters atendedor( config );
     // Obtengo comunicacion con los tecnicos
-    DespachadorTesters despachador;
+    DespachadorTesters despachador( config );
     // Obtengo planilla general de sync con otros tester
-    Planilla planilla;
-    PlanillaAsignacionTesterComun planillaAsignacion;
+    Planilla planilla( config );
+    PlanillaAsignacionTesterComun planillaAsignacion( config );
     
     srand(time(NULL));
     

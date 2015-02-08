@@ -6,8 +6,13 @@
  */
 
 #include "AtendedorEquipoEspecial.h"
+#include "Configuracion.h"
 
-AtendedorEquipoEspecial::AtendedorEquipoEspecial() {
+using namespace Constantes::NombresDeParametros;
+using std::string;
+
+AtendedorEquipoEspecial::AtendedorEquipoEspecial( const Configuracion& config ) {
+    const string ipcFileName = config.ObtenerParametroString( ARCHIVO_IPCS );
     key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_DISPOSITIVOS_TESTERS_ESPECIALES);
     this->colaDispTesterEsp = msgget(key, 0666);
     if(this->colaDispTesterEsp == -1) {

@@ -16,6 +16,8 @@
 #include "common.h"
 #include "../logger/Logger.h"
 
+class Configuracion;
+
 class DespachadorTesters {
 private:
     int msgQueueId;
@@ -28,7 +30,7 @@ private:
     
 public:
     
-    DespachadorTesters();
+    DespachadorTesters( const Configuracion& config );
     DespachadorTesters(const DespachadorTesters& orig);
     virtual ~DespachadorTesters();
     

@@ -6,9 +6,16 @@
  */
 
 #include "PlanillaAsignacionTesterComun.h"
+#include "Configuracion.h"
 
-PlanillaAsignacionTesterComun::PlanillaAsignacionTesterComun() : semShmemCantTesters(SEM_PLANILLA_CANT_TESTER_ASIGNADOS), semShmemCantTareas(SEM_PLANILLA_CANT_TAREAS_ASIGNADAS) {
-    this->shmemCantTestersKey = ftok(ipcFileName.c_str(), SHM_PLANILLA_CANT_TESTER_ASIGNADOS);
+using namespace Constantes::NombresDeParametros;
+using std::string;
+
+PlanillaAsignacionTesterComun::PlanillaAsignacionTesterComun( const Configuracion& config ) :
+        semShmemCantTesters( config.ObtenerParametroString(ARCHIVO_IPCS), SEM_PLANILLA_CANT_TESTER_ASIGNADOS),
+        semShmemCantTareas( config.ObtenerParametroString(ARCHIVO_IPCS), SEM_PLANILLA_CANT_TAREAS_ASIGNADAS) {
+    const string ipcFileName = config.ObtenerParametroString(ARCHIVO_IPCS);
+    this->shmemCantTestersKey = ftok( ipcFileName.c_str(), SHM_PLANILLA_CANT_TESTER_ASIGNADOS);
     if(this->shmemCantTestersKey == -1) {
         std::string err("Error al conseguir la key de la shmem de la planilla de asignacion de testers. Error: " + std::string(strerror(errno)));
         Logger::error(err.c_str(), __FILE__);

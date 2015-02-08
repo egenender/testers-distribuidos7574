@@ -6,11 +6,15 @@
  */
 
 #include "DespachadorTecnicos.h"
+#include "Configuracion.h"
 #include <cstdlib>
 #include "../logger/Logger.h"
 
-DespachadorTecnicos::DespachadorTecnicos() {
-    
+using namespace Constantes::NombresDeParametros;
+using std::string;
+
+DespachadorTecnicos::DespachadorTecnicos( const Configuracion& config ) {
+    const string ipcFileName = config.ObtenerParametroString(ARCHIVO_IPCS);
     key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_DESPACHADOR);
     this->msgQueueId = msgget(key, 0666 | IPC_CREAT); 
     if(this->msgQueueId == -1) {
@@ -19,9 +23,6 @@ DespachadorTecnicos::DespachadorTecnicos() {
         exit(1);
     }
     
-}
-
-DespachadorTecnicos::DespachadorTecnicos(const DespachadorTecnicos& orig) {
 }
 
 DespachadorTecnicos::~DespachadorTecnicos() {
