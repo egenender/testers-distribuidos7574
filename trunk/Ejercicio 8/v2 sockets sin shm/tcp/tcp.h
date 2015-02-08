@@ -58,6 +58,9 @@ int tcpOpenPasivo(uint16_t port){
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     serv_addr.sin_port = htons(port);
     
+    int yes = 1;
+    setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
+    
     if(bind(fd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
         perror("Error en el bind del socket\n");
         return -1;

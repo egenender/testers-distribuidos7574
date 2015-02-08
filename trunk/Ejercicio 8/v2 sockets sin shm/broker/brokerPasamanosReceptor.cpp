@@ -45,6 +45,8 @@ int main(int argc, char* argv[]) {
             case MTYPE_REQUERIMIENTO_TESTER_ESPECIAL:
                 ss << "Llego un requerimiento del dispositivo " << msg.idDispositivo;
                 Logger::notice(ss.str(), __FILE__);
+                ss.str("");
+                ss.clear();
                 
                 ret = msgsnd(msgQueueReqTestEsp, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
                 if(ret == -1) {
@@ -56,6 +58,8 @@ int main(int argc, char* argv[]) {
             default:
                 ss << "Llego mensaje para el dispositivo " << msg.idDispositivo;
                 Logger::notice(ss.str(), __FILE__);
+                ss.str("");
+                ss.clear();
 
                 msg.mtype = msg.idDispositivo;
                 ret = msgsnd(msgQueueDisp, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);

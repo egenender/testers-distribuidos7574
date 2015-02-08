@@ -1,6 +1,7 @@
 #include "tcp.h"
 #include <signal.h>
 #include <string.h>
+#include <errno.h>
 #include <stddef.h>
 #include <sys/msg.h>
 #include <sys/wait.h>
@@ -17,8 +18,7 @@
 int main(int argc, char *argv[]) {
     
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
-	
-    if(argc != 4) {
+    if(argc != 3) {
         printf("Uso: %s <puerto> <idMsgQueue> \n", argv[0]);
         Logger::error("Bad arguments!", __FILE__);
         return -1;
@@ -74,7 +74,9 @@ int main(int argc, char *argv[]) {
                 //Espero un mensaje que deba ser enviado al dispositivo en cuestion
                 int okRead = msgrcv(msgQueue, buffer, size - sizeof(long), idCliente, 0);
                 if (okRead == -1) {
-                    Logger::error("Error recibiendo mensaje de la cola", __FILE__);
+                    std::stringstream ss;
+                    ss << "Error recibiendo mensaje de la cola para el cliente " << idCliente <<". Errno: " << strerror(errno);
+                    Logger::error(ss.str(), __FILE__);
                     exit(1);
                 }
                 //Si el mensaje era de finalizacion, entonces 'mato' al receptor y termino mi labor

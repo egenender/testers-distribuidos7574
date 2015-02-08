@@ -58,9 +58,9 @@ Planilla::Planilla() : semShMem(SEM_PLANILLA_GENERAL) {
 
     // Por ultimo, luego de creado, obtengo el semaforo correspondiente
     if (!this->semShMem.getSem()) {
-	std::string err = std::string("Error al obtener el semaforo de la planilla general. Error: ") + std::string(strerror(errno));
-	Logger::error(err, __FILE__);
-	throw err;
+        std::string err = std::string("Error al obtener el semaforo de la planilla general. Error: ") + std::string(strerror(errno));
+        Logger::error(err, __FILE__);
+        throw err;
     }
 
 }

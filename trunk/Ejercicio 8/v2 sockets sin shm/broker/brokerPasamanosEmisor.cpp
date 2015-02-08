@@ -34,6 +34,8 @@ int main(int argc, char* argv[]) {
             case MTYPE_REQUERIMIENTO_DISPOSITIVO:
                 ss << "Llego un requerimiento del dispositivo " << msg.idDispositivo;
                 Logger::notice(ss.str(), __FILE__);
+                ss.str("");
+                ss.clear();
                 
                 ret = msgsnd(msgQueueReqDisp, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
                 if(ret == -1) {
@@ -45,6 +47,8 @@ int main(int argc, char* argv[]) {
             case MTYPE_RESULTADO_INICIAL:
                 ss << "Llego resultado de test inicial del dispositivo " << msg.idDispositivo;
                 Logger::notice(ss.str(), __FILE__);
+                ss.str("");
+                ss.clear();
                 
                 msg.mtype = msg.tester;
                 ret = msgsnd(msgQueueTestYEq, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
@@ -58,6 +62,8 @@ int main(int argc, char* argv[]) {
                 std::stringstream ss;
                 ss << "Llego resultado de test especial del dispositivo " << msg.idDispositivo;
                 Logger::notice(ss.str(), __FILE__);
+                ss.str("");
+                ss.clear();
                 
                 msg.mtype = ID_EQUIPO_ESPECIAL;
                 int ret = msgsnd(msgQueueTestYEq, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);

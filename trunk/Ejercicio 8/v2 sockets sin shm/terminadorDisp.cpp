@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
         msgctl(queue ,IPC_RMID, NULL);
     }
     
-    unlink(ipcFileName.c_str());
+//    unlink(ipcFileName.c_str());
 
     return 0;
 }

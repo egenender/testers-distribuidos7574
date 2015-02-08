@@ -41,10 +41,8 @@ AtendedorEquipoEspecial::AtendedorEquipoEspecial() {
 	pid_t receptor = fork();
 	if (receptor == 0) {
 		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",
-				UBICACION_SERVER,
-				PUERTO_SERVER_RECEPTOR,
-                paramId,
-				paramIdCola,
+				UBICACION_SERVER, PUERTO_SERVER_EMISOR,
+                paramId, paramIdCola,
 				(char*) 0);
         Logger::error("Log luego de execlp tcpclient_receptor. Error!", __FILE__);
 		exit(1);
@@ -54,8 +52,7 @@ AtendedorEquipoEspecial::AtendedorEquipoEspecial() {
 
 	if (fork() == 0) {
 		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",
-				UBICACION_SERVER,
-				PUERTO_SERVER_EMISOR,
+				UBICACION_SERVER, PUERTO_SERVER_RECEPTOR,
 				paramId, paramIdCola,
 				(char*) 0);
         Logger::error("Log luego de execlp tcpclient_emisor. Error!", __FILE__);
@@ -66,9 +63,9 @@ AtendedorEquipoEspecial::AtendedorEquipoEspecial() {
 AtendedorEquipoEspecial::~AtendedorEquipoEspecial() {
 }
 
-TResultadoEspecial AtendedorEquipoEspecial::recibirResultadoEspecial() {
-    TResultadoEspecial resultado;
-    int ret = msgrcv(this->colaRecepciones, &resultado, sizeof(TResultadoEspecial) - sizeof(long), 0, 0);
+TMessageAtendedor AtendedorEquipoEspecial::recibirResultadoEspecial() {
+    TMessageAtendedor resultado;
+    int ret = msgrcv(this->colaRecepciones, &resultado, sizeof(TMessageAtendedor) - sizeof(long), 0, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir resultado especial de algun dispositivo. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);

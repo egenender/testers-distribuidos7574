@@ -25,6 +25,11 @@ int main(int argc, char* argv[]) {
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
     // Por parametro se recibe el ID del dispositivo
     int id = getIdDispositivo();
+    
+    if (id == 0) {
+        Logger::error("No hay ID disponible para este dispositivo", __FILE__);
+        exit(1);
+    }
 
     std::stringstream ss;
     ss << "El dispositivo " << id << " se crea";
@@ -144,14 +149,12 @@ int getIdDispositivo() {
     int  *result_1;
     char *getiddispositivo_1_arg;
     
-//#ifndef DEBUG
     clnt = clnt_create (UBICACION_SERVER_IDENTIFICADOR, IDENTIFICADORPROG, IDENTIFICADORVERS, "udp");
     if (clnt == NULL) {
         // TODO: Log
         clnt_pcreateerror (UBICACION_SERVER_IDENTIFICADOR);
         exit (1);
     }
-//#endif  /* DEBUG */
     
     result_1 = getiddispositivo_1((void*)&getiddispositivo_1_arg, clnt);
     if (result_1 == (int *) NULL) {
@@ -159,9 +162,7 @@ int getIdDispositivo() {
         clnt_perror (clnt, "call failed");
     }
     
-//#ifndef DEBUG
     clnt_destroy (clnt);
-//#endif
     
     return *result_1;
 }
