@@ -2,6 +2,7 @@
 #define	ATENDEDORTESTERS_H
 
 #include <cstring>
+#include <cstdlib>
 #include <sstream>
 #include <sys/msg.h>
 #include "errno.h"
@@ -12,15 +13,16 @@
 
 class AtendedorTesters {
 private:
-    int cola_testers_especiales;
-    //int cola_tareas_especiales;
-    int cola_envios;
-    int cola_recepciones;
+
+    int colaEnvios;
+    int colaRecepciones;
     
-    Semaphore sem_cola_especiales;
+    int idTester;
+    
+    Semaphore semColaEspeciales;
     
 public:
-    AtendedorTesters();
+    AtendedorTesters(int idTester);
     AtendedorTesters(const AtendedorTesters& orig);
     virtual ~AtendedorTesters();
     
@@ -29,14 +31,13 @@ public:
      */
     int recibirRequerimiento();
     void enviarPrograma(int idDispositivo, int tester, int idPrograma);  // Tester -> Disp
-    int recibirResultado(int idTester);
+    TMessageAtendedor recibirResultado(int idTester);
     void enviarOrden(int idDispositivo, int orden); // Tester -> Disp: Reinicio o apagado
 
     /**
      * Interaccion con testers especiales
      */
     void enviarAEspeciales(bool cuales[], int idDispositivo, int posicionDispositivo);
-    TMessageAssignTE recibirRequerimientoEspecial(int idEsp);
 
     /**
      * Interaccion entre tester especial y dispositivo
@@ -44,7 +45,6 @@ public:
     void enviarTareaEspecial(int idDispositivo, int idTester, int tarea, int posicionDispositivo);
 
     bool destruirComunicacion();
-    int obtenerIdTester();
 };
 
 #endif	/* ATENDEDORTESTERS_H */

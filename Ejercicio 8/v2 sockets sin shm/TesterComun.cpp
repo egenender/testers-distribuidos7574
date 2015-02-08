@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
 	Logger::notice("Inicia el procesamiento, cargo el atendedor, despachador y Planilla" , nombre.str().c_str());
     
     // Obtengo comunicacion con los dispositivos
-    AtendedorTesters atendedor;
+    AtendedorTesters atendedor(id);
     // Obtengo comunicacion con los tecnicos
     DespachadorTesters despachador;
     // Obtengo planilla general de sync con otros tester
@@ -63,22 +63,22 @@ int main(int argc, char** argv) {
         
         Logger::notice(string("Espero resultado de dispositivo ") + ss.str(), nombre.str().c_str());                  	    
   
-        resultado_test_t resul = atendedor.recibirResultado(id);
+        TMessageAtendedor resul = atendedor.recibirResultado(id);
         Logger::notice(string("Recibi resultado del dispositivo ") + ss.str(), nombre.str().c_str());
         usleep( rand() % 1000 + 1000);
-        
-        if (resul.result == RESULTADO_GRAVE){
+
+        if (resul.value == RESULTADO_GRAVE){
             Logger::notice(string("Le envio orden de apagado al dispositivo ") + ss.str(), nombre.str().c_str());
             atendedor.enviarOrden(idDispositivo, ORDEN_APAGADO);
             Logger::notice(string("Le envio al tecnico la notificacion ") + ss.str(), nombre.str().c_str());
             despachador.enviarOrden(idDispositivo);
             planilla.eliminarDispositivo(posicionDispositivo);
-        } else if (resul.result == SEGUIR_TESTEANDO){
+        } else if (resul.value == SEGUIR_TESTEANDO){
             int cant_testers = 0;
             bool los_testers[CANT_TESTERS_ESPECIALES];
             while (cant_testers < 2 || cant_testers > 4){ //requerimientos
                 cant_testers = 0;
-                for (int i = 0; i < CANT_TESTERS_ESPECIALES; i++){
+                for (int i = 0; i < CANT_TESTERS_ESPECIALES; i++) {
                     int random = rand() % 2;
                     cant_testers += random;
                     los_testers[i] = random;
@@ -91,12 +91,12 @@ int main(int argc, char** argv) {
             ss << "Le envio los requerimientos a los " << cant_testers << " testers especiales, ";
             for (int i = 0; i < CANT_TESTERS_ESPECIALES; i++){
                     if(los_testers[i])
-                            ss << i << " ";
+                            ss << i + ID_TESTER_ESP_START << " ";
             }
             Logger::notice(ss.str() , nombre.str().c_str());
             planillaAsignacion.asignarCantTestersEspeciales(posicionDispositivo, cant_testers);
             atendedor.enviarAEspeciales(los_testers, idDispositivo, posicionDispositivo);
-        }else{
+        } else {
             atendedor.enviarOrden(idDispositivo, ORDEN_REINICIO);
             planilla.eliminarDispositivo(posicionDispositivo);
         }
@@ -114,23 +114,20 @@ int getIdTesterComun() {
     int  *result_2;
     char *getidtestercomun_1_arg;
 
-#ifndef DEBUG
     clnt = clnt_create (UBICACION_SERVER_IDENTIFICADOR, IDENTIFICADORPROG, IDENTIFICADORVERS, "udp");
     if (clnt == NULL) {
+        Logger::error("Error en la creación del cliente RPC", __FILE__);
         clnt_pcreateerror (UBICACION_SERVER_IDENTIFICADOR);
         exit (1);
     }
-#endif
     
     result_2 = getidtestercomun_1((void*)&getidtestercomun_1_arg, clnt);
     if (result_2 == (int *) NULL) {
-        // TODO: Log!
+        Logger::error("Error en la llamada al RPC obteniendo el ID", __FILE__);
         clnt_perror (clnt, "call failed");
     }
 
-#ifndef DEBUG
     clnt_destroy (clnt);
-#endif
     
     return *result_2;
 }
@@ -141,23 +138,20 @@ int desregistrarTesterComun(int id) {
     int  *result_4;
     int  desregistrartestercomun_1_arg = id;
 
-#ifndef DEBUG
     clnt = clnt_create (UBICACION_SERVER_IDENTIFICADOR, IDENTIFICADORPROG, IDENTIFICADORVERS, "udp");
     if (clnt == NULL) {
+        Logger::error("Error en la creación del cliente RPC", __FILE__);
         clnt_pcreateerror (UBICACION_SERVER_IDENTIFICADOR);
         exit (1);
     }
-#endif
     
-    result_4 = getidtesterespecial_1((void*)&desregistrartestercomun_1_arg, clnt);
+    result_4 = desregistrartestercomun_1(&desregistrartestercomun_1_arg, clnt);
     if (result_4 == (int *) NULL) {
-        // TODO: Log!
+        Logger::error("Error en la llamada al RPC devolviendo el ID", __FILE__);
         clnt_perror (clnt, "call failed");
     }
 
-#ifndef DEBUG
     clnt_destroy (clnt);
-#endif
     
     return *result_4;
 }

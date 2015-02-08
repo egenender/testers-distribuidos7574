@@ -20,18 +20,16 @@
 
 class AtendedorDispositivos {
 private:
-    int cola_envios;
-    int cola_recepciones;
+    int colaEnvios;
+    int colaRecepciones;
 
     int idTester;
     int posicionDispositivo;
     int idDispositivo;
-    
-    int getIdDispositivo(); // Request al server RPC de identificadores
 
 public:
 
-    AtendedorDispositivos();
+    AtendedorDispositivos(int idDispositivo);
     AtendedorDispositivos(const AtendedorDispositivos& orig);    
     virtual ~AtendedorDispositivos();
         

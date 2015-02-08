@@ -56,11 +56,11 @@ int main(int argc, char** argv) {
     semPlanillaCantTareasAsignadas.eliSem();
 	
     //Destruccion de colas
-    for (int q = MSGQUEUE_DISPOSITIVOS; q <= MSGQUEUE_ULTIMO; q++){
+    /*for (int q = MSGQUEUE_DISPOSITIVOS; q <= MSGQUEUE_ULTIMO; q++){
         key = ftok(ipcFileName.c_str(), q);
         int cola = msgget(key, 0660);
         msgctl(cola ,IPC_RMID, NULL);
-    }
+    }*/
     
     unlink(ipcFileName.c_str());
     

@@ -65,9 +65,9 @@ void createIPCObjects() {
     semPlanillaGeneral.creaSem();
     semPlanillaGeneral.iniSem(1); // Inicializa el semaforo en 1
     
-    Semaphore sem_cola_especiales(SEM_COLA_ESPECIALES);
-    sem_cola_especiales.creaSem();
-    sem_cola_especiales.iniSem(1);
+    Semaphore semColaEspeciales(SEM_COLA_ESPECIALES);
+    semColaEspeciales.creaSem();
+    semColaEspeciales.iniSem(1);
     
     Semaphore semPlanillaCantTestersAsignados(SEM_PLANILLA_CANT_TESTER_ASIGNADOS);
     semPlanillaCantTestersAsignados.creaSem();
@@ -83,92 +83,54 @@ void createIPCObjects() {
     planillaAsignacion.initPlanilla();
     
     //creacion de colas
-    for (int q = MSGQUEUE_DISPOSITIVOS; q <= MSGQUEUE_ULTIMO; q++){
+    for (int q = MSGQUEUE_ENVIO_TESTER_COMUN; q <= MSGQUEUE_REINICIO_TESTEO; q++) {
         key_t key = ftok(ipcFileName.c_str(), q);
-        if (msgget(key, 0660 | IPC_CREAT | IPC_EXCL) == -1){
-            std::cout << "No se pudo crear una cola: " << strerror(errno)<< std::endl;
+        if (msgget(key, 0660 | IPC_CREAT | IPC_EXCL) == -1) {
+            std::cout << "No se pudo crear una cola: " << strerror(errno) << std::endl;
         }
     }
-   
 }
 
 void createSystemProcesses() {
 
-	if (fork() == 0) {
-		execlp("./Broker", "Broker", (char*) 0);
-		Logger::error("Error al ejecutar el programa broker", __FILE__);
-		exit(1);
-	}
+    // Creo testers
+    for(int i = 0; i < CANT_TESTERS_COMUNES; i++) {
+        usleep(10);
+        pid_t newPid = fork();
+        if(newPid == 0) {
+			// Inicio el programa correspondiente
+            execlp("./testerComun", "testerComun", (char*)0);
+            Logger::error("Error al ejecutar el programa TesterComun", __FILE__);
+            exit(1);
+        }
+    }
 
-//    // Creo testers
-//    int idTester = ID_TESTER_START;
-//    for(int i = 0; i < CANT_TESTERS_COMUNES; i++, idTester++) {
-//        char param[3];
-//        sprintf(param, "%d", idTester);
-//        usleep(10);
-//        pid_t newPid = fork();
-//        if(newPid == 0) {
-//			// Inicio el programa correspondiente
-//            execlp("./testerComun", "testerComun", param, (char*)0);
-//            Logger::error("Error al ejecutar el programa TesterComun de ID" + idTester, __FILE__);
-//            exit(1);
-//        }
-//    }
-//
-//    for(int i = 0; i < CANT_TESTERS_ESPECIALES; i++, idTester++) {
-//        char param[3];
-//        sprintf(param, "%d", idTester);
-//        usleep(10);
-//        pid_t newPid = fork();
-//        if(newPid == 0) {
-//			// Inicio el programa correspondiente
-//            execlp("./testerEspecial", "testerEspecial", param, (char*)0);
-//            Logger::error("Error al ejecutar el programa TesterEspecial de ID" + idTester, __FILE__);
-//            exit(1);
-//        }
-//    }
-//
-//    // Creo equipo especial
-//    pid_t eqEspPid = fork();
-//    if (eqEspPid == 0) {
-//        execlp("./equipoEspecial", "equipoEspecial", (char*)0);
-//        Logger::error("Error al ejecutar el programa Equipo Especial", __FILE__);
-//        exit(1);
-//    }
-//
-//    // Creo al tecnico
-//    pid_t tecPid = fork();
-//    if(tecPid == 0) {
-//        execlp("./tecnico", "tecnico", (char*)0);
-//        Logger::error("Error al ejecutar el programa tecnico", __FILE__);
-//        exit(1);
-//    }
-//
-//	//Creo dispositivos
-//    sleep(1);
-//    int idDispositivo = ID_DISPOSITIVO_START;
-//    int cantidad_lanzada = 0;
-//    while (cantidad_lanzada < CANT_DISPOSITIVOS){
-//		int cantidad_a_lanzar = MINIMOS_LANZADOS + rand() % (MAXIMOS_LANZADOS - MINIMOS_LANZADOS + 1);
-//		if (cantidad_a_lanzar + cantidad_lanzada > CANT_DISPOSITIVOS)
-//			cantidad_a_lanzar = CANT_DISPOSITIVOS - cantidad_lanzada;
-//		for (int i = 0; i < cantidad_a_lanzar; i++){
-//			char param[3];
-//			sprintf(param, "%d", idDispositivo);
-//			idDispositivo++;
-//			pid_t newPid = fork();
-//			if(newPid == 0) {
-//				// Inicio el programa correspondiente
-//				execlp("./dispositivo", "dispositivo", param, (char*)0);
-//				Logger::error("Error al ejecutar el programa dispositivo de ID" + idDispositivo, __FILE__);
-//				exit(1);
-//			}
-//		}
-//		cantidad_lanzada += cantidad_a_lanzar;
-//		usleep(1000);
-//	}
-//
-	
+    for(int i = 0; i < CANT_TESTERS_ESPECIALES; i++) {
+        usleep(10);
+        pid_t newPid = fork();
+        if(newPid == 0) {
+			// Inicio el programa correspondiente
+            execlp("./testerEspecial", "testerEspecial", (char*)0);
+            Logger::error("Error al ejecutar el programa TesterEspecial", __FILE__);
+            exit(1);
+        }
+    }
+
+    // Creo equipo especial
+    pid_t eqEspPid = fork();
+    if (eqEspPid == 0) {
+        execlp("./equipoEspecial", "equipoEspecial", (char*)0);
+        Logger::error("Error al ejecutar el programa Equipo Especial", __FILE__);
+        exit(1);
+    }
+
+    // Creo al tecnico
+    pid_t tecPid = fork();
+    if(tecPid == 0) {
+        execlp("./tecnico", "tecnico", (char*)0);
+        Logger::error("Error al ejecutar el programa tecnico", __FILE__);
+        exit(1);
+    }
+
     Logger::debug("Programas iniciados correctamente...", __FILE__);
-    
 }

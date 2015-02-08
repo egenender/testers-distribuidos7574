@@ -6,7 +6,7 @@
  */
 
 #include <cstdlib>
-#include "common/AtendedorTesters.h"
+#include "common/AtendedorTestersEspeciales.h"
 #include "common/Programa.h"
 #include "common/Resultado.h"
 #include "common/DespachadorTesters.h"
@@ -32,11 +32,10 @@ int main(int argc, char** argv) {
     Logger::notice("Inicia el procesamiento, cargo el atendedor y despachador" , nombre.str().c_str());
     
     // Obtengo comunicacion con los dispositivos
-    AtendedorTesters atendedor;
+    AtendedorTestersEspeciales atendedor(id);
     // Obtengo comunicacion con los tecnicos
     DespachadorTesters despachador;
     // Obtengo planilla general de sync con otros tester
-    Planilla planilla;
     PlanillaAsignacionTesterEspecial planillaAsignacion;
     PlanillaReinicioTesterEspecial planillaReinicio;
     
@@ -45,7 +44,7 @@ int main(int argc, char** argv) {
     while(true) {
         Logger::notice("Espero por un nuevo requerimiento de testeo especial" , nombre.str().c_str());
         // Espero un requerimiento
-        TMessageAssignTE msg = atendedor.recibirRequerimientoEspecial(id);
+        TMessageAtendedor msg = atendedor.recibirRequerimientoEspecial(id);
         stringstream ss;
 		ss << msg.idDispositivo;
 		string mensaje = "Recibido requerimiento desde dispositivo id ";
@@ -89,13 +88,11 @@ int getIdTesterEspecial() {
     int  *result_3;
     char *getidtesterespecial_1_arg;
 
-#ifndef DEBUG
     clnt = clnt_create (UBICACION_SERVER_IDENTIFICADOR, IDENTIFICADORPROG, IDENTIFICADORVERS, "udp");
     if (clnt == NULL) {
         clnt_pcreateerror (UBICACION_SERVER_IDENTIFICADOR);
         exit (1);
     }
-#endif
     
     result_3 = getidtesterespecial_1((void*)&getidtesterespecial_1_arg, clnt);
     if (result_3 == (int *) NULL) {
@@ -103,9 +100,7 @@ int getIdTesterEspecial() {
         clnt_perror (clnt, "call failed");
     }
 
-#ifndef DEBUG
     clnt_destroy (clnt);
-#endif
     
     return *result_3;
 }
@@ -116,13 +111,11 @@ int desregistrarTesterEspecial(int id) {
     int  *result_5;
     int  desregistrartesterespecial_1_arg = id;
 
-#ifndef DEBUG
     clnt = clnt_create (UBICACION_SERVER_IDENTIFICADOR, IDENTIFICADORPROG, IDENTIFICADORVERS, "udp");
     if (clnt == NULL) {
         clnt_pcreateerror (UBICACION_SERVER_IDENTIFICADOR);
         exit (1);
     }
-#endif
     
     result_5 = getidtesterespecial_1((void*)&desregistrartesterespecial_1_arg, clnt);
     if (result_5 == (int *) NULL) {
@@ -130,9 +123,7 @@ int desregistrarTesterEspecial(int id) {
         clnt_perror (clnt, "call failed");
     }
 
-#ifndef DEBUG
     clnt_destroy (clnt);
-#endif
     
     return *result_5;
 }

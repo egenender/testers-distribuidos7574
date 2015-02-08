@@ -21,8 +21,11 @@ const int CANT_TESTERS_ESPECIALES = 15;
 const int MAX_DISPOSITIVOS_EN_SISTEMA = 100;
 const int MAX_TAREAS_ESPECIALES = 10;
 
-const int MINIMOS_LANZADOS = 5;
-const int MAXIMOS_LANZADOS = 20;
+const int MAX_TESTER_COMUNES = 100;
+const int MAX_TESTER_ESPECIALES = 100;
+const int ID_TESTER_COMUN_START = 5;
+const int ID_TESTER_ESP_START = MAX_TESTER_COMUNES + 1;
+const int ID_EQUIPO_ESPECIAL = MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES + 1;
 
 // IDs de los IPC
 const int SEM_PLANILLA_GENERAL = 1;
@@ -33,26 +36,43 @@ const int SEM_PLANILLA_CANT_TAREAS_ASIGNADAS = 5;
 const int SHM_PLANILLA_CANT_TESTER_ASIGNADOS = 6;
 const int SHM_PLANILLA_CANT_TAREAS_ASIGNADAS = 7;
 const int SHM_PLANILLA_GENERAL_POSICIONES = 8;
+const int SEM_ESPECIALES = 100;
 
 const int SHM_TESTERS_COMUNES_DISPONIBLES = 9;
 const int SHM_TESTERS_ESPECIALES_DISPONIBLES = 10;
 
-//Confirmado que si va
-const int MSGQUEUE_ENVIOS_DISP = 20;
+const int SEM_TABLA_TESTERS_COMUNES_DISPONIBLES = 11;
+const int SEM_TABLA_TESTERS_ESPECIALES_DISPONIBLES = 12;
+
+const int MSGQUEUE_ENVIO_DISP = 20;
 const int MSGQUEUE_RECEPCIONES_DISP = 21;
-const int MSGQUEUE_ENVIOS_TESTER = 22;
-const int MSGQUEUE_RECEPCIONES_TESTER = 23;
-const int MSGQUEUE_TESTERS_ESPECIALES = 24;
+const int MSGQUEUE_BROKER_RECEPTOR_DISPOSITIVOS = 22;
+const int MSGQUEUE_BROKER_EMISOR_DISPOSITIVOS = 23;
+const int MSGQUEUE_BROKER_RECEPTOR = 24;
+const int MSGQUEUE_BROKER_EMISOR = 25;
+const int MSGQUEUE_ENVIO_TESTER_COMUN = 26;
+const int MSGQUEUE_RECEPCIONES_TESTER_COMUN = 27;
+const int MSGQUEUE_ENVIO_TESTER_ESPECIAL = 28;
+const int MSGQUEUE_RECEPCIONES_TESTER_ESPECIAL = 29;
+const int MSGQUEUE_RECEPCIONES_EQUIPO_ESPECIAL = 30;
+const int MSGQUEUE_ENVIO_EQUIPO_ESPECIAL = 31;
+const int MSGQUEUE_DESPACHADOR = 32;
+const int MSGQUEUE_REINICIO_TESTEO = 33;
+const int MSGQUEUE_BROKER_REQUERIMIENTOS_DISPOSITIVOS = 34;
+const int MSGQUEUE_BROKER_REQUERIMIENTOS_TESTER_ESPECIAL = 35;
 
-//en duda
-const int MSGQUEUE_DESPACHADOR = 23;
-const int MSGQUEUE_DISPOSITIVOS_TESTERS_ESPECIALES = 24;
-const int MSGQUEUE_REINICIO_TESTEO = 25;
-const int MSGQUEUE_ULTIMO = MSGQUEUE_REINICIO_TESTEO;
-
-const int MTYPE_REQUERIMIENTO = 1;
-const int MTYPE_RESULTADO_ESPECIAL = 1;
+// mtypes desde el dispositivo
+const int MTYPE_REQUERIMIENTO_DISPOSITIVO = 1;
+const int MTYPE_RESULTADO_INICIAL = 2;
+const int MTYPE_RESULTADO_ESPECIAL = 3;
+// mtypes desde tester comun
+const int MTYPE_PROGRAMA_INICIAL = 1;
+const int MTYPE_REQUERIMIENTO_TESTER_ESPECIAL = 4;
+// mtypes desde tester especial
+const int MTYPE_TAREA_ESPECIAL = 1;
+// mtypes desde equipo especial
 const int MTYPE_ORDEN = 1;
+const int MTYPE_FIN_TEST_ESPECIAL = 5;
 
 const int ORDEN_APAGADO = 0;
 const int ORDEN_REINICIO = 1;
@@ -66,8 +86,8 @@ const int SEGUIR_TESTEANDO = 2;
 const int NO_CONTESTAR = 3;
 const int FIN_TEST_ESPECIAL = 4;
 
-const int MAXIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION = 4;
-const int MINIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION = 2;
+//const int MAXIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION = 4;
+//const int MINIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION = 2;
 // Archivos necesarios
 
 const std::string ipcFileName = "/tmp/pereira-ipcs";
@@ -75,21 +95,14 @@ const std::string ipcFileName = "/tmp/pereira-ipcs";
 const std::string logFileName = "log.txt";
 
 // Para los sockets
-const char PUERTO_SERVER_RECEPTOR_DISP[] = "9003";
-const char PUERTO_SERVER_EMISOR_DISP[] = "9002";
+const char PUERTO_SERVER_RECEPTOR_DISPOSITIVOS[] = "9000";
+const char PUERTO_SERVER_EMISOR_DISPOSITIVOS[] = "9001";
 
-const char PUERTO_SERVER_RECEPTOR_TESTERS[] = "9000";
-const char PUERTO_SERVER_EMISOR_TESTERS[] = "9001";
+const char PUERTO_SERVER_RECEPTOR[] = "9002";
+const char PUERTO_SERVER_EMISOR[] = "9003";
 
 const char UBICACION_SERVER[] = "localhost"; //Cambiar
 const char UBICACION_SERVER_IDENTIFICADOR[] = "localhost";
-
-/*
- *      BROKER COMMON
- */
-
-const int MAX_TESTERS_COMUNES = 100;
-const int MAX_TESTERS_ESPECIALES = 100;
 
 //Estructuras communes:
 typedef struct resultado{
@@ -97,18 +110,6 @@ typedef struct resultado{
 	int resultadosPendientes;
 	int resultadosGraves;
 }resultado_t;
-
-typedef struct TMessageAssignTE{
-	long mtype;
-	int idDispositivo;
-    int posicionDispositivo;
-} TMessageAssignTE;
-
-typedef struct resultado_test{
-    long mtype;
-    int idDispositivo;
-    int result;
-}resultado_test_t;
 
 typedef struct TContadorTesterEspecial {
     int cantTestersEspecialesTotal;
@@ -133,21 +134,30 @@ typedef struct TMessageReinicioTest {
     bool hayQueReiniciar;
 } TMessageReinicioTest;
 
+// Primer mensaje de protocolo que cliente receptor le envia al server emisor
+typedef struct TFirstMessage {
+    int identificador;
+} TFirstMessage;
+
 typedef struct message {
 	/* BEGIN HEADER */
 	long mtype;
-	long mtype_envio;
-	int finalizar_conexion;
-	int es_requerimiento;
-	int es_especial; //Solo por si acaso
-	/* END HEADER */
+	long mtypeMensaje;
 	int idDispositivo;
 	int tester;
-	int value; // Este parametro posee el valor del requerimiento, del programa y del resultado
-	int cant_testers;
+	int value; // Este parametro posee el valor del programa, del resultado y de la orden
 	int posicionDispositivo;
-	int especiales[MAX_TESTERS_ESPECIALES];
 } TMessageAtendedor;
+
+typedef struct TTablaIdTestersDisponibles {
+    bool disponibles[MAX_TESTER_COMUNES];
+    int ultimoTesterElegido;
+} TTablaIdTestersDisponibles;
+
+typedef struct TTablaIdTestersEspecialesDisponibles {
+    bool disponibles[MAX_TESTER_ESPECIALES];
+    int ultimoTesterElegido;
+} TTablaIdTestersEspecialesDisponibles;
 
 #endif	/* COMMON_H */
 

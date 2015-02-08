@@ -5,15 +5,29 @@ LDFLAGS=
 BINF=bin
 HEADER_DIR=.
 
-SHARED_SOURCES := $(shell find ./*/ -name '*.cpp')
+SHARED_SOURCES := $(shell find ./*/ -name '[^br|Br|identificador]*.cpp')
 SHARED_OBJ=$(SHARED_SOURCES:.cpp=.o)
 
-SHARED_SOURCES_C := $(shell find ./*/ -name '*.c')
+SHARED_SOURCES_C := $(shell find ./*/ -name '*clnt.c')
 SHARED_OBJ_C=$(SHARED_SOURCES_C:.c=.o)
+
+SHARED_SOURCES_SERVER_C := $(shell find ./identificador/ -name 'identificador_server.c')
+SHARED_SOURCES_SERVER_C_OBJ := $(SHARED_SOURCES_SERVER_C:.c=.o)
+
+SHARED_SOURCES_ID_SERVER := $(shell find './identificador/' -name '*.cpp')
+SHARED_OBJ_ID_SERVER := $(SHARED_SOURCES_ID_SERVER:.cpp=.o)
 
 INIT_SOURCES=iniciador.cpp
 INIT_OBJ=$(INIT_SOURCES:.cpp=.o)
 INIT_BIN=$(BINF)/iniciador
+
+INIT_DISP_SOURCES=iniciadorDisp.cpp
+INIT_DISP_OBJ=$(INIT_DISP_SOURCES:.cpp=.o)
+INIT_DISP_BIN=$(BINF)/iniciadorDisp
+
+FIN_DISP_SOURCES=terminadorDisp.cpp
+FIN_DISP_OBJ=$(FIN_DISP_SOURCES:.cpp=.o)
+FIN_DISP_BIN=$(BINF)/terminadorDisp
 
 DISP_SOURCES=Dispositivo.cpp
 DISP_OBJ=$(DISP_SOURCES:.cpp=.o)
@@ -39,34 +53,61 @@ FIN_SOURCES=terminador.cpp
 FIN_OBJ=$(FIN_SOURCES:.cpp=.o)
 FIN_BIN=$(BINF)/terminador
 
-all: testerComun testerEspecial tecnico dispositivo equipoEspecial iniciador terminador
+INIT_ID_SERVER_SOURCES=./identificador/iniciador_identificador_server.cpp
+INIT_ID_SERVER_OBJ=$(INIT_ID_SERVER_SOURCES:.cpp=.o)
+INIT_ID_SERVER_BIN=$(BINF)/iniciadorIdServer
 
-iniciador: $(INIT_OBJ) $(SHARED_OBJ)
-	$(CC) $(SHARED_OBJ) $(INIT_OBJ) -o $(INIT_BIN) -I$(HEADER_DIR)
+ID_SERVER_SOURCES=./identificador/identificador_svc.c
+ID_SERVER_OBJ=$(ID_SERVER_SOURCES:.c=.o)
+ID_SERVER_BIN=$(BINF)/idServer
 
-dispositivo: $(DISP_OBJ) $(SHARED_OBJ)
+FIN_ID_SERVER_SOURCES=./identificador/terminador_identificador_server.cpp
+FIN_ID_SERVER_OBJ=$(FIN_ID_SERVER_SOURCES:.cpp=.o)
+FIN_ID_SERVER_BIN=$(BINF)/terminadorIdServer
+
+all: testerComun testerEspecial tecnico dispositivo equipoEspecial iniciador terminador iniciadorDisp terminadorDisp iniciadorIdServer idServer terminadorIdServer
+
+iniciador: $(INIT_OBJ) $(SHARED_OBJ) $(SHARED_OBJ_C)
+	$(CC) $(SHARED_OBJ) $(INIT_OBJ) $(SHARED_OBJ_C) -o $(INIT_BIN) -I$(HEADER_DIR)
+
+dispositivo: $(DISP_OBJ) $(SHARED_OBJ) $(SHARED_OBJ_C)
 	$(CC) $(SHARED_OBJ) $(DISP_OBJ) $(SHARED_OBJ_C) -o $(DISP_BIN) -I$(HEADER_DIR)
 	
-testerComun: $(TESTERCOMUN_OBJ) $(SHARED_OBJ)
+testerComun: $(TESTERCOMUN_OBJ) $(SHARED_OBJ) $(SHARED_OBJ_C)
 	$(CC) $(TESTERCOMUN_OBJ) $(SHARED_OBJ) $(SHARED_OBJ_C) -o $(TESTERCOMUN_BIN) -I$(HEADER_DIR)
 	
-testerEspecial: $(TESTERESP_OBJ) $(SHARED_OBJ)
+testerEspecial: $(TESTERESP_OBJ) $(SHARED_OBJ) $(SHARED_OBJ_C)
 	$(CC) $(TESTERESP_OBJ) $(SHARED_OBJ) $(SHARED_OBJ_C) -o $(TESTERESP_BIN) -I$(HEADER_DIR)
 	
-equipoEspecial: $(EQUIPOESP_OBJ) $(SHARED_OBJ)
-	$(CC) $(EQUIPOESP_OBJ) $(SHARED_OBJ) -o $(EQUIPOESP_BIN) -I$(HEADER_DIR)
+equipoEspecial: $(EQUIPOESP_OBJ) $(SHARED_OBJ) $(SHARED_OBJ_C)
+	$(CC) $(EQUIPOESP_OBJ) $(SHARED_OBJ) $(SHARED_OBJ_C) -o $(EQUIPOESP_BIN) -I$(HEADER_DIR)
 
-tecnico: $(TECNICO_OBJ) $(SHARED_OBJ)
-	$(CC) $(SHARED_OBJ) $(TECNICO_OBJ) -o $(TECNICO_BIN) -I$(HEADER_DIR)
+tecnico: $(TECNICO_OBJ) $(SHARED_OBJ) $(SHARED_OBJ_C)
+	$(CC) $(SHARED_OBJ) $(TECNICO_OBJ) $(SHARED_OBJ_C) -o $(TECNICO_BIN) -I$(HEADER_DIR)
 
-terminador: $(FIN_OBJ) $(SHARED_OBJ)
-	$(CC) $(SHARED_OBJ) $(FIN_OBJ) -o $(FIN_BIN) -I$(HEADER_DIR)
+terminador: $(FIN_OBJ) $(SHARED_OBJ) $(SHARED_OBJ_C)
+	$(CC) $(SHARED_OBJ) $(FIN_OBJ) $(SHARED_OBJ_C) -o $(FIN_BIN) -I$(HEADER_DIR)
+
+iniciadorIdServer: $(INIT_ID_SERVER_OBJ) $(SHARED_OBJ) $(SHARED_OBJ_C)
+	$(CC) $(SHARED_OBJ) $(SHARED_OBJ_C) $(INIT_ID_SERVER_OBJ) -o $(INIT_ID_SERVER_BIN) -I$(HEADER_DIR)
+
+idServer: $(ID_SERVER_OBJ) $(SHARED_SOURCES_SERVER_C_OBJ)
+	$(CC) $(SHARED_SOURCES_SERVER_C_OBJ) $(ID_SERVER_OBJ) -o $(ID_SERVER_BIN) -I$(HEADER_DIR)
+
+terminadorIdServer: $(FIN_ID_SERVER_OBJ) $(SHARED_OBJ) $(SHARED_OBJ_C)
+	$(CC) $(SHARED_OBJ) $(SHARED_OBJ_C) $(FIN_ID_SERVER_OBJ) -o $(FIN_ID_SERVER_BIN) -I$(HEADER_DIR)
+
+iniciadorDisp: $(INIT_DISP_OBJ) $(SHARED_OBJ)
+	$(CC) $(SHARED_OBJ) $(INIT_DISP_OBJ) -o $(INIT_DISP_BIN) -I$(HEADER_DIR)
+
+terminadorDisp: $(FIN_DISP_OBJ) $(SHARED_OBJ)
+	$(CC) $(SHARED_OBJ) $(FIN_DISP_OBJ) -o $(FIN_DISP_BIN) -I$(HEADER_DIR)
 
 .cpp.o:
 	$(CC) $(CFLAGS) -I$(HEADER_DIR) -c $< -o $@
 	
 .c.o:
-	$(C) $(CFLAGS) -I$(HEADER_DIR) -c $< -o $@
+	$(CC) $(CFLAGS) -I$(HEADER_DIR) -c $< -o $@
 
 clean:
-	$(RM) $(INIT_OBJ) $(INIT_BIN) $(DISP_OBJ) $(DISP_BIN) $(TESTERCOMUN_OBJ) $(TESTERCOMUN_BIN) $(TESTERESP_OBJ) $(TESTERESP_BIN) $(EQUIPOESP_OBJ) $(EQUIPOESP_BIN) $(TECNICO_OBJ) $(TECNICO_BIN) $(FIN_BIN) $(FIN_OBJ) $(SHARED_OBJ) $(SHARED_OBJ_C)
+	$(RM) $(INIT_OBJ) $(INIT_BIN) $(DISP_OBJ) $(DISP_BIN) $(TESTERCOMUN_OBJ) $(TESTERCOMUN_BIN) $(TESTERESP_OBJ) $(TESTERESP_BIN) $(EQUIPOESP_OBJ) $(EQUIPOESP_BIN) $(TECNICO_OBJ) $(TECNICO_BIN) $(FIN_BIN) $(FIN_OBJ) $(INIT_ID_SERVER_BIN) $(INIT_ID_SERVER_OBJ) $(ID_SERVER_BIN) $(ID_SERVER_OBJ) $(FIN_ID_SERVER_BIN) $(FIN_ID_SERVER_OBJ) $(INIT_DISP_OBJ) $(INIT_DISP_BIN) $(FIN_DISP_OBJ) $(FIN_DISP_BIN) $(SHARED_OBJ) $(SHARED_OBJ_C) $(SHARED_SOURCES_SERVER_C_OBJ)
