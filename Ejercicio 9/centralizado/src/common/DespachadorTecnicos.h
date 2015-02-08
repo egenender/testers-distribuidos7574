@@ -5,16 +5,16 @@
  * Created on October 4, 2014, 10:30 PM
  */
 
-#ifndef DESPACHADORTECNICOS_H
-#define	DESPACHADORTECNICOS_H
+#pragma once
 
 #include <string>
 #include <cstring>
 #include <sys/msg.h>
 #include "errno.h"
-
 #include "common.h"
 #include "../logger/Logger.h"
+
+class Configuracion;
 
 class DespachadorTecnicos {
 private:
@@ -26,17 +26,15 @@ private:
         int idDispositivo;
     } TMessageDespachador;
     
+//Operaciones prohibidas
+    DespachadorTecnicos(const DespachadorTecnicos& orig);
+    DespachadorTecnicos& operator=(const DespachadorTecnicos& rv);
 public:
     
-    DespachadorTecnicos();
-    DespachadorTecnicos(const DespachadorTecnicos& orig);
-    virtual ~DespachadorTecnicos();
+    DespachadorTecnicos( const Configuracion& config );
+    ~DespachadorTecnicos();
     
     int recibirOrden();
 
     bool destruirComunicacion();
-
 };
-
-#endif	/* DESPACHADORTECNICOS_H */
-

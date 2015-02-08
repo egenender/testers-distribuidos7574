@@ -17,41 +17,52 @@
 #include "ipc/Semaphore.h"
 #include "common/Planilla.h"
 #include "common/PlanillaAsignacionEquipoEspecial.h"
+#include "common/Configuracion.h"
 
+using namespace Constantes::NombresDeParametros;
+using std::string;
 
 int main(int argc, char** argv) {
     
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
     Logger::error("Logger inicializado. Destruyendo IPCs...", __FILE__);
+    
+    Configuracion config;
+    if( !config.LeerDeArchivo() ){
+        Logger::error("Archivo de configuracion no encontrado", __FILE__);
+        return 1;
+    }
+    
+    const string ipcFileName = config.ObtenerParametroString( ARCHIVO_IPCS );
    
     //Semaforo y Planilla General
     key_t key = ftok(ipcFileName.c_str(), SHM_PLANILLA_GENERAL);
     int shmgeneralid = shmget(key, sizeof(resultado_t) * CANT_RESULTADOS,  0660);
     shmctl(shmgeneralid, IPC_RMID, NULL);
     
-    Planilla planillaGeneral;
+    Planilla planillaGeneral( config );
     if (!planillaGeneral.destruirMemoria()) {
         Logger::warn("No se pudo destruir la memoria compartida de la planilla general", __FILE__);
     }
     
-    PlanillaAsignacionEquipoEspecial planillaAsignacion;
+    PlanillaAsignacionEquipoEspecial planillaAsignacion( config );
     if (!planillaAsignacion.destruirComunicacion()) {
         Logger::warn("No se pudo destruir alguna memoria compartida de la planilla de asignacion", __FILE__);
     }
     
-    Semaphore semPlanillaGeneral(SEM_PLANILLA_GENERAL);
+    Semaphore semPlanillaGeneral( ipcFileName, config.ObtenerParametroEntero(SEM_PLANILLA_GENERAL));
     semPlanillaGeneral.getSem();
     semPlanillaGeneral.eliSem();
 		
-    Semaphore sem_cola_especiales(SEM_COLA_ESPECIALES);
+    Semaphore sem_cola_especiales( ipcFileName, config.ObtenerParametroEntero(SEM_COLA_ESPECIALES));
     sem_cola_especiales.getSem();
     sem_cola_especiales.eliSem();
     
-    Semaphore semPlanillaCantTestersAsignados(SEM_PLANILLA_CANT_TESTER_ASIGNADOS);
+    Semaphore semPlanillaCantTestersAsignados( ipcFileName, SEM_PLANILLA_CANT_TESTER_ASIGNADOS);
     semPlanillaCantTestersAsignados.getSem();
     semPlanillaCantTestersAsignados.eliSem();
     
-    Semaphore semPlanillaCantTareasAsignadas(SEM_PLANILLA_CANT_TAREAS_ASIGNADAS);
+    Semaphore semPlanillaCantTareasAsignadas( ipcFileName, SEM_PLANILLA_CANT_TAREAS_ASIGNADAS);
     semPlanillaCantTareasAsignadas.getSem();
     semPlanillaCantTareasAsignadas.eliSem();
 	

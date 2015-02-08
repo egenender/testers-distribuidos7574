@@ -5,8 +5,13 @@
  * Created on October 4, 2014, 8:04 PM
  */
 #include "AtendedorDispositivos.h"
+#include "Configuracion.h"
 
-AtendedorDispositivos::AtendedorDispositivos() { 
+using namespace Constantes::NombresDeParametros;
+using std::string;
+
+AtendedorDispositivos::AtendedorDispositivos( const Configuracion& config ) { 
+    const string ipcFileName = config.ObtenerParametroString( ARCHIVO_IPCS );
     key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_DISPOSITIVOS);
     this->cola_requerimiento = msgget(key, 0666);
     if(this->cola_requerimiento == -1) {

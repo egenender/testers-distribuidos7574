@@ -10,6 +10,8 @@
 #include "common.h"
 #include "../ipc/Semaphore.h"
 
+class Configuracion;
+
 class AtendedorTesters {
 private:
     int cola_requerimiento;
@@ -17,11 +19,12 @@ private:
     int cola_testers_especiales;
     int cola_tareas_especiales;
     Semaphore sem_cola_especiales;
-    
-public:
-    AtendedorTesters();
+//Operaciones prohibidas
     AtendedorTesters(const AtendedorTesters& orig);
-    virtual ~AtendedorTesters();
+    AtendedorTesters& operator=(const AtendedorTesters& rv);
+public:
+    AtendedorTesters( const Configuracion& config );
+    ~AtendedorTesters();
     
     int recibirRequerimiento();
     void enviarPrograma(int idDispositivo, int tester, int idPrograma);  // Tester -> Disp

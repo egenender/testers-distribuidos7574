@@ -23,8 +23,10 @@
 #include "common/Planilla.h"
 #include "common/PlanillaAsignacionEquipoEspecial.h"
 
-void createIPCObjects();
-void createSystemProcesses();
+using namespace Constantes::NombresDeParametros;
+
+void createIPCObjects( const Configuracion& config );
+void createSystemProcesses( const Configuracion& config );
 
 int main(int argc, char** argv) {
     
@@ -38,7 +40,7 @@ int main(int argc, char** argv) {
     }
 
     try {
-        createIPCObjects();
+        createIPCObjects( config );
     } catch(std::string err) {
         Logger::error("Error al crear los objetos activos...", __FILE__);
         Logger::destroy();
@@ -46,7 +48,7 @@ int main(int argc, char** argv) {
     }
     Logger::debug("Objetos IPC inicializados correctamente. Iniciando procesos...", __FILE__);
     
-    createSystemProcesses();
+    createSystemProcesses( config );
     Logger::debug("Procesos iniciados correctamente...", __FILE__);
     
     Logger::notice("Sistema inicializado correctamente...", __FILE__);
@@ -56,50 +58,57 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-void createIPCObjects() {
+void createIPCObjects( const Configuracion& config ) {
+
+    const std::string archivoIpcs = config.ObtenerParametroString(
+        Constantes::NombresDeParametros::ARCHIVO_IPCS.c_str() );
 
     // Creo el archivo que se usara para obtener las keys
-    std::fstream ipcFile(ipcFileName.c_str(), std::ios::out);
+    std::fstream ipcFile(archivoIpcs.c_str(), std::ios::out);
     if (ipcFile.bad() || ipcFile.fail()) {
-    std::string err = std::string("Error creando el archivo de IPCs. Error: ") + std::string(strerror(errno));
+    std::string err = std::string("Error creando el archivo de IPCs. Error: ")
+        + std::string(strerror(errno));
         Logger::error(err.c_str(), __FILE__);
         throw err;
     }
     ipcFile.close();
-       
+
     // Creo semaforo para la shmem de la planilla
-    Semaphore semPlanillaGeneral(SEM_PLANILLA_GENERAL);
+    Semaphore semPlanillaGeneral( config.ObtenerParametroString(ARCHIVO_IPCS),
+                                  config.ObtenerParametroEntero(SEM_PLANILLA_GENERAL) );
     semPlanillaGeneral.creaSem();
     semPlanillaGeneral.iniSem(1); // Inicializa el semaforo en 1
-    
-    Semaphore sem_cola_especiales(SEM_COLA_ESPECIALES);
+
+    Semaphore sem_cola_especiales( config.ObtenerParametroString(ARCHIVO_IPCS),
+                                   config.ObtenerParametroEntero(SEM_COLA_ESPECIALES) );
     sem_cola_especiales.creaSem();
     sem_cola_especiales.iniSem(1);
-    
-    Semaphore semPlanillaCantTestersAsignados(SEM_PLANILLA_CANT_TESTER_ASIGNADOS);
+
+    Semaphore semPlanillaCantTestersAsignados( config.ObtenerParametroString(ARCHIVO_IPCS),
+                                               SEM_PLANILLA_CANT_TESTER_ASIGNADOS);
     semPlanillaCantTestersAsignados.creaSem();
     semPlanillaCantTestersAsignados.iniSem(1);
-    
-    Semaphore semPlanillaCantTareasAsignadas(SEM_PLANILLA_CANT_TAREAS_ASIGNADAS);
+
+    Semaphore semPlanillaCantTareasAsignadas( config.ObtenerParametroString(ARCHIVO_IPCS),
+                                              SEM_PLANILLA_CANT_TAREAS_ASIGNADAS);
     semPlanillaCantTareasAsignadas.creaSem();
     semPlanillaCantTareasAsignadas.iniSem(1);
 
-    Planilla planillaGeneral;
+    Planilla planillaGeneral( config );
     planillaGeneral.initPlanilla();
-    PlanillaAsignacionEquipoEspecial planillaAsignacion;
+    PlanillaAsignacionEquipoEspecial planillaAsignacion( config );
     planillaAsignacion.initPlanilla();
-    
+
     //creacion de colas
     for (int q = MSGQUEUE_DISPOSITIVOS; q <= MSGQUEUE_ULTIMO; q++){
-        key_t key = ftok(ipcFileName.c_str(), q);
+        key_t key = ftok(archivoIpcs.c_str(), q);
         if (msgget(key, 0660 | IPC_CREAT | IPC_EXCL) == -1){
             std::cout << "No se pudo crear una cola: " << strerror(errno)<< std::endl;
         }
     }
-   
 }
 
-void createSystemProcesses() {
+void createSystemProcesses( const Configuracion& config ) {
    
     // Creo testers
     int idTester = ID_TESTER_START;

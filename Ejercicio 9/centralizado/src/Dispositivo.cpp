@@ -8,12 +8,12 @@
  * y esperando ordenes
  */
 
+#include "common/AtendedorDispositivos.h"
+#include "common/Configuracion.h"
+#include "common/common.h"
+#include "logger/Logger.h"
 #include <cstdlib>
 #include <sstream>
-
-#include "common/AtendedorDispositivos.h"
-#include "logger/Logger.h"
-#include "common/common.h"
 
 using namespace std;
 
@@ -28,8 +28,14 @@ int main(int argc, char** argv) {
     Logger::debug(ss.str().c_str(), __FILE__);
     ss.str("");
     
+    Configuracion config;
+    if( !config.LeerDeArchivo() ){
+        Logger::error("Archivo de configuracion no encontrado", __FILE__);
+        return 1;
+    }
+    
     // Comunicacion con el sistema de testeo
-    AtendedorDispositivos atendedor;
+    AtendedorDispositivos atendedor( config );
     // TODO: Log
     
     while(true) {

@@ -5,16 +5,16 @@
  * Created on November 17, 2014, 12:51 AM
  */
 
-#include <cstdlib>
-#include <sstream>
-#include <set>
-
 #include "common/common.h"
 #include "common/AtendedorEquipoEspecial.h"
 #include "common/PlanillaAsignacionEquipoEspecial.h"
 #include "common/PlanillaReinicioEquipoEspecial.h"
 #include "common/DespachadorTesters.h"
 #include "common/Planilla.h"
+#include "common/Configuracion.h"
+#include <cstdlib>
+#include <sstream>
+#include <set>
 
 /*
  * 
@@ -25,6 +25,12 @@ int main(int argc, char** argv) {
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
     Logger::debug("Se crea el equipo especial...", __FILE__);
     
+    Configuracion config;
+    if( !config.LeerDeArchivo() ){
+        Logger::error("Archivo de configuracion no encontrado", __FILE__);
+        return 1;
+    }
+    
     // Para almacenar que testers especiales testeaban a que dispositivo
     std::set<int> controlador[MAX_DISPOSITIVOS_EN_SISTEMA];
     // Para almacenar los resultados de los testeos especiales
@@ -33,15 +39,15 @@ int main(int argc, char** argv) {
         resultados[i] = 0;
     }
 
-    AtendedorEquipoEspecial atendedor;
+    AtendedorEquipoEspecial atendedor( config );
     
-    Planilla planillaGeneral;
+    Planilla planillaGeneral( config );
     
-    PlanillaAsignacionEquipoEspecial planillaAsignacion;
+    PlanillaAsignacionEquipoEspecial planillaAsignacion( config );
     
-    PlanillaReinicioEquipoEspecial planillaReinicio;
+    PlanillaReinicioEquipoEspecial planillaReinicio( config );
     
-    DespachadorTesters despachador;
+    DespachadorTesters despachador( config );
     
     Logger::notice("Se inicializan correctamente todos los elementos del Equipo Especial", __FILE__);
     

@@ -6,10 +6,16 @@
  */
 
 #include "Planilla.h"
+#include "Configuracion.h"
 #include "logger/Logger.h"
+#include "common.h"
 
-Planilla::Planilla() : semShMem(SEM_PLANILLA_GENERAL) {
-    
+using namespace Constantes::NombresDeParametros;
+using std::string;
+
+Planilla::Planilla( const Configuracion& config ) :
+        semShMem( config.ObtenerParametroString(ARCHIVO_IPCS), config.ObtenerParametroEntero(SEM_PLANILLA_GENERAL) ) {
+    const string ipcFileName = config.ObtenerParametroString( ARCHIVO_IPCS );
     this->shMemKey = ftok(ipcFileName.c_str(), SHM_PLANILLA_GENERAL);
     if(this->shMemKey == -1) {
         std::string err("Error al conseguir la key de la shmem de la planilla general. Error: " + std::string(strerror(errno)));
@@ -63,9 +69,6 @@ Planilla::Planilla() : semShMem(SEM_PLANILLA_GENERAL) {
 	throw err;
     }
 
-}
-
-Planilla::Planilla(const Planilla& orig) : semShMem(SEM_PLANILLA_GENERAL) {
 }
 
 void Planilla::initPlanilla() {

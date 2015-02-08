@@ -1,9 +1,16 @@
 #include "AtendedorTesters.h"
+#include "Configuracion.h"
 #include <cstdlib>
 #include <stdexcept>
 
-AtendedorTesters::AtendedorTesters(): sem_cola_especiales(SEM_COLA_ESPECIALES) {
+using namespace Constantes::NombresDeParametros;
+using std::string;
+
+AtendedorTesters::AtendedorTesters( const Configuracion& config ):
+        sem_cola_especiales( config.ObtenerParametroString(ARCHIVO_IPCS),
+                             config.ObtenerParametroEntero(SEM_COLA_ESPECIALES) ) {
     key_t key;
+    const string ipcFileName = config.ObtenerParametroString( ARCHIVO_IPCS );
     key = ftok(ipcFileName.c_str(), MSGQUEUE_DISPOSITIVOS);
     this->cola_requerimiento = msgget(key, 0666);
     if(this->cola_requerimiento == -1) {
@@ -36,9 +43,6 @@ AtendedorTesters::AtendedorTesters(): sem_cola_especiales(SEM_COLA_ESPECIALES) {
         Logger::error(err, __FILE__);
         exit(1);
     }
-}
-
-AtendedorTesters::AtendedorTesters(const AtendedorTesters& orig): sem_cola_especiales(SEM_COLA_ESPECIALES) {
 }
 
 AtendedorTesters::~AtendedorTesters() {

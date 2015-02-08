@@ -5,22 +5,22 @@
  * Created on November 17, 2014, 12:19 AM
  */
 
-#ifndef PLANILLAREINICIOTESTERESPECIAL_H
-#define	PLANILLAREINICIOTESTERESPECIAL_H
+#pragma once
 
 #include <cstdlib>
 #include <cstring>
 #include <sstream>
 #include <sys/msg.h>
 #include "errno.h"
-
 #include "common.h"
 #include "logger/Logger.h"
 
+class Configuracion;
+
 class PlanillaReinicioTesterEspecial {
 public:
-    PlanillaReinicioTesterEspecial();
-    virtual ~PlanillaReinicioTesterEspecial();
+    PlanillaReinicioTesterEspecial( const Configuracion& config );
+    ~PlanillaReinicioTesterEspecial();
     
     bool hayQueReiniciar(int idTester);
 private:
@@ -28,6 +28,3 @@ private:
     int msgqReinicioId;
 
 };
-
-#endif	/* PLANILLAREINICIOTESTERESPECIAL_H */
-

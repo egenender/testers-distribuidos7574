@@ -1,6 +1,7 @@
 #include "logger/Logger.h"
 #include "common/AtendedorTesters.h"
 #include "TestConfiguracion.h"
+#include "common/Configuracion.h"
 #include <cstdlib>
 
 int main(int argc, char** argv) {
@@ -11,7 +12,13 @@ int main(int argc, char** argv) {
     nombre << __FILE__ << " " << id;
     Logger::notice("Inicia el procesamiento, cargo atendedor" , nombre.str().c_str());
     
-    AtendedorTesters atendedor;
+    Configuracion config;
+    if( !config.LeerDeArchivo() ){
+        Logger::error("Archivo de configuracion no encontrado", __FILE__);
+        return 1;
+    }
+    
+    AtendedorTesters atendedor( config );
     
     while(true) {
         TMessageConfigTest reqTest = atendedor.recibirReqTestConfiguracion();

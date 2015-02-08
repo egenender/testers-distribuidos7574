@@ -12,8 +12,15 @@
 #include <string>
 #include <stddef.h>
 
-// Constantes del sistema
+namespace Constantes{
+    namespace NombresDeParametros{
+        const std::string ARCHIVO_IPCS = "ArchivoIpcs";
+        const std::string SEM_PLANILLA_GENERAL = "SemPlanillaGeneral";
+        const std::string SEM_COLA_ESPECIALES = "SemColaEspeciales";
+    }
+}
 
+// Constantes del sistema
 const int CANT_DISPOSITIVOS = 101;
 const int CANT_TESTERS_COMUNES = 5;
 const int CANT_TESTERS_ESPECIALES = 15;
@@ -27,9 +34,7 @@ const int MINIMOS_LANZADOS = 5;
 const int MAXIMOS_LANZADOS = 20;
 
 // IDs de los IPC
-const int SEM_PLANILLA_GENERAL = 1;
 const int SHM_PLANILLA_GENERAL = 2;
-const int SEM_COLA_ESPECIALES = 3;
 const int SEM_PLANILLA_CANT_TESTER_ASIGNADOS = 4;
 const int SEM_PLANILLA_CANT_TAREAS_ASIGNADAS = 5;
 const int SHM_PLANILLA_CANT_TESTER_ASIGNADOS = 6;
@@ -64,10 +69,7 @@ const int MAXIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION = 4;
 const int MINIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION = 2;
 // Archivos necesarios
 
-const std::string ipcFileName = "/tmp/pereira-ipcs";
-
 const std::string logFileName = "log.txt";
-
 
 //Estructuras communes:
 typedef struct resultado_t{
