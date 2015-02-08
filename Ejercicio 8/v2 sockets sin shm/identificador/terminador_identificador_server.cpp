@@ -8,7 +8,6 @@
 #include <sys/sem.h>
 
 #include "common/common.h"
-#include "commonIdentificador.h"
 #include "logger/Logger.h"
 
 int main(int argc, char* argv[]) {
@@ -19,5 +18,5 @@ int main(int argc, char* argv[]) {
 	int semId = semget(key, 1, IPC_CREAT | 0666);
     semctl(semId, 1, IPC_RMID);
     
-    remove(ipcFileName.c_str());
+//    remove(ipcFileName.c_str());
 }

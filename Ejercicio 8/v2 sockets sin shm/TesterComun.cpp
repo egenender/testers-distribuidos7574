@@ -26,6 +26,12 @@ int main(int argc, char** argv) {
     // El primer parametro es el id del tester
     int id = getIdTesterComun();
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
+    
+    if (id == 0) {
+        Logger::error("No hay lugar en el sistema para este tester comun", __FILE__);
+        exit(1);
+    }
+    
 	std::stringstream nombre;
 	nombre << __FILE__ << " " << id;
 	Logger::notice("Inicia el procesamiento, cargo el atendedor, despachador y Planilla" , nombre.str().c_str());

@@ -1,6 +1,5 @@
 #include "identificador.h"
 #include <stdbool.h>
-#include "commonIdentificador.h"
 #include "common/common.h"
 #include <errno.h>
 #include <unistd.h>
@@ -8,6 +7,9 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/sem.h>
 
 int semId = 0; // Representa el ID del semaforo que lockea las variables globales de identificador
 int semIdTablaTestersComunes = 0;
@@ -107,8 +109,8 @@ getidtesterespecial_1_svc(void *argp, struct svc_req *rqstp)
             exito = true;
             
             // Levanto el semaforo por si hay un requerimiento especial esperando
-            key_t key = ftok(ipcFileName.c_str(),SEM_ESPECIALES + result);
-            int semEspecial = semget(key,1,0660);
+            key_t key = ftok(ipcFileName.c_str(), SEM_ESPECIALES + result);
+            int semEspecial = semget(key, 1, 0660);
             struct sembuf oper;
             oper.sem_num = 0;
             oper.sem_op = 1;
@@ -220,7 +222,7 @@ void* attachMemory(int shmemId) {
 int crearSem(int semProjId) {
 
 	key_t key = ftok(ipcFileName.c_str(), semProjId);
-	return (semget(key, 1, IPC_CREAT | 0666));
+	return (semget(key, 1, 0666));
 }
 
 void p(int semaphoreId, int semNum) {
@@ -237,3 +239,4 @@ void v(int semaphoreId, int semNum) {
     oper.sem_flg = 0;
     semop(semaphoreId, &oper, 1);
 }
+

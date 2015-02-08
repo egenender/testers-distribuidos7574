@@ -8,19 +8,19 @@ HEADER_DIR=..
 SHARED_SOURCES := $(shell find ../*/ -name '[Logger|Lock]*.cpp')
 SHARED_OBJ=$(SHARED_SOURCES:.cpp=.o)
 
-TCP_SERVER_EMISOR_SOURCES=./tcpserver_emisor.cpp
+TCP_SERVER_EMISOR_SOURCES=tcpserver_emisor.cpp
 TCP_SERVER_EMISOR_OBJ=$(TCP_SERVER_EMISOR_SOURCES:.cpp=.o)
 TCP_SERVER_EMISOR_BIN=$(BINF)/tcpserver_emisor
 
-TCP_SERVER_RECEPTOR_SOURCES=./tcpserver_emisor.cpp
+TCP_SERVER_RECEPTOR_SOURCES=tcpserver_receptor.cpp
 TCP_SERVER_RECEPTOR_OBJ=$(TCP_SERVER_RECEPTOR_SOURCES:.cpp=.o)
 TCP_SERVER_RECEPTOR_BIN=$(BINF)/tcpserver_receptor
 
-TCP_CLIENT_EMISOR_SOURCES=./tcpserver_emisor.cpp
+TCP_CLIENT_EMISOR_SOURCES=tcpclient_emisor.cpp
 TCP_CLIENT_EMISOR_OBJ=$(TCP_CLIENT_EMISOR_SOURCES:.cpp=.o)
 TCP_CLIENT_EMISOR_BIN=$(BINF)/tcpclient_emisor
 
-TCP_CLIENT_RECEPTOR_SOURCES=./tcpserver_emisor.cpp
+TCP_CLIENT_RECEPTOR_SOURCES=tcpclient_receptor.cpp
 TCP_CLIENT_RECEPTOR_OBJ=$(TCP_CLIENT_RECEPTOR_SOURCES:.cpp=.o)
 TCP_CLIENT_RECEPTOR_BIN=$(BINF)/tcpclient_receptor
 

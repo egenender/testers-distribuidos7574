@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <iostream>
+#include <fstream>
 #include <sys/msg.h>
 #include <sys/shm.h>
 #include <cstdlib>
@@ -10,6 +11,9 @@
 #include "../logger/Logger.h"
 
 void crearIpc() {
+    
+    std::fstream ipcFile(ipcFileName.c_str(), std::ios_base::out);
+    ipcFile.close();
 
 	key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_RECEPTOR_DISPOSITIVOS);
 	msgget(key, IPC_CREAT | 0660);
@@ -19,8 +23,8 @@ void crearIpc() {
 	
 	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_RECEPTOR);
 	msgget(key, IPC_CREAT | 0660);
-	
-	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_RECEPTOR);
+    
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_EMISOR);
 	msgget(key, IPC_CREAT | 0660);
     
     key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_REQUERIMIENTOS_DISPOSITIVOS);
@@ -30,7 +34,7 @@ void crearIpc() {
 	msgget(key, IPC_CREAT | 0660);
 
 	key = ftok(ipcFileName.c_str(), SHM_TESTERS_COMUNES_DISPONIBLES);
-    int shmTablaTestCom = shmget(key, sizeof(TTablaIdTestersDisponibles) ,IPC_CREAT | 0660);
+    int shmTablaTestCom = shmget(key, sizeof(TTablaIdTestersDisponibles), IPC_CREAT | 0660);
     TTablaIdTestersDisponibles* tablaTesterComun = (TTablaIdTestersDisponibles*) shmat(shmTablaTestCom, NULL, 0);
     tablaTesterComun->ultimoTesterElegido = 0;
 
@@ -48,7 +52,7 @@ void crearIpc() {
     semTablaEsp.iniSem(1);
 
     for (int i = 0; i < MAX_TESTER_ESPECIALES; i++) {
-		Semaphore semEspecial(i + ID_TESTER_ESP_START);
+		Semaphore semEspecial(i + SEM_ESPECIALES);
 		semEspecial.creaSem();
 		semEspecial.iniSem(0);
 	}
@@ -58,35 +62,35 @@ void crearModulosBroker() {
 
 	Logger::notice("Creo el servidor rpc", __FILE__);
 	if (fork() == 0){
-		execlp("./bin/idServer", "idServer", (char*)0);
+		execlp("./idServer", "idServer", (char*)0);
 		Logger::notice ("Mensaje luego de execlp de idServer. Algo salio mal!", __FILE__);
         exit(1);
 	}
-	
+
 	Logger::notice("Creo el modulo de broker pasamanos emisor", __FILE__);
 	if (fork() == 0){
-		execlp("./bin/brokerPasamanosEmisor", "brokerPasamanosEmisor", (char*)0);
+		execlp("./brokerPasamanosEmisor", "brokerPasamanosEmisor", (char*)0);
 		Logger::notice ("Mensaje luego de execlp de brokerPasamanosEmisor. Algo salio mal!", __FILE__);
         exit(1);
 	}
-    
+
     Logger::notice("Creo el modulo de broker pasamanos receptor", __FILE__);
 	if (fork() == 0){
-		execlp("./bin/brokerPasamanosReceptor", "brokerPasamanosReceptor", (char*)0);
+		execlp("./brokerPasamanosReceptor", "brokerPasamanosReceptor", (char*)0);
 		Logger::notice ("Mensaje luego de execlp de brokerPasamanosReceptor. Algo salio mal!", __FILE__);
         exit(1);
 	}
-	
+
 	Logger::notice("Creo el modulo de broker de nuevos requerimientos de dispositivos", __FILE__);
 	if (fork() == 0){
-		execlp("./broker/brokerRequerimientosDisp", "brokerRequerimientosDisp", (char*)0);
+		execlp("./brokerRequerimientosDisp", "brokerRequerimientosDisp", (char*)0);
         Logger::notice ("Mensaje luego de execlp de brokerRequerimientosDisp. Algo salio mal!", __FILE__);
         exit(1);
 	}
-	
+
 	Logger::notice("Creo el modulo de broker de requerimientos para testers especiales", __FILE__);
 	if (fork() == 0){
-		execlp("./broker/brokerReqTestEsp", "brokerReqTestEsp", (char*)0);
+		execlp("./brokerReqTestEsp", "brokerReqTestEsp", (char*)0);
         Logger::notice ("Mensaje luego de execlp de brokerReqTestEsp. Algo salio mal!", __FILE__);
         exit(1);
 	}
@@ -108,12 +112,11 @@ void crearServers(){
 	Logger::notice("Creo el servidor emisor de mensajes a testers comunes", __FILE__);
 	sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_EMISOR);
 	if (fork() == 0){
-		execlp("./tcp/tcpserver_emisor", "tcpserver_emisor", PUERTO_SERVER_EMISOR , paramMsgQueue,(char*)0);
+		execlp("./tcp/tcpserver_emisor", "tcpserver_emisor", PUERTO_SERVER_EMISOR , paramMsgQueue, (char*)0);
         exit(1);
 	}
-	
+
 	// Comunicacion con dispositivos
-	
 	sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_RECEPTOR_DISPOSITIVOS);
     
     Logger::notice("Creo el servidor receptor de mensajes de dispositivos", __FILE__);

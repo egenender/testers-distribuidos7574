@@ -22,7 +22,7 @@ public:
     AtendedorEquipoEspecial();
     virtual ~AtendedorEquipoEspecial();
     
-    TResultadoEspecial recibirResultadoEspecial();
+    TMessageAtendedor recibirResultadoEspecial();
     void enviarFinTestEspecialADispositivo(int idDispositivo);
     void enviarOrden(int idDispositivo, int orden);
 private:

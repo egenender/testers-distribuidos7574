@@ -53,14 +53,14 @@ int main(int argc, char** argv) {
         // Cuando detecta que terminan todos los testeos para un dispositivo
         // se fija si deben reiniciarse, y sino, envia la ordena a los tecnicos
         
-        TResultadoEspecial resultado = atendedor.recibirResultadoEspecial();
-        ss << "Recibi el resultado especial " << resultado.resultado << " del dispositivo " << resultado.idDispositivo << " de la tarea especial enviada por tester " << resultado.idTester;
+        TMessageAtendedor resultado = atendedor.recibirResultadoEspecial();
+        ss << "Recibi el resultado especial " << resultado.value << " del dispositivo " << resultado.idDispositivo << " de la tarea especial enviada por tester " << resultado.tester;
         Logger::debug(ss.str(), __FILE__);
         ss.str("");
         // Almaceno resultado del testeo especial terminado
-        resultados[resultado.posicionDispositivo] += resultado.resultado;
+        resultados[resultado.posicionDispositivo] += resultado.value;
         // Almaceno el tester que testea al dispositivo
-        controlador[resultado.posicionDispositivo].insert(resultado.idTester);
+        controlador[resultado.posicionDispositivo].insert(resultado.tester);
         // Registro que termino una tarea especial
         planillaAsignacion.registrarTareaEspecialFinalizada(resultado.posicionDispositivo);
         Logger::debug("Se registra la tarea especial terminada con exito", __FILE__);
