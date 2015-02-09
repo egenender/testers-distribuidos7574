@@ -25,6 +25,9 @@ private:
     int idTester;
     
     Semaphore sem_cola_especiales;
+    
+    // For killing communication processes
+    pid_t pidEmisor, pidReceptor;
 
 public:
     AtendedorTestersEspeciales(int idTester);

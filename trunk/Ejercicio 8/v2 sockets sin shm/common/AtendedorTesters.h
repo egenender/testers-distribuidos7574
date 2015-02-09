@@ -15,11 +15,15 @@ class AtendedorTesters {
 private:
 
     int colaEnvios;
-    int colaRecepciones;
+    int colaRecepcionesGeneral;
+    int colaRecepcionesRequerimientos;
     
     int idTester;
     
     Semaphore semColaEspeciales;
+    
+    // For killing communication processes
+    pid_t pidEmisor, pidReceptor;
     
 public:
     AtendedorTesters(int idTester);

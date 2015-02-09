@@ -77,6 +77,7 @@ int main(int argc, char *argv[]) {
                     std::stringstream ss;
                     ss << "Error recibiendo mensaje de la cola para el cliente " << idCliente <<". Errno: " << strerror(errno);
                     Logger::error(ss.str(), __FILE__);
+                    close(clientFd);
                     exit(1);
                 }
                 //Si el mensaje era de finalizacion, entonces 'mato' al receptor y termino mi labor

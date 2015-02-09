@@ -40,8 +40,8 @@ AtendedorTestersEspeciales::AtendedorTestersEspeciales(int idTester) : idTester(
     sprintf(paramId, "%d", this->idTester);
     char paramCola[10];
     sprintf(paramCola, "%d", MSGQUEUE_RECEPCIONES_TESTER_ESPECIAL);
-    pid_t receptor = fork();
-    if (receptor == 0){
+    this->pidReceptor = fork();
+    if (this->pidReceptor == 0){
 		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",
 				UBICACION_SERVER,
 				PUERTO_SERVER_EMISOR,
@@ -61,9 +61,12 @@ AtendedorTestersEspeciales::AtendedorTestersEspeciales(int idTester) : idTester(
 	}
 }
 
-//AtendedorTestersEspeciales::AtendedorTestersEspeciales(const AtendedorTestersEspeciales& orig) {}
-
 AtendedorTestersEspeciales::~AtendedorTestersEspeciales() {
+    char pidToKill[10];
+    sprintf(pidToKill, "%d", this->pidReceptor);
+    if (fork() == 0) {
+        execlp("/bin/kill", "kill", pidToKill, (char*) 0);
+    }
 }
 
 TMessageAtendedor AtendedorTestersEspeciales::recibirRequerimientoEspecial(int idEsp) {

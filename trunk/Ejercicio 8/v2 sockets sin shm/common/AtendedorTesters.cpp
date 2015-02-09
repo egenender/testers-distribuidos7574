@@ -10,10 +10,18 @@ AtendedorTesters::AtendedorTesters(int idTester): idTester(idTester), semColaEsp
         exit(1);
     }
     
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_RECEPCIONES_TESTER_COMUN);
-    this->colaRecepciones = msgget(key, 0666);
-    if(this->colaRecepciones == -1) {
-        std::string err = std::string("Error al obtener la cola de recepcion del tester. Errno: ") + std::string(strerror(errno));
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_RECEPCIONES_NO_REQ_TESTER_COMUN);
+    this->colaRecepcionesGeneral = msgget(key, 0666);
+    if(this->colaRecepcionesGeneral == -1) {
+        std::string err = std::string("Error al obtener la cola de recepcion de mensajes generales del tester. Errno: ") + std::string(strerror(errno));
+        Logger::error(err, __FILE__);
+        exit(1);
+    }
+    
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_REQUERIMIENTOS_TESTER_COMUN);
+    this->colaRecepcionesRequerimientos = msgget(key, 0666);
+    if(this->colaRecepcionesRequerimientos == -1) {
+        std::string err = std::string("Error al obtener la cola de recepcion de requerimientos del tester. Errno: ") + std::string(strerror(errno));
         Logger::error(err, __FILE__);
         exit(1);
     }
@@ -24,8 +32,8 @@ AtendedorTesters::AtendedorTesters(int idTester): idTester(idTester), semColaEsp
     sprintf(paramId, "%d", this->idTester);
     char paramCola[10];
     sprintf(paramCola, "%d", MSGQUEUE_RECEPCIONES_TESTER_COMUN);
-    pid_t receptor = fork();
-    if (receptor == 0){
+    this->pidReceptor = fork();
+    if (this->pidReceptor == 0){
 		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",
 				UBICACION_SERVER,
 				PUERTO_SERVER_EMISOR,
@@ -42,6 +50,12 @@ AtendedorTesters::AtendedorTesters(int idTester): idTester(idTester), semColaEsp
 				paramId, paramCola,(char*)0);
         exit(1);
 	}
+    
+    if (fork() == 0){
+		execlp("./distribuidorMsgTester", "distribuidorMsgTester", (char*) 0);
+        Logger::error("No se ejecutó correctamente el distribuidor de mensajes", __FILE__);
+        exit(1);
+	}
 
 }
 
@@ -49,12 +63,17 @@ AtendedorTesters::AtendedorTesters(const AtendedorTesters& orig): semColaEspecia
 }
 
 AtendedorTesters::~AtendedorTesters() {
+    char pidToKill[10];
+    sprintf(pidToKill, "%d", this->pidReceptor);
+    if (fork() == 0) {
+        execlp("/bin/kill", "kill", pidToKill, (char*) 0);
+    }
 }
 
 int AtendedorTesters::recibirRequerimiento() {
 
     TMessageAtendedor msg;
-    int ret = msgrcv(this->colaRecepciones, &msg, sizeof(TMessageAtendedor) - sizeof(long), this->idTester, 0);
+    int ret = msgrcv(this->colaRecepcionesRequerimientos, &msg, sizeof(TMessageAtendedor) - sizeof(long), this->idTester, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir requerimiento del atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
@@ -83,7 +102,7 @@ void AtendedorTesters::enviarPrograma(int idDispositivo, int tester, int idProgr
 
 TMessageAtendedor AtendedorTesters::recibirResultado(int idTester) {
 	TMessageAtendedor rsp;
-    int ret = msgrcv(this->colaRecepciones, &rsp, sizeof(TMessageAtendedor) - sizeof(long), idTester, 0);
+    int ret = msgrcv(this->colaRecepcionesGeneral, &rsp, sizeof(TMessageAtendedor) - sizeof(long), idTester, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir resultado del atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
@@ -133,5 +152,5 @@ void AtendedorTesters::enviarAEspeciales(bool cuales[], int idDispositivo, int p
 }
 
 bool AtendedorTesters::destruirComunicacion() {
-    return (msgctl(this->colaRecepciones, IPC_RMID, (struct msqid_ds*)0) != -1 && msgctl(this->colaRecepciones, IPC_RMID, (struct msqid_ds*)0) != -1);
+    return (msgctl(this->colaEnvios, IPC_RMID, (struct msqid_ds*)0) != -1 && msgctl(this->colaRecepcionesGeneral, IPC_RMID, (struct msqid_ds*)0) != -1 && msgctl(this->colaRecepcionesRequerimientos, IPC_RMID, (struct msqid_ds*)0) != -1);
 }

@@ -60,13 +60,6 @@ void crearIpc() {
 
 void crearModulosBroker() {
 
-	Logger::notice("Creo el servidor rpc", __FILE__);
-	if (fork() == 0){
-		execlp("./idServer", "idServer", (char*)0);
-		Logger::notice ("Mensaje luego de execlp de idServer. Algo salio mal!", __FILE__);
-        exit(1);
-	}
-
 	Logger::notice("Creo el modulo de broker pasamanos emisor", __FILE__);
 	if (fork() == 0){
 		execlp("./brokerPasamanosEmisor", "brokerPasamanosEmisor", (char*)0);
@@ -118,7 +111,6 @@ void crearServers(){
 
 	// Comunicacion con dispositivos
 	sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_RECEPTOR_DISPOSITIVOS);
-    
     Logger::notice("Creo el servidor receptor de mensajes de dispositivos", __FILE__);
 	if (fork() == 0){
 		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_SERVER_RECEPTOR_DISPOSITIVOS , paramMsgQueue, (char*)0);
@@ -131,37 +123,6 @@ void crearServers(){
 		execlp("./tcp/tcpserver_emisor", "tcpserver_emisor", PUERTO_SERVER_EMISOR_DISPOSITIVOS , paramMsgQueue,(char*)0);
         exit(1);
 	}
-    /*
-    // Comunicacion con tester especiales
-    sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_RECEPTOR_TESTERS_ESPECIALES);
-    Logger::notice("Creo el servidor receptor de mensajes de testers especiales", __FILE__);
-	if (fork() == 0){
-		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_SERVER_RECEPTOR_TESTERS_ESPECIALES , paramMsgQueue, (char*)0);
-        exit(1);
-	}
-	
-	Logger::notice("Creo el servidor emisor de mensajes a testers", __FILE__);
-	sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_EMISOR_TESTERS_ESPECIALES);
-	if (fork() == 0){
-		execlp("./tcp/tcpserver_emisor", "tcpserver_emisor", PUERTO_SERVER_EMISOR_TESTERS_ESPECIALES , paramMsgQueue,(char*)0);
-        exit(1);
-	}
-    
-    // Comunicacion con equipo especial
-    sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_RECEPTOR_EQUIPO_ESPECIAL);
-    Logger::notice("Creo el servidor receptor de mensajes de testers especiales", __FILE__);
-	if (fork() == 0){
-		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_SERVER_RECEPTOR_EQUIPO_ESPECIAL , paramMsgQueue, (char*)0);
-        exit(1);
-	}
-	
-	Logger::notice("Creo el servidor emisor de mensajes a testers", __FILE__);
-	sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_EMISOR_EQUIPO_ESPECIAL);
-	if (fork() == 0){
-		execlp("./tcp/tcpserver_emisor", "tcpserver_emisor", PUERTO_SERVER_EMISOR_EQUIPO_ESPECIAL , paramMsgQueue,(char*)0);
-        exit(1);
-	}
-*/
 }
 
 int main (int argc, char* argv[]) {

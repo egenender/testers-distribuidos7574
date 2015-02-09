@@ -84,6 +84,7 @@ int main(int argc, char *argv[]) {
                 int ok = msgsnd(msgQueue, buffer, sizeof(TMessageAtendedor) - sizeof(long), 0);
                 if (ok == -1) {
                     Logger::error("Error enviando a la cola de mensajes", __FILE__);
+                    close(clientFd);
                     exit(1);
                 }
             }

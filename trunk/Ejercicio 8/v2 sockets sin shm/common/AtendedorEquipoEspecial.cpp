@@ -38,8 +38,8 @@ AtendedorEquipoEspecial::AtendedorEquipoEspecial() {
 	sprintf(paramIdCola, "%d", MSGQUEUE_RECEPCIONES_EQUIPO_ESPECIAL);
     sprintf(paramId, "%d", ID_EQUIPO_ESPECIAL);
 
-	pid_t receptor = fork();
-	if (receptor == 0) {
+	this->pidReceptor = fork();
+	if (this->pidReceptor == 0) {
 		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",
 				UBICACION_SERVER, PUERTO_SERVER_EMISOR,
                 paramId, paramIdCola,
@@ -61,6 +61,11 @@ AtendedorEquipoEspecial::AtendedorEquipoEspecial() {
 }
 
 AtendedorEquipoEspecial::~AtendedorEquipoEspecial() {
+    char pidToKill[10];
+    sprintf(pidToKill, "%d", this->pidReceptor);
+    if (fork() == 0) {
+        execlp("/bin/kill", "kill", pidToKill, (char*) 0);
+    }
 }
 
 TMessageAtendedor AtendedorEquipoEspecial::recibirResultadoEspecial() {

@@ -26,6 +26,9 @@ private:
     int idTester;
     int posicionDispositivo;
     int idDispositivo;
+    
+    // For killing communication processes
+    pid_t pidEmisor, pidReceptor;
 
 public:
 
