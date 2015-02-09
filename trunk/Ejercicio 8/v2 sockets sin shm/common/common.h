@@ -17,13 +17,13 @@
 
 const int CANT_DISPOSITIVOS = 100;
 const int CANT_TESTERS_COMUNES = 5;
+const int MAX_TESTER_COMUNES = 30;
 const int CANT_TESTERS_ESPECIALES = 15;
+const int MAX_TESTER_ESPECIALES = 30;
 const int MAX_DISPOSITIVOS_EN_SISTEMA = 100;
 const int MAX_TAREAS_ESPECIALES = 10;
 
 static int ID_DISPOSITIVO = 5;
-const int MAX_TESTER_COMUNES = 30;
-const int MAX_TESTER_ESPECIALES = 30;
 const int ID_TESTER_COMUN_START = ID_DISPOSITIVO + CANT_DISPOSITIVOS + 1;
 const int ID_TESTER_ESP_START = ID_TESTER_COMUN_START + MAX_TESTER_COMUNES + 1;
 const int ID_EQUIPO_ESPECIAL = ID_TESTER_ESP_START + MAX_TESTER_ESPECIALES + 1;
@@ -46,6 +46,8 @@ const int SEM_TABLA_TESTERS_ESPECIALES_DISPONIBLES = 12;
 
 const int SEM_IDENTIFICADOR = 13;
 
+const int SEM_ESPECIALES_ASIGNACION = 14;
+
 const int MSGQUEUE_ENVIO_DISP = 20;
 const int MSGQUEUE_RECEPCIONES_DISP = 21;
 const int MSGQUEUE_BROKER_RECEPTOR_DISPOSITIVOS = 22;
@@ -67,6 +69,7 @@ const int MSGQUEUE_BROKER_REQUERIMIENTOS_TESTER_ESPECIAL = 37;
 
 const int LAST_ID_IPC = MSGQUEUE_BROKER_REQUERIMIENTOS_TESTER_ESPECIAL + 1;
 const int SEM_ESPECIALES = LAST_ID_IPC; // Semaforos para testers especiales (creciente)
+const int SEM_ESPECIALES_ASIGNACION_ESPEC = SEM_ESPECIALES + MAX_TESTER_ESPECIALES + 1;
 
 // mtypes desde el dispositivo
 const int MTYPE_REQUERIMIENTO_DISPOSITIVO = 1;
@@ -93,7 +96,8 @@ const int SEGUIR_TESTEANDO = 2;
 const int NO_CONTESTAR = 3;
 const int FIN_TEST_ESPECIAL = 4;
 
-//const int MAXIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION = 4;
+const int MAX_TESTERS_ESPECIALES_PARA_ASIGNAR = 4;
+const int TESTER_ESPECIAL_NO_ASIGNADO = 0;
 //const int MINIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION = 2;
 // Archivos necesarios
 
@@ -139,13 +143,14 @@ typedef struct TFirstMessage {
 } TFirstMessage;
 
 typedef struct message {
-	/* BEGIN HEADER */
-	long mtype;
-	long mtypeMensaje;
-	int idDispositivo;
-	int tester;
-	int value; // Este parametro posee el valor del programa, del resultado y de la orden
-	int posicionDispositivo;
+    long mtype;
+    long mtypeMensaje;
+    int idDispositivo;
+    int tester;
+    int value; // Este parametro posee el valor del programa, del resultado y de la orden
+    int posicionDispositivo;
+    int idTestersEspeciales[MAX_TESTERS_ESPECIALES_PARA_ASIGNAR];
+    int cantTestersEspecialesAsignados;
 } TMessageAtendedor;
 
 typedef struct TTablaIdTestersDisponibles {
