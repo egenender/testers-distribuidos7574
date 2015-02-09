@@ -30,8 +30,8 @@ AtendedorDispositivos::AtendedorDispositivos(int idDispositivo) : idDispositivo(
 	sprintf(paramIdCola, "%d", MSGQUEUE_RECEPCIONES_DISP);
     sprintf(paramId, "%d", this->idDispositivo);
 
-	pid_t receptor = fork();
-	if (receptor == 0) {
+	this->pidReceptor = fork();
+	if (this->pidReceptor == 0) {
 		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",
 				UBICACION_SERVER,
 				PUERTO_SERVER_EMISOR_DISPOSITIVOS,
@@ -43,7 +43,8 @@ AtendedorDispositivos::AtendedorDispositivos(int idDispositivo) : idDispositivo(
 
 	sprintf(paramIdCola, "%d", MSGQUEUE_ENVIO_DISP);
 
-	if (fork() == 0) {
+    this->pidEmisor = fork();
+	if (this->pidEmisor == 0) {
 		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",
 				UBICACION_SERVER,
 				PUERTO_SERVER_RECEPTOR_DISPOSITIVOS,
@@ -59,6 +60,11 @@ AtendedorDispositivos::AtendedorDispositivos(const AtendedorDispositivos& orig) 
 }
 
 AtendedorDispositivos::~AtendedorDispositivos() {
+    char pidToKill[10];
+    sprintf(pidToKill, "%d", this->pidReceptor);
+    if (fork() == 0) {
+        execlp("/bin/kill", "kill", pidToKill, (char*) 0);
+    }
 }
     
 void AtendedorDispositivos::enviarRequerimiento(int idDispositivo) {

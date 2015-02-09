@@ -28,6 +28,8 @@ public:
 private:
     int colaRecepciones, /*colaReinicioTestEsp, */colaEnvios;
 
+    // For killing communication processes
+    pid_t pidEmisor, pidReceptor;
 };
 
 #endif	/* ATENDEDOREQUIPOESPECIAL_H */

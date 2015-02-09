@@ -48,6 +48,7 @@ int main(int argc, char *argv[]){
         int okRead = msgrcv(msgQueue, buffer, size - sizeof(long), id, 0);
         if (okRead == -1) {
             Logger::error("Error de lectura de la cola de mensajes", __FILE__);
+            close(fd);
             exit(1);
         }
         //Si era un mensaje de finalizacion, envio info para matar al receptor

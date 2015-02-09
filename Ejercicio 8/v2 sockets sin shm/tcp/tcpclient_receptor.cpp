@@ -58,6 +58,7 @@ int main(int argc, char *argv[]) {
         //Mando el mensaje por la cola que me indique el server
         int ok = msgsnd(msgQueue, buffer, size - sizeof(long), 0);
         if (ok == -1) {
+            close(fd);
             exit(1);
         }
     }
