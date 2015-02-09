@@ -28,6 +28,7 @@ int main(int argc, char** argv) {
     }
     
     int cantACrear = atoi(argv[1]);
+    if (cantACrear > MAX_DISPOSITIVOS_EN_SISTEMA) exit(1);
     
     // Creo IPCs
     std::fstream ipcFile(ipcFileName.c_str(), std::ios_base::out);
