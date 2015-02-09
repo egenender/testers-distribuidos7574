@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
         // Si llega un requerimiento lo envio a la cola de requerimientos, sino a la cola general
         if(msg.mtypeMensaje == MTYPE_REQUERIMIENTO_DISPOSITIVO) {
             std::stringstream log;
-            log << "Distribuyo mensaje de requerimiento del dispositivo " << msg.idDispositivo << " para el tester " << msg.tester;
+            log << "Distribuyo mensaje de requerimiento del dispositivo " << msg.idDispositivo << " para el tester " << msg.mtype;
             Logger::notice(log.str(), __FILE__); log.str(""); log.clear();
             
             int okSend = msgsnd(msgQueueReq, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
             }
         } else {
             std::stringstream log;
-            log << "Distribuyo mensaje general del dispositivo " << msg.idDispositivo << " para el tester " << msg.tester;
+            log << "Distribuyo mensaje general del dispositivo " << msg.idDispositivo << " para el tester " << msg.mtype;
             Logger::notice(log.str(), __FILE__); log.str(""); log.clear();
             
             int okSend = msgsnd(msgQueueGral, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);

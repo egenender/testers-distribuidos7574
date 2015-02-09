@@ -129,25 +129,30 @@ void AtendedorTesters::enviarOrden(int idDispositivo, int orden) {
 
 void AtendedorTesters::enviarAEspeciales(bool cuales[], int idDispositivo, int posicionDispositivo){
 	semColaEspeciales.p();
-	for (int i = 0; i < CANT_TESTERS_ESPECIALES; i++){
-            if (!cuales[i]) continue;
-            TMessageAtendedor msg;
-            msg.mtype = this->idTester;
-            msg.mtypeMensaje = MTYPE_REQUERIMIENTO_TESTER_ESPECIAL;
-            msg.idDispositivo = idDispositivo;
-            msg.tester = i + ID_TESTER_ESP_START;
-            msg.posicionDispositivo = posicionDispositivo;
-            std::stringstream ss;
-            ss << "Se envian requerimiento especial a tester especial " << msg.tester;
-            Logger::debug(ss.str(), __FILE__);
-            ss.str("");
-            int ret = msgsnd(this->colaEnvios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
-            if(ret == -1) {
-                std::string error = std::string("Error al asignar dispositivos a testers especiales. Error: ") + std::string(strerror(errno));
-                Logger::error(error.c_str(), __FILE__);
-                exit(0);
-            }
-	}
+    int j = 0;
+    TMessageAtendedor msg;
+    msg.mtype = this->idTester;
+    msg.mtypeMensaje = MTYPE_REQUERIMIENTO_TESTER_ESPECIAL;
+    msg.idDispositivo = idDispositivo;
+    msg.tester = this->idTester;
+    msg.posicionDispositivo = posicionDispositivo;
+    msg.cantTestersEspecialesAsignados = 0;
+	for (int i = 0; (i < CANT_TESTERS_ESPECIALES) && (j < MAX_TESTERS_ESPECIALES_PARA_ASIGNAR); i++) {
+        if (!cuales[i]) continue;
+        msg.idTestersEspeciales[j] = i + ID_TESTER_ESP_START; j++;
+        msg.cantTestersEspecialesAsignados++;
+    }
+
+    std::stringstream ss;
+    ss << "Se envian requerimientos especiales a testers especiales: " << msg.idTestersEspeciales[0] << ", " << msg.idTestersEspeciales[1] << ", " << msg.idTestersEspeciales[2] << ", " << msg.idTestersEspeciales[3];
+    Logger::debug(ss.str(), __FILE__);
+    ss.str("");
+    int ret = msgsnd(this->colaEnvios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    if(ret == -1) {
+        std::string error = std::string("Error al asignar dispositivo a testers especiales. Error: ") + std::string(strerror(errno));
+        Logger::error(error.c_str(), __FILE__);
+        exit(0);
+    }
 	semColaEspeciales.v();
 }
 

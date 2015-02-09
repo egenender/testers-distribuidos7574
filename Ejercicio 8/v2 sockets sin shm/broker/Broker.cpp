@@ -44,17 +44,25 @@ void crearIpc() {
     tablaTesterEsp->ultimoTesterElegido = 0;
 
     Semaphore semTablaCom(SEM_TABLA_TESTERS_COMUNES_DISPONIBLES);
-    semTablaCom.getSem();
+    semTablaCom.creaSem();
     semTablaCom.iniSem(1);
     
     Semaphore semTablaEsp(SEM_TABLA_TESTERS_ESPECIALES_DISPONIBLES);
-    semTablaEsp.getSem();
+    semTablaEsp.creaSem();
     semTablaEsp.iniSem(1);
+    
+    Semaphore semEspecialAsignacion(SEM_ESPECIALES_ASIGNACION);
+    semEspecialAsignacion.creaSem();
+    semEspecialAsignacion.iniSem(1);
 
     for (int i = 0; i < MAX_TESTER_ESPECIALES; i++) {
 		Semaphore semEspecial(i + SEM_ESPECIALES);
 		semEspecial.creaSem();
 		semEspecial.iniSem(0);
+        
+        Semaphore semEspecialAsignacionEspec(i + SEM_ESPECIALES_ASIGNACION_ESPEC);
+        semEspecialAsignacionEspec.creaSem();
+        semEspecialAsignacionEspec.iniSem(1);
 	}
 }
 

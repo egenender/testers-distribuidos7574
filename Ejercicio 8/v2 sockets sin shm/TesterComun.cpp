@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
             Logger::notice(string("Le envio al tecnico la notificacion ") + ss.str(), nombre.str().c_str());
             despachador.enviarOrden(idDispositivo);
             planilla.eliminarDispositivo(posicionDispositivo);
-        } else if (resul.value == SEGUIR_TESTEANDO){
+        } else if (resul.value == SEGUIR_TESTEANDO) {
             int cant_testers = 0;
             bool los_testers[CANT_TESTERS_ESPECIALES];
             while (cant_testers < 2 || cant_testers > 4){ //requerimientos

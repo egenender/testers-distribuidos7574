@@ -64,10 +64,18 @@ int main(int argc, char** argv) {
     semTablaEsp.getSem();
     semTablaEsp.eliSem();
     
+    Semaphore semEspecialAsignacion(SEM_ESPECIALES_ASIGNACION);
+    semEspecialAsignacion.getSem();
+    semEspecialAsignacion.eliSem();
+    
     for (int i = 0; i < MAX_TESTER_ESPECIALES; i++) {
 		Semaphore semEspecial(i + SEM_ESPECIALES);
 		semEspecial.getSem();
 		semEspecial.eliSem();
+        
+        Semaphore semEspecialAsignacionEspec(i + SEM_ESPECIALES_ASIGNACION_ESPEC);
+        semEspecialAsignacionEspec.getSem();
+        semEspecialAsignacionEspec.eliSem();
 	}
     
     //Destruccion de colas
