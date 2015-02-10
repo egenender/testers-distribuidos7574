@@ -15,40 +15,39 @@
 namespace Constantes{
     namespace NombresDeParametros{
         const std::string ARCHIVO_IPCS = "ArchivoIpcs";
+        const std::string CANT_DISPOSITIVOS = "CantDispositivos";
+        const std::string CANT_TESTERS_COMUNES = "CantTestersComunes";
+        const std::string CANT_TESTERS_ESPECIALES = "CantTestersEspeciales";
+        const std::string ID_DISPOSITIVO_START = "IdDispositivoStart";
+        const std::string ID_TESTER_ESPECIAL_START = "IdTesterEspecialStart";
+        const std::string ID_TESTER_START = "IdTesterStart";
+        const std::string MAX_DISPOSITIVOS_EN_SISTEMA = "MaxDispositivosEnSistema";
+        const std::string MAX_TAREAS_ESPECIALES = "MaxTareasEspeciales";
+        const std::string MAXIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION = "MaxTestersEspecialesPorEspecificacion";
+        const std::string MINIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION = "MinTestersEspecialesPorEspecificacion";
+        const std::string MAXIMOS_LANZADOS = "MaximosLanzados";
+        const std::string MINIMOS_LANZADOS = "MinimosLanzados";
+        const std::string MSGQUEUE_DESPACHADOR = "MsgQueueDespachador";
+        const std::string MSGQUEUE_DISPOSITIVOS = "MsgQueueDispositivos";
+        const std::string MSGQUEUE_DISPOSITIVOS_TESTERS_ESPECIALES = "MsgQueueDispositivosTestersEspeciales";
+        const std::string MSGQUEUE_REINICIO_TESTEO = "MsgQueueReinicioTesteo";
+        const std::string MSGQUEUE_TESTERS = "MsgQueueTesters";
+        const std::string MSGQUEUE_TESTERS_ESPECIALES = "MsgQueueTestersEspeciales";
+        const std::string SEM_PLANILLA_CANT_TAREAS_ASIGNADAS = "SemPlanillaCantTareasAsignadas";
+        const std::string SEM_PLANILLA_CANT_TESTER_ASIGNADOS = "SemPlanillaCantTesterAsignados";
         const std::string SEM_PLANILLA_GENERAL = "SemPlanillaGeneral";
         const std::string SEM_COLA_ESPECIALES = "SemColaEspeciales";
+        const std::string SHM_PLANILLA_CANT_TAREAS_ASIGNADAS = "ShmPlanillaCantTareasAsignadas";
+        const std::string SHM_PLANILLA_CANT_TESTER_ASIGNADOS = "ShmPlanillaCantTesterAsignados";
+        const std::string SHM_PLANILLA_GENERAL = "ShmPlanillaGeneral";
+        const std::string SHM_PLANILLA_GENERAL_POSICIONES = "ShmPlanillaGeneralPosiciones";
+        // Alias / equivalencias
+        const std::string CANT_RESULTADOS = MAX_DISPOSITIVOS_EN_SISTEMA;
+        const std::string MSGQUEUE_ULTIMO = MSGQUEUE_REINICIO_TESTEO;
     }
 }
 
-// Constantes del sistema
-const int CANT_DISPOSITIVOS = 101;
-const int CANT_TESTERS_COMUNES = 5;
-const int CANT_TESTERS_ESPECIALES = 15;
-const int ID_DISPOSITIVO_START = 50;
-const int ID_TESTER_START = 1;
-const int ID_TESTER_ESPECIAL_START = ID_TESTER_START + CANT_TESTERS_COMUNES;
-const int MAX_DISPOSITIVOS_EN_SISTEMA = 100;
-const int MAX_TAREAS_ESPECIALES = 10;
-
-const int MINIMOS_LANZADOS = 5;
-const int MAXIMOS_LANZADOS = 20;
-
 // IDs de los IPC
-const int SHM_PLANILLA_GENERAL = 2;
-const int SEM_PLANILLA_CANT_TESTER_ASIGNADOS = 4;
-const int SEM_PLANILLA_CANT_TAREAS_ASIGNADAS = 5;
-const int SHM_PLANILLA_CANT_TESTER_ASIGNADOS = 6;
-const int SHM_PLANILLA_CANT_TAREAS_ASIGNADAS = 7;
-const int SHM_PLANILLA_GENERAL_POSICIONES = 8;
-
-const int MSGQUEUE_DISPOSITIVOS = 20;
-const int MSGQUEUE_TESTERS = 21;
-const int MSGQUEUE_TESTERS_ESPECIALES = 22;
-const int MSGQUEUE_DESPACHADOR = 23;
-const int MSGQUEUE_DISPOSITIVOS_TESTERS_ESPECIALES = 24;
-const int MSGQUEUE_REINICIO_TESTEO = 25;
-const int MSGQUEUE_ULTIMO = MSGQUEUE_REINICIO_TESTEO;
-
 const int MTYPE_REQUERIMIENTO = 1;
 const int MTYPE_RESULTADO_ESPECIAL = 1;
 const int MTYPE_ORDEN = 1;
@@ -58,17 +57,13 @@ const int ORDEN_REINICIO = 1;
 const int ORDEN_SEGUIR_TESTEANDO = 2;
 const int SIN_LUGAR = -1;
 
-const int CANT_RESULTADOS = MAX_DISPOSITIVOS_EN_SISTEMA;
 const int RESULTADO_GRAVE = 0;
 const int RESULTADO_NO_GRAVE = 1;
 const int SEGUIR_TESTEANDO = 2;
 const int NO_CONTESTAR = 3;
 const int FIN_TEST_ESPECIAL = 4;
 
-const int MAXIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION = 4;
-const int MINIMO_TESTERS_ESPECIALES_POR_ESPECIFICACION = 2;
 // Archivos necesarios
-
 const std::string logFileName = "log.txt";
 
 //Estructuras communes:

@@ -13,7 +13,8 @@ using std::string;
 
 AtendedorEquipoEspecial::AtendedorEquipoEspecial( const Configuracion& config ) {
     const string ipcFileName = config.ObtenerParametroString( ARCHIVO_IPCS );
-    key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_DISPOSITIVOS_TESTERS_ESPECIALES);
+    key_t key = ftok( ipcFileName.c_str(),
+                      config.ObtenerParametroEntero(MSGQUEUE_DISPOSITIVOS_TESTERS_ESPECIALES) );
     this->colaDispTesterEsp = msgget(key, 0666);
     if(this->colaDispTesterEsp == -1) {
         std::string err = std::string("Error al obtener la cola para enviar fin de tareas especiales a los dispositivos. Errno: ") + std::string(strerror(errno));
@@ -21,7 +22,8 @@ AtendedorEquipoEspecial::AtendedorEquipoEspecial( const Configuracion& config ) 
         exit(1);
     }
     
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_REINICIO_TESTEO);
+    key = ftok( ipcFileName.c_str(),
+                config.ObtenerParametroEntero(MSGQUEUE_REINICIO_TESTEO) );
     this->colaReinicioTestEsp = msgget(key, 0666);
     if(this->colaReinicioTestEsp == -1) {
         std::string err = std::string("Error al obtener la cola para avisar reinicio de testeo especial. Errno: ") + std::string(strerror(errno));
@@ -29,7 +31,8 @@ AtendedorEquipoEspecial::AtendedorEquipoEspecial( const Configuracion& config ) 
         exit(1);
     }
     
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_DISPOSITIVOS);
+    key = ftok( ipcFileName.c_str(),
+                config.ObtenerParametroEntero(MSGQUEUE_DISPOSITIVOS) );
     this->colaOrdenDispositivos = msgget(key, 0666);
     if(this->colaOrdenDispositivos == -1) {
         std::string err = std::string("Error al obtener la cola para enviar orden de apagado o reinicio a dispositivos. Errno: ") + std::string(strerror(errno));

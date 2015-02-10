@@ -14,9 +14,11 @@ using namespace Constantes::NombresDeParametros;
 using std::string;
 
 Planilla::Planilla( const Configuracion& config ) :
+        m_MaxDispositivosEnSistema( config.ObtenerParametroEntero(MAX_DISPOSITIVOS_EN_SISTEMA) ),
         semShMem( config.ObtenerParametroString(ARCHIVO_IPCS), config.ObtenerParametroEntero(SEM_PLANILLA_GENERAL) ) {
     const string ipcFileName = config.ObtenerParametroString( ARCHIVO_IPCS );
-    this->shMemKey = ftok(ipcFileName.c_str(), SHM_PLANILLA_GENERAL);
+    this->shMemKey = ftok( ipcFileName.c_str(),
+                           config.ObtenerParametroEntero(SHM_PLANILLA_GENERAL) );
     if(this->shMemKey == -1) {
         std::string err("Error al conseguir la key de la shmem de la planilla general. Error: " + std::string(strerror(errno)));
         Logger::error(err.c_str(), __FILE__);
@@ -39,13 +41,14 @@ Planilla::Planilla( const Configuracion& config ) :
         throw err;
     }
     
-    this->shMemPosicionesKey = ftok(ipcFileName.c_str(), SHM_PLANILLA_GENERAL_POSICIONES);
+    this->shMemPosicionesKey = ftok( ipcFileName.c_str(),
+                                     config.ObtenerParametroEntero(SHM_PLANILLA_GENERAL_POSICIONES) );
     if(this->shMemKey == -1) {
         std::string err("Error al conseguir la key de la shmem de posiciones de la planilla general. Error: " + std::string(strerror(errno)));
         Logger::error(err.c_str(), __FILE__);
         throw err;
     }
-    this->shMemPosicionesId = shmget(this->shMemPosicionesKey, sizeof(bool) * MAX_DISPOSITIVOS_EN_SISTEMA, IPC_CREAT | 0660);
+    this->shMemPosicionesId = shmget(this->shMemPosicionesKey, sizeof(bool) * config.ObtenerParametroEntero(MAX_DISPOSITIVOS_EN_SISTEMA), IPC_CREAT | 0660);
     if(this->shMemId == -1) {
         std::string err("Error al conseguir la memoria compartida de posiciones de la planilla general. Error: " + std::string(strerror(errno)));
         Logger::error(err.c_str(), __FILE__);
@@ -64,9 +67,9 @@ Planilla::Planilla( const Configuracion& config ) :
 
     // Por ultimo, luego de creado, obtengo el semaforo correspondiente
     if (!this->semShMem.getSem()) {
-	std::string err = std::string("Error al obtener el semaforo de la planilla general. Error: ") + std::string(strerror(errno));
-	Logger::error(err, __FILE__);
-	throw err;
+        std::string err = std::string("Error al obtener el semaforo de la planilla general. Error: ") + std::string(strerror(errno));
+        Logger::error(err, __FILE__);
+        throw err;
     }
 
 }
@@ -74,7 +77,7 @@ Planilla::Planilla( const Configuracion& config ) :
 void Planilla::initPlanilla() {
     this->semShMem.p();
     *(this->cantDispositivosSiendoTesteados) = 0;
-    for (int i = 0; i < MAX_DISPOSITIVOS_EN_SISTEMA; i++)
+    for (int i = 0; i < m_MaxDispositivosEnSistema; i++)
         this->idsPrivadosDispositivos[i] = false;
     this->semShMem.v();
 }
@@ -87,11 +90,11 @@ int Planilla::hayLugar() {
     // Si hay lugar, registro el dispositivo
     int result = SIN_LUGAR;
     this->semShMem.p();
-    if(*this->cantDispositivosSiendoTesteados >= MAX_DISPOSITIVOS_EN_SISTEMA) {
+    if(*this->cantDispositivosSiendoTesteados >= m_MaxDispositivosEnSistema) {
     } else {
         *this->cantDispositivosSiendoTesteados += 1;
         int i = 0;
-        for (i = 0; (i < MAX_DISPOSITIVOS_EN_SISTEMA) && (this->idsPrivadosDispositivos[i]); i++);
+        for (i = 0; (i < m_MaxDispositivosEnSistema) && (this->idsPrivadosDispositivos[i]); i++);
         this->idsPrivadosDispositivos[i] = true;
         result = i;
     }

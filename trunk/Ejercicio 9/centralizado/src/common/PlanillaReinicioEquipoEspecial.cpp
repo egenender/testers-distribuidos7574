@@ -14,11 +14,12 @@ using std::string;
 
 PlanillaReinicioEquipoEspecial::PlanillaReinicioEquipoEspecial( const Configuracion& config ) {
     const string ipcFileName = config.ObtenerParametroString( ARCHIVO_IPCS );
-    this->msgqReinicioKey = ftok(ipcFileName.c_str(), MSGQUEUE_REINICIO_TESTEO);
+    this->msgqReinicioKey = ftok( ipcFileName.c_str(),
+                                  config.ObtenerParametroEntero(MSGQUEUE_REINICIO_TESTEO) );
     this->msgqReinicioId = msgget(this->msgqReinicioKey, 0666);
     if(this->msgqReinicioId == -1) {
-	std::string err = std::string("Error al obtener la cola de reinicio de tests de la planilla de reinicio del equipo especial. Errno: ") + std::string(strerror(errno));
-	Logger::error(err, __FILE__);
+    std::string err = std::string("Error al obtener la cola de reinicio de tests de la planilla de reinicio del equipo especial. Errno: ") + std::string(strerror(errno));
+    Logger::error(err, __FILE__);
         exit(1);
     }
 }

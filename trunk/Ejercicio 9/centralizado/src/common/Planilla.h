@@ -19,6 +19,7 @@ class Configuracion;
 
 class Planilla {
 private:
+    const int m_MaxDispositivosEnSistema;
     Semaphore semShMem;
     key_t shMemKey, shMemPosicionesKey;
     int shMemId, shMemPosicionesId;

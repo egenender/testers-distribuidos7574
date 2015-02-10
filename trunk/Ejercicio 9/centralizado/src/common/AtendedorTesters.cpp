@@ -7,11 +7,14 @@ using namespace Constantes::NombresDeParametros;
 using std::string;
 
 AtendedorTesters::AtendedorTesters( const Configuracion& config ):
+        m_CantTestersEspeciales( config.ObtenerParametroEntero(CANT_TESTERS_ESPECIALES) ),
+        m_IdPrimerTesterEspecial( config.ObtenerParametroEntero(ID_TESTER_ESPECIAL_START) ),
         sem_cola_especiales( config.ObtenerParametroString(ARCHIVO_IPCS),
-                             config.ObtenerParametroEntero(SEM_COLA_ESPECIALES) ) {
+                             config.ObtenerParametroEntero(SEM_COLA_ESPECIALES) ){
     key_t key;
     const string ipcFileName = config.ObtenerParametroString( ARCHIVO_IPCS );
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_DISPOSITIVOS);
+    key = ftok( ipcFileName.c_str(),
+                config.ObtenerParametroEntero(MSGQUEUE_DISPOSITIVOS) );
     this->cola_requerimiento = msgget(key, 0666);
     if(this->cola_requerimiento == -1) {
         std::string err = std::string("Error al obtener la cola de requerimientos del atendedor de testers. Errno: ") + std::string(strerror(errno));
@@ -19,7 +22,8 @@ AtendedorTesters::AtendedorTesters( const Configuracion& config ):
         exit(1);
     }
     
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_TESTERS);
+    key = ftok( ipcFileName.c_str(),
+                config.ObtenerParametroEntero(MSGQUEUE_TESTERS) );
     this->cola_recibos_tests = msgget(key, 0666);
     if(this->cola_recibos_tests == -1) {
         std::string err = std::string("Error al obtener la cola de lectura de resultados del atendedor de testers. Errno: ") + std::string(strerror(errno));
@@ -27,7 +31,8 @@ AtendedorTesters::AtendedorTesters( const Configuracion& config ):
         exit(1);
     }
     
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_TESTERS_ESPECIALES);
+    key = ftok( ipcFileName.c_str(),
+                config.ObtenerParametroEntero(MSGQUEUE_TESTERS_ESPECIALES) );
     this->cola_testers_especiales = msgget(key, 0666);
     if(this->cola_testers_especiales == -1) {
         std::string err = std::string("Error al obtener la cola para enviar a los testers especiales. Errno: ") + std::string(strerror(errno));
@@ -36,7 +41,8 @@ AtendedorTesters::AtendedorTesters( const Configuracion& config ):
     }
     sem_cola_especiales.getSem();
     
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_DISPOSITIVOS_TESTERS_ESPECIALES);
+    key = ftok( ipcFileName.c_str(),
+                config.ObtenerParametroEntero(MSGQUEUE_DISPOSITIVOS_TESTERS_ESPECIALES) );
     this->cola_tareas_especiales = msgget(key, 0666);
     if(this->cola_tareas_especiales == -1) {
         std::string err = std::string("Error al obtener la cola para enviar tareas especiales a los dispositivos. Errno: ") + std::string(strerror(errno));
@@ -122,12 +128,12 @@ void AtendedorTesters::enviarTareaEspecial(int idDispositivo, int idTester, int 
     }
 }
 
-void AtendedorTesters::enviarAEspeciales(bool cuales[], int idDispositivo, int posicionDispositivo){
-	sem_cola_especiales.p();
-	for (int i = 0; i < CANT_TESTERS_ESPECIALES; i++){
+void AtendedorTesters::enviarAEspeciales(std::vector<bool> cuales, int idDispositivo, int posicionDispositivo){
+    sem_cola_especiales.p();
+    for (int i = 0; i < m_CantTestersEspeciales; i++){
             if (!cuales[i]) continue;
             TMessageAssignTE msg;
-            msg.mtype = i + ID_TESTER_ESPECIAL_START;
+            msg.mtype = i + m_IdPrimerTesterEspecial;
             msg.idDispositivo = idDispositivo;
             msg.posicionDispositivo = posicionDispositivo;
             std::stringstream ss;
@@ -140,8 +146,8 @@ void AtendedorTesters::enviarAEspeciales(bool cuales[], int idDispositivo, int p
                 Logger::error(error.c_str(), __FILE__);
                 exit(0);
             }
-	}
-	sem_cola_especiales.v();
+    }
+    sem_cola_especiales.v();
 }
 
 TMessageAssignTE AtendedorTesters::recibirRequerimientoEspecial(int idEsp) {

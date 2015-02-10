@@ -7,6 +7,12 @@
  * Crea todos los IPCs a usar e inicia todos los procesos correspondientes a la aplicacion
  */
 
+#include "common/common.h"
+#include "ipc/Semaphore.h"
+#include "logger/Logger.h"
+#include "common/Configuracion.h"
+#include "common/Planilla.h"
+#include "common/PlanillaAsignacionEquipoEspecial.h"
 #include <cstdlib>
 #include <fstream>
 #include <unistd.h>
@@ -15,13 +21,6 @@
 #include <sys/shm.h>
 #include <sys/msg.h>
 #include <string.h>
-
-#include "common/common.h"
-#include "ipc/Semaphore.h"
-#include "logger/Logger.h"
-#include "common/Configuracion.h"
-#include "common/Planilla.h"
-#include "common/PlanillaAsignacionEquipoEspecial.h"
 
 using namespace Constantes::NombresDeParametros;
 
@@ -111,8 +110,9 @@ void createIPCObjects( const Configuracion& config ) {
 void createSystemProcesses( const Configuracion& config ) {
    
     // Creo testers
-    int idTester = ID_TESTER_START;
-    for(int i = 0; i < CANT_TESTERS_COMUNES; i++, idTester++) {
+    const int cantTestersComunes = config.ObtenerParametroEntero( CANT_TESTERS_COMUNES );
+    int idTester = config.ObtenerParametroEntero( ID_TESTER_START );
+    for(int i = 0; i < cantTestersComunes; i++, idTester++) {
         char param[3];
         sprintf(param, "%d", idTester);
         usleep(10);
@@ -153,32 +153,31 @@ void createSystemProcesses( const Configuracion& config ) {
         Logger::error("Error al ejecutar el programa tecnico", __FILE__);
         exit(1);
     }
-		
-	//Creo dispositivos
+
+    //Creo dispositivos
     sleep(1);
     int idDispositivo = ID_DISPOSITIVO_START;
     int cantidad_lanzada = 0;
-    while (cantidad_lanzada < CANT_DISPOSITIVOS){
-		int cantidad_a_lanzar = MINIMOS_LANZADOS + rand() % (MAXIMOS_LANZADOS - MINIMOS_LANZADOS + 1);
-		if (cantidad_a_lanzar + cantidad_lanzada > CANT_DISPOSITIVOS)
-			cantidad_a_lanzar = CANT_DISPOSITIVOS - cantidad_lanzada;
-		for (int i = 0; i < cantidad_a_lanzar; i++){
-			char param[3];
-			sprintf(param, "%d", idDispositivo);
-			idDispositivo++;
-			pid_t newPid = fork();
-			if(newPid == 0) {
-				// Inicio el programa correspondiente
-				execlp("./dispositivo", "dispositivo", param, (char*)0);
-				Logger::error("Error al ejecutar el programa dispositivo de ID" + idDispositivo, __FILE__);
-				exit(1);
-			}
-		}
-		cantidad_lanzada += cantidad_a_lanzar;
-		usleep(1000);
-	}
-
-	
+    const int cantDispositivos = config.ObtenerParametroEntero(CANT_DISPOSITIVOS);
+    while (cantidad_lanzada < cantDispositivos){
+        int cantidad_a_lanzar = MINIMOS_LANZADOS + rand() % (MAXIMOS_LANZADOS - MINIMOS_LANZADOS + 1);
+        if (cantidad_a_lanzar + cantidad_lanzada > cantDispositivos)
+            cantidad_a_lanzar = cantDispositivos - cantidad_lanzada;
+        for (int i = 0; i < cantidad_a_lanzar; i++){
+            char param[3];
+            sprintf(param, "%d", idDispositivo);
+            idDispositivo++;
+            pid_t newPid = fork();
+            if(newPid == 0) {
+                // Inicio el programa correspondiente
+                execlp("./dispositivo", "dispositivo", param, (char*)0);
+                Logger::error("Error al ejecutar el programa dispositivo de ID" + idDispositivo, __FILE__);
+                exit(1);
+            }
+        }
+        cantidad_lanzada += cantidad_a_lanzar;
+        usleep(1000);
+    }
     Logger::debug("Programas iniciados correctamente...", __FILE__);
     
 }

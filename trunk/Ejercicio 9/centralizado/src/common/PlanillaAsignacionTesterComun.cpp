@@ -12,16 +12,20 @@ using namespace Constantes::NombresDeParametros;
 using std::string;
 
 PlanillaAsignacionTesterComun::PlanillaAsignacionTesterComun( const Configuracion& config ) :
-        semShmemCantTesters( config.ObtenerParametroString(ARCHIVO_IPCS), SEM_PLANILLA_CANT_TESTER_ASIGNADOS),
-        semShmemCantTareas( config.ObtenerParametroString(ARCHIVO_IPCS), SEM_PLANILLA_CANT_TAREAS_ASIGNADAS) {
+        semShmemCantTesters( config.ObtenerParametroString(ARCHIVO_IPCS),
+                             config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TESTER_ASIGNADOS) ),
+        semShmemCantTareas( config.ObtenerParametroString(ARCHIVO_IPCS),
+                            config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TAREAS_ASIGNADAS)) {
     const string ipcFileName = config.ObtenerParametroString(ARCHIVO_IPCS);
-    this->shmemCantTestersKey = ftok( ipcFileName.c_str(), SHM_PLANILLA_CANT_TESTER_ASIGNADOS);
+    this->shmemCantTestersKey = ftok( ipcFileName.c_str(),
+                                      config.ObtenerParametroEntero(SHM_PLANILLA_CANT_TESTER_ASIGNADOS) );
     if(this->shmemCantTestersKey == -1) {
         std::string err("Error al conseguir la key de la shmem de la planilla de asignacion de testers. Error: " + std::string(strerror(errno)));
         Logger::error(err.c_str(), __FILE__);
         throw err;
     }
-    this->shmemCantTestersId = shmget(this->shmemCantTestersKey, sizeof(TContadorTesterEspecial) * MAX_DISPOSITIVOS_EN_SISTEMA, IPC_CREAT | 0660);
+    const int maxDispositivos = config.ObtenerParametroEntero(MAX_DISPOSITIVOS_EN_SISTEMA);
+    this->shmemCantTestersId = shmget(this->shmemCantTestersKey, sizeof(TContadorTesterEspecial) * maxDispositivos, IPC_CREAT | 0660);
     if(this->shmemCantTestersId == -1) {
         std::string err("Error al conseguir la memoria compartida de la planilla de asignacion de testers. Error: " + std::string(strerror(errno)));
         Logger::error(err.c_str(), __FILE__);
@@ -40,18 +44,19 @@ PlanillaAsignacionTesterComun::PlanillaAsignacionTesterComun( const Configuracio
 
     // Por ultimo, luego de creado, obtengo el semaforo correspondiente
     if (!this->semShmemCantTesters.getSem()) {
-	std::string err = std::string("Error al obtener el semaforo de la planilla de asignacion de testers. Error: ") + std::string(strerror(errno));
-	Logger::error(err, __FILE__);
-	throw err;
+        std::string err = std::string("Error al obtener el semaforo de la planilla de asignacion de testers. Error: ") + std::string(strerror(errno));
+        Logger::error(err, __FILE__);
+        throw err;
     }
     
-    this->shmemCantTareasKey = ftok(ipcFileName.c_str(), SHM_PLANILLA_CANT_TAREAS_ASIGNADAS);
+    this->shmemCantTareasKey = ftok( ipcFileName.c_str(),
+                                     config.ObtenerParametroEntero(SHM_PLANILLA_CANT_TAREAS_ASIGNADAS) );
     if(this->shmemCantTareasKey == -1) {
         std::string err("Error al conseguir la key de la shmem de la planilla de asignacion de tareas. Error: " + std::string(strerror(errno)));
         Logger::error(err.c_str(), __FILE__);
         throw err;
     }
-    this->shmemCantTareasId = shmget(this->shmemCantTareasKey, sizeof(TContadorTareaEspecial) * MAX_DISPOSITIVOS_EN_SISTEMA, IPC_CREAT | 0660);
+    this->shmemCantTareasId = shmget(this->shmemCantTareasKey, sizeof(TContadorTareaEspecial) * maxDispositivos, IPC_CREAT | 0660);
     if(this->shmemCantTareasId == -1) {
         std::string err("Error al conseguir la memoria compartida de la planilla de asignacion de tareas. Error: " + std::string(strerror(errno)));
         Logger::error(err.c_str(), __FILE__);
@@ -70,9 +75,9 @@ PlanillaAsignacionTesterComun::PlanillaAsignacionTesterComun( const Configuracio
 
     // Por ultimo, luego de creado, obtengo el semaforo correspondiente
     if (!this->semShmemCantTareas.getSem()) {
-	std::string err = std::string("Error al obtener el semaforo de la planilla de asignacion de tareas. Error: ") + std::string(strerror(errno));
-	Logger::error(err, __FILE__);
-	throw err;
+        std::string err = std::string("Error al obtener el semaforo de la planilla de asignacion de tareas. Error: ") + std::string(strerror(errno));
+        Logger::error(err, __FILE__);
+        throw err;
     }
 }
 
