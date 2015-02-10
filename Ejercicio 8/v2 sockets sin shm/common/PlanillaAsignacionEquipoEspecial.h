@@ -22,7 +22,7 @@ public:
     virtual ~PlanillaAsignacionEquipoEspecial();
     
     void registrarTareaEspecialFinalizada(int idDispositivo);
-    bool terminoTesteoEspecial(int idDispositivo);
+    bool terminoTesteoEspecial(int posDispositivo, int idDispositivo);
     void reiniciarContadoresTesteoEspecial(int idDispositivo);
     void limpiarContadoresFinTesteo(int idDispositivo);
     

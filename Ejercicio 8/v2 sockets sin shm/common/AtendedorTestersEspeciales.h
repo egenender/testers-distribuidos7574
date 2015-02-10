@@ -16,15 +16,12 @@
 
 #include "../logger/Logger.h"
 #include "common.h"
-#include "../ipc/Semaphore.h"
 #include "identificador/identificador.h"
 
 class AtendedorTestersEspeciales {
 private:
     int colaEnvios, colaRecepciones;
     int idTester;
-    
-    Semaphore sem_cola_especiales;
     
     // For killing communication processes
     pid_t pidEmisor, pidReceptor;

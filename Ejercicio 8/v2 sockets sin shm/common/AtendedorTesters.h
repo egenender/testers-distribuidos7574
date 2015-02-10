@@ -9,7 +9,6 @@
 
 #include "../logger/Logger.h"
 #include "common.h"
-#include "../ipc/Semaphore.h"
 
 class AtendedorTesters {
 private:
@@ -19,8 +18,6 @@ private:
     int colaRecepcionesRequerimientos;
     
     int idTester;
-    
-    Semaphore semColaEspeciales;
     
     // For killing communication processes
     pid_t pidEmisor, pidReceptor;

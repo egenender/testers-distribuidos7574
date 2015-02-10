@@ -1,6 +1,6 @@
 #include "AtendedorTesters.h"
 
-AtendedorTesters::AtendedorTesters(int idTester): idTester(idTester), semColaEspeciales(SEM_COLA_ESPECIALES) {
+AtendedorTesters::AtendedorTesters(int idTester): idTester(idTester) {
     key_t key;
     key = ftok(ipcFileName.c_str(), MSGQUEUE_ENVIO_TESTER_COMUN);
     this->colaEnvios = msgget(key, 0666);
@@ -25,8 +25,6 @@ AtendedorTesters::AtendedorTesters(int idTester): idTester(idTester), semColaEsp
         Logger::error(err, __FILE__);
         exit(1);
     }
-
-    semColaEspeciales.getSem();
 
     char paramId[10];
     sprintf(paramId, "%d", this->idTester);
@@ -59,8 +57,7 @@ AtendedorTesters::AtendedorTesters(int idTester): idTester(idTester), semColaEsp
 
 }
 
-AtendedorTesters::AtendedorTesters(const AtendedorTesters& orig): semColaEspeciales(SEM_COLA_ESPECIALES) {
-}
+AtendedorTesters::AtendedorTesters(const AtendedorTesters& orig) {}
 
 AtendedorTesters::~AtendedorTesters() {
     char pidToKill[10];
@@ -128,7 +125,6 @@ void AtendedorTesters::enviarOrden(int idDispositivo, int orden) {
 }
 
 void AtendedorTesters::enviarAEspeciales(bool cuales[], int idDispositivo, int posicionDispositivo){
-	semColaEspeciales.p();
     int j = 0;
     TMessageAtendedor msg;
     msg.mtype = this->idTester;
@@ -153,7 +149,6 @@ void AtendedorTesters::enviarAEspeciales(bool cuales[], int idDispositivo, int p
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
-	semColaEspeciales.v();
 }
 
 bool AtendedorTesters::destruirComunicacion() {

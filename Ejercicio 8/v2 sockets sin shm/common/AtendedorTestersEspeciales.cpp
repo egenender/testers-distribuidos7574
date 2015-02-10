@@ -7,7 +7,7 @@
 
 #include "AtendedorTestersEspeciales.h"
 
-AtendedorTestersEspeciales::AtendedorTestersEspeciales(int idTester) : idTester(idTester), sem_cola_especiales(SEM_COLA_ESPECIALES) {
+AtendedorTestersEspeciales::AtendedorTestersEspeciales(int idTester) : idTester(idTester) {
     
     key_t key;
     key = ftok(ipcFileName.c_str(), MSGQUEUE_ENVIO_TESTER_ESPECIAL);
@@ -25,16 +25,6 @@ AtendedorTestersEspeciales::AtendedorTestersEspeciales(int idTester) : idTester(
         Logger::error(err, __FILE__);
         exit(1);
     }
-/*
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_TESTERS_ESPECIALES);
-    this->cola_testers_especiales = msgget(key, 0666);
-    if(this->cola_testers_especiales == -1) {
-        std::string err = std::string("Error al obtener la cola para enviar a los testers especiales. Errno: ") + std::string(strerror(errno));
-        Logger::error(err, __FILE__);
-        exit(1);
-     }
-*/
-    sem_cola_especiales.getSem();
 
     char paramId[10];
     sprintf(paramId, "%d", this->idTester);

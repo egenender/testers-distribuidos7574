@@ -59,10 +59,6 @@ void crearIpc() {
 		Semaphore semEspecial(i + SEM_ESPECIALES);
 		semEspecial.creaSem();
 		semEspecial.iniSem(0);
-        
-        Semaphore semEspecialAsignacionEspec(i + SEM_ESPECIALES_ASIGNACION_ESPEC);
-        semEspecialAsignacionEspec.creaSem();
-        semEspecialAsignacionEspec.iniSem(1);
 	}
 }
 
