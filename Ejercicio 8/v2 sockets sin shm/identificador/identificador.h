@@ -27,12 +27,12 @@ extern  int * getidtestercomun_1_svc(void *, struct svc_req *);
 #define GETIDTESTERESPECIAL 3
 extern  int * getidtesterespecial_1(void *, CLIENT *);
 extern  int * getidtesterespecial_1_svc(void *, struct svc_req *);
-#define DESREGISTRARTESTERCOMUN 4
-extern  int * desregistrartestercomun_1(int *, CLIENT *);
-extern  int * desregistrartestercomun_1_svc(int *, struct svc_req *);
-#define DESREGISTRARTESTERESPECIAL 5
-extern  int * desregistrartesterespecial_1(int *, CLIENT *);
-extern  int * desregistrartesterespecial_1_svc(int *, struct svc_req *);
+#define DEVOLVERIDTESTERCOMUN 4
+extern  int * devolveridtestercomun_1(int *, CLIENT *);
+extern  int * devolveridtestercomun_1_svc(int *, struct svc_req *);
+#define DEVOLVERIDTESTERESPECIAL 5
+extern  int * devolveridtesterespecial_1(int *, CLIENT *);
+extern  int * devolveridtesterespecial_1_svc(int *, struct svc_req *);
 extern int identificadorprog_1_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
 
 #else /* K&R C */
@@ -45,12 +45,12 @@ extern  int * getidtestercomun_1_svc();
 #define GETIDTESTERESPECIAL 3
 extern  int * getidtesterespecial_1();
 extern  int * getidtesterespecial_1_svc();
-#define DESREGISTRARTESTERCOMUN 4
-extern  int * desregistrartestercomun_1();
-extern  int * desregistrartestercomun_1_svc();
-#define DESREGISTRARTESTERESPECIAL 5
-extern  int * desregistrartesterespecial_1();
-extern  int * desregistrartesterespecial_1_svc();
+#define DEVOLVERIDTESTERCOMUN 4
+extern  int * devolveridtestercomun_1();
+extern  int * devolveridtestercomun_1_svc();
+#define DEVOLVERIDTESTERESPECIAL 5
+extern  int * devolveridtesterespecial_1();
+extern  int * devolveridtesterespecial_1_svc();
 extern int identificadorprog_1_freeresult ();
 #endif /* K&R C */
 

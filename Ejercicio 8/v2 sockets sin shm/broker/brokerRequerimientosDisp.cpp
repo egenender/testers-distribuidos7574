@@ -19,15 +19,12 @@ int main (void) {
     
     key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_EMISOR_DISPOSITIVOS);
 	int msgQueueADisp = msgget(key, 0660);
-/*
-	Semaphore sem_comunes(SEM_CANT_TESTERS_COMUNES);
-	sem_comunes.getSem();
-*/
-	key = ftok(ipcFileName.c_str(), SHM_TESTERS_COMUNES_DISPONIBLES);
-    int shmTablaTestersComunesDisp = shmget(key, sizeof(TTablaIdTestersDisponibles), IPC_CREAT | 0660);
-    TTablaIdTestersDisponibles* tablaTestersComunesDisp = (TTablaIdTestersDisponibles*) shmat(shmTablaTestersComunesDisp, (void*) NULL, 0);
+
+	key = ftok(ipcFileName.c_str(), SHM_BROKER_TESTERS_REGISTRADOS);
+    int shmTablaTestersComunesRegistrados = shmget(key, sizeof(TTablaBrokerTestersRegistrados), IPC_CREAT | 0660);
+    TTablaBrokerTestersRegistrados* tablaTestersComunesReg = (TTablaBrokerTestersRegistrados*) shmat(shmTablaTestersComunesRegistrados, (void*) NULL, 0);
     
-    Semaphore semTabla(SEM_TABLA_TESTERS_COMUNES_DISPONIBLES);
+    Semaphore semTabla(SEM_BROKER_TESTERS_REGISTRADOS);
     semTabla.getSem();
 
 	TMessageAtendedor msg;
@@ -42,21 +39,17 @@ int main (void) {
 		ss << "Me llego un requerimiento desde el dispositivo " << msg.idDispositivo;
 		Logger::notice(ss.str(), __FILE__);
 
-/* TODO: IMP!		Logger::notice("Obtengo semaforo para actuar, esperando que haya testers comunes", __FILE__);
-		sem_comunes.p();
-		Logger::notice("Ya hay un tester comun, entonces puedo enviar el requerimiento", __FILE__);
-*/
         bool exito = true;
 		semTabla.p();
-        // Busco un id que no este disponible (es decir, uno registrado)
-        for(int i = tablaTestersComunesDisp->ultimoTesterElegido + 1; i <= MAX_TESTER_COMUNES; i++) {
+        // Busco un id que este registrado
+        for(int i = tablaTestersComunesReg->ultimoTesterElegido + 1; i <= MAX_TESTER_COMUNES; i++) {
             if(i == MAX_TESTER_COMUNES) i = 0;
-            if(!tablaTestersComunesDisp->disponibles[i]) {
+            if(tablaTestersComunesReg->registrados[i]) {
                 msg.mtype = i + ID_TESTER_COMUN_START;
-                tablaTestersComunesDisp->ultimoTesterElegido = i;
+                tablaTestersComunesReg->ultimoTesterElegido = i;
                 break;
             }
-            if (i == tablaTestersComunesDisp->ultimoTesterElegido) {
+            if (i == tablaTestersComunesReg->ultimoTesterElegido) {
                 std::stringstream ss;
                 ss << "No hay tester comun disponible para el dispositivo " << msg.idDispositivo;
                 Logger::error(ss.str(), __FILE__);

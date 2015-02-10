@@ -19,11 +19,11 @@ int main (int argc, char* argv[]){
     key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_EMISOR);
 	int msgQueueTesterEsp = msgget(key, 0660);
 
-	key = ftok(ipcFileName.c_str(), SHM_TESTERS_ESPECIALES_DISPONIBLES);
-    int shmTablaTestersEspDisp = shmget(key, sizeof(TTablaIdTestersEspecialesDisponibles), 0660);
-    TTablaIdTestersEspecialesDisponibles* tablaTestersEspDisp = (TTablaIdTestersEspecialesDisponibles*) shmat(shmTablaTestersEspDisp, (void*) NULL, 0);
+	key = ftok(ipcFileName.c_str(), SHM_BROKER_TESTERS_REGISTRADOS);
+    int shmTablaTestersEspReg = shmget(key, sizeof(TTablaBrokerTestersRegistrados), 0660);
+    TTablaBrokerTestersRegistrados* tablaTestersEspReg = (TTablaBrokerTestersRegistrados*) shmat(shmTablaTestersEspReg, (void*) NULL, 0);
     
-    Semaphore semTabla(SEM_TABLA_TESTERS_ESPECIALES_DISPONIBLES);
+    Semaphore semTabla(SEM_BROKER_TESTERS_REGISTRADOS);
     semTabla.getSem();
     
     Semaphore semTestEspAsig(SEM_ESPECIALES_ASIGNACION);
@@ -44,15 +44,15 @@ int main (int argc, char* argv[]){
 		Logger::notice(ss.str(), __FILE__); ss.str(""); ss.clear();
 		if (fork() != 0) continue;  // Como puedo llegar a bloquearme, lo hago en un proceso aparte!
 		
-        // Busco si los tester especiales están disponibles TODO: Puede flaquear si se desregistra el tester especial en el diome
+        // Busco si los tester especiales están registrados TODO: Puede flaquear si se desregistra el tester especial en el diome
         semTabla.p();
         for (int i = 0; i < msg.cantTestersEspecialesAsignados; i++) {
-            if (tablaTestersEspDisp->disponibles[i]) {
+            if (!tablaTestersEspReg->registrados[msg.idTestersEspeciales[i] - ID_TESTER_ESP_START + MAX_TESTER_COMUNES]) { // Le sumo el MAX_TESTER_COMUNES porque es una tabla de tamanio MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES
                 semTabla.v();
                 ss << "Espero a que este disponible el tester especial id " << msg.idTestersEspeciales[i];
                 Logger::notice(ss.str(), __FILE__);
 
-                Semaphore semEspecial(msg.idTestersEspeciales[i]);
+                Semaphore semEspecial(msg.idTestersEspeciales[i] - ID_TESTER_ESP_START + SEM_ESPECIALES);
                 semEspecial.getSem();
                 semEspecial.p();
                 semEspecial.v();
@@ -72,7 +72,6 @@ int main (int argc, char* argv[]){
         // interleaveen cuando dos dispositivos distintos se les asignan los mismos testers 
         // especiales al mismo tiempo. Race condition MUY maldita
         semTestEspAsig.p();
-
         // Aca ya tengo todos los testers especiales tomados para mandarlos en orden y que no se 
         // interleaveaee con cualquier otro proceso
         for (int i = 0; i < msg.cantTestersEspecialesAsignados; i++) {

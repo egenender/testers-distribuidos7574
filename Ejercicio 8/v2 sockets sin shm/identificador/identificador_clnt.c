@@ -55,12 +55,12 @@ getidtesterespecial_1(void *argp, CLIENT *clnt)
 }
 
 int *
-desregistrartestercomun_1(int *argp, CLIENT *clnt)
+devolveridtestercomun_1(int *argp, CLIENT *clnt)
 {
 	static int clnt_res;
 
 	memset((char *)&clnt_res, 0, sizeof(clnt_res));
-	if (clnt_call (clnt, DESREGISTRARTESTERCOMUN,
+	if (clnt_call (clnt, DEVOLVERIDTESTERCOMUN,
 		(xdrproc_t) xdr_int, (caddr_t) argp,
 		(xdrproc_t) xdr_int, (caddr_t) &clnt_res,
 		TIMEOUT) != RPC_SUCCESS) {
@@ -70,12 +70,12 @@ desregistrartestercomun_1(int *argp, CLIENT *clnt)
 }
 
 int *
-desregistrartesterespecial_1(int *argp, CLIENT *clnt)
+devolveridtesterespecial_1(int *argp, CLIENT *clnt)
 {
 	static int clnt_res;
 
 	memset((char *)&clnt_res, 0, sizeof(clnt_res));
-	if (clnt_call (clnt, DESREGISTRARTESTERESPECIAL,
+	if (clnt_call (clnt, DEVOLVERIDTESTERESPECIAL,
 		(xdrproc_t) xdr_int, (caddr_t) argp,
 		(xdrproc_t) xdr_int, (caddr_t) &clnt_res,
 		TIMEOUT) != RPC_SUCCESS) {

@@ -32,25 +32,20 @@ void crearIpc() {
 	
 	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_REQUERIMIENTOS_TESTER_ESPECIAL);
 	msgget(key, IPC_CREAT | 0660);
-
-	key = ftok(ipcFileName.c_str(), SHM_TESTERS_COMUNES_DISPONIBLES);
-    int shmTablaTestCom = shmget(key, sizeof(TTablaIdTestersDisponibles), IPC_CREAT | 0660);
-    TTablaIdTestersDisponibles* tablaTesterComun = (TTablaIdTestersDisponibles*) shmat(shmTablaTestCom, NULL, 0);
-    tablaTesterComun->ultimoTesterElegido = 0;
-
-    key = ftok(ipcFileName.c_str(), SHM_TESTERS_ESPECIALES_DISPONIBLES);
-    int shmTablaTestEsp = shmget(key, sizeof(TTablaIdTestersEspecialesDisponibles) ,IPC_CREAT | 0660);
-    TTablaIdTestersEspecialesDisponibles* tablaTesterEsp = (TTablaIdTestersEspecialesDisponibles*) shmat(shmTablaTestEsp, NULL, 0);
-    tablaTesterEsp->ultimoTesterElegido = 0;
-
-    Semaphore semTablaCom(SEM_TABLA_TESTERS_COMUNES_DISPONIBLES);
-    semTablaCom.creaSem();
-    semTablaCom.iniSem(1);
     
-    Semaphore semTablaEsp(SEM_TABLA_TESTERS_ESPECIALES_DISPONIBLES);
-    semTablaEsp.creaSem();
-    semTablaEsp.iniSem(1);
-    
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_REGISTRO_TESTERS);
+	msgget(key, IPC_CREAT | 0660);
+
+    key = ftok(ipcFileName.c_str(), SHM_BROKER_TESTERS_REGISTRADOS);
+    int shmTablaTestCom = shmget(key, sizeof(TTablaBrokerTestersRegistrados), IPC_CREAT | 0660);
+    TTablaBrokerTestersRegistrados* tablaTesterRegistrados = (TTablaBrokerTestersRegistrados*) shmat(shmTablaTestCom, NULL, 0);
+    for (int i = 0; i < MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES; i++)    tablaTesterRegistrados->registrados[i] = false;
+    tablaTesterRegistrados->ultimoTesterElegido = 0;
+
+    Semaphore semTestersRegistrados(SEM_BROKER_TESTERS_REGISTRADOS);
+    semTestersRegistrados.creaSem();
+    semTestersRegistrados.iniSem(1);
+
     Semaphore semEspecialAsignacion(SEM_ESPECIALES_ASIGNACION);
     semEspecialAsignacion.creaSem();
     semEspecialAsignacion.iniSem(1);
@@ -89,6 +84,13 @@ void crearModulosBroker() {
 	if (fork() == 0){
 		execlp("./brokerReqTestEsp", "brokerReqTestEsp", (char*)0);
         Logger::notice ("Mensaje luego de execlp de brokerReqTestEsp. Algo salio mal!", __FILE__);
+        exit(1);
+	}
+    
+    Logger::notice("Creo el modulo de broker de registro de testers", __FILE__);
+    if (fork() == 0){
+		execlp("./brokerRegistroTesters", "brokerRegistroTesters", (char*)0);
+        Logger::notice ("Mensaje luego de execlp de brokerRegistroTesters. Algo salio mal!", __FILE__);
         exit(1);
 	}
 

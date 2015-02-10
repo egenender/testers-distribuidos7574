@@ -28,6 +28,9 @@ int main(int argc, char* argv[]) {
 	
 	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_REQUERIMIENTOS_TESTER_ESPECIAL);
 	int msgQueueReqTestEsp = msgget(key, 0660);
+    
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_REGISTRO_TESTERS);
+    int msgQueueRegistroTesters = msgget(key, 0660);
 	
 	TMessageAtendedor msg;
     int ret = 0;
@@ -51,6 +54,19 @@ int main(int argc, char* argv[]) {
                 ret = msgsnd(msgQueueReqTestEsp, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
                 if(ret == -1) {
                     Logger::error("Error al enviar el mensaje a la cola de requerimientos de dispositivo");
+                    exit(1);
+                }
+                break;
+
+            case MTYPE_REGISTRAR_TESTER:
+                ss << "Llego un pedido de registro del tester " << msg.tester;
+                Logger::notice(ss.str(), __FILE__);
+                ss.str("");
+                ss.clear();
+                
+                ret = msgsnd(msgQueueRegistroTesters, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+                if(ret == -1) {
+                    Logger::error("Error al enviar el mensaje a la cola de registros de testers");
                     exit(1);
                 }
                 break;

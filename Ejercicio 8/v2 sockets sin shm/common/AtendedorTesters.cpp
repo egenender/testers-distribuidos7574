@@ -54,6 +54,8 @@ AtendedorTesters::AtendedorTesters(int idTester): idTester(idTester) {
         Logger::error("No se ejecutó correctamente el distribuidor de mensajes", __FILE__);
         exit(1);
 	}
+    
+    registrarTester();
 
 }
 
@@ -153,4 +155,20 @@ void AtendedorTesters::enviarAEspeciales(bool cuales[], int idDispositivo, int p
 
 bool AtendedorTesters::destruirComunicacion() {
     return (msgctl(this->colaEnvios, IPC_RMID, (struct msqid_ds*)0) != -1 && msgctl(this->colaRecepcionesGeneral, IPC_RMID, (struct msqid_ds*)0) != -1 && msgctl(this->colaRecepcionesRequerimientos, IPC_RMID, (struct msqid_ds*)0) != -1);
+}
+
+void AtendedorTesters::registrarTester() {
+
+    // El primer mensaje que se envia es de registro TODO: Ver devolucion!
+    TMessageAtendedor msg;
+    msg.mtype = this->idTester;
+    msg.mtypeMensaje = MTYPE_REGISTRAR_TESTER;
+    msg.esTesterEspecial = false;
+    msg.tester = this->idTester;
+    int ret = msgsnd(this->colaEnvios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    if(ret == -1) {
+        std::string error = std::string("Error al enviar mensaje de registro de tester comun. Error: ") + std::string(strerror(errno));
+        Logger::error(error.c_str(), __FILE__);
+        exit(0);
+    }
 }

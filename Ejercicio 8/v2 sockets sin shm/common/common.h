@@ -43,8 +43,9 @@ const int SEM_TABLA_TESTERS_COMUNES_DISPONIBLES = 11;
 const int SEM_TABLA_TESTERS_ESPECIALES_DISPONIBLES = 12;
 
 const int SEM_IDENTIFICADOR = 13;
-
 const int SEM_ESPECIALES_ASIGNACION = 14;
+const int SHM_BROKER_TESTERS_REGISTRADOS = 15;
+const int SEM_BROKER_TESTERS_REGISTRADOS = 16;
 
 const int MSGQUEUE_ENVIO_DISP = 20;
 const int MSGQUEUE_RECEPCIONES_DISP = 21;
@@ -64,8 +65,9 @@ const int MSGQUEUE_DESPACHADOR = 34;
 const int MSGQUEUE_REINICIO_TESTEO = 35;
 const int MSGQUEUE_BROKER_REQUERIMIENTOS_DISPOSITIVOS = 36;
 const int MSGQUEUE_BROKER_REQUERIMIENTOS_TESTER_ESPECIAL = 37;
+const int MSGQUEUE_BROKER_REGISTRO_TESTERS = 38;
 
-const int LAST_ID_IPC = MSGQUEUE_BROKER_REQUERIMIENTOS_TESTER_ESPECIAL + 1;
+const int LAST_ID_IPC = MSGQUEUE_BROKER_REGISTRO_TESTERS + 1;
 const int SEM_ESPECIALES = LAST_ID_IPC; // Semaforos para testers especiales (creciente)
 
 // mtypes desde el dispositivo
@@ -74,6 +76,7 @@ const int MTYPE_RESULTADO_INICIAL = 2;
 const int MTYPE_RESULTADO_ESPECIAL = 3;
 // mtypes desde tester comun
 const int MTYPE_PROGRAMA_INICIAL = 1;
+const int MTYPE_REGISTRAR_TESTER = 2;
 const int MTYPE_REQUERIMIENTO_TESTER_ESPECIAL = 4;
 // mtypes desde tester especial
 const int MTYPE_TAREA_ESPECIAL = 1;
@@ -109,7 +112,7 @@ const char PUERTO_SERVER_EMISOR_DISPOSITIVOS[] = "50001";
 const char PUERTO_SERVER_RECEPTOR[] = "50002";
 const char PUERTO_SERVER_EMISOR[] = "50003";
 
-const char UBICACION_SERVER[] = "localhost"; //Cambiar
+const char UBICACION_SERVER[] = "localhost";
 const char UBICACION_SERVER_IDENTIFICADOR[] = "localhost";
 
 //Estructuras communes:
@@ -144,20 +147,25 @@ typedef struct message {
     long mtypeMensaje;
     int idDispositivo;
     int tester;
+    bool esTesterEspecial;
     int value; // Este parametro posee el valor del programa, del resultado y de la orden
     int posicionDispositivo;
     int idTestersEspeciales[MAX_TESTERS_ESPECIALES_PARA_ASIGNAR];
     int cantTestersEspecialesAsignados;
 } TMessageAtendedor;
 
+typedef struct TTablaBrokerTestersRegistrados {
+    bool registrados[MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES];
+    int ultimoTesterElegido;
+} TTablaBrokerTestersRegistrados;
+
+// Para el server RPC de identificadores
 typedef struct TTablaIdTestersDisponibles {
     bool disponibles[MAX_TESTER_COMUNES];
-    int ultimoTesterElegido;
 } TTablaIdTestersDisponibles;
 
 typedef struct TTablaIdTestersEspecialesDisponibles {
     bool disponibles[MAX_TESTER_ESPECIALES];
-    int ultimoTesterElegido;
 } TTablaIdTestersEspecialesDisponibles;
 
 #endif	/* COMMON_H */
