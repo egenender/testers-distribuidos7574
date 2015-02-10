@@ -64,11 +64,7 @@ void createIPCObjects() {
     Semaphore semPlanillaGeneral(SEM_PLANILLA_GENERAL);
     semPlanillaGeneral.creaSem();
     semPlanillaGeneral.iniSem(1); // Inicializa el semaforo en 1
-    
-    Semaphore semColaEspeciales(SEM_COLA_ESPECIALES);
-    semColaEspeciales.creaSem();
-    semColaEspeciales.iniSem(1);
-    
+
     Semaphore semPlanillaCantTestersAsignados(SEM_PLANILLA_CANT_TESTER_ASIGNADOS);
     semPlanillaCantTestersAsignados.creaSem();
     semPlanillaCantTestersAsignados.iniSem(1);

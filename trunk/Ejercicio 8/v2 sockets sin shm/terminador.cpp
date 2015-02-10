@@ -42,10 +42,6 @@ int main(int argc, char** argv) {
     Semaphore semPlanillaGeneral(SEM_PLANILLA_GENERAL);
     semPlanillaGeneral.getSem();
     semPlanillaGeneral.eliSem();
-		
-    Semaphore sem_cola_especiales(SEM_COLA_ESPECIALES);
-    sem_cola_especiales.getSem();
-    sem_cola_especiales.eliSem();
     
     Semaphore semPlanillaCantTestersAsignados(SEM_PLANILLA_CANT_TESTER_ASIGNADOS);
     semPlanillaCantTestersAsignados.getSem();

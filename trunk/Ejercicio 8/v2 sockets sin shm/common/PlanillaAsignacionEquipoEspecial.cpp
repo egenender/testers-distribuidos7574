@@ -94,15 +94,15 @@ void PlanillaAsignacionEquipoEspecial::registrarTareaEspecialFinalizada(int idDi
     this->semShmemCantTareas.v();
 }
 
-bool PlanillaAsignacionEquipoEspecial::terminoTesteoEspecial(int idDispositivo) {
+bool PlanillaAsignacionEquipoEspecial::terminoTesteoEspecial(int posDispositivo, int idDispositivo) {
     this->semShmemCantTareas.p();
-    int cantTareasPendientes = this->cantTareasEspecialesAsignadas[idDispositivo].cantTareasEspecialesTotal - this->cantTareasEspecialesAsignadas[idDispositivo].cantTareasEspecialesTerminadas;
+    int cantTareasPendientes = this->cantTareasEspecialesAsignadas[posDispositivo].cantTareasEspecialesTotal - this->cantTareasEspecialesAsignadas[posDispositivo].cantTareasEspecialesTerminadas;
     this->semShmemCantTareas.v();
     this->semShmemCantTesters.p();
-    int cantTestersPendientes = this->cantTestersEspecialesAsignados[idDispositivo].cantTestersEspecialesTotal - this->cantTestersEspecialesAsignados[idDispositivo].cantTestersEspecialesTerminados;
+    int cantTestersPendientes = this->cantTestersEspecialesAsignados[posDispositivo].cantTestersEspecialesTotal - this->cantTestersEspecialesAsignados[posDispositivo].cantTestersEspecialesTerminados;
     this->semShmemCantTesters.v();
     std::stringstream ss;
-    ss << "Para dispositivo " << idDispositivo << ". Cant Tareas pendientes: " << cantTareasPendientes << " y cant testers pendientes: " << cantTestersPendientes;
+    ss << "Para dispositivo " << idDispositivo << " con posicion " << posDispositivo << ". Cant Tareas pendientes: " << cantTareasPendientes << " y cant testers pendientes: " << cantTestersPendientes;
     Logger::warn(ss.str(), __FILE__);
     return ((cantTareasPendientes == 0) && (cantTestersPendientes == 0));
 }
