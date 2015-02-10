@@ -5,6 +5,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <errno.h>
+#include <cstring>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/ipc.h>
@@ -19,7 +20,7 @@ int main(int argc, char* argv[]) {
     
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
 
-    std::fstream ipcFile(ipcFileName.c_str(), std::ios_base::in);
+    std::fstream ipcFile(ipcFileName.c_str(), std::ios_base::out);
     ipcFile.close();
     
     Semaphore semId(SEM_IDENTIFICADOR);
@@ -38,8 +39,23 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < MAX_TESTER_COMUNES; i++)    tablaTesterComDisp->disponibles[i] = true;
     
     key = ftok(ipcFileName.c_str(), SHM_TESTERS_ESPECIALES_DISPONIBLES);
+    if (key == -1) {
+        std::stringstream ss;
+        ss << "Error en la obtencion de la clave para el IPC " << SHM_TESTERS_ESPECIALES_DISPONIBLES << ". Errno: " << strerror(errno);
+        Logger::error(ss.str(), __FILE__);
+    }
     int shmTablaTestEsp = shmget(key, sizeof(TTablaIdTestersEspecialesDisponibles), IPC_CREAT | IPC_EXCL | 0660);
+    if (shmTablaTestEsp == -1) {
+        std::stringstream ss;
+        ss << "Error en la obtencion del ID para el IPC " << SHM_TESTERS_ESPECIALES_DISPONIBLES << ". Errno: " << strerror(errno);
+        Logger::error(ss.str(), __FILE__);
+    }
     TTablaIdTestersEspecialesDisponibles* tablaTesterEspDisp = (TTablaIdTestersEspecialesDisponibles*) shmat(shmTablaTestEsp, NULL, 0);
+    if (tablaTesterEspDisp == (void*) -1) {
+        std::stringstream ss;
+        ss << "Error en el attacheo del proceso a la ShMem de testers especiales disponibles con ID " << SHM_TESTERS_ESPECIALES_DISPONIBLES << ". Errno: " << strerror(errno);
+        Logger::error(ss.str(), __FILE__);
+    }
     for (int i = 0; i < MAX_TESTER_ESPECIALES; i++)    tablaTesterEspDisp->disponibles[i] = true;
     
     pid_t idServer = fork();
