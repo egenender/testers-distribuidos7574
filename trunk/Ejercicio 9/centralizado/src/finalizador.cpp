@@ -36,8 +36,10 @@ int main(int argc, char** argv) {
     const string ipcFileName = config.ObtenerParametroString( ARCHIVO_IPCS );
    
     //Semaforo y Planilla General
-    key_t key = ftok(ipcFileName.c_str(), SHM_PLANILLA_GENERAL);
-    int shmgeneralid = shmget(key, sizeof(resultado_t) * CANT_RESULTADOS,  0660);
+    key_t key = ftok( ipcFileName.c_str(),
+                      config.ObtenerParametroEntero(SHM_PLANILLA_GENERAL) );
+    const int cantResultados = config.ObtenerParametroEntero(CANT_RESULTADOS);
+    int shmgeneralid = shmget(key, sizeof(resultado_t) * cantResultados,  0660);
     shmctl(shmgeneralid, IPC_RMID, NULL);
     
     Planilla planillaGeneral( config );
@@ -50,24 +52,30 @@ int main(int argc, char** argv) {
         Logger::warn("No se pudo destruir alguna memoria compartida de la planilla de asignacion", __FILE__);
     }
     
-    Semaphore semPlanillaGeneral( ipcFileName, config.ObtenerParametroEntero(SEM_PLANILLA_GENERAL));
+    Semaphore semPlanillaGeneral( ipcFileName,
+                                  config.ObtenerParametroEntero(SEM_PLANILLA_GENERAL));
     semPlanillaGeneral.getSem();
     semPlanillaGeneral.eliSem();
-		
-    Semaphore sem_cola_especiales( ipcFileName, config.ObtenerParametroEntero(SEM_COLA_ESPECIALES));
+
+    Semaphore sem_cola_especiales( ipcFileName,
+                                   config.ObtenerParametroEntero(SEM_COLA_ESPECIALES));
     sem_cola_especiales.getSem();
     sem_cola_especiales.eliSem();
     
-    Semaphore semPlanillaCantTestersAsignados( ipcFileName, SEM_PLANILLA_CANT_TESTER_ASIGNADOS);
+    Semaphore semPlanillaCantTestersAsignados( ipcFileName,
+                                               config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TESTER_ASIGNADOS) );
     semPlanillaCantTestersAsignados.getSem();
     semPlanillaCantTestersAsignados.eliSem();
     
-    Semaphore semPlanillaCantTareasAsignadas( ipcFileName, SEM_PLANILLA_CANT_TAREAS_ASIGNADAS);
+    Semaphore semPlanillaCantTareasAsignadas( ipcFileName,
+                                              config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TAREAS_ASIGNADAS) );
     semPlanillaCantTareasAsignadas.getSem();
     semPlanillaCantTareasAsignadas.eliSem();
-	
+
     //Destruccion de colas
-    for (int q = MSGQUEUE_DISPOSITIVOS; q <= MSGQUEUE_ULTIMO; q++){
+    const int msgQueueDispositivos = config.ObtenerParametroEntero(MSGQUEUE_DISPOSITIVOS);
+    const int msgQueueUltimo = config.ObtenerParametroEntero(MSGQUEUE_ULTIMO);
+    for (int q = msgQueueDispositivos; q <= msgQueueUltimo; q++){
         key = ftok(ipcFileName.c_str(), q);
         int cola = msgget(key, 0660);
         msgctl(cola ,IPC_RMID, NULL);

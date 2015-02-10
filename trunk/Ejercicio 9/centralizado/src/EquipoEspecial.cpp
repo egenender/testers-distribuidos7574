@@ -15,10 +15,10 @@
 #include <cstdlib>
 #include <sstream>
 #include <set>
+#include <vector>
 
-/*
- * 
- */
+using namespace Constantes::NombresDeParametros;
+
 int main(int argc, char** argv) {
     
     srand(time(NULL));
@@ -30,12 +30,13 @@ int main(int argc, char** argv) {
         Logger::error("Archivo de configuracion no encontrado", __FILE__);
         return 1;
     }
+    const int maxDispositivosEnSistema = config.ObtenerParametroEntero(MAX_DISPOSITIVOS_EN_SISTEMA);
     
     // Para almacenar que testers especiales testeaban a que dispositivo
-    std::set<int> controlador[MAX_DISPOSITIVOS_EN_SISTEMA];
+    std::vector< std::set<int> > controlador(maxDispositivosEnSistema);
     // Para almacenar los resultados de los testeos especiales
-    int resultados[MAX_DISPOSITIVOS_EN_SISTEMA];
-    for (int i = 0; i < MAX_DISPOSITIVOS_EN_SISTEMA; i++) {
+    std::vector<int> resultados(maxDispositivosEnSistema);
+    for (int i = 0; i < maxDispositivosEnSistema; i++) {
         resultados[i] = 0;
     }
 

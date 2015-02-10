@@ -84,12 +84,12 @@ void createIPCObjects( const Configuracion& config ) {
     sem_cola_especiales.iniSem(1);
 
     Semaphore semPlanillaCantTestersAsignados( config.ObtenerParametroString(ARCHIVO_IPCS),
-                                               SEM_PLANILLA_CANT_TESTER_ASIGNADOS);
+                                               config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TESTER_ASIGNADOS) );
     semPlanillaCantTestersAsignados.creaSem();
     semPlanillaCantTestersAsignados.iniSem(1);
 
     Semaphore semPlanillaCantTareasAsignadas( config.ObtenerParametroString(ARCHIVO_IPCS),
-                                              SEM_PLANILLA_CANT_TAREAS_ASIGNADAS);
+                                              config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TAREAS_ASIGNADAS) );
     semPlanillaCantTareasAsignadas.creaSem();
     semPlanillaCantTareasAsignadas.iniSem(1);
 
@@ -99,7 +99,9 @@ void createIPCObjects( const Configuracion& config ) {
     planillaAsignacion.initPlanilla();
 
     //creacion de colas
-    for (int q = MSGQUEUE_DISPOSITIVOS; q <= MSGQUEUE_ULTIMO; q++){
+    int msgQueueDispositivos = config.ObtenerParametroEntero( MSGQUEUE_DISPOSITIVOS );
+    int msgQueueUltimo = config.ObtenerParametroEntero( MSGQUEUE_ULTIMO );
+    for (int q = msgQueueDispositivos; q <= msgQueueUltimo; q++){
         key_t key = ftok(archivoIpcs.c_str(), q);
         if (msgget(key, 0660 | IPC_CREAT | IPC_EXCL) == -1){
             std::cout << "No se pudo crear una cola: " << strerror(errno)<< std::endl;
@@ -124,8 +126,8 @@ void createSystemProcesses( const Configuracion& config ) {
             exit(1);
         }
     }
-    
-    for(int i = 0; i < CANT_TESTERS_ESPECIALES; i++, idTester++) {
+    const int cantTestersEspeciales = config.ObtenerParametroEntero( CANT_TESTERS_ESPECIALES );
+    for(int i = 0; i < cantTestersEspeciales; i++, idTester++) {
         char param[3];
         sprintf(param, "%d", idTester);
         usleep(10);
@@ -156,11 +158,13 @@ void createSystemProcesses( const Configuracion& config ) {
 
     //Creo dispositivos
     sleep(1);
-    int idDispositivo = ID_DISPOSITIVO_START;
+    int idDispositivo = config.ObtenerParametroEntero(ID_DISPOSITIVO_START);
     int cantidad_lanzada = 0;
     const int cantDispositivos = config.ObtenerParametroEntero(CANT_DISPOSITIVOS);
+    const int minLanzados = config.ObtenerParametroEntero(MINIMOS_LANZADOS);
+    const int maxLanzados = config.ObtenerParametroEntero(MAXIMOS_LANZADOS);
     while (cantidad_lanzada < cantDispositivos){
-        int cantidad_a_lanzar = MINIMOS_LANZADOS + rand() % (MAXIMOS_LANZADOS - MINIMOS_LANZADOS + 1);
+        int cantidad_a_lanzar = minLanzados + rand() % (maxLanzados - minLanzados + 1);
         if (cantidad_a_lanzar + cantidad_lanzada > cantDispositivos)
             cantidad_a_lanzar = cantDispositivos - cantidad_lanzada;
         for (int i = 0; i < cantidad_a_lanzar; i++){
