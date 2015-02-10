@@ -112,8 +112,8 @@ const char PUERTO_SERVER_EMISOR_DISPOSITIVOS[] = "50001";
 const char PUERTO_SERVER_RECEPTOR[] = "50002";
 const char PUERTO_SERVER_EMISOR[] = "50003";
 
-const char UBICACION_SERVER[] = "localhost";
-const char UBICACION_SERVER_IDENTIFICADOR[] = "localhost";
+const char UBICACION_SERVER[] = "192.168.2.3";
+const char UBICACION_SERVER_IDENTIFICADOR[] = "192.168.2.3";
 
 //Estructuras communes:
 typedef struct resultado{
