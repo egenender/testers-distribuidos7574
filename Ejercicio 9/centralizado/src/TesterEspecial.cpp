@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
         atendedor.enviarReqTestConfig( id, msg.idDispositivo, msg.tipoDispositivo );
         usleep( rand() % 1000 + 1000);
 
-        TareaEspecial tarea;
+        TareaEspecial tarea( config );
         tarea.prepararTareasEspeciales();
 
         do {

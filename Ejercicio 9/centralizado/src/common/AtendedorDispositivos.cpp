@@ -12,7 +12,8 @@ using std::string;
 
 AtendedorDispositivos::AtendedorDispositivos( const Configuracion& config ) { 
     const string ipcFileName = config.ObtenerParametroString( ARCHIVO_IPCS );
-    key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_DISPOSITIVOS);
+    key_t key = ftok( ipcFileName.c_str(),
+                      config.ObtenerParametroEntero(MSGQUEUE_DISPOSITIVOS) );
     this->cola_requerimiento = msgget(key, 0666);
     if(this->cola_requerimiento == -1) {
         std::string err = std::string("Error al obtener la cola para enviar requerimientos. Errno: ") + std::string(strerror(errno));
@@ -20,7 +21,8 @@ AtendedorDispositivos::AtendedorDispositivos( const Configuracion& config ) {
         exit(1);
     }
     
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_TESTERS);
+    key = ftok( ipcFileName.c_str(),
+                config.ObtenerParametroEntero(MSGQUEUE_TESTERS) );
     this->cola_tests = msgget(key, 0666);
     if(this->cola_tests == -1) {
         std::string err = std::string("Error al obtener la cola para enviar testeos a los dispositivos. Errno: ") + std::string(strerror(errno));
@@ -28,7 +30,8 @@ AtendedorDispositivos::AtendedorDispositivos( const Configuracion& config ) {
         exit(1);
     }
     
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_DISPOSITIVOS_TESTERS_ESPECIALES);
+    key = ftok( ipcFileName.c_str(),
+                config.ObtenerParametroEntero(MSGQUEUE_DISPOSITIVOS_TESTERS_ESPECIALES) );
     this->cola_tests_especiales = msgget(key, 0666);
     if(this->cola_tests_especiales == -1) {
         std::string err = std::string("Error al obtener la cola para enviar tareas especiales a los dispositivos. Errno: ") + std::string(strerror(errno));
@@ -101,6 +104,7 @@ int AtendedorDispositivos::recibirProgramaEspecial(int idDispositivo) {
     this->posicionDispositivo = msg.posicionDispositivo;
     return msg.value;
 }
+
 
 // El resultado especial se envia solo al Equipo Especial, por lo que el mtype influye poco
 void AtendedorDispositivos::enviarResultadoEspecial(int idDispositivo, int resultado) {

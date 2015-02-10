@@ -15,7 +15,9 @@
 #include "common/Configuracion.h"
 #include <string>
 #include <cstdlib>
+#include <vector>
 
+using namespace Constantes::NombresDeParametros;
 using namespace std;
 
 int main(int argc, char** argv) {
@@ -32,7 +34,7 @@ int main(int argc, char** argv) {
         Logger::error("Archivo de configuracion no encontrado", __FILE__);
         return 1;
     }
-    
+
     // Obtengo comunicacion con los dispositivos
     AtendedorTesters atendedor( config );
     // Obtengo comunicacion con los tecnicos
@@ -40,16 +42,18 @@ int main(int argc, char** argv) {
     // Obtengo planilla general de sync con otros tester
     Planilla planilla( config );
     PlanillaAsignacionTesterComun planillaAsignacion( config );
-    
+
     srand(time(NULL));
     
+    const int idPrimerTesterEspecial = config.ObtenerParametroEntero(ID_TESTER_ESPECIAL_START);
+
     while(true) {
-		Logger::notice("Espero por un nuevo requerimiento de testeo" , nombre.str().c_str());
+        Logger::notice("Espero por un nuevo requerimiento de testeo" , nombre.str().c_str());
         // Espero un requerimiento
         int idDispositivo = atendedor.recibirRequerimiento();
         stringstream ss;
-		ss << idDispositivo;
-		string mensaje = "Recibido requerimiento desde dispositivo id ";
+        ss << idDispositivo;
+        string mensaje = "Recibido requerimiento desde dispositivo id ";
         Logger::notice(mensaje + ss.str() , nombre.str().c_str());
         
         int posicionDispositivo = planilla.hayLugar();
@@ -58,18 +62,18 @@ int main(int argc, char** argv) {
             Logger::notice(mensaje + ss.str() , nombre.str().c_str());
             atendedor.enviarPrograma(idDispositivo, id, SIN_LUGAR);
             continue;
-	}
-        
+        }
+
         usleep( rand() % 1000 + 1000);
         Logger::notice(string("Envio programa a dispositivo ") + ss.str(), nombre.str().c_str());                  	
         atendedor.enviarPrograma(idDispositivo, id, Programa::getPrograma());
         
         Logger::notice(string("Espero resultado de dispositivo ") + ss.str(), nombre.str().c_str());                  	    
-  
+
         resultado_test_t resul = atendedor.recibirResultado(id);
         Logger::notice(string("Recibi resultado del dispositivo ") + ss.str(), nombre.str().c_str());
         usleep( rand() % 1000 + 1000);
-        
+
         if (resul.result == RESULTADO_GRAVE){
             Logger::notice(string("Le envio orden de apagado al dispositivo ") + ss.str(), nombre.str().c_str());
             atendedor.enviarOrden(idDispositivo, ORDEN_APAGADO);
@@ -78,23 +82,24 @@ int main(int argc, char** argv) {
             planilla.eliminarDispositivo(posicionDispositivo);
         } else if (resul.result == SEGUIR_TESTEANDO){
             int cant_testers = 0;
-            bool los_testers[CANT_TESTERS_ESPECIALES];
+            const int cantTestersEspeciales = config.ObtenerParametroEntero(CANT_TESTERS_ESPECIALES);
+            vector<bool> los_testers( cantTestersEspeciales );
             while (cant_testers < 2 || cant_testers > 4){ //requerimientos
                 cant_testers = 0;
-                for (int i = 0; i < CANT_TESTERS_ESPECIALES; i++){
+                for (int i = 0; i < cantTestersEspeciales; i++){
                     int random = rand() % 2;
                     cant_testers += random;
                     los_testers[i] = random;
                 }
             }
-			
+
             Logger::notice(string("Le envio orden de seguir evaluando al dispositivo ") + ss.str(), nombre.str().c_str());
             atendedor.enviarOrden(idDispositivo, ORDEN_SEGUIR_TESTEANDO);
             ss.str("");
             ss << "Le envio los requerimientos a los " << cant_testers << " testers especiales, ";
-            for (int i = 0; i < CANT_TESTERS_ESPECIALES; i++){
+            for (int i = 0; i < cantTestersEspeciales; i++){
                     if(los_testers[i])
-                            ss << i+ID_TESTER_ESPECIAL_START << " ";
+                            ss << i+idPrimerTesterEspecial << " ";
             }
             Logger::notice(ss.str() , nombre.str().c_str());
             planillaAsignacion.asignarCantTestersEspeciales(posicionDispositivo, cant_testers);
@@ -103,7 +108,6 @@ int main(int argc, char** argv) {
             atendedor.enviarOrden(idDispositivo, ORDEN_REINICIO);
             planilla.eliminarDispositivo(posicionDispositivo);
         }
-               
     }
 
     return 0;

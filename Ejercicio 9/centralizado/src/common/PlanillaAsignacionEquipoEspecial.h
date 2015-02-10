@@ -31,6 +31,7 @@ public:
     
     bool destruirComunicacion();
 private:
+    const int m_MaxDispositivosEnSistema;
     Semaphore semShmemCantTesters, semShmemCantTareas;
     key_t shmemCantTestersKey, shmemCantTareasKey;
     int shmemCantTestersId, shmemCantTareasId;
