@@ -34,13 +34,11 @@ void inicializar() {
         shmemTestersComunesDisponiblesId = getShMemId(SHM_TESTERS_COMUNES_DISPONIBLES, sizeof(TTablaIdTestersDisponibles));
         testersComunesDisponibles = (TTablaIdTestersDisponibles*) attachMemory(shmemTestersComunesDisponiblesId);
         for (int i = 0; i < MAX_TESTER_COMUNES; i++)   testersComunesDisponibles->disponibles[i] = true;
-        testersComunesDisponibles->ultimoTesterElegido = 0;
     }
     if (shmemTestersEspecialesDisponiblesId == 0 || testersEspecialesDisponibles == NULL) {
         shmemTestersEspecialesDisponiblesId = getShMemId(SHM_TESTERS_ESPECIALES_DISPONIBLES, sizeof(TTablaIdTestersEspecialesDisponibles));
         testersEspecialesDisponibles = (TTablaIdTestersEspecialesDisponibles*) attachMemory(shmemTestersEspecialesDisponiblesId);
         for (int i = 0; i < MAX_TESTER_ESPECIALES; i++)   testersEspecialesDisponibles->disponibles[i] = true;
-        testersEspecialesDisponibles->ultimoTesterElegido = 0;
     }
     if (semId == 0) {
         semId = crearSem(SEM_IDENTIFICADOR);
@@ -107,15 +105,6 @@ getidtesterespecial_1_svc(void *argp, struct svc_req *rqstp)
             result = i + ID_TESTER_ESP_START; // Para que funcione como mtype
             testersEspecialesDisponibles->disponibles[i] = false;
             exito = true;
-            
-            // Levanto el semaforo por si hay un requerimiento especial esperando
-            key_t key = ftok(ipcFileName.c_str(), SEM_ESPECIALES + result);
-            int semEspecial = semget(key, 1, 0660);
-            struct sembuf oper;
-            oper.sem_num = 0;
-            oper.sem_op = 1;
-            oper.sem_flg = 0;
-            semop(semEspecial, &oper, 1);
         }
     }
     v(semIdTablaTestersEspeciales, 0);
@@ -128,7 +117,7 @@ getidtesterespecial_1_svc(void *argp, struct svc_req *rqstp)
 }
 
 int *
-desregistrartestercomun_1_svc(int *argp, struct svc_req *rqstp)
+devolveridtestercomun_1_svc(int *argp, struct svc_req *rqstp)
 {
     static int  result;
     
@@ -149,7 +138,7 @@ desregistrartestercomun_1_svc(int *argp, struct svc_req *rqstp)
 }
 
 int *
-desregistrartesterespecial_1_svc(int *argp, struct svc_req *rqstp)
+devolveridtesterespecial_1_svc(int *argp, struct svc_req *rqstp)
 {
     static int  result;
     
@@ -160,17 +149,7 @@ desregistrartesterespecial_1_svc(int *argp, struct svc_req *rqstp)
     p(semIdTablaTestersEspeciales, 0);
     if (!testersEspecialesDisponibles->disponibles[id - ID_TESTER_ESP_START]) {
         testersEspecialesDisponibles->disponibles[id - ID_TESTER_ESP_START] = true;
-        result = 0;
-        
-        // Bajo el semaforo que indica que el tester esta disponible
-        key_t key = ftok(ipcFileName.c_str(),SEM_ESPECIALES + id - ID_TESTER_ESP_START);
-        int semEspecial = semget(key, 1, 0660);
-        struct sembuf oper;
-        oper.sem_num = 0;
-        oper.sem_op = -1;
-        oper.sem_flg = 0;
-        semop(semEspecial, &oper, 1);
-        
+        result = 0;        
     } else {
         result = -1; // Ese ID no estaba registrado, KB!
     }

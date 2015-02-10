@@ -20,8 +20,8 @@ static void
 identificadorprog_1(struct svc_req *rqstp, register SVCXPRT *transp)
 {
 	union {
-		int desregistrartestercomun_1_arg;
-		int desregistrartesterespecial_1_arg;
+		int devolveridtestercomun_1_arg;
+		int devolveridtesterespecial_1_arg;
 	} argument;
 	char *result;
 	xdrproc_t _xdr_argument, _xdr_result;
@@ -50,16 +50,16 @@ identificadorprog_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		local = (char *(*)(char *, struct svc_req *)) getidtesterespecial_1_svc;
 		break;
 
-	case DESREGISTRARTESTERCOMUN:
+	case DEVOLVERIDTESTERCOMUN:
 		_xdr_argument = (xdrproc_t) xdr_int;
 		_xdr_result = (xdrproc_t) xdr_int;
-		local = (char *(*)(char *, struct svc_req *)) desregistrartestercomun_1_svc;
+		local = (char *(*)(char *, struct svc_req *)) devolveridtestercomun_1_svc;
 		break;
 
-	case DESREGISTRARTESTERESPECIAL:
+	case DEVOLVERIDTESTERESPECIAL:
 		_xdr_argument = (xdrproc_t) xdr_int;
 		_xdr_result = (xdrproc_t) xdr_int;
-		local = (char *(*)(char *, struct svc_req *)) desregistrartesterespecial_1_svc;
+		local = (char *(*)(char *, struct svc_req *)) devolveridtesterespecial_1_svc;
 		break;
 
 	default:

@@ -115,7 +115,7 @@ int desregistrarTesterEspecial(int id) {
 
     CLIENT *clnt;
     int  *result_5;
-    int  desregistrartesterespecial_1_arg = id;
+    int  devolveridtesterespecial_1_arg = id;
 
     clnt = clnt_create (UBICACION_SERVER_IDENTIFICADOR, IDENTIFICADORPROG, IDENTIFICADORVERS, "udp");
     if (clnt == NULL) {
@@ -123,7 +123,7 @@ int desregistrarTesterEspecial(int id) {
         exit (1);
     }
     
-    result_5 = getidtesterespecial_1((void*)&desregistrartesterespecial_1_arg, clnt);
+    result_5 = devolveridtesterespecial_1(&devolveridtesterespecial_1_arg, clnt);
     if (result_5 == (int *) NULL) {
         // TODO: Log!
         clnt_perror (clnt, "call failed");

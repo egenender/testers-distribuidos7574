@@ -22,6 +22,8 @@ private:
     // For killing communication processes
     pid_t pidEmisor, pidReceptor;
     
+    void registrarTester();
+    
 public:
     AtendedorTesters(int idTester);
     AtendedorTesters(const AtendedorTesters& orig);

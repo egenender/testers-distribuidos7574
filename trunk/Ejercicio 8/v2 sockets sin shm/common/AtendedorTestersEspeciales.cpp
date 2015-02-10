@@ -49,6 +49,8 @@ AtendedorTestersEspeciales::AtendedorTestersEspeciales(int idTester) : idTester(
                 (char*)0);
         exit(1);
 	}
+    
+    registrarTester();
 }
 
 AtendedorTestersEspeciales::~AtendedorTestersEspeciales() {
@@ -89,4 +91,21 @@ void AtendedorTestersEspeciales::enviarTareaEspecial(int idDispositivo, int idTe
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
+}
+
+void AtendedorTestersEspeciales::registrarTester() {
+
+    // El primer mensaje que se envia es de registro TODO: Ver devolucion!
+    TMessageAtendedor msg;
+    msg.mtype = this->idTester;
+    msg.mtypeMensaje = MTYPE_REGISTRAR_TESTER;
+    msg.esTesterEspecial = true;
+    msg.tester = this->idTester;
+    int ret = msgsnd(this->colaEnvios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    if(ret == -1) {
+        std::string error = std::string("Error al enviar mensaje de registro de tester especial. Error: ") + std::string(strerror(errno));
+        Logger::error(error.c_str(), __FILE__);
+        exit(0);
+    }
+
 }
