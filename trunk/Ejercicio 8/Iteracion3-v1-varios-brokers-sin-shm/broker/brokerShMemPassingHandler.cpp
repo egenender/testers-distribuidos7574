@@ -25,24 +25,24 @@ int main(int argc, char** argv) {
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
     std::stringstream nombre;
     nombre << __FILE__ << " " << ID_BROKER;
-    
+
     // Queue desde donde se reciben mensajes de otros brokers
     key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_ENVIO_BROKER_SHM);
 	int msgQueueShmemHaciaBrokers = msgget(key, IPC_CREAT | 0660);
 
     key = ftok(ipcFileName.c_str(), MSGQUEUE_RECEPCION_BROKER_SHM);
 	int msgQueueShmemDesdeBrokers = msgget(key, IPC_CREAT | 0660);
-    
+
     key = ftok(ipcFileName.c_str(), MSGQUEUE_INTERNAL_BROKER_SHM);
 	int msgQueueInternaBrokerShmem = msgget(key, IPC_CREAT | 0660);
-    
+
     key = ftok(ipcFileName.c_str(), SHM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM);
     int shmCantReqBrokerShMem = shmget(key, sizeof(int), IPC_CREAT | 0660);
     int* cantReqBrokerShm = (int*) shmat(shmCantReqBrokerShMem, NULL, 0);
-    
+
     Semaphore semBrokerCantShmemReq(SEM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM);
     semBrokerCantShmemReq.getSem();
-    
+
     while(true) {
     
         TMessageShMemInterBroker msg;
