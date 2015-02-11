@@ -110,12 +110,14 @@ void crearServers(){
 	
     char paramMsgQueue[10];
     char paramIdBroker[10];
+    char paramSizeMsg[10];
     
+    sprintf(paramSizeMsg, "%d", (int) sizeof(TMessageAtendedor));
     // Comunicacion con testers y equipo especial
     sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_RECEPTOR);
     Logger::notice("Creo el servidor receptor de mensajes de testers comunes", __FILE__);
 	if (fork() == 0){
-		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_SERVER_RECEPTOR , paramMsgQueue, (char*)0);
+		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_SERVER_RECEPTOR , paramMsgQueue, paramSizeMsg, (char*)0);
         exit(1);
 	}
 	
@@ -130,7 +132,7 @@ void crearServers(){
 	sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_RECEPTOR_DISPOSITIVOS);
     Logger::notice("Creo el servidor receptor de mensajes de dispositivos", __FILE__);
 	if (fork() == 0){
-		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_SERVER_RECEPTOR_DISPOSITIVOS , paramMsgQueue, (char*)0);
+		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_SERVER_RECEPTOR_DISPOSITIVOS , paramMsgQueue, paramSizeMsg, (char*)0);
         exit(1);
 	}
 	
@@ -145,15 +147,16 @@ void crearServers(){
     sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_DESDE_BROKER);
     Logger::notice("Creo el servidor receptor de mensajes generales de brokers", __FILE__);
 	if (fork() == 0){
-		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_CONTRA_BROKERS , paramMsgQueue, (char*) 0);
+		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_CONTRA_BROKERS , paramMsgQueue, paramSizeMsg, (char*) 0);
         exit(1);
 	}
     
     // Comunicacion Servidor con brokers para memoria compartida de los brokers
     sprintf(paramMsgQueue, "%d", MSGQUEUE_RECEPCION_BROKER_SHM);
+    sprintf(paramSizeMsg, "%d", (int) sizeof(TMessageShMemInterBroker));
     Logger::notice("Creo el servidor receptor de memoria compartida de brokers", __FILE__);
 	if (fork() == 0){
-		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_CONTRA_BROKERS_SHMEM_BROKERS , paramMsgQueue, (char*) 0);
+		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_CONTRA_BROKERS_SHMEM_BROKERS , paramMsgQueue, paramSizeMsg, (char*) 0);
         exit(1);
 	}
 
@@ -162,22 +165,24 @@ void crearServers(){
 
     // Comunicacion cliente con brokers para mensajes generales
     sprintf(paramIdBroker, "%d", ID_BROKER);
+    sprintf(paramSizeMsg, "%d", (int) sizeof(TMessageAtendedor));
     sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_HACIA_BROKER);
     for (int i = 0; i < CANT_BROKERS; i++) {
         if (i == (ID_BROKER - ID_BROKER_START)) continue;
         Logger::notice("Creo el cliente emisor de mensajes generales a brokers", __FILE__);
         if (fork() == 0){
-            execlp("./tcp/tcpclient_emisor", "tcpclient_emisor", IP_BROKERS[i], PUERTO_CONTRA_BROKERS , paramIdBroker, paramMsgQueue, (char*) 0);
+            execlp("./tcp/tcpclient_emisor", "tcpclient_emisor", IP_BROKERS[i], PUERTO_CONTRA_BROKERS , paramIdBroker, paramMsgQueue, paramSizeMsg, (char*) 0);
             exit(1);
         }
     }
     
     // Comunicacion cliente con brokers para memoria compartida de los brokers
     sprintf(paramMsgQueue, "%d", MSGQUEUE_ENVIO_BROKER_SHM);
+    sprintf(paramSizeMsg, "%d", (int) sizeof(TMessageShMemInterBroker));
     sprintf(paramIdBroker, "%d", 0); // La conexion es solo con el sgte broker por lo que agarra todo lo que esta en la MsgQueue
     Logger::notice("Creo el cliente emisor de memoria compartida a brokers", __FILE__);
     if (fork() == 0){
-        execlp("./tcp/tcpclient_emisor", "tcpclient_emisor", IP_BROKERS[ID_BROKER_SIGUIENTE - ID_BROKER_START], PUERTO_CONTRA_BROKERS_SHMEM_BROKERS , paramIdBroker, paramMsgQueue, (char*) 0);
+        execlp("./tcp/tcpclient_emisor", "tcpclient_emisor", IP_BROKERS[ID_BROKER_SIGUIENTE - ID_BROKER_START], PUERTO_CONTRA_BROKERS_SHMEM_BROKERS , paramIdBroker, paramMsgQueue, paramSizeMsg, (char*) 0);
         exit(1);
     }
     
