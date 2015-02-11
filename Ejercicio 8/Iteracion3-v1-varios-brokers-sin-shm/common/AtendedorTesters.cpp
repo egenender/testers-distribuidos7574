@@ -78,6 +78,7 @@ int AtendedorTesters::recibirRequerimiento() {
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
+    this->idBroker = msg.idBroker;
     return msg.idDispositivo;
 }
 
@@ -88,6 +89,7 @@ void AtendedorTesters::enviarPrograma(int idDispositivo, int tester, int idProgr
     msg.mtypeMensaje = MTYPE_PROGRAMA_INICIAL;
     msg.idDispositivo = idDispositivo;
     msg.tester = this->idTester;
+    msg.idBroker = this->idBroker;
     msg.value = idPrograma;
     
     int ret = msgsnd(this->colaEnvios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
@@ -107,6 +109,7 @@ TMessageAtendedor AtendedorTesters::recibirResultado(int idTester) {
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
+    this->idBroker = rsp.idBroker;
     return rsp;
 }
 
@@ -116,6 +119,7 @@ void AtendedorTesters::enviarOrden(int idDispositivo, int orden) {
     msg.mtypeMensaje = MTYPE_ORDEN;
     msg.tester = this->idTester;
     msg.idDispositivo = idDispositivo;
+    msg.idBroker = this->idBroker;
     msg.value = orden;
     
     int ret = msgsnd(this->colaEnvios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
