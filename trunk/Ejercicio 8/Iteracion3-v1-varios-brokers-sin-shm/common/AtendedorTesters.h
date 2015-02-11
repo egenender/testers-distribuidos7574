@@ -17,7 +17,7 @@ private:
     int colaRecepcionesGeneral;
     int colaRecepcionesRequerimientos;
     
-    int idTester;
+    int idTester, idBroker;
     
     // For killing communication processes
     pid_t pidEmisor, pidReceptor;

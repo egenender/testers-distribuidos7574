@@ -8,9 +8,12 @@
 #include <cstdlib>
 #include <sys/msg.h>
 #include <sys/shm.h>
+#include <cstring>
+#include <cerrno>
 
 #include "logger/Logger.h"
 #include "ipc/Semaphore.h"
+#include "ipc/DistributedSharedMemory.h"
 
 using namespace std;
 
@@ -23,13 +26,21 @@ int main(int argc, char** argv) {
 
     key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_REGISTRO_TESTERS);
 	int msgQueueRegistros = msgget(key, 0660);
-
-    key = ftok(ipcFileName.c_str(), SHM_BROKER_TESTERS_REGISTRADOS);
-    int shmTablaTestersRegistrados = shmget(key, sizeof(TTablaBrokerTestersRegistrados), IPC_CREAT | 0660);
-    TTablaBrokerTestersRegistrados* tablaTestersComunesRegistrados = (TTablaBrokerTestersRegistrados*) shmat(shmTablaTestersRegistrados, (void*) NULL, 0);
     
-    Semaphore semTabla(SEM_BROKER_TESTERS_REGISTRADOS);
-    semTabla.getSem();
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_INTERNAL_BROKER_SHM);
+	int msgQueueShm = msgget(key, 0660);
+
+    key = ftok(ipcFileName.c_str(), SHM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM);
+    int shMemCantReqBrokerShmemId = shmget(key, sizeof(int), IPC_CREAT | 0660);
+    int* shMemCantReqBrokerShmem = (int*) shmat(shMemCantReqBrokerShmemId, (void*) NULL, 0);
+    
+    Semaphore semCantReqBrokerShmem(SEM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM);
+    semCantReqBrokerShmem.getSem();
+
+    TMessageShMemInterBroker* shmDistrTablaTesters = NULL;
+    TMessageRequerimientoBrokerShm reqMsg;
+    reqMsg.mtype = MTYPE_REQUERIMIENTO_SHM_BROKER;
+    reqMsg.idSubBroker = ID_SUB_BROKER_REGISTRO_TESTER;
     
     while(true) {
 
@@ -51,9 +62,16 @@ int main(int argc, char** argv) {
             id = id - ID_TESTER_ESP_START + MAX_TESTER_COMUNES;
         } else  id -= ID_TESTER_COMUN_START;
         
-        semTabla.p();
-        if (!tablaTestersComunesRegistrados->registrados[id]) {
-            tablaTestersComunesRegistrados->registrados[id] = true;
+        shmDistrTablaTesters = (TMessageShMemInterBroker*) obtenerDistributedSharedMemory(msgQueueShm, &reqMsg, sizeof(TMessageRequerimientoBrokerShm), shMemCantReqBrokerShmem, &semCantReqBrokerShmem, msgQueueShm, sizeof(TMessageShMemInterBroker), ID_SUB_BROKER_REGISTRO_TESTER);
+        if (shmDistrTablaTesters == NULL) {
+            std::stringstream ss;
+            ss << "Error intentando obtener la memoria compartida distribuida para el broker " << ID_BROKER << " y sub-broker " << ID_SUB_BROKER_REGISTRO_TESTER << ". Errno: " << strerror(errno);
+            Logger::error(ss.str(), __FILE__);
+            exit(1);
+        }
+        if (!shmDistrTablaTesters->memoria.registrados[id]) {
+            shmDistrTablaTesters->memoria.registrados[id] = true;
+            shmDistrTablaTesters->memoria.brokerAsignado[id] = ID_BROKER;
 
             if (msg.esTesterEspecial) {
                 // Levanto el semaforo por si hay un requerimiento especial esperando
@@ -72,8 +90,9 @@ int main(int argc, char** argv) {
             Logger::error(ss.str(), __FILE__);
             // TODO: ¿Que hacemos aca?
         }
-        semTabla.v();
-        
+        shmDistrTablaTesters->mtype = MTYPE_DEVOLUCION_SHM_BROKER;
+        devolverDistributedSharedMemory(msgQueueShm, shmDistrTablaTesters, sizeof(TMessageShMemInterBroker));
+        shmDistrTablaTesters = NULL;
     }
 
     return 0;

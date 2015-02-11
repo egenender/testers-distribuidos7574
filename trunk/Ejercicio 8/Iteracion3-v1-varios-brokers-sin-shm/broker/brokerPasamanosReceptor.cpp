@@ -31,6 +31,10 @@ int main(int argc, char* argv[]) {
     
     key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_REGISTRO_TESTERS);
     int msgQueueRegistroTesters = msgget(key, 0660);
+
+    // Queue hacia donde se envian mensajes de otros brokers
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_HACIA_BROKER);
+	int msgQueueHaciaBrokers = msgget(key, IPC_CREAT | 0660);
 	
 	TMessageAtendedor msg;
     int ret = 0;
@@ -72,16 +76,29 @@ int main(int argc, char* argv[]) {
                 break;
 
             default:
-                ss << "Llego mensaje para el dispositivo " << msg.idDispositivo;
+                ss << "Llego mensaje para el dispositivo " << msg.idDispositivo << " que esta conectado al broker " << msg.idBroker << " y estoy en el broker " << ID_BROKER;
                 Logger::notice(ss.str(), __FILE__);
                 ss.str("");
                 ss.clear();
 
-                msg.mtype = msg.idDispositivo;
-                ret = msgsnd(msgQueueDisp, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
-                if(ret == -1) {
-                    Logger::error("Error al enviar el mensaje a la cola de envio a dispositivos");
-                    exit(1);
+                if (msg.idBroker == ID_BROKER) {
+                    msg.mtype = msg.idDispositivo;
+                    ret = msgsnd(msgQueueDisp, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+                    if(ret == -1) {
+                        Logger::error("Error al enviar el mensaje a la cola de envio a dispositivos", __FILE__);
+                        exit(1);
+                    }
+                } else {
+                    ss << "Envío el mensaje al broker correspondiente de ID " << msg.idBroker;
+                    Logger::debug(ss.str(), __FILE__); ss.str(""); ss.clear();
+                    // Envio el mensaje al broker correspondiente
+                    msg.mtype = msg.idBroker;
+                    msg.mtypeMensajeBroker = MTYPE_HACIA_DISPOSITIVO;
+                    ret = msgsnd(msgQueueHaciaBrokers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+                    if(ret == -1) {
+                        Logger::error("Error al enviar el mensaje a la cola de envio a otros brokers", __FILE__);
+                        exit(1);
+                    }
                 }
                 break;
             

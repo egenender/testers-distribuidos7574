@@ -17,6 +17,10 @@ int main(int argc, char* argv[]) {
 	
 	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_REQUERIMIENTOS_DISPOSITIVOS);
 	int msgQueueReqDisp = msgget(key, 0660);
+    
+    // Queue hacia donde se envian mensajes de otros brokers
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_HACIA_BROKER);
+	int msgQueueHaciaBrokers = msgget(key, IPC_CREAT | 0660);
 	
 	TMessageAtendedor msg;
     int ret = 0;
@@ -50,11 +54,28 @@ int main(int argc, char* argv[]) {
                 ss.str("");
                 ss.clear();
                 
-                msg.mtype = msg.tester;
-                ret = msgsnd(msgQueueTestYEq, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
-                if(ret == -1) {
-                    Logger::error("Error al enviar el mensaje a la cola de envio a testers comunes");
-                    exit(1);
+                ss << "El resultado inicial debe ser enviado al broker " << msg.idBroker << " y estoy en el broker " << ID_BROKER;
+                Logger::notice(ss.str(), __FILE__); ss.str(""); ss.clear();
+                
+                if (msg.idBroker == ID_BROKER) {
+                    // El mensaje es de para tester en este broker
+                    msg.mtype = msg.tester;
+                    ret = msgsnd(msgQueueTestYEq, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+                    if(ret == -1) {
+                        Logger::error("Error al enviar el mensaje a la cola de envio a testers comunes", __FILE__);
+                        exit(1);
+                    }
+                } else {
+                    ss << "Envío resultado inicial hacia el broker " << msg.idBroker;
+                    Logger::notice(ss.str(), __FILE__); ss.str(""); ss.clear();
+                    // El mensaje es para tester en otro broker
+                    msg.mtype = msg.idBroker;
+                    msg.mtypeMensajeBroker = MTYPE_HACIA_TESTER;
+                    ret = msgsnd(msgQueueHaciaBrokers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+                    if(ret == -1) {
+                        Logger::error("Error al enviar el mensaje a la cola de envio hacia brokers", __FILE__);
+                        exit(1);
+                    }
                 }
                 break;
 
@@ -65,11 +86,27 @@ int main(int argc, char* argv[]) {
                 ss.str("");
                 ss.clear();
                 
-                msg.mtype = ID_EQUIPO_ESPECIAL;
-                int ret = msgsnd(msgQueueTestYEq, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
-                if(ret == -1) {
-                    Logger::error("Error al enviar el mensaje a la cola de envio a equipo especial");
-                    exit(1);
+                ss << "El resultado inicial debe ser enviado al broker " << msg.idBroker << " y estoy en el broker " << ID_BROKER;
+                Logger::notice(ss.str(), __FILE__); ss.str(""); ss.clear();
+                
+                msg.tester = ID_EQUIPO_ESPECIAL;
+                if (msg.idBroker == ID_BROKER) {
+                    int ret = msgsnd(msgQueueTestYEq, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+                    if(ret == -1) {
+                        Logger::error("Error al enviar el resultado especial a la cola de envio a testers y equipo especial", __FILE__);
+                        exit(1);
+                    }
+                } else {
+                    ss << "Envío resultado inicial hacia el broker " << msg.idBroker;
+                    Logger::notice(ss.str(), __FILE__); ss.str(""); ss.clear();
+                    // El mensaje es para tester en otro broker
+                    msg.mtype = msg.idBroker;
+                    msg.mtypeMensajeBroker = MTYPE_HACIA_TESTER;
+                    ret = msgsnd(msgQueueHaciaBrokers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+                    if(ret == -1) {
+                        Logger::error("Error al enviar el resultado especial a la cola de envio hacia brokers", __FILE__);
+                        exit(1);
+                    }
                 }
                 break;
         }

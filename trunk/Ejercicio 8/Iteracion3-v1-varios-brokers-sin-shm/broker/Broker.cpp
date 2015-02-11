@@ -10,6 +10,8 @@
 #include "../ipc/Semaphore.h"
 #include "../logger/Logger.h"
 
+const char* IP_BROKERS[CANT_BROKERS] = {"127.0.0.1", "127.0.0.1", "127.0.0.1"};
+
 void crearIpc() {
     
     std::fstream ipcFile(ipcFileName.c_str(), std::ios_base::out);
@@ -26,21 +28,22 @@ void crearIpc() {
     
     key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_EMISOR);
 	msgget(key, IPC_CREAT | 0660);
-    
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_REQUERIMIENTOS_DISPOSITIVOS);
-	msgget(key, IPC_CREAT | 0660);
 	
-	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_REQUERIMIENTOS_TESTER_ESPECIAL);
-	msgget(key, IPC_CREAT | 0660);
-    
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_REGISTRO_TESTERS);
-	msgget(key, IPC_CREAT | 0660);
+	for(int i = MSGQUEUE_BROKER_REQUERIMIENTOS_DISPOSITIVOS; i <= MSGQUEUE_RECEPCION_BROKER_SHM; i++) {
+        key = ftok(ipcFileName.c_str(), i);
+        msgget(key, IPC_CREAT | 0660);
+    }
 
     key = ftok(ipcFileName.c_str(), SHM_BROKER_TESTERS_REGISTRADOS);
     int shmTablaTestCom = shmget(key, sizeof(TTablaBrokerTestersRegistrados), IPC_CREAT | 0660);
     TTablaBrokerTestersRegistrados* tablaTesterRegistrados = (TTablaBrokerTestersRegistrados*) shmat(shmTablaTestCom, NULL, 0);
     for (int i = 0; i < MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES; i++)    tablaTesterRegistrados->registrados[i] = false;
     tablaTesterRegistrados->ultimoTesterElegido = 0;
+    
+    key = ftok(ipcFileName.c_str(), SHM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM);
+    int shmCantReqBrokerShMem = shmget(key, sizeof(int), IPC_CREAT | 0660);
+    int* cantReqBrokerShm = (int*) shmat(shmCantReqBrokerShMem, NULL, 0);
+    *cantReqBrokerShm = 0;
 
     Semaphore semTestersRegistrados(SEM_BROKER_TESTERS_REGISTRADOS);
     semTestersRegistrados.creaSem();
@@ -49,6 +52,10 @@ void crearIpc() {
     Semaphore semEspecialAsignacion(SEM_ESPECIALES_ASIGNACION);
     semEspecialAsignacion.creaSem();
     semEspecialAsignacion.iniSem(1);
+    
+    Semaphore semReqBrokerShm(SEM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM);
+    semReqBrokerShm.creaSem();
+    semReqBrokerShm.iniSem(1);
 
     for (int i = 0; i < MAX_TESTER_ESPECIALES; i++) {
 		Semaphore semEspecial(i + SEM_ESPECIALES);
@@ -93,12 +100,26 @@ void crearModulosBroker() {
         Logger::notice ("Mensaje luego de execlp de brokerRegistroTesters. Algo salio mal!", __FILE__);
         exit(1);
 	}
-
+    
+    Logger::notice("Creo el modulo de broker paso de mensajes inter-broker", __FILE__);
+    if (fork() == 0){
+		execlp("./interBrokerMsgHandler", "interBrokerMsgHandler", (char*)0);
+        Logger::notice ("Mensaje luego de execlp de interBrokerMsgHandler. Algo salio mal!", __FILE__);
+        exit(1);
+	}
+    
+    Logger::notice("Creo el modulo de broker paso de shmem inter-broker", __FILE__);
+    if (fork() == 0){
+		execlp("./brokerShMemPassingHandler", "brokerShMemPassingHandler", (char*)0);
+        Logger::notice ("Mensaje luego de execlp de brokerShMemPassingHandler. Algo salio mal!", __FILE__);
+        exit(1);
+	}
 }
 
 void crearServers(){
 	
     char paramMsgQueue[10];
+    char paramIdBroker[10];
     
     // Comunicacion con testers y equipo especial
     sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_RECEPTOR);
@@ -126,9 +147,47 @@ void crearServers(){
 	sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_EMISOR_DISPOSITIVOS);
 	Logger::notice("Creo el servidor emisor de mensajes a dispositivos", __FILE__);
 	if (fork() == 0){
-		execlp("./tcp/tcpserver_emisor", "tcpserver_emisor", PUERTO_SERVER_EMISOR_DISPOSITIVOS , paramMsgQueue,(char*)0);
+		execlp("./tcp/tcpserver_emisor", "tcpserver_emisor", PUERTO_SERVER_EMISOR_DISPOSITIVOS , paramMsgQueue,(char*) 0);
         exit(1);
 	}
+    
+    // Comunicacion con brokers para mensajes generales
+    sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_DESDE_BROKER);
+    Logger::notice("Creo el servidor receptor de mensajes de dispositivos", __FILE__);
+	if (fork() == 0){
+		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_CONTRA_BROKERS , paramMsgQueue, (char*) 0);
+        exit(1);
+	}
+	
+    sprintf(paramIdBroker, "%d", ID_BROKER);
+    sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_HACIA_BROKER);
+    for (int i = 0; i < CANT_BROKERS; i++) {
+        if (i == ID_BROKER) continue;
+        Logger::notice("Creo el servidor emisor de mensajes a dispositivos", __FILE__);
+        if (fork() == 0){
+            execlp("./tcp/tcpclient_emisor", "tcpclient_emisor", IP_BROKERS[i], PUERTO_CONTRA_BROKERS , paramIdBroker, paramMsgQueue, (char*) 0);
+            exit(1);
+        }
+    }
+    
+    // Comunicacion con brokers para memoria compartida de los brokers
+    sprintf(paramMsgQueue, "%d", MSGQUEUE_RECEPCION_BROKER_SHM);
+    Logger::notice("Creo el servidor receptor de mensajes de dispositivos", __FILE__);
+	if (fork() == 0){
+		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_CONTRA_BROKERS_SHMEM_BROKERS , paramMsgQueue, (char*) 0);
+        exit(1);
+	}
+	
+    sprintf(paramMsgQueue, "%d", MSGQUEUE_ENVIO_BROKER_SHM);
+    for (int i = 0; i < CANT_BROKERS; i++) {
+        if (i == ID_BROKER) continue;
+        Logger::notice("Creo el servidor emisor de mensajes a dispositivos", __FILE__);
+        if (fork() == 0){
+            execlp("./tcp/tcpclient_emisor", "tcpclient_emisor", IP_BROKERS[i], PUERTO_CONTRA_BROKERS_SHMEM_BROKERS , paramIdBroker, paramMsgQueue, (char*) 0);
+            exit(1);
+        }
+    }
+    
 }
 
 int main (int argc, char* argv[]) {
