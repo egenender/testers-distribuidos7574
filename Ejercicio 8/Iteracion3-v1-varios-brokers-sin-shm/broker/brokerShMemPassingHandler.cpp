@@ -57,17 +57,17 @@ int main(int argc, char** argv) {
         
         std::stringstream log;
         log << "Me llego la memoria compartida. Broker ID: " << ID_BROKER << ". Me fijo si alguien la necesita.";
-        Logger::debug(log.str(), nombre.str().c_str()); log.str(""); log.clear();
+        /*Logger::debug(log.str(), nombre.str().c_str());*/ log.str(""); log.clear();
         
         semBrokerCantShmemReq.p();
         int cantRequerimientos = *cantReqBrokerShm;
         semBrokerCantShmemReq.v();
         
         int cantTotalRequerimientos = cantRequerimientos;
-        log << "Hay " << cantRequerimientos << " modulo(s) del broker " << ID_BROKER << " que necesita(n) la shared memory.";
-        Logger::debug(log.str(), nombre.str().c_str()); log.str(""); log.clear();
         while (cantRequerimientos > 0) {
-            
+            log << "Hay " << cantRequerimientos << " modulo(s) del broker " << ID_BROKER << " que necesita(n) la shared memory.";
+            Logger::notice(log.str(), nombre.str().c_str()); log.str(""); log.clear();
+
             TMessageRequerimientoBrokerShm msgReq;
             okRead = msgrcv(msgQueueInternaBrokerShmem, &msgReq, sizeof(TMessageRequerimientoBrokerShm) - sizeof(long), MTYPE_REQUERIMIENTO_SHM_BROKER, 0);
             if (okRead == -1) {
@@ -110,6 +110,12 @@ int main(int argc, char** argv) {
         semBrokerCantShmemReq.p();
         *cantReqBrokerShm = *cantReqBrokerShm - cantTotalRequerimientos;
         semBrokerCantShmemReq.v();
+        
+        if (CANT_BROKERS <= 5) {
+            sleep(5 - CANT_BROKERS);
+        } else {
+            usleep(10000);
+        }
         
         // Envio de vuelta la shmem al siguiente broker
         msg.mtype = ID_BROKER_SIGUIENTE;
