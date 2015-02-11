@@ -34,6 +34,7 @@ AtendedorEquipoEspecial::AtendedorEquipoEspecial() {
     
     char paramIdCola[10];
     char paramId[10];
+    char paramSizeMsg[10];
 
 	sprintf(paramIdCola, "%d", MSGQUEUE_RECEPCIONES_EQUIPO_ESPECIAL);
     sprintf(paramId, "%d", ID_EQUIPO_ESPECIAL);
@@ -49,11 +50,12 @@ AtendedorEquipoEspecial::AtendedorEquipoEspecial() {
 	}
 
 	sprintf(paramIdCola, "%d", MSGQUEUE_ENVIO_EQUIPO_ESPECIAL);
+    sprintf(paramSizeMsg, "%d", (int) sizeof(TMessageAtendedor));
 
 	if (fork() == 0) {
 		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",
 				UBICACION_SERVER, PUERTO_SERVER_RECEPTOR,
-				paramId, paramIdCola,
+				paramId, paramIdCola, paramSizeMsg, 
 				(char*) 0);
         Logger::error("Log luego de execlp tcpclient_emisor. Error!", __FILE__);
 		exit(1);

@@ -26,6 +26,7 @@ AtendedorTesters::AtendedorTesters(int idTester): idTester(idTester) {
         exit(1);
     }
 
+    char paramSizeMsg[10];
     char paramId[10];
     sprintf(paramId, "%d", this->idTester);
     char paramCola[10];
@@ -40,12 +41,13 @@ AtendedorTesters::AtendedorTesters(int idTester): idTester(idTester) {
 	}
 
 	sprintf(paramCola, "%d", MSGQUEUE_ENVIO_TESTER_COMUN);
+    sprintf(paramSizeMsg, "%d", (int) sizeof(TMessageAtendedor));
 
 	if (fork() == 0){
 		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",
 				UBICACION_SERVER,
 				PUERTO_SERVER_RECEPTOR,
-				paramId, paramCola,(char*)0);
+				paramId, paramCola, paramSizeMsg, (char*)0);
         exit(1);
 	}
     

@@ -8,12 +8,6 @@
 #include "../common/common.h"
 #include "comunes_tcp.h"
 #include "logger/Logger.h"
-
-#ifdef EJEMPLO_TEST
-#define IPCS_FILE "ipcs-prueba"
-#else
-#define IPCS_FILE "/tmp/pereira-ipcs"
-#endif
 /*
 void terminar_ejecucion(int sig){
     // ACA HAY QUE TOCAR SI DEBERIA HACER ALGO DISTINTO A SIMPLEMENTE MORIR
@@ -24,14 +18,15 @@ int main(int argc, char *argv[]) {
     
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
 	
-    if(argc != 3){
+    if(argc != 4){
         //printf("Uso: %s <puerto> <id_server> <id_cola>\n", argv[0]);
         Logger::error("Bad arguments!", __FILE__);
-        printf("Uso: %s <puerto> <idMsgQueue>\n", argv[0]);
+        printf("Uso: %s <puerto> <idMsgQueue> <sizeMsg>\n", argv[0]);
         return -1;
     }
 
     int idMsgQueue = atoi(argv[2]);
+    int sizeMsg = atoi(argv[3]);
 	
     int fd = tcpOpenPasivo(atoi(argv[1]));
     if(fd < 0) {
@@ -57,7 +52,7 @@ int main(int argc, char *argv[]) {
         //cant_atendidos++;
 
         if (fork() == 0) {
-            TMessageAtendedor* buffer = (TMessageAtendedor*) malloc(sizeof(TMessageAtendedor));
+            void* buffer = malloc(sizeMsg);
 
             //Espero primer mensaje, que el cliente me tiene que decir su ID.
             //recibir(buffer, clientfd);
@@ -78,10 +73,10 @@ int main(int argc, char *argv[]) {
             int msgQueue = msgget(key, 0660);
             while (true) {
                 //Espero por un mensaje desde el cliente
-                recibir(clientFd, buffer, sizeof(TMessageAtendedor));
+                recibir(clientFd, buffer, sizeMsg);
 
                 //Mando el mensaje por la cola que el cliente me dice que tengo que usar
-                int ok = msgsnd(msgQueue, buffer, sizeof(TMessageAtendedor) - sizeof(long), 0);
+                int ok = msgsnd(msgQueue, buffer, sizeMsg - sizeof(long), 0);
                 if (ok == -1) {
                     Logger::error("Error enviando a la cola de mensajes", __FILE__);
                     close(clientFd);
