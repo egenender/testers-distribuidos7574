@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
         semBrokerCantShmemReq.v();
         
         int cantTotalRequerimientos = cantRequerimientos;
-        log << "Hay " << cantRequerimientos << " modulo(s) del broker " << ID_BROKER << " que necesita(n) la shared memory. Busco al primero en pedirla...";
+        log << "Hay " << cantRequerimientos << " modulo(s) del broker " << ID_BROKER << " que necesita(n) la shared memory.";
         Logger::debug(log.str(), nombre.str().c_str()); log.str(""); log.clear();
         while (cantRequerimientos > 0) {
             
