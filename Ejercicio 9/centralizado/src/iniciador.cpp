@@ -120,7 +120,7 @@ void createSystemProcesses( const Configuracion& config ) {
         usleep(10);
         pid_t newPid = fork();
         if(newPid == 0) {
-			// Inicio el programa correspondiente
+            // Inicio el programa correspondiente
             execlp("./testerComun", "testerComun", param, (char*)0);
             Logger::error("Error al ejecutar el programa TesterComun de ID" + idTester, __FILE__);
             exit(1);
@@ -133,7 +133,7 @@ void createSystemProcesses( const Configuracion& config ) {
         usleep(10);
         pid_t newPid = fork();
         if(newPid == 0) {
-			// Inicio el programa correspondiente
+            // Inicio el programa correspondiente
             execlp("./testerEspecial", "testerEspecial", param, (char*)0);
             Logger::error("Error al ejecutar el programa TesterEspecial de ID" + idTester, __FILE__);
             exit(1);

@@ -18,7 +18,7 @@
 using namespace std;
 
 int main(int argc, char** argv) {
-	srand(time(NULL));
+    srand(time(NULL));
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
     // Por parametro se recibe el ID del dispositivo
     int id = atoi(argv[1]);
@@ -39,18 +39,18 @@ int main(int argc, char** argv) {
     // TODO: Log
     
     while(true) {
-	try {
+    try {
         // Dispositivo envia requerimiento
-		ss << "El dispositivo " << id << " envia un requerimiento al sistema de testeo";
-		Logger::debug(ss.str().c_str(), __FILE__);
-		ss.str("");
+        ss << "El dispositivo " << id << " envia un requerimiento al sistema de testeo";
+        Logger::debug(ss.str().c_str(), __FILE__);
+        ss.str("");
         atendedor.enviarRequerimiento(id);
         // Recibe programa, verificando que no sea un rechazo por parte del sistema
         int program = atendedor.recibirPrograma(id);
         if (program == SIN_LUGAR) {
-	    ss << "El dispositivo " << id << " recibe indicacion de que no hay lugar en el sistema de testeo. Reintentara luego";
-	    Logger::debug(ss.str().c_str(), __FILE__);
-	    ss.str("");
+            ss << "El dispositivo " << id << " recibe indicacion de que no hay lugar en el sistema de testeo. Reintentara luego";
+            Logger::debug(ss.str().c_str(), __FILE__);
+            ss.str("");
             // Si no hay programa -> no hay lugar -> Duermo y envio otro req mas tarde
             usleep(rand() % 10000 + 10000);
             continue;
@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
         ss << "El dispositivo " << id << " envia los resultados";
         Logger::debug(ss.str().c_str(), __FILE__);;
         ss.str("");
-		
+
         // Le envio resultado del primer programa de testeo
         int resul = rand() % 10;
         if (resul >= 4){
@@ -84,12 +84,12 @@ int main(int argc, char** argv) {
         int orden = atendedor.recibirOrden(id);
         
         if (orden == ORDEN_APAGADO) {
-			ss << "El dispositivo " << id << " recibe la orden de apagado (" << orden << "). Byebye!";
+            ss << "El dispositivo " << id << " recibe la orden de apagado (" << orden << "). Byebye!";
             Logger::notice(ss.str().c_str(), __FILE__);
-			ss.str("");
+            ss.str("");
             break;
         } else if (orden == ORDEN_REINICIO){
-			ss << "El dispositivo " << id << " recibe la orden de reinicio (" << orden << "). Vuelvo pronto!";
+            ss << "El dispositivo " << id << " recibe la orden de reinicio (" << orden << "). Vuelvo pronto!";
             Logger::notice(ss.str().c_str(), __FILE__);
             ss.str("");
             break;
@@ -97,21 +97,21 @@ int main(int argc, char** argv) {
             ss << "El dispositivo " << id << " recibe la orden de hacer testeos especiales!";
             Logger::notice(ss.str().c_str(), __FILE__);
             ss.str("");
-			
+
             bool lastSpecialTest = false;
             program = atendedor.recibirProgramaEspecial(id);
-                while (!lastSpecialTest){
-                    ss << "El dispositivo " << id << " recibe el programa especial numero " << program << ". Enviando resultados...";
-                    Logger::debug(ss.str().c_str(), __FILE__);;
-                    ss.str("");
-                    atendedor.enviarResultadoEspecial(id, rand() % 2);
-                    program = atendedor.recibirProgramaEspecial(id);
-                    if (program == FIN_TEST_ESPECIAL)
-                        lastSpecialTest = true;
-		}
+            while (!lastSpecialTest){
+                ss << "El dispositivo " << id << " recibe el programa especial numero " << program << ". Enviando resultados...";
+                Logger::debug(ss.str().c_str(), __FILE__);;
+                ss.str("");
+                atendedor.enviarResultadoEspecial(id, rand() % 2);
+                program = atendedor.recibirProgramaEspecial(id);
+                if (program == FIN_TEST_ESPECIAL)
+                    lastSpecialTest = true;
+            }
             orden = atendedor.recibirOrden(id);
-			
-			if (orden == ORDEN_APAGADO) {
+
+            if (orden == ORDEN_APAGADO) {
 				ss << "El dispositivo " << id << " recibe la orden de apagado (" << orden << "). Byebye!";
 				Logger::notice(ss.str().c_str(), __FILE__);
 				ss.str("");
@@ -131,7 +131,7 @@ int main(int argc, char** argv) {
 	} catch(std::string exception) {
 		Logger::error("Error en el dispositivo...", __FILE__);
 		break;
-	}
+    }
     }
    
     ss << "El dispositivo " << id << " ha terminado el testeo"; 
