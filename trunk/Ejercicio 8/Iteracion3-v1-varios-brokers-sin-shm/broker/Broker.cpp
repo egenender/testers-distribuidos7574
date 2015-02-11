@@ -162,8 +162,9 @@ void crearServers(){
 
     // Comunicacion cliente con brokers para mensajes generales
     sprintf(paramIdBroker, "%d", ID_BROKER);
+    sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_HACIA_BROKER);
     for (int i = 0; i < CANT_BROKERS; i++) {
-        if (i == ID_BROKER) continue;
+        if (i == (ID_BROKER - ID_BROKER_START)) continue;
         Logger::notice("Creo el cliente emisor de mensajes generales a brokers", __FILE__);
         if (fork() == 0){
             execlp("./tcp/tcpclient_emisor", "tcpclient_emisor", IP_BROKERS[i], PUERTO_CONTRA_BROKERS , paramIdBroker, paramMsgQueue, (char*) 0);
