@@ -141,40 +141,42 @@ void crearServers(){
         exit(1);
 	}
     
-    // Comunicacion con brokers para mensajes generales
+    // Comunicacion Servidor con brokers para mensajes generales
     sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_DESDE_BROKER);
-    Logger::notice("Creo el servidor receptor de mensajes de dispositivos", __FILE__);
+    Logger::notice("Creo el servidor receptor de mensajes generales de brokers", __FILE__);
 	if (fork() == 0){
 		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_CONTRA_BROKERS , paramMsgQueue, (char*) 0);
         exit(1);
 	}
+    
+    // Comunicacion Servidor con brokers para memoria compartida de los brokers
+    sprintf(paramMsgQueue, "%d", MSGQUEUE_RECEPCION_BROKER_SHM);
+    Logger::notice("Creo el servidor receptor de memoria compartida de brokers", __FILE__);
+	if (fork() == 0){
+		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_CONTRA_BROKERS_SHMEM_BROKERS , paramMsgQueue, (char*) 0);
+        exit(1);
+	}
 	
+    // Para dar tiempo a que todos los broker esten arriba
+	sleep(5);
+
+    // Comunicacion cliente con brokers para mensajes generales
     sprintf(paramIdBroker, "%d", ID_BROKER);
     sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_HACIA_BROKER);
     for (int i = 0; i < CANT_BROKERS; i++) {
         if (i == ID_BROKER) continue;
-        Logger::notice("Creo el servidor emisor de mensajes a dispositivos", __FILE__);
+        Logger::notice("Creo el cliente emisor de mensajes generales a brokers", __FILE__);
         if (fork() == 0){
             execlp("./tcp/tcpclient_emisor", "tcpclient_emisor", IP_BROKERS[i], PUERTO_CONTRA_BROKERS , paramIdBroker, paramMsgQueue, (char*) 0);
             exit(1);
         }
     }
-    
-    // Comunicacion con brokers para memoria compartida de los brokers
-    sprintf(paramMsgQueue, "%d", MSGQUEUE_RECEPCION_BROKER_SHM);
-    Logger::notice("Creo el servidor receptor de mensajes de dispositivos", __FILE__);
-	if (fork() == 0){
-		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_CONTRA_BROKERS_SHMEM_BROKERS , paramMsgQueue, (char*) 0);
-        exit(1);
-	}
-
-	// Para dar tiempo a que todos los broker esten arriba
-	sleep(5);
 	
+    // Comunicacion cliente con brokers para memoria compartida de los brokers
     sprintf(paramMsgQueue, "%d", MSGQUEUE_ENVIO_BROKER_SHM);
     for (int i = 0; i < CANT_BROKERS; i++) {
         if (i == (ID_BROKER - ID_BROKER_START)) continue;
-        Logger::notice("Creo el servidor emisor de mensajes a dispositivos", __FILE__);
+        Logger::notice("Creo el cliente emisor de memoria compartida a brokers", __FILE__);
         if (fork() == 0){
             execlp("./tcp/tcpclient_emisor", "tcpclient_emisor", IP_BROKERS[i], PUERTO_CONTRA_BROKERS_SHMEM_BROKERS , paramIdBroker, paramMsgQueue, (char*) 0);
             exit(1);
