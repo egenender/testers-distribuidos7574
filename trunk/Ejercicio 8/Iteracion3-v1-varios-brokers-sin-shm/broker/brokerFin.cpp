@@ -24,23 +24,23 @@ int main(int argc, char** argv) {
 
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
 
-    key_t key = ftok(ipcFileName.c_str(), SHM_BROKER_TESTERS_REGISTRADOS);
+    key_t key = ftok(ipcFileName.c_str(), SHM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM);
     if (key == -1) {
         std::stringstream ss;
-        ss << "Error obteniendo la key del IPC " << SHM_BROKER_TESTERS_REGISTRADOS << ". Error: " << strerror(errno);
+        ss << "Error obteniendo la key del IPC " << SHM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM << ". Error: " << strerror(errno);
         Logger::error(ss.str(), __FILE__);
         exit(1);
     }
-    int shmTestCom = shmget(key, sizeof(TTablaBrokerTestersRegistrados), 0660);
-    if (shmTestCom == -1) {
+    int shmCantReqShmem = shmget(key, sizeof(int), 0660);
+    if (shmCantReqShmem == -1) {
         std::stringstream ss;
-        ss << "Error obteniendo el ID del IPC " << SHM_BROKER_TESTERS_REGISTRADOS << ". Error: " << strerror(errno);
+        ss << "Error obteniendo el ID del IPC " << SHM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM << ". Error: " << strerror(errno);
         Logger::error(ss.str(), __FILE__);
         exit(1);
     }
-    shmctl(shmTestCom, IPC_RMID, NULL);
+    shmctl(shmCantReqShmem, IPC_RMID, NULL);
 
-    Semaphore semTablaCom(SEM_BROKER_TESTERS_REGISTRADOS);
+    Semaphore semTablaCom(SEM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM);
     semTablaCom.getSem();
     semTablaCom.eliSem();
     
@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
         msgctl(cola ,IPC_RMID, NULL);
     }
 
-    for (int q = MSGQUEUE_BROKER_REQUERIMIENTOS_DISPOSITIVOS; q <= MSGQUEUE_BROKER_REGISTRO_TESTERS; q++) {
+    for (int q = MSGQUEUE_BROKER_REQUERIMIENTOS_DISPOSITIVOS; q <= MSGQUEUE_RECEPCION_BROKER_SHM; q++) {
         key = ftok(ipcFileName.c_str(), q);
         if (key == -1) {
             std::stringstream ss;

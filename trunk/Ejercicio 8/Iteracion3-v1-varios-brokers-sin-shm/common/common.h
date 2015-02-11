@@ -44,8 +44,6 @@ const int SEM_TABLA_TESTERS_ESPECIALES_DISPONIBLES = 12;
 
 const int SEM_IDENTIFICADOR = 13;
 const int SEM_ESPECIALES_ASIGNACION = 14;
-const int SHM_BROKER_TESTERS_REGISTRADOS = 15;
-const int SEM_BROKER_TESTERS_REGISTRADOS = 16;
 
 const int SHM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM = 18;
 const int SEM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM = 19;
@@ -174,9 +172,11 @@ typedef struct TTablaIdTestersEspecialesDisponibles {
 } TTablaIdTestersEspecialesDisponibles;
 
 /*******BROKERS CONFIG!********/
-const int CANT_BROKERS = 3;
+const int MASTER_BROKER = 1;
+const int ID_BROKER_START = 1;
+const int CANT_BROKERS = 2;
 const int ID_BROKER = 1;
-const int ID_BROKER_SIGUIENTE = ((ID_BROKER + 1) == CANT_BROKERS) ? 1 : ID_BROKER + 1;
+const int ID_BROKER_SIGUIENTE = (ID_BROKER == CANT_BROKERS) ? ID_BROKER_START : ID_BROKER + 1;
 // LAS IPS DE LOS BROKERS ESTA EN EL ARCHIVO BROKER.CPP
 const char PUERTO_CONTRA_BROKERS[] = "40000";
 const char PUERTO_CONTRA_BROKERS_SHMEM_BROKERS[] = "40005";
@@ -193,8 +193,8 @@ const char PUERTO_SERVER_RECEPTOR[] = "50002";
 const char PUERTO_SERVER_EMISOR[] = "50003";
 
 // Para el broker al que se conectan dispositivos y testers de esta maquina
-const char UBICACION_SERVER[] = "192.168.2.3";
-const char UBICACION_SERVER_IDENTIFICADOR[] = "192.168.2.3";
+const char UBICACION_SERVER[] = "127.0.0.1";
+const char UBICACION_SERVER_IDENTIFICADOR[] = "192.168.2.7";
 
 /*******SUB-BROKERS-CONFIG********/
 const int MTYPE_DEVOLUCION_SHM_BROKER = 1;

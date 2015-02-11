@@ -10,7 +10,7 @@
 #include "../ipc/Semaphore.h"
 #include "../logger/Logger.h"
 
-const char* IP_BROKERS[CANT_BROKERS] = {"127.0.0.1", "127.0.0.1", "127.0.0.1"};
+const char* IP_BROKERS[CANT_BROKERS] = {"127.0.0.1", "192.168.2.7"};
 
 void crearIpc() {
     
@@ -32,22 +32,12 @@ void crearIpc() {
 	for(int i = MSGQUEUE_BROKER_REQUERIMIENTOS_DISPOSITIVOS; i <= MSGQUEUE_RECEPCION_BROKER_SHM; i++) {
         key = ftok(ipcFileName.c_str(), i);
         msgget(key, IPC_CREAT | 0660);
-    }
-
-    key = ftok(ipcFileName.c_str(), SHM_BROKER_TESTERS_REGISTRADOS);
-    int shmTablaTestCom = shmget(key, sizeof(TTablaBrokerTestersRegistrados), IPC_CREAT | 0660);
-    TTablaBrokerTestersRegistrados* tablaTesterRegistrados = (TTablaBrokerTestersRegistrados*) shmat(shmTablaTestCom, NULL, 0);
-    for (int i = 0; i < MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES; i++)    tablaTesterRegistrados->registrados[i] = false;
-    tablaTesterRegistrados->ultimoTesterElegido = 0;
+    }    
     
     key = ftok(ipcFileName.c_str(), SHM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM);
     int shmCantReqBrokerShMem = shmget(key, sizeof(int), IPC_CREAT | 0660);
     int* cantReqBrokerShm = (int*) shmat(shmCantReqBrokerShMem, NULL, 0);
     *cantReqBrokerShm = 0;
-
-    Semaphore semTestersRegistrados(SEM_BROKER_TESTERS_REGISTRADOS);
-    semTestersRegistrados.creaSem();
-    semTestersRegistrados.iniSem(1);
 
     Semaphore semEspecialAsignacion(SEM_ESPECIALES_ASIGNACION);
     semEspecialAsignacion.creaSem();
@@ -177,10 +167,13 @@ void crearServers(){
 		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_CONTRA_BROKERS_SHMEM_BROKERS , paramMsgQueue, (char*) 0);
         exit(1);
 	}
+
+	// Para dar tiempo a que todos los broker esten arriba
+	sleep(5);
 	
     sprintf(paramMsgQueue, "%d", MSGQUEUE_ENVIO_BROKER_SHM);
     for (int i = 0; i < CANT_BROKERS; i++) {
-        if (i == ID_BROKER) continue;
+        if (i == (ID_BROKER - ID_BROKER_START)) continue;
         Logger::notice("Creo el servidor emisor de mensajes a dispositivos", __FILE__);
         if (fork() == 0){
             execlp("./tcp/tcpclient_emisor", "tcpclient_emisor", IP_BROKERS[i], PUERTO_CONTRA_BROKERS_SHMEM_BROKERS , paramIdBroker, paramMsgQueue, (char*) 0);
@@ -190,11 +183,38 @@ void crearServers(){
     
 }
 
+void lanzarTareasMaster() {
+
+    // Tengo que inicializar y lanzar la memoria compartida
+    TMessageShMemInterBroker msgShmemInterBroker;
+    msgShmemInterBroker.mtype = ID_BROKER;
+
+    for (int i = 0; i < MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES; i++) {
+        msgShmemInterBroker.memoria.registrados[i] = false;
+        msgShmemInterBroker.memoria.brokerAsignado[i] = TESTER_ESPECIAL_NO_ASIGNADO;
+    }
+    msgShmemInterBroker.memoria.ultimoTesterElegido = 0;
+    
+    Logger::notice("Soy el MASTER y me lanzo la memoria compartida para iniciar el flujo", __FILE__);
+    key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_RECEPCION_BROKER_SHM);
+	int msgQueueRecepcionShmem = msgget(key, IPC_CREAT | 0660);
+    int okSend = msgsnd(msgQueueRecepcionShmem, &msgShmemInterBroker, sizeof(TMessageShMemInterBroker) - sizeof(long), 0);
+    if (okSend == -1) {
+        Logger::error("Error al iniciar el envio de la Shmem a mi mismo (MASTER). Abort!", __FILE__);
+        exit(1);
+    }
+}
+
 int main (int argc, char* argv[]) {
     
 	Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
 	crearIpc();
 	crearServers();
 	crearModulosBroker();
+    
+    if (ID_BROKER == MASTER_BROKER) {
+        lanzarTareasMaster();
+    }
+    
     return 0;
 }
