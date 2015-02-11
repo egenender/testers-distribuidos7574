@@ -1,5 +1,0 @@
-g++ -Wall -pedantic -pedantic-errors -g -ggdb -DDEBUG -c sync/LockFile.cpp
-g++ -Wall -pedantic -pedantic-errors -g -ggdb -DDEBUG -c common/AtendedorDispositivos.cpp
-g++ -Wall -pedantic -pedantic-errors -g -ggdb -DDEBUG LockFile.o logger/Logger.o AtendedorDispositivos.o Dispositivo.cpp -o Dispositivo
-g++: error: logger/Logger.o: No such file or directory
-make: *** [dispositivo] Error 1
