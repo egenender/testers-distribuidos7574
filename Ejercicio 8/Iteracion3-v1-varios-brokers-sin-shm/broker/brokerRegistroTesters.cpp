@@ -54,6 +54,7 @@ int main(int argc, char** argv) {
 		std::stringstream ss;
 		ss << "Me llego un pedido de requerimiento desde el tester " << msg.tester;
 		Logger::notice(ss.str(), __FILE__);
+        if (fork() == 0)    continue;
         
         // Calculo el ID en la tabla de testers registrados en base a si es 
         // Tester Comun -> Al ppio de la tabla; Tester Especial -> al final de la tabla
@@ -72,16 +73,16 @@ int main(int argc, char** argv) {
         if (!shmDistrTablaTesters->memoria.registrados[id]) {
             shmDistrTablaTesters->memoria.registrados[id] = true;
             shmDistrTablaTesters->memoria.brokerAsignado[id] = ID_BROKER;
-
+/*
             if (msg.esTesterEspecial) {
                 // Levanto el semaforo por si hay un requerimiento especial esperando
                 Semaphore semEspecial(SEM_ESPECIALES + id - MAX_TESTER_COMUNES);
                 semEspecial.getSem();
                 semEspecial.v();
             }
-            
+*/
             std::stringstream ss;
-            ss << "Se ha registrado al tester " << msg.tester << " con exito";
+            ss << "Se ha registrado al tester " << msg.tester << " en el espacio " << id << " de la shared memory y asignado al broker " << ID_BROKER << " con exito";
             Logger::notice(ss.str(), __FILE__);
 
         } else {

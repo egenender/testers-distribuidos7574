@@ -34,7 +34,7 @@ int main (int argc, char* argv[]){
     TMessageShMemInterBroker* shmDistrTablaTesters = NULL;
     TMessageRequerimientoBrokerShm reqMsg;
     reqMsg.mtype = MTYPE_REQUERIMIENTO_SHM_BROKER;
-    reqMsg.idSubBroker = ID_SUB_BROKER_REGISTRO_TESTER;
+    reqMsg.idSubBroker = ID_SUB_BROKER_REQUERIMIENTO_ESP;
 
     Semaphore semTestEspAsig(SEM_ESPECIALES_ASIGNACION);
     semTestEspAsig.getSem();
@@ -114,6 +114,7 @@ int main (int argc, char* argv[]){
         for (int i = 0; i < msg.cantTestersEspecialesAsignados; i++) {
             // Mando cada requerimiento especial especifico
             msg.mtype = msg.idTestersEspeciales[i];
+            msg.idBroker = brokersAsignados[i];
             
             ss.str(""); ss.clear();
             ss << "Se enviará requerimiento especial al tester especial " << msg.mtype << " que se encuentra en el broker " << brokersAsignados[i];

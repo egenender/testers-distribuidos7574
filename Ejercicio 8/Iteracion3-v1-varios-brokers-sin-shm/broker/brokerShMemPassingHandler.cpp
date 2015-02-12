@@ -99,7 +99,7 @@ int main(int argc, char** argv) {
                 Logger::error(ss.str(), nombre.str().c_str());
                 exit(1);
             }
-            log << "Shared memory regresa del sub-broker " << msg.mtype;
+            log << "Shared memory regresa del sub-broker";
             Logger::debug(log.str(), nombre.str().c_str()); log.str(""); log.clear();
             cantRequerimientos--;
         }
@@ -117,14 +117,26 @@ int main(int argc, char** argv) {
             usleep(10000);
         }
         
-        // Envio de vuelta la shmem al siguiente broker
-        msg.mtype = ID_BROKER_SIGUIENTE;
-        int okSend = msgsnd(msgQueueShmemHaciaBrokers, &msg, sizeof(TMessageShMemInterBroker) - sizeof(long), 0);
-        if (okSend == -1) {
-            std::stringstream ss;
-            ss << "Error al enviar shared memory hacia siguiente broker " << msg.mtype << ". Errno: " << strerror(errno);
-            Logger::error(ss.str(), nombre.str().c_str());
-            exit(1);
+        if (CANT_BROKERS == 1) {
+            // Soy el unico. Me la envio a mi mismo
+            msg.mtype = ID_BROKER;
+            int okSend = msgsnd(msgQueueShmemDesdeBrokers, &msg, sizeof(TMessageShMemInterBroker) - sizeof(long), 0);
+            if (okSend == -1) {
+                std::stringstream ss;
+                ss << "Error al enviar shared memory hacia mi. Errno: " << strerror(errno);
+                Logger::error(ss.str(), nombre.str().c_str());
+                exit(1);
+            } 
+        } else {
+            // Envio de vuelta la shmem al siguiente broker
+            msg.mtype = ID_BROKER_SIGUIENTE;
+            int okSend = msgsnd(msgQueueShmemHaciaBrokers, &msg, sizeof(TMessageShMemInterBroker) - sizeof(long), 0);
+            if (okSend == -1) {
+                std::stringstream ss;
+                ss << "Error al enviar shared memory hacia siguiente broker " << msg.mtype << ". Errno: " << strerror(errno);
+                Logger::error(ss.str(), nombre.str().c_str());
+                exit(1);
+            }
         }
     }
 

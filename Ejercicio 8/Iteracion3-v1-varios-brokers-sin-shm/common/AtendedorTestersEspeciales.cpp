@@ -72,6 +72,9 @@ TMessageAtendedor AtendedorTestersEspeciales::recibirRequerimientoEspecial(int i
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
+    this->idBroker = msg.idBroker;
+    std::stringstream ss; ss << "Le asigne a mi id Broker " << this->idBroker << " el idBroker " << msg.idBroker;
+    Logger::debug(ss.str(), __FILE__);
     return msg;
 }
 
@@ -81,6 +84,9 @@ void AtendedorTestersEspeciales::enviarTareaEspecial(int idDispositivo, int idTe
     msg.mtype = this->idTester;
     msg.mtypeMensaje = MTYPE_TAREA_ESPECIAL;
     msg.tester = this->idTester;
+    msg.idBroker = this->idBroker;
+    std::stringstream ss; ss << "Le asigne al msg id Broker " << msg.idBroker << " el idBroker " << this->idBroker;
+    Logger::debug(ss.str(), __FILE__);
     msg.idDispositivo = idDispositivo;
     msg.posicionDispositivo = posicionDispositivo;
     msg.value = tarea;
