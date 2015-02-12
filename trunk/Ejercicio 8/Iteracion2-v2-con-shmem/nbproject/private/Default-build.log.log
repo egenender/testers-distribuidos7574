@@ -1,0 +1,11 @@
+g++ -Wall -pedantic -pedantic-errors -g -ggdb -DDEBUG -I. -c TesterComun.cpp -o TesterComun.o
+In file included from common/AtendedorTesters.h:10:0,
+                 from TesterComun.cpp:9:
+common/common.h:142:17: error: ‘MAX_TESTERS_ESPECIALES’ was not declared in this scope
+  int especiales[MAX_TESTERS_ESPECIALES];
+                 ^
+TesterComun.cpp: In function ‘int main(int, char**)’:
+TesterComun.cpp:62:63: error: conversion from ‘int’ to non-scalar type ‘resultado_test_t {aka resultado_test}’ requested
+         resultado_test_t resul = atendedor.recibirResultado(id);
+                                                               ^
+make: *** [TesterComun.o] Error 1
