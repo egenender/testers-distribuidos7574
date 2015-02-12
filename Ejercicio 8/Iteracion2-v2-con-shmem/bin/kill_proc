@@ -1,0 +1,6 @@
+#!/bin/bash
+
+killall tcpserver_receptor
+killall tcpserver_emisor
+killall tcpclient_receptor
+killall idServer
