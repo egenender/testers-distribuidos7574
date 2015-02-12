@@ -44,16 +44,6 @@ int main(int argc, char** argv) {
     semTablaCom.getSem();
     semTablaCom.eliSem();
     
-    Semaphore semEspecialAsignacion(SEM_ESPECIALES_ASIGNACION);
-    semEspecialAsignacion.getSem();
-    semEspecialAsignacion.eliSem();
-    
-    for (int i = 0; i < MAX_TESTER_ESPECIALES; i++) {
-		Semaphore semEspecial(i + SEM_ESPECIALES);
-		semEspecial.getSem();
-		semEspecial.eliSem();
-	}
-    
     //Destruccion de colas
     for (int q = MSGQUEUE_BROKER_RECEPTOR_DISPOSITIVOS; q <= MSGQUEUE_BROKER_EMISOR; q++) {
         key = ftok(ipcFileName.c_str(), q);

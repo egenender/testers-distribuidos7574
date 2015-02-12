@@ -72,6 +72,7 @@ int main(int argc, char** argv) {
         }
         if (!shmDistrTablaTesters->memoria.registrados[id]) {
             shmDistrTablaTesters->memoria.registrados[id] = true;
+            shmDistrTablaTesters->memoria.disponible[id] = true;
             shmDistrTablaTesters->memoria.brokerAsignado[id] = ID_BROKER;
 /*
             if (msg.esTesterEspecial) {

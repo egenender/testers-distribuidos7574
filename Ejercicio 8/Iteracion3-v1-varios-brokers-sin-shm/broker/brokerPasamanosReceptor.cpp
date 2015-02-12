@@ -19,23 +19,23 @@ using namespace std;
 int main(int argc, char* argv[]) {
 
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
-	
+
 	key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_RECEPTOR);
 	int msgQueueReceptor = msgget(key, 0660);
 
 	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_EMISOR_DISPOSITIVOS);
 	int msgQueueDisp = msgget(key, 0660);
-	
+
 	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_REQUERIMIENTOS_TESTER_ESPECIAL);
 	int msgQueueReqTestEsp = msgget(key, 0660);
-    
+
     key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_REGISTRO_TESTERS);
     int msgQueueRegistroTesters = msgget(key, 0660);
 
     // Queue hacia donde se envian mensajes de otros brokers
     key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_HACIA_BROKER);
 	int msgQueueHaciaBrokers = msgget(key, IPC_CREAT | 0660);
-	
+
 	TMessageAtendedor msg;
     int ret = 0;
     std::stringstream ss;
@@ -46,15 +46,15 @@ int main(int argc, char* argv[]) {
             Logger::error("Error al recibir un mensaje de la cola de los testers", __FILE__);
 			exit(1);
 		}
-        
+
         switch(msg.mtypeMensaje) {
-        
+
             case MTYPE_REQUERIMIENTO_TESTER_ESPECIAL:
                 ss << "Llego un requerimiento del dispositivo " << msg.idDispositivo;
                 Logger::notice(ss.str(), __FILE__);
                 ss.str("");
                 ss.clear();
-                
+
                 ret = msgsnd(msgQueueReqTestEsp, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
                 if(ret == -1) {
                     Logger::error("Error al enviar el mensaje a la cola de requerimientos de dispositivo");
@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
                 Logger::notice(ss.str(), __FILE__);
                 ss.str("");
                 ss.clear();
-                
+
                 ret = msgsnd(msgQueueRegistroTesters, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
                 if(ret == -1) {
                     Logger::error("Error al enviar el mensaje a la cola de registros de testers");
@@ -101,9 +101,7 @@ int main(int argc, char* argv[]) {
                     }
                 }
                 break;
-            
         }
 	}
     return 0;
 }
-
