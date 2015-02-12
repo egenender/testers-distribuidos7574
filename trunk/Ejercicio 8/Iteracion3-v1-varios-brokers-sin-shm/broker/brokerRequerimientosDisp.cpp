@@ -40,7 +40,7 @@ int main (void) {
     TMessageShMemInterBroker* shmDistrTablaTesters = NULL;
     TMessageRequerimientoBrokerShm reqMsg;
     reqMsg.mtype = MTYPE_REQUERIMIENTO_SHM_BROKER;
-    reqMsg.idSubBroker = ID_SUB_BROKER_REGISTRO_TESTER;
+    reqMsg.idSubBroker = ID_SUB_BROKER_REQUERIMIENTO_DISP;
 
 	TMessageAtendedor msg;
 	while(true) {
@@ -53,22 +53,27 @@ int main (void) {
 		std::stringstream ss;
 		ss << "Me llego un requerimiento desde el dispositivo " << msg.idDispositivo;
 		Logger::notice(ss.str(), __FILE__);
+        if (fork() == 0)    continue;
 
         bool exito = true;
 
         shmDistrTablaTesters = (TMessageShMemInterBroker*) obtenerDistributedSharedMemory(msgQueueShm, &reqMsg, sizeof(TMessageRequerimientoBrokerShm), shMemCantReqBrokerShmem, &semCantReqBrokerShmem, msgQueueShm, sizeof(TMessageShMemInterBroker), ID_SUB_BROKER_REQUERIMIENTO_DISP);
         if (shmDistrTablaTesters == NULL) {
             std::stringstream ss;
-            ss << "Error intentando obtener la memoria compartida distribuida para el broker " << ID_BROKER << " y sub-broker " << ID_SUB_BROKER_REGISTRO_TESTER << ". Errno: " << strerror(errno);
+            ss << "Error intentando obtener la memoria compartida distribuida para el broker " << ID_BROKER << " y sub-broker " << ID_SUB_BROKER_REQUERIMIENTO_DISP << ". Errno: " << strerror(errno);
             Logger::error(ss.str(), __FILE__);
             exit(1);
         }
+        
         // Busco un id que este registrado
         for(int i = shmDistrTablaTesters->memoria.ultimoTesterElegido + 1; i <= MAX_TESTER_COMUNES; i++) {
             if(i == MAX_TESTER_COMUNES) i = 0;
             if(shmDistrTablaTesters->memoria.registrados[i]) {
                 msg.mtype = i + ID_TESTER_COMUN_START;
                 msg.idBroker = shmDistrTablaTesters->memoria.brokerAsignado[i];
+                std::stringstream ss;
+                ss << "Se elige el tester " << msg.mtype << " que se encuentra en el espacio " << i << " de la memoria compartida y que esta asignado al broker " << shmDistrTablaTesters->memoria.brokerAsignado[i];
+                Logger::debug(ss.str(), __FILE__);
                 shmDistrTablaTesters->memoria.ultimoTesterElegido = i;
                 break;
             }

@@ -86,18 +86,18 @@ int main(int argc, char* argv[]) {
                 ss.str("");
                 ss.clear();
                 
-                ss << "El resultado inicial debe ser enviado al broker " << msg.idBroker << " y estoy en el broker " << ID_BROKER;
+                ss << "El resultado especial debe ser enviado al broker " << msg.idBroker << " y estoy en el broker " << ID_BROKER;
                 Logger::notice(ss.str(), __FILE__); ss.str(""); ss.clear();
-                
-                msg.tester = ID_EQUIPO_ESPECIAL;
+
                 if (msg.idBroker == ID_BROKER) {
+                    msg.mtype = ID_EQUIPO_ESPECIAL;
                     int ret = msgsnd(msgQueueTestYEq, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
                     if(ret == -1) {
                         Logger::error("Error al enviar el resultado especial a la cola de envio a testers y equipo especial", __FILE__);
                         exit(1);
                     }
                 } else {
-                    ss << "Envío resultado inicial hacia el broker " << msg.idBroker;
+                    ss << "Envío resultado especial hacia el broker " << msg.idBroker;
                     Logger::notice(ss.str(), __FILE__); ss.str(""); ss.clear();
                     // El mensaje es para tester en otro broker
                     msg.mtype = msg.idBroker;

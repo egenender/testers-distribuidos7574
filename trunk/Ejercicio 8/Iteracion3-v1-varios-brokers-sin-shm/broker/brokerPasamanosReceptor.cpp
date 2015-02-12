@@ -40,10 +40,10 @@ int main(int argc, char* argv[]) {
     int ret = 0;
     std::stringstream ss;
 	while(true) {
-		Logger::notice("Espero un mensaje de un dispositivo", __FILE__);
+		Logger::notice("Espero un mensaje de un tester", __FILE__);
 		int okRead = msgrcv(msgQueueReceptor, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0, 0);
 		if (okRead == -1){
-            Logger::error("Error al recibir un mensaje de la cola del dispositivo", __FILE__);
+            Logger::error("Error al recibir un mensaje de la cola de los testers", __FILE__);
 			exit(1);
 		}
         

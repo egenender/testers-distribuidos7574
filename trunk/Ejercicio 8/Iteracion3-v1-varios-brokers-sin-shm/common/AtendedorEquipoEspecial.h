@@ -27,6 +27,8 @@ public:
     void enviarOrden(int idDispositivo, int orden);
 private:
     int colaRecepciones, /*colaReinicioTestEsp, */colaEnvios;
+    
+    int idBroker;
 
     // For killing communication processes
     pid_t pidEmisor, pidReceptor;
