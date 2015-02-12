@@ -7,12 +7,17 @@
 
 #include <cstdlib>
 #include <sstream>
+#include <cerrno>
+#include <cstring>
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
+#include <sys/shm.h>
 
 #include "common/common.h"
 #include "logger/Logger.h"
+#include "ipc/Semaphore.h"
+#include "ipc/DistributedSharedMemory.h"
 
 using namespace std;
 
@@ -35,6 +40,21 @@ int main(int argc, char* argv[]) {
     // Queue hacia donde se envian mensajes de otros brokers
     key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_HACIA_BROKER);
 	int msgQueueHaciaBrokers = msgget(key, IPC_CREAT | 0660);
+    
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_INTERNAL_BROKER_SHM);
+	int msgQueueShm = msgget(key, 0660);
+
+    key = ftok(ipcFileName.c_str(), SHM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM);
+    int shMemCantReqBrokerShmemId = shmget(key, sizeof(int), IPC_CREAT | 0660);
+    int* shMemCantReqBrokerShmem = (int*) shmat(shMemCantReqBrokerShmemId, (void*) NULL, 0);
+    
+    Semaphore semCantReqBrokerShmem(SEM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM);
+    semCantReqBrokerShmem.getSem();
+
+    TMessageShMemInterBroker* shmDistrTablaTesters = NULL;
+    TMessageRequerimientoBrokerShm reqMsg;
+    reqMsg.mtype = MTYPE_REQUERIMIENTO_SHM_BROKER;
+    reqMsg.idSubBroker = ID_SUB_BROKER_PASAMANOS_RECEPTOR;
 
 	TMessageAtendedor msg;
     int ret = 0;
@@ -72,6 +92,30 @@ int main(int argc, char* argv[]) {
                 if(ret == -1) {
                     Logger::error("Error al enviar el mensaje a la cola de registros de testers");
                     exit(1);
+                }
+                break;
+
+            case MTYPE_AVISAR_DISPONIBILIDAD:
+                ss << "Llego un aviso de disponibilidad del tester especial " << msg.tester;
+                Logger::notice(ss.str(), __FILE__); ss.str(""); ss.clear();
+                
+                if (fork() == 0) {
+                    // Pido la shmem y vuelvo a poner al tester disponible
+                    shmDistrTablaTesters = (TMessageShMemInterBroker*) obtenerDistributedSharedMemory(msgQueueShm, &reqMsg, sizeof(TMessageRequerimientoBrokerShm), shMemCantReqBrokerShmem, &semCantReqBrokerShmem, msgQueueShm, sizeof(TMessageShMemInterBroker), ID_SUB_BROKER_PASAMANOS_RECEPTOR);
+                    if (shmDistrTablaTesters == NULL) {
+                        std::stringstream ss;
+                        ss << "Error intentando obtener la memoria compartida distribuida para el broker " << ID_BROKER << " y sub-broker " << ID_SUB_BROKER_REGISTRO_TESTER << ". Errno: " << strerror(errno);
+                        Logger::error(ss.str(), __FILE__);
+                        exit(1);
+                    }
+                    
+                    shmDistrTablaTesters->memoria.disponible[msg.tester - ID_TESTER_ESP_START + MAX_TESTER_COMUNES] = true;
+                    
+                    shmDistrTablaTesters->mtype = MTYPE_DEVOLUCION_SHM_BROKER;
+                    devolverDistributedSharedMemory(msgQueueShm, shmDistrTablaTesters, sizeof(TMessageShMemInterBroker));
+                    shmDistrTablaTesters = NULL;
+                    
+                    exit(0);
                 }
                 break;
 

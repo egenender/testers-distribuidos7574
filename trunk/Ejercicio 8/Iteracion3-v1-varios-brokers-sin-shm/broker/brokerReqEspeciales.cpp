@@ -53,49 +53,43 @@ int main (int argc, char* argv[]){
 		
         // Busco si los tester especiales están registrados TODO: Puede flaquear si se desregistra el tester especial en el diome
         
-        int brokersAsignados[MAX_TESTERS_ESPECIALES_PARA_ASIGNAR];
-        pid_t childProcesses[MAX_TESTERS_ESPECIALES_PARA_ASIGNAR];
+        static int brokersAsignados[MAX_TESTERS_ESPECIALES_PARA_ASIGNAR];
+        bool seguiBuscandoTesterEspecial = false;
+        do {
+            seguiBuscandoTesterEspecial = false;
             
-        for (int i = 0; i < msg.cantTestersEspecialesAsignados; i++) {
-            int id = msg.idTestersEspeciales[i] - ID_TESTER_ESP_START + MAX_TESTER_COMUNES;
-            childProcesses[i] = fork();
-            if (childProcesses[i] == 0) {
-                bool seguiBuscandoTesterEspecial = false;
-                do {
-                    seguiBuscandoTesterEspecial = false;
-                    shmDistrTablaTesters = (TMessageShMemInterBroker*) obtenerDistributedSharedMemory(msgQueueShm, &reqMsg, sizeof(TMessageRequerimientoBrokerShm), shMemCantReqBrokerShmem, &semCantReqBrokerShmem, msgQueueShm, sizeof(TMessageShMemInterBroker), ID_SUB_BROKER_REQUERIMIENTO_ESP);
-                    if (shmDistrTablaTesters == NULL) {
-                        std::stringstream ss;
-                        ss << "Error intentando obtener la memoria compartida distribuida para el broker " << ID_BROKER << " y sub-broker " << ID_SUB_BROKER_REGISTRO_TESTER << ". Errno: " << strerror(errno);
-                        Logger::error(ss.str(), __FILE__);
-                        exit(1);
-                    }
-                    if (!shmDistrTablaTesters->memoria.disponible[id]) { // Le sumo el MAX_TESTER_COMUNES porque es una tabla de tamanio MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES
-                        seguiBuscandoTesterEspecial = true;
-                    } else {
-                        brokersAsignados[i] = shmDistrTablaTesters->memoria.brokerAsignado[id];
-                        shmDistrTablaTesters->memoria.disponible[id] = false;
-                        shmDistrTablaTesters->mtype = MTYPE_DEVOLUCION_SHM_BROKER;
-                        devolverDistributedSharedMemory(msgQueueShm, shmDistrTablaTesters, sizeof(TMessageShMemInterBroker));
-                        exit(0);
-                    }
-                    shmDistrTablaTesters->mtype = MTYPE_DEVOLUCION_SHM_BROKER;
-                    devolverDistributedSharedMemory(msgQueueShm, shmDistrTablaTesters, sizeof(TMessageShMemInterBroker));
-                    shmDistrTablaTesters = NULL;
-                } while(seguiBuscandoTesterEspecial);
-            }
-        }
-        
-        // Espero por todos los procesos, lo que significa que ya tengo potestad sobre los tester
-        for (int i = 0; i < msg.cantTestersEspecialesAsignados; i++) {
-            int status;
-            waitpid(childProcesses[i], &status, 0);
-            if (status != 0) {
-                Logger::error("Hubo algun error buscando testers especiales disponibles. Abort!", __FILE__);
+            shmDistrTablaTesters = (TMessageShMemInterBroker*) obtenerDistributedSharedMemory(msgQueueShm, &reqMsg, sizeof(TMessageRequerimientoBrokerShm), shMemCantReqBrokerShmem, &semCantReqBrokerShmem, msgQueueShm, sizeof(TMessageShMemInterBroker), ID_SUB_BROKER_REQUERIMIENTO_ESP);
+            if (shmDistrTablaTesters == NULL) {
+                std::stringstream ss;
+                ss << "Error intentando obtener la memoria compartida distribuida para el broker " << ID_BROKER << " y sub-broker " << ID_SUB_BROKER_REGISTRO_TESTER << ". Errno: " << strerror(errno);
+                Logger::error(ss.str(), __FILE__);
                 exit(1);
             }
-        }
-        
+
+            for (int i = 0; (i < msg.cantTestersEspecialesAsignados) && (!seguiBuscandoTesterEspecial); i++) {
+                int id = msg.idTestersEspeciales[i] - ID_TESTER_ESP_START + MAX_TESTER_COMUNES;
+
+                std::stringstream ss; ss << "Busco disponibilidad del tester especial " << msg.idTestersEspeciales[i];
+                Logger::debug(ss.str(), __FILE__); ss.str(""); ss.clear();
+
+
+                if (!shmDistrTablaTesters->memoria.disponible[id]) {
+                    seguiBuscandoTesterEspecial = true;
+                    while((--i) >= 0) {
+                        shmDistrTablaTesters->memoria.disponible[msg.idTestersEspeciales[i] - ID_TESTER_ESP_START + MAX_TESTER_COMUNES] = true;
+                    }
+                } else {
+                    brokersAsignados[i] = shmDistrTablaTesters->memoria.brokerAsignado[id];
+                    shmDistrTablaTesters->memoria.disponible[id] = false;
+                }
+            }
+
+            shmDistrTablaTesters->mtype = MTYPE_DEVOLUCION_SHM_BROKER;
+            devolverDistributedSharedMemory(msgQueueShm, shmDistrTablaTesters, sizeof(TMessageShMemInterBroker));
+            shmDistrTablaTesters = NULL;
+
+        } while(seguiBuscandoTesterEspecial);
+
         ss << "Los testers especiales que se requieren ya estan disponibles";
         Logger::debug(ss.str(), __FILE__); ss.str(""); ss.clear();
         
@@ -121,7 +115,7 @@ int main (int argc, char* argv[]){
                 msg.mtypeMensajeBroker = MTYPE_HACIA_TESTER;
                 int ret = msgsnd(msgQueueTesterEsp, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
                 if(ret == -1) {
-                    Logger::error("Error al enviar mensaje a la msgqueue de testers especiales", __FILE__);
+                    Logger::error("Error al enviar mensaje a la msgqueue hacia otros brokers", __FILE__);
                     exit(1);
                 }
             }
