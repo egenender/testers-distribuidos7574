@@ -70,6 +70,16 @@ int main(void){
 	printf("\nIngrese ip del servidor RPC\n");
 	char* ip_rpc = leer_linea();
 	
+	printf("\nIngrese cantidad de testers comunes\n");
+	char* tc = leer_linea();
+	int cant_tc = atoi(tc);
+	free(tc);
+	
+	printf("\nIngrese cantidad de testers especiales\n");
+	char* te = leer_linea();
+	int cant_te = atoi(te);
+	free(te);
+	
 	printf("\nIngrese direccion default de broker\n");
 	char* ip_broker_default = leer_linea();
 	
@@ -124,7 +134,11 @@ int main(void){
 	system("rm -f broker/Broker.cpp.tmp");
 	
 	/* Configuro el common/common.h (rpc server)*/
-	printf("Configurando ip servidor rpc\n");
+	printf("Configurando ip servidor rpc y demas constatnes\n");
+	sprintf(sed, "sed 's/#define MAX_TESTERS_ESPECIALES .*/#define MAX_TESTERS_ESPECIALES %d/' common/common.h > common/common.h.tmp", cant_te);
+	system(sed);
+	sprintf(sed, "sed 's/#define MAX_TESTERS_COMUNES .*/#define MAX_TESTERS_COMUNES %d/' common/common.h.tmp > common/common.h", cant_tc);
+	system(sed);
 	sprintf(sed, "sed 's/const char UBICACION_BROKER\\[\\] = .*;/const char UBICACION_BROKER[] = \"%s\";/' common/common.h > common/common.h.tmp", ip_broker_default);
 	system(sed);
 	sprintf(sed, "sed 's/const int PROBABILIDAD_FALLA_BROKER = .*;/const int PROBABILIDAD_FALLA_BROKER = %d;/' common/common.h.tmp > common/common.h", prob_falla);
