@@ -15,8 +15,8 @@ realiza la instalación completa, elimina el instalador y compila el proyecto.
 	- Luego de haber compilado como es indicado en 1. se debe correr el programa 'iniciador', que se encarga de inicializar todos los ipcs (shm, semaforos, colas).
 	El 'iniciador' recibe parámetros en función de la tarea a realizar.
 	- Si el equipo será utilizado para lanzar dispositivos, testers comunes, testers especiales, o el servidor RPC, no es necesario pasarle ningún parámetro.
-	- Si el equipo será utilizado como broker, pero como un slave broker (en el caso inicial), es necesario pasarle el parámetro: '-sb'.
-	- Si el equipo será utilizado como broker, pero como un master broker (en el caso inicial), es necesario pasarle el parámetro '-mb'.
+	- Si el equipo será utilizado como broker, pero como un slave broker (en el caso inicial), es necesario pasarle el parámetro: '-sb' (slave broker).
+	- Si el equipo será utilizado como broker, pero como un master broker (en el caso inicial), es necesario pasarle el parámetro '-mb' (master broker).
 	
 	Para el caso de los brokers, luego de haberse ejecutado se pasará a la etapa de armado del anillo, luego de lo cual se esperará poco menos de un minuto para lanzar el resto de los procesos
 	del broker. Tal espera se debe a tener que esperar por el cierre de los canales de comunicaciones (i.e. tiempo de timeout de tcp) para que en caso de error, se pueda volver a formar el anillo en cualquier momento,

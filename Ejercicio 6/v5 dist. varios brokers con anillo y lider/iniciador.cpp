@@ -42,10 +42,13 @@ int main(int argc, char** argv) {
 	}
 	
 	int ser_master;
-	if (argc == 2){
+	if (strcmp(argv[1], "-sb") == 0){
 		ser_master = 0;
-	} else {
+	} else if (strcmp(argv[1], "-mb") == 0){
 		ser_master = 1;
+	} else {
+		Logger::destroy();
+		return 0;
 	}
 	
     createSystemProcesses(ser_master);
