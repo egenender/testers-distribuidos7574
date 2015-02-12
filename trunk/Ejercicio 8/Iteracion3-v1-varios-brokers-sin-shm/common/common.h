@@ -43,7 +43,6 @@ const int SEM_TABLA_TESTERS_COMUNES_DISPONIBLES = 11;
 const int SEM_TABLA_TESTERS_ESPECIALES_DISPONIBLES = 12;
 
 const int SEM_IDENTIFICADOR = 13;
-const int SEM_ESPECIALES_ASIGNACION = 14;
 
 const int SHM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM = 18;
 const int SEM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM = 19;
@@ -78,7 +77,6 @@ const int MSGQUEUE_ENVIO_BROKER_SHM = 42; // Envio de la shm inter-broker a otro
 const int MSGQUEUE_RECEPCION_BROKER_SHM = 43; // Recepcion de la shm inter-broker desde otros brokers
 
 const int LAST_ID_IPC = MSGQUEUE_RECEPCION_BROKER_SHM + 1;
-const int SEM_ESPECIALES = LAST_ID_IPC; // Semaforos para testers especiales (creciente)
 
 // mtypes desde el dispositivo
 const int MTYPE_REQUERIMIENTO_DISPOSITIVO = 1;
@@ -158,6 +156,7 @@ typedef struct message {
 
 typedef struct TTablaBrokerTestersRegistrados {
     bool registrados[MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES];
+    bool disponible[MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES];
     int brokerAsignado[MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES]; // Especifica el ID del broker de cada ID
     int ultimoTesterElegido;
 } TTablaBrokerTestersRegistrados;

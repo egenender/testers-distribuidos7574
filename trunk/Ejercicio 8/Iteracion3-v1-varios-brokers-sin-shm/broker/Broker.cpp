@@ -38,20 +38,10 @@ void crearIpc() {
     int shmCantReqBrokerShMem = shmget(key, sizeof(int), IPC_CREAT | 0660);
     int* cantReqBrokerShm = (int*) shmat(shmCantReqBrokerShMem, NULL, 0);
     *cantReqBrokerShm = 0;
-
-    Semaphore semEspecialAsignacion(SEM_ESPECIALES_ASIGNACION);
-    semEspecialAsignacion.creaSem();
-    semEspecialAsignacion.iniSem(1);
     
     Semaphore semReqBrokerShm(SEM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM);
     semReqBrokerShm.creaSem();
     semReqBrokerShm.iniSem(1);
-
-    for (int i = 0; i < MAX_TESTER_ESPECIALES; i++) {
-		Semaphore semEspecial(i + SEM_ESPECIALES);
-		semEspecial.creaSem();
-		semEspecial.iniSem(0);
-	}
 }
 
 void crearModulosBroker() {
@@ -197,6 +187,7 @@ void lanzarTareasMaster() {
     for (int i = 0; i < MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES; i++) {
         msgShmemInterBroker.memoria.registrados[i] = false;
         msgShmemInterBroker.memoria.brokerAsignado[i] = TESTER_ESPECIAL_NO_ASIGNADO;
+        msgShmemInterBroker.memoria.disponible[i] = false;
     }
     msgShmemInterBroker.memoria.ultimoTesterElegido = 0;
     

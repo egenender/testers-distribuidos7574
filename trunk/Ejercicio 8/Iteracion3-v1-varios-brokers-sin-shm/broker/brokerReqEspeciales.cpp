@@ -35,9 +35,6 @@ int main (int argc, char* argv[]){
     TMessageRequerimientoBrokerShm reqMsg;
     reqMsg.mtype = MTYPE_REQUERIMIENTO_SHM_BROKER;
     reqMsg.idSubBroker = ID_SUB_BROKER_REQUERIMIENTO_ESP;
-
-    Semaphore semTestEspAsig(SEM_ESPECIALES_ASIGNACION);
-    semTestEspAsig.getSem();
         
 	TMessageAtendedor msg;
 	while(true) {
@@ -55,62 +52,53 @@ int main (int argc, char* argv[]){
 		if (fork() != 0) continue;  // Como puedo llegar a bloquearme, lo hago en un proceso aparte!
 		
         // Busco si los tester especiales están registrados TODO: Puede flaquear si se desregistra el tester especial en el diome
-        shmDistrTablaTesters = (TMessageShMemInterBroker*) obtenerDistributedSharedMemory(msgQueueShm, &reqMsg, sizeof(TMessageRequerimientoBrokerShm), shMemCantReqBrokerShmem, &semCantReqBrokerShmem, msgQueueShm, sizeof(TMessageShMemInterBroker), ID_SUB_BROKER_REQUERIMIENTO_ESP);
-        if (shmDistrTablaTesters == NULL) {
-            std::stringstream ss;
-            ss << "Error intentando obtener la memoria compartida distribuida para el broker " << ID_BROKER << " y sub-broker " << ID_SUB_BROKER_REGISTRO_TESTER << ". Errno: " << strerror(errno);
-            Logger::error(ss.str(), __FILE__);
-            exit(1);
-        }
+        
         int brokersAsignados[MAX_TESTERS_ESPECIALES_PARA_ASIGNAR];
+        pid_t childProcesses[MAX_TESTERS_ESPECIALES_PARA_ASIGNAR];
+            
         for (int i = 0; i < msg.cantTestersEspecialesAsignados; i++) {
-            if (!shmDistrTablaTesters->memoria.registrados[msg.idTestersEspeciales[i] - ID_TESTER_ESP_START + MAX_TESTER_COMUNES]) { // Le sumo el MAX_TESTER_COMUNES porque es una tabla de tamanio MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES
-                shmDistrTablaTesters->mtype = MTYPE_DEVOLUCION_SHM_BROKER;
-                devolverDistributedSharedMemory(msgQueueShm, shmDistrTablaTesters, sizeof(TMessageShMemInterBroker));
-                shmDistrTablaTesters = NULL;
-
-                ss << "Espero a que este disponible el tester especial id " << msg.idTestersEspeciales[i];
-                Logger::notice(ss.str(), __FILE__);
-
-                Semaphore semEspecial(msg.idTestersEspeciales[i] - ID_TESTER_ESP_START + SEM_ESPECIALES);
-                semEspecial.getSem();
-                semEspecial.p();
-                semEspecial.v();
-                ss.str("");
-                ss << "El tester especial " << msg.idTestersEspeciales[i] << " ya esta disponible";
-                Logger::notice(ss.str(), __FILE__);
-                
-                shmDistrTablaTesters = (TMessageShMemInterBroker*) obtenerDistributedSharedMemory(msgQueueShm, &reqMsg, sizeof(TMessageRequerimientoBrokerShm), shMemCantReqBrokerShmem, &semCantReqBrokerShmem, msgQueueShm, sizeof(TMessageShMemInterBroker), ID_SUB_BROKER_REQUERIMIENTO_ESP);
-                if (shmDistrTablaTesters == NULL) {
-                    std::stringstream ss;
-                    ss << "Error intentando obtener la memoria compartida distribuida para el broker " << ID_BROKER << " y sub-broker " << ID_SUB_BROKER_REGISTRO_TESTER << ". Errno: " << strerror(errno);
-                    Logger::error(ss.str(), __FILE__);
-                    exit(1);
-                }
+            int id = msg.idTestersEspeciales[i] - ID_TESTER_ESP_START + MAX_TESTER_COMUNES;
+            childProcesses[i] = fork();
+            if (childProcesses[i] == 0) {
+                bool seguiBuscandoTesterEspecial = false;
+                do {
+                    seguiBuscandoTesterEspecial = false;
+                    shmDistrTablaTesters = (TMessageShMemInterBroker*) obtenerDistributedSharedMemory(msgQueueShm, &reqMsg, sizeof(TMessageRequerimientoBrokerShm), shMemCantReqBrokerShmem, &semCantReqBrokerShmem, msgQueueShm, sizeof(TMessageShMemInterBroker), ID_SUB_BROKER_REQUERIMIENTO_ESP);
+                    if (shmDistrTablaTesters == NULL) {
+                        std::stringstream ss;
+                        ss << "Error intentando obtener la memoria compartida distribuida para el broker " << ID_BROKER << " y sub-broker " << ID_SUB_BROKER_REGISTRO_TESTER << ". Errno: " << strerror(errno);
+                        Logger::error(ss.str(), __FILE__);
+                        exit(1);
+                    }
+                    if (!shmDistrTablaTesters->memoria.disponible[id]) { // Le sumo el MAX_TESTER_COMUNES porque es una tabla de tamanio MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES
+                        seguiBuscandoTesterEspecial = true;
+                    } else {
+                        brokersAsignados[i] = shmDistrTablaTesters->memoria.brokerAsignado[id];
+                        shmDistrTablaTesters->memoria.disponible[id] = false;
+                        shmDistrTablaTesters->mtype = MTYPE_DEVOLUCION_SHM_BROKER;
+                        devolverDistributedSharedMemory(msgQueueShm, shmDistrTablaTesters, sizeof(TMessageShMemInterBroker));
+                        exit(0);
+                    }
+                    shmDistrTablaTesters->mtype = MTYPE_DEVOLUCION_SHM_BROKER;
+                    devolverDistributedSharedMemory(msgQueueShm, shmDistrTablaTesters, sizeof(TMessageShMemInterBroker));
+                    shmDistrTablaTesters = NULL;
+                } while(seguiBuscandoTesterEspecial);
             }
-            brokersAsignados[i] = shmDistrTablaTesters->memoria.brokerAsignado[msg.idTestersEspeciales[i] - ID_TESTER_ESP_START + MAX_TESTER_COMUNES];
         }
-        shmDistrTablaTesters->mtype = MTYPE_DEVOLUCION_SHM_BROKER;
-        devolverDistributedSharedMemory(msgQueueShm, shmDistrTablaTesters, sizeof(TMessageShMemInterBroker));
-        shmDistrTablaTesters = NULL;
+        
+        // Espero por todos los procesos, lo que significa que ya tengo potestad sobre los tester
+        for (int i = 0; i < msg.cantTestersEspecialesAsignados; i++) {
+            int status;
+            waitpid(childProcesses[i], &status, 0);
+            if (status != 0) {
+                Logger::error("Hubo algun error buscando testers especiales disponibles. Abort!", __FILE__);
+                exit(1);
+            }
+        }
         
         ss << "Los testers especiales que se requieren ya estan disponibles";
         Logger::debug(ss.str(), __FILE__); ss.str(""); ss.clear();
         
-        // ¿Por que se toma este semaforo? Para que los requerimientos especiales lleguen en orden a
-        // la cantidad total de testers especiales asignados. Basicamente, para que no se 
-        // interleaveen cuando dos dispositivos distintos se les asignan los mismos testers 
-        // especiales al mismo tiempo. Race condition MUY maldita
-        semTestEspAsig.p();
-        // Aca ya tengo todos los testers especiales tomados para mandarlos en orden y que no se 
-        // interleaveaee con cualquier otro proceso
-        // TODO: AL DISTRIBUIR LOS ESPECIALES, INTUYO QUE SE IRA TODO A LA GOMA, 
-        // PORQUE NO PODEMOS APELAR A QUE LOS TESTERS ESPECIALES DESPERDIGADOS
-        // POR TODOS LADOS LES LLEGUEN DE TODOS LADOS EN ORDEN. KB O QQQ
-        // SOLUCION: NO DISTRIBUIR TESTERS ESPECIALES, O QUE EN LA SHMEM SALGA
-        // SI ESTA EN USO O NO Y LUEGO VER COMO LO SETEAMOS
-        // TAMBIEN VER SI LA ELECCION DE QUE TESTER ESPECIAL PASA AL BROKER
-        // EN VEZ DE QUE LA TENGA EL MAS ALTO NIVEL (TESTERCOMUN.CPP)
         for (int i = 0; i < msg.cantTestersEspecialesAsignados; i++) {
             // Mando cada requerimiento especial especifico
             msg.mtype = msg.idTestersEspeciales[i];
@@ -124,7 +112,6 @@ int main (int argc, char* argv[]){
                 int ret = msgsnd(msgQueueTesterEsp, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
                 if(ret == -1) {
                     Logger::error("Error al enviar mensaje a la msgqueue de testers especiales", __FILE__);
-                    semTestEspAsig.v();
                     exit(1);
                 }
             } else {
@@ -135,12 +122,10 @@ int main (int argc, char* argv[]){
                 int ret = msgsnd(msgQueueTesterEsp, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
                 if(ret == -1) {
                     Logger::error("Error al enviar mensaje a la msgqueue de testers especiales", __FILE__);
-                    semTestEspAsig.v();
                     exit(1);
                 }
             }
         }
-        semTestEspAsig.v();
         exit(0);
 	}
 }
