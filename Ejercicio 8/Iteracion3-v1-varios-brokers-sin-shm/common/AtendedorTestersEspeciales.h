@@ -35,6 +35,7 @@ public:
     
     TMessageAtendedor recibirRequerimientoEspecial(int idEsp);
     void enviarTareaEspecial(int idDispositivo, int idTester, int tarea, int posicionDispositivo);
+    void enviarDisponibilidad();
 
 };
 

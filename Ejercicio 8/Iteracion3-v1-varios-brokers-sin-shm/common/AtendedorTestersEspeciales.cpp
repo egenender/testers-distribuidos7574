@@ -85,8 +85,6 @@ void AtendedorTestersEspeciales::enviarTareaEspecial(int idDispositivo, int idTe
     msg.mtypeMensaje = MTYPE_TAREA_ESPECIAL;
     msg.tester = this->idTester;
     msg.idBroker = this->idBroker;
-    std::stringstream ss; ss << "Le asigne al msg id Broker " << msg.idBroker << " el idBroker " << this->idBroker;
-    Logger::debug(ss.str(), __FILE__);
     msg.idDispositivo = idDispositivo;
     msg.posicionDispositivo = posicionDispositivo;
     msg.value = tarea;
@@ -95,6 +93,22 @@ void AtendedorTestersEspeciales::enviarTareaEspecial(int idDispositivo, int idTe
     if(ret == -1) {
         std::stringstream ss;
         ss << "Error al enviar tarea especial " << tarea << " al dispositivo " << idDispositivo << " desde el tester " << idTester << ". Error: ";
+        std::string error = ss.str() + std::string(strerror(errno));
+        Logger::error(error.c_str(), __FILE__);
+        exit(0);
+    }
+}
+
+void AtendedorTestersEspeciales::enviarDisponibilidad() {
+
+    TMessageAtendedor msg;
+    msg.mtype = this->idTester;
+    msg.mtypeMensaje = MTYPE_AVISAR_DISPONIBILIDAD;
+    msg.tester = this->idTester;
+    int ret = msgsnd(this->colaEnvios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    if(ret == -1) {
+        std::stringstream ss;
+        ss << "Error al enviar aviso de disponibilidad  del tester especial " << idTester << ". Error: ";
         std::string error = ss.str() + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
         exit(0);

@@ -88,6 +88,7 @@ const int MTYPE_REGISTRAR_TESTER = 2;
 const int MTYPE_REQUERIMIENTO_TESTER_ESPECIAL = 4;
 // mtypes desde tester especial
 const int MTYPE_TAREA_ESPECIAL = 1;
+const int MTYPE_AVISAR_DISPONIBILIDAD = 6;
 // mtypes desde equipo especial
 const int MTYPE_ORDEN = 1;
 const int MTYPE_FIN_TEST_ESPECIAL = 5;
@@ -202,6 +203,7 @@ const int MTYPE_REQUERIMIENTO_SHM_BROKER = 2; // Procurar que el ID de los subbr
 const int ID_SUB_BROKER_REQUERIMIENTO_DISP = 5;
 const int ID_SUB_BROKER_REQUERIMIENTO_ESP = 6;
 const int ID_SUB_BROKER_REGISTRO_TESTER = 7;
+const int ID_SUB_BROKER_PASAMANOS_RECEPTOR = 8;
 
 typedef struct TMessageShMemInterBroker {
     long mtype;
