@@ -6,25 +6,21 @@
 #include "common/common.h"
 #include "comunes_tcp.h"
 #include "logger/Logger.h"
-/*
-#ifdef EJEMPLO_TEST
-#define IPCS_FILE "ipcs-prueba"
-#else
-#define IPCS_FILE "/tmp/pereira-ipcs"
-#endif
- */
+
+
 int main(int argc, char *argv[]){
     
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
     
-    if(argc != 5) {
+    if(argc != 6) {
         Logger::error("Bad arguments", __FILE__);
-        printf("%s <host> <port> <identificador> <idMsgQueue>",argv[0]);
+        printf("%s <host> <port> <identificador> <idMsgQueue> <sizeMsg>",argv[0]);
         return -1;
     }
 
     int id = atoi(argv[3]); // Id de Disp, o de Tester o de EqEsp, dependiendo de quien lo llame
     int idMsgQueue = atoi(argv[4]);
+    int sizeMsg = atoi(argv[5]);
 
     int fd = tcpOpenActivo(argv[1], atoi(argv[2]));
     if(fd < 0) {
@@ -38,11 +34,11 @@ int main(int argc, char *argv[]){
     /* FIN del setup */
     
     // Envio primer mensaje, para pasarle mi id al servidor
-    TMessageAtendedor* buffer = (TMessageAtendedor*) malloc(sizeof(TMessageAtendedor));
+    void* buffer = malloc(sizeMsg);
     /*buffer->mtype = 1;
     buffer->idDispositivo = id;
     enviar(buffer, fd);*/
-    size_t size = sizeof(TMessageAtendedor);
+    size_t size = sizeMsg;
     while (true) {
         //Espero mensaje de la cola
         int okRead = msgrcv(msgQueue, buffer, size - sizeof(long), id, 0);
@@ -63,7 +59,7 @@ int main(int argc, char *argv[]){
             exit(0);
         }*/
 
-        buffer->mtype = buffer->mtypeMensaje;
+        //buffer->mtype = buffer->mtypeMensaje;
         enviar(fd, buffer, size);
     }
     

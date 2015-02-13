@@ -28,14 +28,6 @@ const int ID_TESTER_ESP_START = ID_TESTER_COMUN_START + MAX_TESTER_COMUNES + 1;
 const int ID_EQUIPO_ESPECIAL = ID_TESTER_ESP_START + MAX_TESTER_ESPECIALES + 1;
 
 // IDs de los IPC
-const int SEM_PLANILLA_GENERAL = 1;
-const int SHM_PLANILLA_GENERAL = 2;
-const int SEM_PLANILLA_CANT_TESTER_ASIGNADOS = 4;
-const int SEM_PLANILLA_CANT_TAREAS_ASIGNADAS = 5;
-const int SHM_PLANILLA_CANT_TESTER_ASIGNADOS = 6;
-const int SHM_PLANILLA_CANT_TAREAS_ASIGNADAS = 7;
-const int SHM_PLANILLA_GENERAL_POSICIONES = 8;
-
 const int SHM_TESTERS_COMUNES_DISPONIBLES = 9;
 const int SHM_TESTERS_ESPECIALES_DISPONIBLES = 10;
 
@@ -61,11 +53,17 @@ const int MSGQUEUE_ENVIO_TESTER_ESPECIAL = 30;
 const int MSGQUEUE_RECEPCIONES_TESTER_ESPECIAL = 31;
 const int MSGQUEUE_RECEPCIONES_EQUIPO_ESPECIAL = 32;
 const int MSGQUEUE_ENVIO_EQUIPO_ESPECIAL = 33;
-const int MSGQUEUE_DESPACHADOR = 34;
-const int MSGQUEUE_REINICIO_TESTEO = 35;
-const int MSGQUEUE_BROKER_REQUERIMIENTOS_DISPOSITIVOS = 36;
-const int MSGQUEUE_BROKER_REQUERIMIENTOS_TESTER_ESPECIAL = 37;
-const int MSGQUEUE_BROKER_REGISTRO_TESTERS = 38;
+const int MSGQUEUE_REQ_TESTER_ESPECIAL = 34;
+const int MSGQUEUE_REINICIO_TESTER_ESPECIAL = 35;
+const int MSGQUEUE_DESPACHADOR = 36;
+const int MSGQUEUE_ENVIO_TESTERS_SHMEM_PLANILLA_GENERAL = 37;
+const int MSGQUEUE_RECEPCION_TESTERS_SHMEM_PLANILLA_GENERAL = 38;
+const int MSGQUEUE_ENVIO_TESTERS_SHMEM_PLANILLA_ASIGNACION = 39;
+const int MSGQUEUE_RECEPCION_TESTERS_SHMEM_PLANILLA_ASIGNACION = 40;
+const int MSGQUEUE_BROKER_SHMEM_HANDLER = 41;
+const int MSGQUEUE_BROKER_REQUERIMIENTOS_DISPOSITIVOS = 42;
+const int MSGQUEUE_BROKER_REQUERIMIENTOS_TESTER_ESPECIAL = 43;
+const int MSGQUEUE_BROKER_REGISTRO_TESTERS = 44;
 
 const int LAST_ID_IPC = MSGQUEUE_BROKER_REGISTRO_TESTERS + 1;
 const int SEM_ESPECIALES = LAST_ID_IPC; // Semaforos para testers especiales (creciente)
@@ -83,6 +81,7 @@ const int MTYPE_TAREA_ESPECIAL = 1;
 // mtypes desde equipo especial
 const int MTYPE_ORDEN = 1;
 const int MTYPE_FIN_TEST_ESPECIAL = 5;
+const int MTYPE_HAY_QUE_REINICIAR = 6;
 
 const int ORDEN_APAGADO = 0;
 const int ORDEN_REINICIO = 1;
@@ -132,11 +131,6 @@ typedef struct TContadorTareaEspecial {
     int cantTareasEspecialesTerminadas;
 } TContadorTareaEspecial;
 
-typedef struct TMessageReinicioTest {
-    long mtype;
-    bool hayQueReiniciar;
-} TMessageReinicioTest;
-
 // Primer mensaje de protocolo que cliente receptor le envia al server emisor
 typedef struct TFirstMessage {
     int identificador;
@@ -148,6 +142,7 @@ typedef struct message {
     int idDispositivo;
     int tester;
     bool esTesterEspecial;
+    bool hayQueReiniciar; // Se usa para avisarle al tester especial si debe reiniciar o no
     int value; // Este parametro posee el valor del programa, del resultado y de la orden
     int posicionDispositivo;
     int idTestersEspeciales[MAX_TESTERS_ESPECIALES_PARA_ASIGNAR];
@@ -167,6 +162,29 @@ typedef struct TTablaIdTestersDisponibles {
 typedef struct TTablaIdTestersEspecialesDisponibles {
     bool disponibles[MAX_TESTER_ESPECIALES];
 } TTablaIdTestersEspecialesDisponibles;
+
+/*********CONFIG PEDIDO SHARED MEMORY TESTERS**********/
+typedef struct TSharedMemoryPlanillaAsignacion {
+    long mtype;
+    int idSolicitante;
+    TContadorTesterEspecial cantTestersEspecialesAsignados[MAX_DISPOSITIVOS_EN_SISTEMA];
+    TContadorTareaEspecial cantTareasEspecialesAsignadas[MAX_DISPOSITIVOS_EN_SISTEMA];
+} TSharedMemoryPlanillaAsignacion;
+const int MTYPE_REQ_SHMEM_PLANILLA_ASIGNACION = 1;
+const int MTYPE_DEVOLUCION_SHMEM_PLANILLA_ASIGNACION = 2;
+const char PUERTO_SERVER_RECEPCION_SHM_PLANILLA_ASIGNACION[] = "50011";
+const char PUERTO_SERVER_ENVIO_SHM_PLANILLA_ASIGNACION[] = "50012";
+
+typedef struct TSharedMemoryPlanillaGeneral {
+    long mtype;
+    int idSolicitante;
+    int cantDispositivosSiendoTesteados;
+    bool idsPrivadosDispositivos[MAX_DISPOSITIVOS_EN_SISTEMA];
+} TSharedMemoryPlanillaGeneral;
+const int MTYPE_REQ_SHMEM_PLANILLA_GENERAL = 3;
+const int MTYPE_DEVOLUCION_SHMEM_PLANILLA_GENERAL = 4;
+const char PUERTO_SERVER_RECEPCION_SHM_PLANILLA_GENERAL[] = "50013";
+const char PUERTO_SERVER_ENVIO_SHM_PLANILLA_GENERAL[] = "50014";
 
 #endif	/* COMMON_H */
 

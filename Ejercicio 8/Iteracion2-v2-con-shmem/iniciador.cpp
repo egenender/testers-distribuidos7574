@@ -59,29 +59,11 @@ void createIPCObjects() {
         throw err;
     }
     ipcFile.close();
-       
-    // Creo semaforo para la shmem de la planilla
-    Semaphore semPlanillaGeneral(SEM_PLANILLA_GENERAL);
-    semPlanillaGeneral.creaSem();
-    semPlanillaGeneral.iniSem(1); // Inicializa el semaforo en 1
-
-    Semaphore semPlanillaCantTestersAsignados(SEM_PLANILLA_CANT_TESTER_ASIGNADOS);
-    semPlanillaCantTestersAsignados.creaSem();
-    semPlanillaCantTestersAsignados.iniSem(1);
-    
-    Semaphore semPlanillaCantTareasAsignadas(SEM_PLANILLA_CANT_TAREAS_ASIGNADAS);
-    semPlanillaCantTareasAsignadas.creaSem();
-    semPlanillaCantTareasAsignadas.iniSem(1);
-
-    Planilla planillaGeneral;
-    planillaGeneral.initPlanilla();
-    PlanillaAsignacionEquipoEspecial planillaAsignacion;
-    planillaAsignacion.initPlanilla();
     
     //creacion de colas
-    for (int q = MSGQUEUE_ENVIO_TESTER_COMUN; q <= MSGQUEUE_REINICIO_TESTEO; q++) {
+    for (int q = MSGQUEUE_ENVIO_TESTER_COMUN; q <= MSGQUEUE_RECEPCION_TESTERS_SHMEM_PLANILLA_ASIGNACION; q++) {
         key_t key = ftok(ipcFileName.c_str(), q);
-        if (msgget(key, 0660 | IPC_CREAT | IPC_EXCL) == -1) {
+        if (msgget(key, 0660 | IPC_CREAT) == -1) {
             std::cout << "No se pudo crear una cola: " << strerror(errno) << std::endl;
         }
     }
@@ -110,14 +92,6 @@ void createSystemProcesses() {
             Logger::error("Error al ejecutar el programa TesterEspecial", __FILE__);
             exit(1);
         }
-    }
-
-    // Creo equipo especial
-    pid_t eqEspPid = fork();
-    if (eqEspPid == 0) {
-        execlp("./equipoEspecial", "equipoEspecial", (char*)0);
-        Logger::error("Error al ejecutar el programa Equipo Especial", __FILE__);
-        exit(1);
     }
 
     // Creo al tecnico

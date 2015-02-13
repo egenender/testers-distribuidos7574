@@ -10,28 +10,30 @@
 
 #include "ipc/Semaphore.h"
 #include <sys/ipc.h>
-#include <sys/shm.h>
+#include <sys/msg.h>
 #include <errno.h>
 #include <cstring>
+#include <cstdlib>
 
 #include "logger/Logger.h"
+#include "common/common.h"
 
 class PlanillaAsignacionTesterComun {
 public:
-    PlanillaAsignacionTesterComun();
+    PlanillaAsignacionTesterComun(int idTester);
     virtual ~PlanillaAsignacionTesterComun();
     
     void asignarCantTestersEspeciales(int posicionDispositivo, int cantTestersEspeciales);
     
-    bool destruirComunicacion();
-    
 private:
-    Semaphore semShmemCantTesters, semShmemCantTareas;
-    key_t shmemCantTestersKey, shmemCantTareasKey;
-    int shmemCantTestersId, shmemCantTareasId;
-    TContadorTesterEspecial* cantTestersEspecialesAsignados;
-    TContadorTareaEspecial* cantTareasEspecialesAsignadas;
 
+    int idTester;
+    int shmemMsgqueueEmisor, shmemMsgqueueReceptor;
+    pid_t pidEmisor, pidReceptor;
+    TSharedMemoryPlanillaAsignacion memoria;
+    
+    void obtenerMemoriaCompartida();
+    void devolverMemoriaCompartida();
 };
 
 #endif	/* PLANILLAASIGNACIONTESTERCOMUN_H */

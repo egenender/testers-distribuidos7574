@@ -8,13 +8,14 @@
 #ifndef PLANILLAASIGNACIONEQUIPOESPECIAL_H
 #define	PLANILLAASIGNACIONEQUIPOESPECIAL_H
 
-#include "ipc/Semaphore.h"
 #include <sys/ipc.h>
-#include <sys/shm.h>
+#include <sys/msg.h>
 #include <errno.h>
 #include <cstring>
+#include <cstdlib>
 
 #include "logger/Logger.h"
+#include "common/common.h"
 
 class PlanillaAsignacionEquipoEspecial {
 public:
@@ -25,16 +26,14 @@ public:
     bool terminoTesteoEspecial(int posDispositivo, int idDispositivo);
     void reiniciarContadoresTesteoEspecial(int idDispositivo);
     void limpiarContadoresFinTesteo(int idDispositivo);
-    
-    void initPlanilla();
-    
-    bool destruirComunicacion();
+        
 private:
-    Semaphore semShmemCantTesters, semShmemCantTareas;
-    key_t shmemCantTestersKey, shmemCantTareasKey;
-    int shmemCantTestersId, shmemCantTareasId;
-    TContadorTesterEspecial* cantTestersEspecialesAsignados;
-    TContadorTareaEspecial* cantTareasEspecialesAsignadas;
+    int shmemMsgqueueEmisor, shmemMsgqueueReceptor;
+    pid_t pidEmisor, pidReceptor;
+    TSharedMemoryPlanillaAsignacion memoria;
+    
+    void obtenerMemoriaCompartida();
+    void devolverMemoriaCompartida();
 
 };
 

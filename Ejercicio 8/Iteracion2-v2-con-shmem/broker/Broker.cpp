@@ -35,6 +35,9 @@ void crearIpc() {
     
     key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_REGISTRO_TESTERS);
 	msgget(key, IPC_CREAT | 0660);
+    
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_SHMEM_HANDLER);
+	msgget(key, IPC_CREAT | 0660);
 
     key = ftok(ipcFileName.c_str(), SHM_BROKER_TESTERS_REGISTRADOS);
     int shmTablaTestCom = shmget(key, sizeof(TTablaBrokerTestersRegistrados), IPC_CREAT | 0660);
@@ -93,25 +96,35 @@ void crearModulosBroker() {
         Logger::notice ("Mensaje luego de execlp de brokerRegistroTesters. Algo salio mal!", __FILE__);
         exit(1);
 	}
+    
+    Logger::notice("Creo el modulo de broker de manejo de memoria compartida por testers", __FILE__);
+    if (fork() == 0){
+		execlp("./brokerTesterShmemHandler", "brokerTesterShmemHandler", (char*)0);
+        Logger::notice ("Mensaje luego de execlp de brokerTesterShmemHandler. Algo salio mal!", __FILE__);
+        exit(1);
+	}
 
 }
 
 void crearServers(){
 	
     char paramMsgQueue[10];
+    char paramSize[10];
+    
+    sprintf(paramSize, "%d", (int)sizeof(TMessageAtendedor));
     
     // Comunicacion con testers y equipo especial
     sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_RECEPTOR);
     Logger::notice("Creo el servidor receptor de mensajes de testers comunes", __FILE__);
 	if (fork() == 0){
-		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_SERVER_RECEPTOR , paramMsgQueue, (char*)0);
+		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_SERVER_RECEPTOR , paramMsgQueue, paramSize, (char*)0);
         exit(1);
 	}
 	
 	Logger::notice("Creo el servidor emisor de mensajes a testers comunes", __FILE__);
 	sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_EMISOR);
 	if (fork() == 0){
-		execlp("./tcp/tcpserver_emisor", "tcpserver_emisor", PUERTO_SERVER_EMISOR , paramMsgQueue, (char*)0);
+		execlp("./tcp/tcpserver_emisor", "tcpserver_emisor", PUERTO_SERVER_EMISOR , paramMsgQueue, paramSize, (char*)0);
         exit(1);
 	}
 
@@ -119,14 +132,46 @@ void crearServers(){
 	sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_RECEPTOR_DISPOSITIVOS);
     Logger::notice("Creo el servidor receptor de mensajes de dispositivos", __FILE__);
 	if (fork() == 0){
-		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_SERVER_RECEPTOR_DISPOSITIVOS , paramMsgQueue, (char*)0);
+		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_SERVER_RECEPTOR_DISPOSITIVOS , paramMsgQueue, paramSize, (char*)0);
         exit(1);
 	}
 	
 	sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_EMISOR_DISPOSITIVOS);
 	Logger::notice("Creo el servidor emisor de mensajes a dispositivos", __FILE__);
 	if (fork() == 0){
-		execlp("./tcp/tcpserver_emisor", "tcpserver_emisor", PUERTO_SERVER_EMISOR_DISPOSITIVOS , paramMsgQueue,(char*)0);
+		execlp("./tcp/tcpserver_emisor", "tcpserver_emisor", PUERTO_SERVER_EMISOR_DISPOSITIVOS , paramMsgQueue, paramSize, (char*)0);
+        exit(1);
+	}
+    
+    // Comunicacion con tester/eq-esp para la shared memory de planilla general
+    sprintf(paramSize, "%d", (int)sizeof(TSharedMemoryPlanillaGeneral));
+    sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_SHMEM_HANDLER);
+    Logger::notice("Creo el servidor receptor de mensajes de dispositivos", __FILE__);
+	if (fork() == 0){
+		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_SERVER_RECEPCION_SHM_PLANILLA_GENERAL , paramMsgQueue, paramSize, (char*)0);
+        exit(1);
+	}
+	
+	sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_SHMEM_HANDLER);
+	Logger::notice("Creo el servidor emisor de mensajes a dispositivos", __FILE__);
+	if (fork() == 0){
+		execlp("./tcp/tcpserver_emisor", "tcpserver_emisor", PUERTO_SERVER_ENVIO_SHM_PLANILLA_GENERAL , paramMsgQueue, paramSize, (char*)0);
+        exit(1);
+	}
+    
+    // Comunicacion con tester/eq-esp para la shared memory de planilla asignacion
+    sprintf(paramSize, "%d", (int)sizeof(TSharedMemoryPlanillaAsignacion));
+    sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_SHMEM_HANDLER);
+    Logger::notice("Creo el servidor receptor de mensajes de dispositivos", __FILE__);
+	if (fork() == 0){
+		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_SERVER_RECEPCION_SHM_PLANILLA_ASIGNACION , paramMsgQueue, paramSize, (char*)0);
+        exit(1);
+	}
+	
+	sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_SHMEM_HANDLER);
+	Logger::notice("Creo el servidor emisor de mensajes a dispositivos", __FILE__);
+	if (fork() == 0){
+		execlp("./tcp/tcpserver_emisor", "tcpserver_emisor", PUERTO_SERVER_ENVIO_SHM_PLANILLA_ASIGNACION , paramMsgQueue, paramSize, (char*)0);
         exit(1);
 	}
 }

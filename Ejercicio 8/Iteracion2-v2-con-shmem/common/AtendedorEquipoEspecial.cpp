@@ -15,15 +15,7 @@ AtendedorEquipoEspecial::AtendedorEquipoEspecial() {
         Logger::error(err, __FILE__);
         exit(1);
     }
-/*
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_REINICIO_TESTEO);
-    this->colaReinicioTestEsp = msgget(key, 0666);
-    if(this->colaReinicioTestEsp == -1) {
-        std::string err = std::string("Error al obtener la cola para avisar reinicio de testeo especial. Errno: ") + std::string(strerror(errno));
-        Logger::error(err, __FILE__);
-        exit(1);
-    }
-*/
+
     key = ftok(ipcFileName.c_str(), MSGQUEUE_ENVIO_EQUIPO_ESPECIAL);
     this->colaEnvios = msgget(key, 0666);
     if(this->colaEnvios == -1) {
