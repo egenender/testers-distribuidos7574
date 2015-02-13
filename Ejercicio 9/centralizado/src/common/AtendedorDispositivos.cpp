@@ -16,7 +16,8 @@ AtendedorDispositivos::AtendedorDispositivos( const Configuracion& config ) {
                       config.ObtenerParametroEntero(MSGQUEUE_DISPOSITIVOS) );
     this->cola_requerimiento = msgget(key, 0666);
     if(this->cola_requerimiento == -1) {
-        std::string err = std::string("Error al obtener la cola para enviar requerimientos. Errno: ") + std::string(strerror(errno));
+        std::string err = std::string("Error al obtener la cola para enviar requerimientos. Errno: ") 
+                          + std::string(strerror(errno));
         Logger::error(err, __FILE__);
         exit(1);
     }
