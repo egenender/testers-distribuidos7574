@@ -8,7 +8,7 @@
 #include "PlanillaReinicioTesterEspecial.h"
 
 PlanillaReinicioTesterEspecial::PlanillaReinicioTesterEspecial() {
-    this->msgqReinicioKey = ftok(ipcFileName.c_str(), MSGQUEUE_REINICIO_TESTEO);
+    this->msgqReinicioKey = ftok(ipcFileName.c_str(), MSGQUEUE_RECEPCIONES_TESTER_ESPECIAL);
     this->msgqReinicioId = msgget(this->msgqReinicioKey, 0666);
     if(this->msgqReinicioId == -1) {
 		std::string err = std::string("Error al obtener la cola de reinicio de tests. Errno: ") + std::string(strerror(errno));
@@ -22,8 +22,8 @@ PlanillaReinicioTesterEspecial::~PlanillaReinicioTesterEspecial() {
 
 bool PlanillaReinicioTesterEspecial::hayQueReiniciar(int idTester) {
 
-    TMessageReinicioTest msg;
-    int ret = msgrcv(this->msgqReinicioId, &msg, sizeof(TMessageReinicioTest) - sizeof(long), idTester, 0);
+    TMessageAtendedor msg;
+    int ret = msgrcv(this->msgqReinicioId, &msg, sizeof(TMessageAtendedor) - sizeof(long), idTester, 0);
     if(ret == -1) {
         std::ostringstream ss;
         ss << "Error al recibir reinicio de testeo para tester " << idTester << ". Error: ";

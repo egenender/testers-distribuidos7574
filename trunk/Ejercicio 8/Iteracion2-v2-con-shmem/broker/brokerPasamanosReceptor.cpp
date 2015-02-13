@@ -22,6 +22,9 @@ int main(int argc, char* argv[]) {
 	
 	key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_RECEPTOR);
 	int msgQueueReceptor = msgget(key, 0660);
+    
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_EMISOR);
+	int msgQueueEmisor = msgget(key, 0660);
 
 	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_EMISOR_DISPOSITIVOS);
 	int msgQueueDisp = msgget(key, 0660);
@@ -65,6 +68,20 @@ int main(int argc, char* argv[]) {
                 ss.clear();
                 
                 ret = msgsnd(msgQueueRegistroTesters, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+                if(ret == -1) {
+                    Logger::error("Error al enviar el mensaje a la cola de registros de testers");
+                    exit(1);
+                }
+                break;
+
+            case MTYPE_HAY_QUE_REINICIAR:
+                ss << "Llego un mensaje para reiniciar (o no) para el tester especial " << msg.tester;
+                Logger::notice(ss.str(), __FILE__);
+                ss.str("");
+                ss.clear();
+                
+                msg.mtype = msg.tester;
+                ret = msgsnd(msgQueueEmisor, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
                 if(ret == -1) {
                     Logger::error("Error al enviar el mensaje a la cola de registros de testers");
                     exit(1);

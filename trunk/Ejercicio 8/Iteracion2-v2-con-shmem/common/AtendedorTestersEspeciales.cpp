@@ -49,6 +49,12 @@ AtendedorTestersEspeciales::AtendedorTestersEspeciales(int idTester) : idTester(
                 (char*)0);
         exit(1);
 	}
+
+    if (fork() == 0){
+		execlp("./distribuidorMsgTesterEspecial", "distribuidorMsgTesterEspecial", (char*) 0);
+        Logger::error("No se ejecutó correctamente el distribuidor de mensajes de tester especiales", __FILE__);
+        exit(1);
+	}
     
     registrarTester();
 }
