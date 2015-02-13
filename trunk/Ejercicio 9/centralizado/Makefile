@@ -35,17 +35,24 @@ TESTERCONFIG_SOURCES=src/TesterConfiguracion.cpp src/TestConfiguracion.cpp
 TESTERCONFIG_OBJ=$(TESTERCONFIG_SOURCES:.cpp=.o)
 TESTERCONFIG_BIN=$(BINF)/testerConfig
 
+DISP_CONFIG_SOURCES=src/DispositivoConfig.cpp
+DISP_CONFIG_OBJ=$(DISP_CONFIG_SOURCES:.cpp=.o)
+DISP_CONFIG_BIN=$(BINF)/dispositivoConfig
+
 FIN_SOURCES=src/finalizador.cpp
 FIN_OBJ=$(FIN_SOURCES:.cpp=.o)
 FIN_BIN=$(BINF)/finalizador
 
-all: testerComun testerEspecial testerConfig tecnico dispositivo equipoEspecial iniciador finalizador
+all: testerComun testerEspecial testerConfig tecnico dispositivo equipoEspecial iniciador finalizador dispositivoConfig
 
 iniciador: $(INIT_OBJ) $(SHARED_OBJ)
 	$(CC) $(SHARED_OBJ) $(INIT_OBJ) -o $(INIT_BIN) -I$(HEADER_DIR)
 
 dispositivo: $(DISP_OBJ) $(SHARED_OBJ)
 	$(CC) $(SHARED_OBJ) $(DISP_OBJ) -o $(DISP_BIN) -I$(HEADER_DIR)
+
+dispositivoConfig: $(DISP_CONFIG_OBJ) $(SHARED_OBJ)
+	$(CC) $(SHARED_OBJ) $(DISP_CONFIG_OBJ) -o $(DISP_CONFIG_BIN) -I$(HEADER_DIR)
 	
 testerComun: $(TESTERCOMUN_OBJ) $(SHARED_OBJ)
 	$(CC) $(TESTERCOMUN_OBJ) $(SHARED_OBJ) -o $(TESTERCOMUN_BIN) -I$(HEADER_DIR)

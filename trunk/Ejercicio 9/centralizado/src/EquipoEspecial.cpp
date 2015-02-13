@@ -1,6 +1,6 @@
 /* 
  * File:   EquipoEspecial.cpp
- * Author: ferno
+ * Author: knoppix
  *
  * Created on November 17, 2014, 12:51 AM
  */
