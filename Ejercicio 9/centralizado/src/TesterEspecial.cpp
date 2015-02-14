@@ -57,8 +57,7 @@ int main(int argc, char** argv) {
         ss.str("");
         ss << "Enviando pedido de test de configuracion para dispositivo con id " << msg.idDispositivo;
         Logger::notice(ss.str() , nombre.str().c_str());
-        ss.str("");
-        atendedor.enviarReqTestConfig( id, msg.idDispositivo, msg.tipoDispositivo );
+        ss.str("");        
         usleep( rand() % 1000 + 1000);
 
         TareaEspecial tarea( config );

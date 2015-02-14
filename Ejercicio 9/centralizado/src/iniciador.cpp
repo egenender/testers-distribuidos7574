@@ -73,23 +73,19 @@ void createIPCObjects( const Configuracion& config ) {
     ipcFile.close();
 
     // Creo semaforo para la shmem de la planilla
-    Semaphore semPlanillaGeneral( config.ObtenerParametroString(ARCHIVO_IPCS),
-                                  config.ObtenerParametroEntero(SEM_PLANILLA_GENERAL) );
+    Semaphore semPlanillaGeneral( archivoIpcs, config.ObtenerParametroEntero(SEM_PLANILLA_GENERAL) );
     semPlanillaGeneral.creaSem();
     semPlanillaGeneral.iniSem(1); // Inicializa el semaforo en 1
 
-    Semaphore sem_cola_especiales( config.ObtenerParametroString(ARCHIVO_IPCS),
-                                   config.ObtenerParametroEntero(SEM_COLA_ESPECIALES) );
+    Semaphore sem_cola_especiales( archivoIpcs, config.ObtenerParametroEntero(SEM_COLA_ESPECIALES) );
     sem_cola_especiales.creaSem();
     sem_cola_especiales.iniSem(1);
 
-    Semaphore semPlanillaCantTestersAsignados( config.ObtenerParametroString(ARCHIVO_IPCS),
-                                               config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TESTER_ASIGNADOS) );
+    Semaphore semPlanillaCantTestersAsignados( archivoIpcs, config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TESTER_ASIGNADOS) );
     semPlanillaCantTestersAsignados.creaSem();
     semPlanillaCantTestersAsignados.iniSem(1);
 
-    Semaphore semPlanillaCantTareasAsignadas( config.ObtenerParametroString(ARCHIVO_IPCS),
-                                              config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TAREAS_ASIGNADAS) );
+    Semaphore semPlanillaCantTareasAsignadas( archivoIpcs, config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TAREAS_ASIGNADAS) );
     semPlanillaCantTareasAsignadas.creaSem();
     semPlanillaCantTareasAsignadas.iniSem(1);
 
@@ -97,7 +93,20 @@ void createIPCObjects( const Configuracion& config ) {
     planillaGeneral.initPlanilla();
     PlanillaAsignacionEquipoEspecial planillaAsignacion( config );
     planillaAsignacion.initPlanilla();
-
+    
+    //Semaforos planilla variables config
+    for( int i=0; i<config.ObtenerParametroEntero( MAX_DISPOSITIVOS_EN_SISTEMA ) ){
+        Semaphore semPlanillaVarsTE( archivoIpcs, config.ObtenerParametroEntero(SEM_PLANILLA_VARS_TE_START) + i );
+        semPlanillaVarsTE.creaSem();
+        semPlanillaVarsTE.iniSem(1);
+        Semaphore semPlanillaVarsCV( archivoIpcs, config.ObtenerParametroEntero(SEM_PLANILLA_VARS_CV_START) + i );
+        semPlanillaVarsCV.creaSem();
+        semPlanillaVarsCV.iniSem(1);        
+        Semaphore semMutexPlanillaVars( archivoIpcs, config.ObtenerParametroEntero(SEM_MUTEX_PLANILLA_VARS) + i );
+        semMutexPlanillaVars.creaSem();
+        semMutexPlanillaVars.iniSem(1);
+    }
+    
     //creacion de colas
     int msgQueueDispositivos = config.ObtenerParametroEntero( MSGQUEUE_DISPOSITIVOS );
     int msgQueueUltimo = config.ObtenerParametroEntero( MSGQUEUE_ULTIMO );

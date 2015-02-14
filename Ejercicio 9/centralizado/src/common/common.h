@@ -37,10 +37,14 @@ namespace Constantes{
         const std::string SEM_PLANILLA_CANT_TESTER_ASIGNADOS = "SemPlanillaCantTesterAsignados";
         const std::string SEM_PLANILLA_GENERAL = "SemPlanillaGeneral";
         const std::string SEM_COLA_ESPECIALES = "SemColaEspeciales";
+        const std::string SEM_MUTEX_PLANILLA_VARS_START = "SemMutexPlanillaVarsStart";
         const std::string SHM_PLANILLA_CANT_TAREAS_ASIGNADAS = "ShmPlanillaCantTareasAsignadas";
         const std::string SHM_PLANILLA_CANT_TESTER_ASIGNADOS = "ShmPlanillaCantTesterAsignados";
         const std::string SHM_PLANILLA_GENERAL = "ShmPlanillaGeneral";
         const std::string SHM_PLANILLA_GENERAL_POSICIONES = "ShmPlanillaGeneralPosiciones";
+        const std::string SEM_PLANILLA_VARS_TE_START = "SemPlanillaVarsTeStart" ;
+        const std::string SEM_PLANILLA_VARS_CV_START = "SemPlanillaVarsCvStart";
+        const std::string SHM_PLANILLA_VARS_START = "ShmPlanillaVarsStart";        
         // Alias / equivalencias
         const std::string CANT_RESULTADOS = MAX_DISPOSITIVOS_EN_SISTEMA;
         const std::string MSGQUEUE_ULTIMO = MSGQUEUE_REINICIO_TESTEO;
@@ -129,3 +133,14 @@ typedef struct TMessageConfigTest {
 typedef struct TMessageResultadoConfigTest{
     long mtype;
 } TMessageResultadoConfigTest;
+
+enum EstadoProcesoDisp{
+    EPD_ESPERANDO,
+    EPD_CORRIENDO_TEST,
+    EPD_LIBRE
+};
+
+typedef struct TEstadoDispositivo{
+    EstadoProcesoDisp    estadoDisp;
+    EstadoProcesoDisp    estadoDispConfig;
+};
