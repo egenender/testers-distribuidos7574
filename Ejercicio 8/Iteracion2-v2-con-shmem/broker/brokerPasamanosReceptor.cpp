@@ -10,9 +10,11 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
+#include <sys/shm.h>
 
 #include "common/common.h"
 #include "logger/Logger.h"
+#include "ipc/Semaphore.h"
 
 using namespace std;
 
@@ -34,6 +36,13 @@ int main(int argc, char* argv[]) {
     
     key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_REGISTRO_TESTERS);
     int msgQueueRegistroTesters = msgget(key, 0660);
+
+    key = ftok(ipcFileName.c_str(), SHM_BROKER_TESTERS_REGISTRADOS);
+    int shmTablaTestersRegistrados = shmget(key, sizeof(TTablaBrokerTestersRegistrados), IPC_CREAT | 0660);
+    TTablaBrokerTestersRegistrados* tablaTestersRegistrados = (TTablaBrokerTestersRegistrados*) shmat(shmTablaTestersRegistrados, (void*) NULL, 0);
+
+    Semaphore semTabla(SEM_BROKER_TESTERS_REGISTRADOS);
+    semTabla.getSem();
 	
 	TMessageAtendedor msg;
     int ret = 0;
@@ -85,6 +94,19 @@ int main(int argc, char* argv[]) {
                 if(ret == -1) {
                     Logger::error("Error al enviar el mensaje a la cola de registros de testers");
                     exit(1);
+                }
+                break;
+
+            case MTYPE_AVISAR_DISPONIBILIDAD:
+                ss << "Llego un aviso de disponibilidad del tester especial " << msg.tester;
+                Logger::notice(ss.str(), __FILE__); ss.str(""); ss.clear();
+                
+                if (fork() == 0) {
+                    // Pido la shmem y vuelvo a poner al tester disponible
+                    semTabla.p();
+                    tablaTestersRegistrados->disponibles[msg.tester - ID_TESTER_ESP_START + MAX_TESTER_COMUNES] = true;
+                    semTabla.v();                    
+                    exit(0);
                 }
                 break;
 

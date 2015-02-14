@@ -28,7 +28,7 @@ public:
     void limpiarContadoresFinTesteo(int idDispositivo);
         
 private:
-    int shmemMsgqueueEmisor, shmemMsgqueueReceptor;
+    int shmemMsgqueueEmisor, shmemMsgqueueReceptor, shmemMsgqueueReq;
     pid_t pidEmisor, pidReceptor;
     TSharedMemoryPlanillaAsignacion memoria;
     

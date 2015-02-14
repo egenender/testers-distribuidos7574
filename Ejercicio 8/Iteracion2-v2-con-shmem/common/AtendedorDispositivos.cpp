@@ -26,16 +26,18 @@ AtendedorDispositivos::AtendedorDispositivos(int idDispositivo) : idDispositivo(
 
     char paramIdCola[10];
     char paramId[10];
+    char paramSize[10];
 
 	sprintf(paramIdCola, "%d", MSGQUEUE_RECEPCIONES_DISP);
     sprintf(paramId, "%d", this->idDispositivo);
+    sprintf(paramSize, "%d", (int) sizeof(TMessageAtendedor));
 
 	this->pidReceptor = fork();
 	if (this->pidReceptor == 0) {
 		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",
 				UBICACION_SERVER,
 				PUERTO_SERVER_EMISOR_DISPOSITIVOS,
-                paramId, paramIdCola,
+                paramId, paramIdCola, paramSize, 
 				(char*) 0);
         Logger::error("Log luego de execlp tcpclient_receptor. Error!", __FILE__);
 		exit(1);
@@ -48,7 +50,7 @@ AtendedorDispositivos::AtendedorDispositivos(int idDispositivo) : idDispositivo(
 		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",
 				UBICACION_SERVER,
 				PUERTO_SERVER_RECEPTOR_DISPOSITIVOS,
-				paramId, paramIdCola,
+				paramId, paramIdCola, paramSize, 
 				(char*) 0);
         Logger::error("Log luego de execlp tcpclient_emisor. Error!", __FILE__);
 		exit(1);

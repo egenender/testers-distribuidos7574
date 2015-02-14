@@ -24,6 +24,13 @@ Planilla::Planilla(int idTester) : idTester(idTester) {
         Logger::error("Error al construir la msgqueue para la gestion de la memora compartida distribuida", __FILE__);
         exit(1);
     }
+    
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_REQ_TESTERS_SHMEM_PLANILLAS);
+	this->shmemMsgqueueReq = msgget(key, IPC_CREAT | 0660);
+    if(this->shmemMsgqueueReq == -1) {
+        Logger::error("Error al construir la msgqueue para la gestion de la memora compartida distribuida", __FILE__);
+        exit(1);
+    }
 
     // Creo la comunicacion al broker para la memoria compartida distribuida
     char paramIdCola[10];
@@ -31,7 +38,7 @@ Planilla::Planilla(int idTester) : idTester(idTester) {
     char paramSize[10];
 
 	sprintf(paramIdCola, "%d", MSGQUEUE_RECEPCION_TESTERS_SHMEM_PLANILLA_GENERAL);
-    sprintf(paramId, "%d", this->idTester);
+    sprintf(paramId, "%d", this->idTester + INIT_MTYPE_SHMEM_PLANILLA_GENERAL);
     sprintf(paramSize, "%d", (int) sizeof(TSharedMemoryPlanillaGeneral));
 
 	this->pidReceptor = fork();
@@ -47,6 +54,7 @@ Planilla::Planilla(int idTester) : idTester(idTester) {
 
     sprintf(paramIdCola, "%d", MSGQUEUE_ENVIO_TESTERS_SHMEM_PLANILLA_GENERAL);
     sprintf(paramId, "%d", 0); // Para que envie todos los mensajes
+
     this->pidEmisor = fork();
 	if (this->pidEmisor == 0) {
 		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",
@@ -91,9 +99,11 @@ void Planilla::eliminarDispositivo(int posicionDispositivo) {
 }
 
 void Planilla::obtenerSharedMemory() {
-    this->memoria.mtype = MTYPE_REQ_SHMEM_PLANILLA_GENERAL;
-    this->memoria.idSolicitante = this->idTester;
-    int okSend = msgsnd(this->shmemMsgqueueEmisor, &this->memoria, sizeof(TSharedMemoryPlanillaGeneral) - sizeof(long), 0);
+    TRequerimientoSharedMemory req;
+    req.mtype = MTYPE_REQ_SHMEM_PLANILLA_GENERAL;
+    req.idDevolucion = this->idTester + INIT_MTYPE_SHMEM_PLANILLA_GENERAL;
+    req.idSolicitante = this->idTester;
+    int okSend = msgsnd(this->shmemMsgqueueReq, &req, sizeof(TRequerimientoSharedMemory) - sizeof(long), 0);
     if(okSend == -1) {
         std::stringstream ss;
         ss << "Error pidiendo la shmem distribuida de planilla general para el tester " << this->idTester;
@@ -101,16 +111,20 @@ void Planilla::obtenerSharedMemory() {
         exit(1);
     }
     // Espero por la shmem
-    int okRead = msgrcv(this->shmemMsgqueueReceptor, &this->memoria, sizeof(TSharedMemoryPlanillaGeneral) - sizeof(long), this->idTester, 0);
+    int okRead = msgrcv(this->shmemMsgqueueReceptor, &this->memoria, sizeof(TSharedMemoryPlanillaGeneral) - sizeof(long), this->idTester + INIT_MTYPE_SHMEM_PLANILLA_GENERAL, 0);
     if(okRead == -1) {
         std::stringstream ss;
         ss << "Error leyendo de la msgqueue la shmem distribuida de planilla general para el tester " << this->idTester;
         Logger::error(ss.str(), __FILE__);
         exit(1);
     }
+    std::stringstream ss; ss << "Me llega la shmem de planilla general al tester/equipo " << this->memoria.mtype;
+    //Logger::debug(ss.str(), __FILE__);
 }
 
 void Planilla::devolverSharedMemory() {
+    std::stringstream ss; ss << "Tester/equipo " << this->idTester << " envía planilla general de vuelta";
+    //Logger::debug(ss.str(), __FILE__);
     this->memoria.mtype = MTYPE_DEVOLUCION_SHMEM_PLANILLA_GENERAL;
     int okSend = msgsnd(this->shmemMsgqueueEmisor, &this->memoria, sizeof(TSharedMemoryPlanillaGeneral) - sizeof(long), 0);
     if(okSend == -1) {

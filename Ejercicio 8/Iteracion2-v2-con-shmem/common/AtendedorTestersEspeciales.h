@@ -20,7 +20,7 @@
 
 class AtendedorTestersEspeciales {
 private:
-    int colaEnvios, colaRecepciones;
+    int colaEnvios, colaRecepcionesReq, colaRecepcionesReinicio;
     int idTester;
     
     // For killing communication processes
@@ -35,7 +35,7 @@ public:
     
     TMessageAtendedor recibirRequerimientoEspecial(int idEsp);
     void enviarTareaEspecial(int idDispositivo, int idTester, int tarea, int posicionDispositivo);
-
+    void enviarDisponibilidad();
 };
 
 #endif	/* ATENDEDORTESTERSESPECIALES_H */

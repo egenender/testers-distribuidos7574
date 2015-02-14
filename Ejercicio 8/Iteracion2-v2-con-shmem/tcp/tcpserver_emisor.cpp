@@ -79,13 +79,7 @@ int main(int argc, char *argv[]) {
                     close(clientFd);
                     exit(1);
                 }
-                //Si el mensaje era de finalizacion, entonces 'mato' al receptor y termino mi labor
-                /*if (buffer->finalizar_conexion) {
-                    kill(receptor, SIGHUP);
-                    free(buffer);
-                    close(clientFd);
-                    exit(0);
-                }*/				
+
                 enviar(clientFd, buffer, size);
             }			
         }

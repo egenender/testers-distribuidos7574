@@ -20,6 +20,8 @@
  */
 int main(int argc, char** argv) {
     
+    Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
+    
     // Creo archivo de IPCs
     std::fstream ipcFile(ipcFileName.c_str(), std::ios::out);
     if (ipcFile.bad() || ipcFile.fail()) {
@@ -81,6 +83,14 @@ int main(int argc, char** argv) {
     idQueue = msgget(key, 0660 | IPC_CREAT | IPC_EXCL);
     if (idQueue == -1) {
         std::stringstream ss; ss << "No se pudo crear cola de id " << MSGQUEUE_ENVIO_TESTERS_SHMEM_PLANILLA_GENERAL << ". Errno: " << strerror(errno);
+        Logger::error(ss.str(), __FILE__);
+    }
+    msgctl(idQueue ,IPC_RMID, NULL);
+
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_REQ_TESTERS_SHMEM_PLANILLAS);
+    idQueue = msgget(key, 0660 | IPC_CREAT | IPC_EXCL);
+    if (idQueue == -1) {
+        std::stringstream ss; ss << "No se pudo crear cola de id " << MSGQUEUE_REQ_TESTERS_SHMEM_PLANILLAS << ". Errno: " << strerror(errno);
         Logger::error(ss.str(), __FILE__);
     }
     msgctl(idQueue ,IPC_RMID, NULL);
