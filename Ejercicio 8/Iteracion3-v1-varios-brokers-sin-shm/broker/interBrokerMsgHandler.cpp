@@ -86,6 +86,23 @@ int main(int argc, char** argv) {
                 }
                 break;
             }
+            
+            case MTYPE_HACIA_EQUIPO_ESPECIAL: {
+                log << "Me llego un mensaje desde broker " << msg.idBrokerOrigen << " para enviar al equipo especial " << ID_EQUIPO_ESPECIAL;
+                Logger::notice(log.str(), nombre.str().c_str());
+
+                // Cambio el mtype al ID del tester y envio a la cola hacia tester
+                msg.mtype = ID_EQUIPO_ESPECIAL;
+                int okSend = msgsnd(msgQueueTester, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+                if (okSend == -1) {
+                    std::stringstream ss;
+                    ss << "Error al enviar mensaje hacia equipo especial " << ID_EQUIPO_ESPECIAL << ". Errno: " << strerror(errno);
+                    Logger::error(ss.str(), nombre.str().c_str());
+                    exit(1);
+                }
+                break;
+            }
+                
         }
 
     }

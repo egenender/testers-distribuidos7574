@@ -51,12 +51,6 @@ AtendedorTesters::AtendedorTesters(int idTester): idTester(idTester) {
         exit(1);
 	}
     
-    if (fork() == 0){
-		execlp("./distribuidorMsgTester", "distribuidorMsgTester", (char*) 0);
-        Logger::error("No se ejecutó correctamente el distribuidor de mensajes", __FILE__);
-        exit(1);
-	}
-    
     registrarTester();
 
 }

@@ -100,6 +100,7 @@ int main (void) {
             
             msg.mtype = msg.idDispositivo;
             msg.value = SIN_LUGAR;
+            msg.idBrokerOrigen = ID_BROKER;
             int ret = msgsnd(msgQueueADisp, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
             if(ret == -1) {
                 Logger::error("Error al enviar el SIN_LUGAR al dispositivo", __FILE__);
@@ -109,6 +110,7 @@ int main (void) {
             ss << "Le envio el requerimiento del dispositivo al Tester " << msg.mtype << " que se encuentra en el broker " << msg.idBroker;
             Logger::notice(ss.str(), __FILE__);
 
+            msg.idBrokerOrigen = ID_BROKER;
             if (msg.idBroker == ID_BROKER) {
                 int ret = msgsnd(msgQueueTesterComun, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
                 if(ret == -1) {
@@ -119,7 +121,6 @@ int main (void) {
                 // Paso el mensaje al broker correspondiente
                 msg.mtype = msg.idBroker;
                 msg.mtypeMensajeBroker = MTYPE_HACIA_TESTER;
-                msg.idBrokerOrigen = ID_BROKER;
                 int ret = msgsnd(msgQueueHaciaBrokers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
                 if(ret == -1) {
                     Logger::error("Error al enviar el requerimiento del dispositivo al tester", __FILE__);

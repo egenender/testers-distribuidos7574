@@ -185,6 +185,7 @@ const char PUERTO_CONTRA_BROKERS_SHMEM_BROKERS[] = "40005";
 // Para el mtypeMessageBroker del InterBroker-Message-Handler
 const int MTYPE_HACIA_DISPOSITIVO = 1;
 const int MTYPE_HACIA_TESTER = 2;
+const int MTYPE_HACIA_EQUIPO_ESPECIAL = 3;
 
 // Para los sockets
 const char PUERTO_SERVER_RECEPTOR_DISPOSITIVOS[] = "50000";

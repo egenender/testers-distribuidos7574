@@ -131,7 +131,7 @@ int main(int argc, char* argv[]) {
                     Logger::notice(ss.str(), __FILE__); ss.str(""); ss.clear();
                     // El mensaje es para tester en otro broker
                     msg.mtype = msg.idBroker;
-                    msg.mtypeMensajeBroker = MTYPE_HACIA_TESTER;
+                    msg.mtypeMensajeBroker = MTYPE_HACIA_EQUIPO_ESPECIAL;
                     ret = msgsnd(msgQueueHaciaBrokers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
                     if(ret == -1) {
                         Logger::error("Error al enviar el resultado especial a la cola de envio hacia brokers", __FILE__);
