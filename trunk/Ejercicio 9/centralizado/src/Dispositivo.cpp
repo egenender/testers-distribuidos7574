@@ -17,6 +17,12 @@
 
 using namespace std;
 
+void correrTestEspecial( PlanillaVariablesDisp& planillaVars ){
+    planillaVars.iniciarTestEspecial();
+    usleep( rand() % 1000 + 1000 );
+    planillaVars.finalizarTestEspecial();
+}
+
 int main(int argc, char** argv) {
     srand(time(NULL));
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
@@ -36,6 +42,8 @@ int main(int argc, char** argv) {
     
     // Comunicacion con el sistema de testeo
     AtendedorDispositivos atendedor( config );
+    //Para exclusion mutua entre tests especiales y cambios de variable de config
+    PlanillaVariablesDisp planillaVariables( config );
     // TODO: Log
     
     while(true) {
@@ -57,13 +65,13 @@ int main(int argc, char** argv) {
         }
     
         ss << "El dispositivo " << id << " recibe el programa numero " << program;
-        Logger::debug(ss.str().c_str(), __FILE__);;
+        Logger::debug(ss.str().c_str(), __FILE__);
         ss.str("");
 
         usleep( rand() % 1000 + 1000);
 
         ss << "El dispositivo " << id << " envia los resultados";
-        Logger::debug(ss.str().c_str(), __FILE__);;
+        Logger::debug(ss.str().c_str(), __FILE__);
         ss.str("");
 
         // Le envio resultado del primer programa de testeo
@@ -100,12 +108,13 @@ int main(int argc, char** argv) {
 
             bool lastSpecialTest = false;
             program = atendedor.recibirProgramaEspecial(id);
-            while (!lastSpecialTest){
-                ss << "El dispositivo " << id << " recibe el programa especial numero " << program << ". Enviando resultados...";
+            while (!lastSpecialTest){                
+                ss << "El dispositivo " << id << " recibe el programa especial numero " << program << ". Ejecutando test especial...";
+                correrTestEspecial( planillaVars );
                 Logger::debug(ss.str().c_str(), __FILE__);;
                 ss.str("");
                 atendedor.enviarResultadoEspecial(id, rand() % 2);
-                program = atendedor.recibirProgramaEspecial(id);
+                program = atendedor.recibirProgramaEspecial(id);                
                 if (program == FIN_TEST_ESPECIAL)
                     lastSpecialTest = true;
             }

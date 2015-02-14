@@ -81,6 +81,19 @@ int main(int argc, char** argv) {
         msgctl(cola ,IPC_RMID, NULL);
     }
     
+    //Semaforos de planilla variables
+    for( int i=0; i<config.ObtenerParametroEntero( MAX_DISPOSITIVOS_EN_SISTEMA ) ){
+        Semaphore semPlanillaVarsTE( archivoIpcs, config.ObtenerParametroEntero(SEM_PLANILLA_VARS_TE_START) + i );
+        semPlanillaVarsTE.getSem();
+        semPlanillaVarsTE.eliSem();
+        Semaphore semPlanillaVarsCV( archivoIpcs, config.ObtenerParametroEntero(SEM_PLANILLA_VARS_CV_START) + i );
+        semPlanillaVarsCV.getSem();
+        semPlanillaVarsCV.eliSem();        
+        Semaphore semMutexPlanillaVars( archivoIpcs, config.ObtenerParametroEntero(SEM_MUTEX_PLANILLA_VARS_START) + i );
+        semMutexPlanillaVars.getSem();
+        semMutexPlanillaVars.eliSem();
+    }
+    
     unlink(ipcFileName.c_str());
     
     return 0;

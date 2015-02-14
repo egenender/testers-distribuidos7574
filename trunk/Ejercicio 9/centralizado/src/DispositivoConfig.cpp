@@ -18,6 +18,20 @@
 #include <cstdlib>
 #include <sstream>
 
+void realizarCambioDeVariable( PlanillaVariablesDisp& planillaVariables ){
+    planillaVariables.iniciarCambioDeVariable();
+    usleep(rand() % 1000 + 1000);
+    ss << "El dispositivo-config " << id << " cambiara la variable de configuracion " 
+       << nombreVarConfig << " del valor " << valorPrevio << " al valor " << nuevoValor;
+    Logger::debug(ss.str().c_str(), __FILE__);
+    ss.str("");
+    planillaVariables.FinalizarCambioDeVariable();
+    ss << "El dispositivo-config " << id << " cambió exitosamente la variable de configuracion " 
+       << nombreVarConfig;
+    Logger::debug(ss.str().c_str(), __FILE__);
+    ss.str("");
+}
+
 using namespace std;
 
 int main(int argc, char** argv) {
@@ -44,17 +58,7 @@ int main(int argc, char** argv) {
     while(true) {
     try {
         atendedor.recibirPedidoCambioVariable( id );
-        planillaVariables.IniciarCambioDeVariable();
-        usleep(rand() % 1000 + 1000);
-        ss << "El dispositivo-config " << id << " cambiara la variable de configuracion " 
-           << nombreVarConfig << " del valor " << valorPrevio << " al valor " << nuevoValor;
-        Logger::debug(ss.str().c_str(), __FILE__);
-        ss.str("");
-        planillaVariables.FinalizarCambioDeVariable();
-        ss << "El dispositivo-config " << id << " cambió exitosamente la variable de configuracion " 
-           << nombreVarConfig;
-        Logger::debug(ss.str().c_str(), __FILE__);
-        ss.str("");
+        realizarCambioDeVariable( planillaVariables );        
     } catch(std::string exception) {
         Logger::error("Error en el dispositivo...", __FILE__);
         break;

@@ -104,6 +104,7 @@ int main(int argc, char** argv) {
             Logger::notice(ss.str() , nombre.str().c_str());
             planillaAsignacion.asignarCantTestersEspeciales(posicionDispositivo, cant_testers);
             atendedor.enviarAEspeciales(los_testers, idDispositivo, posicionDispositivo);
+            atendedor.enviarReqTestConfig( id, idDispositivo, tipoDispositivo );
         }else{
             atendedor.enviarOrden(idDispositivo, ORDEN_REINICIO);
             planilla.eliminarDispositivo(posicionDispositivo);
