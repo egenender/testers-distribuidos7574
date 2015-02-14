@@ -93,7 +93,7 @@ int AtendedorDispositivos::recibirPrograma(int idDispositivo) {
         exit(0);
     }
     this->idTester = msg.tester;
-    this->idBroker = msg.idBroker;
+    this->idBroker = msg.idBrokerOrigen;
     return msg.value;
 }
 
@@ -105,6 +105,7 @@ void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {
 	msg.tester = this->idTester;
 	msg.idDispositivo = idDispositivo;
     msg.idBroker = this->idBroker;
+    msg.idBrokerOrigen = ID_BROKER;
 	msg.value = resultado;
             
     int ret = msgsnd(this->colaEnvios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
@@ -125,7 +126,7 @@ int AtendedorDispositivos::recibirProgramaEspecial(int idDispositivo) {
         exit(0);
     }
     this->idTester = msg.tester;
-    this->idBroker = msg.idBroker;
+    this->idBroker = msg.idBrokerOrigen;
     this->posicionDispositivo = msg.posicionDispositivo;
     return msg.value;
 }
@@ -139,6 +140,7 @@ void AtendedorDispositivos::enviarResultadoEspecial(int idDispositivo, int resul
 		msg.idDispositivo = idDispositivo;
 		msg.tester = this->idTester;
         msg.idBroker = this->idBroker;
+        msg.idBrokerOrigen = ID_BROKER;
 		msg.value = resultado;
 		msg.posicionDispositivo = this->posicionDispositivo;
             

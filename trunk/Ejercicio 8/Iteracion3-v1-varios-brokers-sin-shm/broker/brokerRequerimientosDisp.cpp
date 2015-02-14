@@ -70,6 +70,7 @@ int main (void) {
             if(i == MAX_TESTER_COMUNES) i = 0;
             if(shmDistrTablaTesters->memoria.registrados[i]) {
                 msg.mtype = i + ID_TESTER_COMUN_START;
+                msg.tester = msg.mtype;
                 msg.idBroker = shmDistrTablaTesters->memoria.brokerAsignado[i];
                 std::stringstream ss;
                 ss << "Se elige el tester " << msg.mtype << " que se encuentra en el espacio " << i << " de la memoria compartida y que esta asignado al broker " << shmDistrTablaTesters->memoria.brokerAsignado[i];
@@ -118,6 +119,7 @@ int main (void) {
                 // Paso el mensaje al broker correspondiente
                 msg.mtype = msg.idBroker;
                 msg.mtypeMensajeBroker = MTYPE_HACIA_TESTER;
+                msg.idBrokerOrigen = ID_BROKER;
                 int ret = msgsnd(msgQueueHaciaBrokers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
                 if(ret == -1) {
                     Logger::error("Error al enviar el requerimiento del dispositivo al tester", __FILE__);

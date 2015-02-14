@@ -10,7 +10,7 @@
 #include "../ipc/Semaphore.h"
 #include "../logger/Logger.h"
 
-const char* IP_BROKERS[CANT_BROKERS] = {"127.0.0.1"/*, "192.168.2.7"*/};
+const char* IP_BROKERS[CANT_BROKERS] = {"127.0.0.1", "192.168.2.3"};
 
 void crearIpc() {
     
@@ -154,11 +154,11 @@ void crearServers(){
 	sleep(5);
 
     // Comunicacion cliente con brokers para mensajes generales
-    sprintf(paramIdBroker, "%d", ID_BROKER);
     sprintf(paramSizeMsg, "%d", (int) sizeof(TMessageAtendedor));
     sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_HACIA_BROKER);
     for (int i = 0; i < CANT_BROKERS; i++) {
         if (i == (ID_BROKER - ID_BROKER_START)) continue;
+        sprintf(paramIdBroker, "%d", i + ID_BROKER_START);
         Logger::notice("Creo el cliente emisor de mensajes generales a brokers", __FILE__);
         if (fork() == 0){
             execlp("./tcp/tcpclient_emisor", "tcpclient_emisor", IP_BROKERS[i], PUERTO_CONTRA_BROKERS , paramIdBroker, paramMsgQueue, paramSizeMsg, (char*) 0);

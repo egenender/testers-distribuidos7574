@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
         switch(msg.mtypeMensajeBroker) {
         
             case MTYPE_HACIA_DISPOSITIVO: {
-                log << "Me llego un mensaje desde el broker " << msg.idBroker << " para enviar al dispositivo " << msg.idDispositivo;
+                log << "Me llego un mensaje desde el broker " << msg.idBrokerOrigen << " para enviar al dispositivo " << msg.idDispositivo;
                 Logger::notice(log.str(), nombre.str().c_str());
 
                 // Cambio el mtype al ID del dispositivo y envio a la cola hacia disp
@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
             }
 
             case MTYPE_HACIA_TESTER: {
-                log << "Me llego un mensaje desde el broker " << msg.idBroker << " para enviar al tester " << msg.tester;
+                log << "Me llego un mensaje desde broker " << msg.idBrokerOrigen << " para enviar al tester " << msg.tester;
                 Logger::notice(log.str(), nombre.str().c_str());
 
                 // Cambio el mtype al ID del tester y envio a la cola hacia tester

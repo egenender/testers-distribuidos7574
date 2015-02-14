@@ -6,13 +6,8 @@
 #include "common/common.h"
 #include "comunes_tcp.h"
 #include "logger/Logger.h"
-/*
-#ifdef EJEMPLO_TEST
-#define IPCS_FILE "ipcs-prueba"
-#else
-#define IPCS_FILE "/tmp/pereira-ipcs"
-#endif
- */
+
+
 int main(int argc, char *argv[]){
     
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
