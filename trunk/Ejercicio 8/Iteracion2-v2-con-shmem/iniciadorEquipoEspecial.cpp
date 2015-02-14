@@ -27,6 +27,8 @@
  */
 int main(int argc, char** argv) {
     
+    Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
+    
     // Creo archivo de IPCs
     std::fstream ipcFile(ipcFileName.c_str(), std::ios::out);
     if (ipcFile.bad() || ipcFile.fail()) {
@@ -77,6 +79,12 @@ int main(int argc, char** argv) {
         std::stringstream ss; ss << "No se pudo crear cola de id " << MSGQUEUE_RECEPCION_TESTERS_SHMEM_PLANILLA_ASIGNACION << ". Errno: " << strerror(errno);
         Logger::error(ss.str(), __FILE__);
     }
+            
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_REQ_TESTERS_SHMEM_PLANILLAS);
+    if (msgget(key, 0660 | IPC_CREAT) == -1) {
+        std::stringstream ss; ss << "No se pudo crear cola de id " << MSGQUEUE_REQ_TESTERS_SHMEM_PLANILLAS << ". Errno: " << strerror(errno);
+        Logger::error(ss.str(), __FILE__);
+    }
 
     // Creo equipo especial
     pid_t eqEspPid = fork();
@@ -93,6 +101,37 @@ int main(int argc, char** argv) {
         Logger::error("Error al ejecutar el programa tecnico", __FILE__);
         exit(1);
     }
+    
+    char paramIdCola[10];
+    char paramId[10];
+    char paramSize[10];
+    
+    // Se crea el emisor de requerimientos de shmem
+    sprintf(paramIdCola, "%d", MSGQUEUE_ENVIO_TESTERS_SHMEM_PLANILLA_ASIGNACION);
+    sprintf(paramId, "%d", 0); // Para que envie todos los mensajes
+    sprintf(paramSize, "%d", (int) sizeof(TSharedMemoryPlanillaAsignacion));
+	if (fork() == 0) {
+		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",
+				UBICACION_SERVER,
+				PUERTO_SERVER_RECEPCION_SHM_PLANILLA_ASIGNACION,
+				paramId, paramIdCola, paramSize,
+				(char*) 0);
+        Logger::error("Log luego de execlp tcpclient_emisor. Error!", __FILE__);
+		exit(1);
+	}
+    
+    sprintf(paramIdCola, "%d", MSGQUEUE_REQ_TESTERS_SHMEM_PLANILLAS);
+    sprintf(paramId, "%d", 0); // Para que envie todos los mensajes
+    sprintf(paramSize, "%d", (int) sizeof(TRequerimientoSharedMemory));
+	if (fork() == 0) {
+		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",
+				UBICACION_SERVER,
+				PUERTO_SERVER_RECEPCION_REQ_SHM,
+				paramId, paramIdCola, paramSize,
+				(char*) 0);
+        Logger::error("Log luego de execlp tcpclient_emisor. Error!", __FILE__);
+		exit(1);
+	}
 
     Logger::debug("Programas del equipo especial iniciados correctamente...", __FILE__);
 

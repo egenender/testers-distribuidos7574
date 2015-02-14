@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
 	
     key_t key;
     //Destruccion de colas
-    for (int q = MSGQUEUE_ENVIO_TESTER_COMUN; q <= MSGQUEUE_RECEPCION_TESTERS_SHMEM_PLANILLA_ASIGNACION; q++){
+    for (int q = MSGQUEUE_ENVIO_TESTER_COMUN; q <= MSGQUEUE_REQ_TESTERS_SHMEM_PLANILLAS; q++){
         key = ftok(ipcFileName.c_str(), q);
         int cola = msgget(key, 0660);
         msgctl(cola ,IPC_RMID, NULL);

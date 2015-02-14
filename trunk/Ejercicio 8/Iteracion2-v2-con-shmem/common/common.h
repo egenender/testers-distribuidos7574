@@ -60,10 +60,13 @@ const int MSGQUEUE_ENVIO_TESTERS_SHMEM_PLANILLA_GENERAL = 37;
 const int MSGQUEUE_RECEPCION_TESTERS_SHMEM_PLANILLA_GENERAL = 38;
 const int MSGQUEUE_ENVIO_TESTERS_SHMEM_PLANILLA_ASIGNACION = 39;
 const int MSGQUEUE_RECEPCION_TESTERS_SHMEM_PLANILLA_ASIGNACION = 40;
-const int MSGQUEUE_BROKER_SHMEM_HANDLER = 41;
-const int MSGQUEUE_BROKER_REQUERIMIENTOS_DISPOSITIVOS = 42;
-const int MSGQUEUE_BROKER_REQUERIMIENTOS_TESTER_ESPECIAL = 43;
-const int MSGQUEUE_BROKER_REGISTRO_TESTERS = 44;
+const int MSGQUEUE_REQ_TESTERS_SHMEM_PLANILLAS = 41;
+const int MSGQUEUE_BROKER_RECEPCION_SHMEM_HANDLER = 42;
+const int MSGQUEUE_BROKER_ENVIO_SHMEM_HANDLER = 43;
+const int MSGQUEUE_BROKER_REQUERIMIENTO_SHMEM_HANDLER = 44;
+const int MSGQUEUE_BROKER_REQUERIMIENTOS_DISPOSITIVOS = 45;
+const int MSGQUEUE_BROKER_REQUERIMIENTOS_TESTER_ESPECIAL = 46;
+const int MSGQUEUE_BROKER_REGISTRO_TESTERS = 47;
 
 const int LAST_ID_IPC = MSGQUEUE_BROKER_REGISTRO_TESTERS + 1;
 const int SEM_ESPECIALES = LAST_ID_IPC; // Semaforos para testers especiales (creciente)
@@ -78,6 +81,7 @@ const int MTYPE_REGISTRAR_TESTER = 2;
 const int MTYPE_REQUERIMIENTO_TESTER_ESPECIAL = 4;
 // mtypes desde tester especial
 const int MTYPE_TAREA_ESPECIAL = 1;
+const int MTYPE_AVISAR_DISPONIBILIDAD = 3;
 // mtypes desde equipo especial
 const int MTYPE_ORDEN = 1;
 const int MTYPE_FIN_TEST_ESPECIAL = 5;
@@ -111,8 +115,8 @@ const char PUERTO_SERVER_EMISOR_DISPOSITIVOS[] = "50001";
 const char PUERTO_SERVER_RECEPTOR[] = "50002";
 const char PUERTO_SERVER_EMISOR[] = "50003";
 
-const char UBICACION_SERVER[] = "192.168.2.3";
-const char UBICACION_SERVER_IDENTIFICADOR[] = "192.168.2.3";
+const char UBICACION_SERVER[] = "192.168.2.10";
+const char UBICACION_SERVER_IDENTIFICADOR[] = "192.168.2.10";
 
 //Estructuras communes:
 typedef struct resultado{
@@ -151,6 +155,7 @@ typedef struct message {
 
 typedef struct TTablaBrokerTestersRegistrados {
     bool registrados[MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES];
+    bool disponibles[MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES];
     int ultimoTesterElegido;
 } TTablaBrokerTestersRegistrados;
 
@@ -166,7 +171,6 @@ typedef struct TTablaIdTestersEspecialesDisponibles {
 /*********CONFIG PEDIDO SHARED MEMORY TESTERS**********/
 typedef struct TSharedMemoryPlanillaAsignacion {
     long mtype;
-    int idSolicitante;
     TContadorTesterEspecial cantTestersEspecialesAsignados[MAX_DISPOSITIVOS_EN_SISTEMA];
     TContadorTareaEspecial cantTareasEspecialesAsignadas[MAX_DISPOSITIVOS_EN_SISTEMA];
 } TSharedMemoryPlanillaAsignacion;
@@ -177,14 +181,21 @@ const char PUERTO_SERVER_ENVIO_SHM_PLANILLA_ASIGNACION[] = "50012";
 
 typedef struct TSharedMemoryPlanillaGeneral {
     long mtype;
-    int idSolicitante;
     int cantDispositivosSiendoTesteados;
     bool idsPrivadosDispositivos[MAX_DISPOSITIVOS_EN_SISTEMA];
 } TSharedMemoryPlanillaGeneral;
 const int MTYPE_REQ_SHMEM_PLANILLA_GENERAL = 3;
 const int MTYPE_DEVOLUCION_SHMEM_PLANILLA_GENERAL = 4;
+const int INIT_MTYPE_SHMEM_PLANILLA_GENERAL = ID_EQUIPO_ESPECIAL + 1;
 const char PUERTO_SERVER_RECEPCION_SHM_PLANILLA_GENERAL[] = "50013";
 const char PUERTO_SERVER_ENVIO_SHM_PLANILLA_GENERAL[] = "50014";
+
+typedef struct TRequerimientoSharedMemory {
+    long mtype;
+    int idSolicitante;
+    int idDevolucion;
+} TRequerimientoSharedMemory;
+const char PUERTO_SERVER_RECEPCION_REQ_SHM[] = "50015";
 
 #endif	/* COMMON_H */
 

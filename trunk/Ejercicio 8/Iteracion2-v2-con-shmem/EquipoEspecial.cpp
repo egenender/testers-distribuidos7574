@@ -23,7 +23,8 @@ int main(int argc, char** argv) {
     
     srand(time(NULL));
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
-    Logger::debug("Se crea el equipo especial...", __FILE__);
+    std::stringstream nombre; nombre << __FILE__ << " " << ID_EQUIPO_ESPECIAL;
+    Logger::debug("Se crea el equipo especial...", nombre.str().c_str());
     
     // Para almacenar que testers especiales testeaban a que dispositivo
     std::set<int> controlador[MAX_DISPOSITIVOS_EN_SISTEMA];
@@ -43,7 +44,7 @@ int main(int argc, char** argv) {
     
     DespachadorTesters despachador;
     
-    Logger::notice("Se inicializan correctamente todos los elementos del Equipo Especial", __FILE__);
+    Logger::notice("Se inicializan correctamente todos los elementos del Equipo Especial", nombre.str().c_str());
     
     std::stringstream ss;
     
@@ -55,7 +56,7 @@ int main(int argc, char** argv) {
         
         TMessageAtendedor resultado = atendedor.recibirResultadoEspecial();
         ss << "Recibi el resultado especial " << resultado.value << " del dispositivo " << resultado.idDispositivo << " de la tarea especial enviada por tester " << resultado.tester;
-        Logger::debug(ss.str(), __FILE__);
+        Logger::debug(ss.str(), nombre.str().c_str());
         ss.str("");
         // Almaceno resultado del testeo especial terminado
         resultados[resultado.posicionDispositivo] += resultado.value;
@@ -64,25 +65,25 @@ int main(int argc, char** argv) {
         // Registro que termino una tarea especial
         planillaAsignacion.registrarTareaEspecialFinalizada(resultado.posicionDispositivo);
         ss << "Se registra tarea especial del dispositivo " << resultado.idDispositivo << ", posicion " << resultado.posicionDispositivo << " enviada por tester especial " << resultado.tester << " con exito";
-        Logger::debug(ss.str(), __FILE__); ss.str(""); ss.clear();
+        Logger::debug(ss.str(), nombre.str().c_str()); ss.str(""); ss.clear();
         
         if (planillaAsignacion.terminoTesteoEspecial(resultado.posicionDispositivo, resultado.idDispositivo)) {
             ss << "Termino el testeo especial del dispositivo " << resultado.idDispositivo << ". Se verificara si hay que rehacerlo";
-            Logger::notice(ss.str(), __FILE__);
+            Logger::notice(ss.str(), nombre.str().c_str());
             ss.str("");
             // Si se ha terminado el testeo especial para este dispositivo
             // me fijo si hay que reiniciarlo, y si no, envio ordenes
-            Logger::debug("Se reiniciaron los contadores del testeo especial", __FILE__);
+            Logger::debug("Se reiniciaron los contadores del testeo especial", nombre.str().c_str());
             if (resultados[resultado.posicionDispositivo] % 5 == 0) {
                 planillaAsignacion.reiniciarContadoresTesteoEspecial(resultado.posicionDispositivo);
                 ss << "Hay que reiniciar el testeo para el dispositivo " << resultado.idDispositivo;
-                Logger::notice(ss.str(), __FILE__);
+                Logger::notice(ss.str(), nombre.str().c_str());
                 ss.str("");
                 planillaReinicio.avisarReinicio(controlador[resultado.posicionDispositivo], true);
-                Logger::debug("Se aviso envio mensaje de reinicio del testeo a los dispositivos correspondientes", __FILE__);
+                Logger::debug("Se aviso envio mensaje de reinicio del testeo a los dispositivos correspondientes", nombre.str().c_str());
             } else {
                 ss << "Se termina el testeo para el dispositivo " << resultado.idDispositivo;
-                Logger::debug( ss.str(), __FILE__);
+                Logger::debug( ss.str(), nombre.str().c_str());
                 ss.str("");
                 // Aviso al dispositivo que ya no recibira mas tests especiales
                 atendedor.enviarFinTestEspecialADispositivo(resultado.idDispositivo);
@@ -93,19 +94,19 @@ int main(int argc, char** argv) {
                 // Envio orden correspondiente dependiendo del resultado
                 if (resultados[resultado.posicionDispositivo] % 5 == RESULTADO_GRAVE) {
                     ss << "Se envia orden de apagado al dispositivo y a los tecnicos para el dispositivo " << resultado.idDispositivo;
-                    Logger::debug(ss.str(), __FILE__);
+                    Logger::debug(ss.str(), nombre.str().c_str());
                     ss.str("");
                     despachador.enviarOrden(resultado.idDispositivo);
                     atendedor.enviarOrden(resultado.idDispositivo, ORDEN_APAGADO);
                 } else {
                     ss << "Se envia orden de reinicio al dispositivo " << resultado.idDispositivo;
-                    Logger::debug(ss.str(), __FILE__);
+                    Logger::debug(ss.str(), nombre.str().c_str());
                     ss.str("");
                     atendedor.enviarOrden(resultado.idDispositivo, ORDEN_REINICIO);
                 }
                 planillaGeneral.eliminarDispositivo(resultado.posicionDispositivo);
                 ss << "Elimino al dispositivo " << resultado.idDispositivo << " de la planilla general y sigo procesando...";
-                Logger::debug(ss.str(), __FILE__);
+                Logger::debug(ss.str(), nombre.str().c_str());
                 ss.str("");
             }
             // Reinicio los resultados y los testers especiales asignados
@@ -114,7 +115,7 @@ int main(int argc, char** argv) {
         }
     }
     
-    Logger::notice("Termina el Equipo Especial", __FILE__);
+    Logger::notice("Termina el Equipo Especial", nombre.str().c_str());
     
     return 0;
 }

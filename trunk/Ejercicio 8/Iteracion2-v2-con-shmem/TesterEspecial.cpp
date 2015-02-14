@@ -81,6 +81,7 @@ int main(int argc, char** argv) {
 
             usleep( rand() % 1000 + 1000);
         } while (planillaReinicio.hayQueReiniciar(id));
+        atendedor.enviarDisponibilidad();
     }
 
     desregistrarTesterEspecial(id);

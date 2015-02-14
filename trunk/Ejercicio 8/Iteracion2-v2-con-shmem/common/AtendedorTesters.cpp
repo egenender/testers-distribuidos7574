@@ -30,12 +30,14 @@ AtendedorTesters::AtendedorTesters(int idTester): idTester(idTester) {
     sprintf(paramId, "%d", this->idTester);
     char paramCola[10];
     sprintf(paramCola, "%d", MSGQUEUE_RECEPCIONES_TESTER_COMUN);
+    char paramSize[10];
+    sprintf(paramSize, "%d", (int) sizeof(TMessageAtendedor));
     this->pidReceptor = fork();
     if (this->pidReceptor == 0){
 		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",
 				UBICACION_SERVER,
 				PUERTO_SERVER_EMISOR,
-				paramId, paramCola,(char*)0);
+				paramId, paramCola, paramSize, (char*)0);
         exit(1);
 	}
 
@@ -45,13 +47,7 @@ AtendedorTesters::AtendedorTesters(int idTester): idTester(idTester) {
 		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",
 				UBICACION_SERVER,
 				PUERTO_SERVER_RECEPTOR,
-				paramId, paramCola,(char*)0);
-        exit(1);
-	}
-    
-    if (fork() == 0){
-		execlp("./distribuidorMsgTester", "distribuidorMsgTester", (char*) 0);
-        Logger::error("No se ejecutó correctamente el distribuidor de mensajes", __FILE__);
+				paramId, paramCola, paramSize, (char*)0);
         exit(1);
 	}
     

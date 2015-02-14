@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
 
     key = ftok(ipcFileName.c_str(), SHM_BROKER_TESTERS_REGISTRADOS);
     int shmTablaTestersRegistrados = shmget(key, sizeof(TTablaBrokerTestersRegistrados), IPC_CREAT | 0660);
-    TTablaBrokerTestersRegistrados* tablaTestersComunesRegistrados = (TTablaBrokerTestersRegistrados*) shmat(shmTablaTestersRegistrados, (void*) NULL, 0);
+    TTablaBrokerTestersRegistrados* tablaTestersRegistrados = (TTablaBrokerTestersRegistrados*) shmat(shmTablaTestersRegistrados, (void*) NULL, 0);
     
     Semaphore semTabla(SEM_BROKER_TESTERS_REGISTRADOS);
     semTabla.getSem();
@@ -52,8 +52,9 @@ int main(int argc, char** argv) {
         } else  id -= ID_TESTER_COMUN_START;
         
         semTabla.p();
-        if (!tablaTestersComunesRegistrados->registrados[id]) {
-            tablaTestersComunesRegistrados->registrados[id] = true;
+        if (!tablaTestersRegistrados->registrados[id]) {
+            tablaTestersRegistrados->registrados[id] = true;
+            tablaTestersRegistrados->disponibles[id] = true;
 
             if (msg.esTesterEspecial) {
                 // Levanto el semaforo por si hay un requerimiento especial esperando

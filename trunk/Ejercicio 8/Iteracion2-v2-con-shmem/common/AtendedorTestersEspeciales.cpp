@@ -18,9 +18,9 @@ AtendedorTestersEspeciales::AtendedorTestersEspeciales(int idTester) : idTester(
         exit(1);
     }
     
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_RECEPCIONES_TESTER_ESPECIAL);
-    this->colaRecepciones = msgget(key, 0666);
-    if(this->colaRecepciones == -1) {
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_REQ_TESTER_ESPECIAL);
+    this->colaRecepcionesReq = msgget(key, 0666);
+    if(this->colaRecepcionesReq == -1) {
         std::string err = std::string("Error al obtener la cola de recepcion del tester especial. Errno: ") + std::string(strerror(errno));
         Logger::error(err, __FILE__);
         exit(1);
@@ -30,12 +30,14 @@ AtendedorTestersEspeciales::AtendedorTestersEspeciales(int idTester) : idTester(
     sprintf(paramId, "%d", this->idTester);
     char paramCola[10];
     sprintf(paramCola, "%d", MSGQUEUE_RECEPCIONES_TESTER_ESPECIAL);
+    char paramSize[10];
+    sprintf(paramSize, "%d", (int) sizeof(TMessageAtendedor));
     this->pidReceptor = fork();
     if (this->pidReceptor == 0){
 		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",
 				UBICACION_SERVER,
 				PUERTO_SERVER_EMISOR,
-				paramId, paramCola,(char*)0);
+				paramId, paramCola, paramSize, (char*)0);
         exit(1);
 	}
 	
@@ -45,14 +47,8 @@ AtendedorTestersEspeciales::AtendedorTestersEspeciales(int idTester) : idTester(
 		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",
 				UBICACION_SERVER,
 				PUERTO_SERVER_RECEPTOR,
-				paramId, paramCola,
+				paramId, paramCola, paramSize, 
                 (char*)0);
-        exit(1);
-	}
-
-    if (fork() == 0){
-		execlp("./distribuidorMsgTesterEspecial", "distribuidorMsgTesterEspecial", (char*) 0);
-        Logger::error("No se ejecutó correctamente el distribuidor de mensajes de tester especiales", __FILE__);
         exit(1);
 	}
     
@@ -70,7 +66,7 @@ AtendedorTestersEspeciales::~AtendedorTestersEspeciales() {
 TMessageAtendedor AtendedorTestersEspeciales::recibirRequerimientoEspecial(int idEsp) {
 
     TMessageAtendedor msg;
-    int ret = msgrcv(this->colaRecepciones, &msg, sizeof(TMessageAtendedor) - sizeof(long), idEsp, 0);
+    int ret = msgrcv(this->colaRecepcionesReq, &msg, sizeof(TMessageAtendedor) - sizeof(long), idEsp, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir requerimiento del atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
@@ -93,6 +89,22 @@ void AtendedorTestersEspeciales::enviarTareaEspecial(int idDispositivo, int idTe
     if(ret == -1) {
         std::stringstream ss;
         ss << "Error al enviar tarea especial " << tarea << " al dispositivo " << idDispositivo << " desde el tester " << idTester << ". Error: ";
+        std::string error = ss.str() + std::string(strerror(errno));
+        Logger::error(error.c_str(), __FILE__);
+        exit(0);
+    }
+}
+
+void AtendedorTestersEspeciales::enviarDisponibilidad() {
+
+    TMessageAtendedor msg;
+    msg.mtype = this->idTester;
+    msg.mtypeMensaje = MTYPE_AVISAR_DISPONIBILIDAD;
+    msg.tester = this->idTester;
+    int ret = msgsnd(this->colaEnvios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    if(ret == -1) {
+        std::stringstream ss;
+        ss << "Error al enviar aviso de disponibilidad  del tester especial " << idTester << ". Error: ";
         std::string error = ss.str() + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
         exit(0);

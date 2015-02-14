@@ -27,7 +27,7 @@ public:
     void avisarFinEnvioTareas(int idDispositivo);
 private:
     int idTester;
-    int shmemMsgqueueEmisor, shmemMsgqueueReceptor;
+    int shmemMsgqueueEmisor, shmemMsgqueueReceptor, shmemMsgqueueReq;
     pid_t pidEmisor, pidReceptor;
     TSharedMemoryPlanillaAsignacion memoria;
     

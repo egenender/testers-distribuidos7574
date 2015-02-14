@@ -20,7 +20,7 @@
 
 class Planilla {
 private:
-    int shmemMsgqueueEmisor, shmemMsgqueueReceptor;
+    int shmemMsgqueueEmisor, shmemMsgqueueReceptor, shmemMsgqueueReq;
     int idTester;
     pid_t pidEmisor, pidReceptor;
     TSharedMemoryPlanillaGeneral memoria;

@@ -61,7 +61,7 @@ void createIPCObjects() {
     ipcFile.close();
     
     //creacion de colas
-    for (int q = MSGQUEUE_ENVIO_TESTER_COMUN; q <= MSGQUEUE_RECEPCION_TESTERS_SHMEM_PLANILLA_ASIGNACION; q++) {
+    for (int q = MSGQUEUE_ENVIO_TESTER_COMUN; q <= MSGQUEUE_REQ_TESTERS_SHMEM_PLANILLAS; q++) {
         key_t key = ftok(ipcFileName.c_str(), q);
         if (msgget(key, 0660 | IPC_CREAT) == -1) {
             std::cout << "No se pudo crear una cola: " << strerror(errno) << std::endl;
@@ -93,14 +93,58 @@ void createSystemProcesses() {
             exit(1);
         }
     }
+    
+    if (fork() == 0) {
+		execlp("./distribuidorMsgTester", "distribuidorMsgTester", (char*) 0);
+        Logger::error("No se ejecutó correctamente el distribuidor de mensajes", __FILE__);
+        exit(1);
+	}
+    
+    if (fork() == 0) {
+		execlp("./distribuidorMsgTesterEspecial", "distribuidorMsgTesterEspecial", (char*) 0);
+        Logger::error("No se ejecutó correctamente el distribuidor de mensajes de tester especiales", __FILE__);
+        exit(1);
+	}
 
     // Creo al tecnico
     pid_t tecPid = fork();
     if(tecPid == 0) {
-        execlp("./tecnico", "tecnico", (char*)0);
+        execlp("./tecnico", "tecnico", (char*) 0);
         Logger::error("Error al ejecutar el programa tecnico", __FILE__);
         exit(1);
     }
+    
+    char paramIdCola[10];
+    char paramId[10];
+    char paramSize[10];
+    
+    // Se crea el emisor de requerimientos de shmem
+    sprintf(paramIdCola, "%d", MSGQUEUE_ENVIO_TESTERS_SHMEM_PLANILLA_ASIGNACION);
+    sprintf(paramId, "%d", 0); // Para que envie todos los mensajes
+    sprintf(paramSize, "%d", (int) sizeof(TRequerimientoSharedMemory));
+	if (fork() == 0) {
+		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",
+				UBICACION_SERVER,
+				PUERTO_SERVER_RECEPCION_SHM_PLANILLA_ASIGNACION,
+				paramId, paramIdCola, paramSize,
+				(char*) 0);
+        Logger::error("Log luego de execlp tcpclient_emisor. Error!", __FILE__);
+		exit(1);
+	}
+    
+    // Se crea el emisor de requerimientos de shmem
+    sprintf(paramIdCola, "%d", MSGQUEUE_REQ_TESTERS_SHMEM_PLANILLAS);
+    sprintf(paramId, "%d", 0); // Para que envie todos los mensajes
+    sprintf(paramSize, "%d", (int) sizeof(TRequerimientoSharedMemory));
+	if (fork() == 0) {
+		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",
+				UBICACION_SERVER,
+				PUERTO_SERVER_RECEPCION_REQ_SHM,
+				paramId, paramIdCola, paramSize,
+				(char*) 0);
+        Logger::error("Log luego de execlp tcpclient_emisor. Error!", __FILE__);
+		exit(1);
+	}
 
     Logger::debug("Programas iniciados correctamente...", __FILE__);
 }
