@@ -17,7 +17,7 @@
 
 const int CANT_TESTERS_COMUNES = 5;
 const int MAX_TESTER_COMUNES = 30;
-const int CANT_TESTERS_ESPECIALES = 15;
+const int CANT_TESTERS_ESPECIALES = 10;
 const int MAX_TESTER_ESPECIALES = 30;
 const int MAX_DISPOSITIVOS_EN_SISTEMA = 100;
 const int MAX_TAREAS_ESPECIALES = 10;
@@ -115,8 +115,8 @@ const char PUERTO_SERVER_EMISOR_DISPOSITIVOS[] = "50001";
 const char PUERTO_SERVER_RECEPTOR[] = "50002";
 const char PUERTO_SERVER_EMISOR[] = "50003";
 
-const char UBICACION_SERVER[] = "192.168.2.10";
-const char UBICACION_SERVER_IDENTIFICADOR[] = "192.168.2.10";
+const char UBICACION_SERVER[] = "192.168.2.3";
+const char UBICACION_SERVER_IDENTIFICADOR[] = "192.168.2.3";
 
 //Estructuras communes:
 typedef struct resultado{
