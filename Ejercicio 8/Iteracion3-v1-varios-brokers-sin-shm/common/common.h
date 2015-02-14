@@ -149,6 +149,7 @@ typedef struct message {
     int tester;
     bool esTesterEspecial;
     int idBroker;
+    int idBrokerOrigen;
     int value; // Este parametro posee el valor del programa, del resultado y de la orden
     int posicionDispositivo;
     int idTestersEspeciales[MAX_TESTERS_ESPECIALES_PARA_ASIGNAR];
@@ -174,7 +175,7 @@ typedef struct TTablaIdTestersEspecialesDisponibles {
 /*******BROKERS CONFIG!********/
 const int MASTER_BROKER = 1;
 const int ID_BROKER_START = 1;
-const int CANT_BROKERS = 1;
+const int CANT_BROKERS = 2;
 const int ID_BROKER = 1;
 const int ID_BROKER_SIGUIENTE = (ID_BROKER == CANT_BROKERS) ? ID_BROKER_START : ID_BROKER + 1;
 // LAS IPS DE LOS BROKERS ESTA EN EL ARCHIVO BROKER.CPP
@@ -195,7 +196,7 @@ const char PUERTO_SERVER_EMISOR[] = "50003";
 // Para el broker al que se conectan dispositivos y testers de esta maquina
 const char UBICACION_SERVER[] = "127.0.0.1";
 //const char UBICACION_SERVER_IDENTIFICADOR[] = "192.168.2.7";
-const char UBICACION_SERVER_IDENTIFICADOR[] = "127.0.0.1";
+const char UBICACION_SERVER_IDENTIFICADOR[] = "192.168.2.10";
 
 /*******SUB-BROKERS-CONFIG********/
 const int MTYPE_DEVOLUCION_SHM_BROKER = 1;

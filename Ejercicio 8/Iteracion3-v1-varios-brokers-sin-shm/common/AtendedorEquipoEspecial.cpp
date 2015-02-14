@@ -78,7 +78,7 @@ TMessageAtendedor AtendedorEquipoEspecial::recibirResultadoEspecial() {
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
-    this->idBroker = resultado.idBroker;
+    this->idBroker = resultado.idBrokerOrigen;
     return resultado;
 }
 
@@ -88,6 +88,7 @@ void AtendedorEquipoEspecial::enviarFinTestEspecialADispositivo(int idDispositiv
     msg.mtypeMensaje = MTYPE_FIN_TEST_ESPECIAL;
     msg.idDispositivo = idDispositivo;
     msg.idBroker = this->idBroker;
+    msg.idBrokerOrigen = ID_BROKER;
     msg.value = FIN_TEST_ESPECIAL;
     int ret = msgsnd(this->colaEnvios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
@@ -105,6 +106,7 @@ void AtendedorEquipoEspecial::enviarOrden(int idDispositivo, int orden) {
     msg.mtypeMensaje = MTYPE_ORDEN;
     msg.idDispositivo = idDispositivo;
     msg.idBroker = this->idBroker;
+    msg.idBrokerOrigen = ID_BROKER;
     msg.value = orden;
     int ret = msgsnd(this->colaEnvios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {

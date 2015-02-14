@@ -80,7 +80,7 @@ int AtendedorTesters::recibirRequerimiento() {
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
-    this->idBroker = msg.idBroker;
+    this->idBroker = msg.idBrokerOrigen;
     return msg.idDispositivo;
 }
 
@@ -92,6 +92,7 @@ void AtendedorTesters::enviarPrograma(int idDispositivo, int tester, int idProgr
     msg.idDispositivo = idDispositivo;
     msg.tester = this->idTester;
     msg.idBroker = this->idBroker;
+    msg.idBrokerOrigen = ID_BROKER;
     msg.value = idPrograma;
     
     int ret = msgsnd(this->colaEnvios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
@@ -111,7 +112,7 @@ TMessageAtendedor AtendedorTesters::recibirResultado(int idTester) {
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
-    this->idBroker = rsp.idBroker;
+    this->idBroker = rsp.idBrokerOrigen;
     return rsp;
 }
 
@@ -122,6 +123,7 @@ void AtendedorTesters::enviarOrden(int idDispositivo, int orden) {
     msg.tester = this->idTester;
     msg.idDispositivo = idDispositivo;
     msg.idBroker = this->idBroker;
+    msg.idBrokerOrigen = ID_BROKER;
     msg.value = orden;
     
     int ret = msgsnd(this->colaEnvios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
@@ -139,6 +141,7 @@ void AtendedorTesters::enviarAEspeciales(bool cuales[], int idDispositivo, int p
     msg.mtypeMensaje = MTYPE_REQUERIMIENTO_TESTER_ESPECIAL;
     msg.idDispositivo = idDispositivo;
     msg.tester = this->idTester;
+    msg.idBrokerOrigen = this->idBroker; // Le asigno el broker del dispositivo
     msg.posicionDispositivo = posicionDispositivo;
     msg.cantTestersEspecialesAsignados = 0;
 	for (int i = 0; (i < CANT_TESTERS_ESPECIALES) && (j < MAX_TESTERS_ESPECIALES_PARA_ASIGNAR); i++) {

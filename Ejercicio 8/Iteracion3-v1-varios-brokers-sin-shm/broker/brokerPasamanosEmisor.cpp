@@ -78,7 +78,37 @@ int main(int argc, char* argv[]) {
                     }
                 }
                 break;
-
+/* TODO: Lo necesitare para el anillo
+            case MTYPE_REQ_DISP_DESDE_BROKER:
+                std::stringstream ss;
+                ss << "Llego requerimiento desde otro broker del disp " << msg.idDispositivo;
+                Logger::notice(ss.str(), __FILE__);
+                ss.str("");
+                ss.clear();
+                
+                ss << "Este requerimiento debe ser enviado al broker " << msg.idBroker << " y estoy en el broker " << ID_BROKER;
+                Logger::notice(ss.str(), __FILE__); ss.str(""); ss.clear();
+                
+                if (msg.idBroker == ID_BROKER) {
+                    // El mensaje es de para tester en este broker
+                    msg.mtype = msg.tester;
+                    ret = msgsnd(msgQueueTestYEq, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+                    if(ret == -1) {
+                        Logger::error("Error al enviar el mensaje a la cola de envio a testers comunes", __FILE__);
+                        exit(1);
+                    }
+                } else {
+                    ss << "Envío resultado inicial hacia el broker " << msg.idBroker;
+                    Logger::notice(ss.str(), __FILE__); ss.str(""); ss.clear();
+                    // El mensaje es para tester en otro broker
+                    ret = msgsnd(msgQueueHaciaBrokers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+                    if(ret == -1) {
+                        Logger::error("Error al enviar el mensaje a la cola de envio hacia brokers", __FILE__);
+                        exit(1);
+                    }
+                }
+                break;
+*/
             case MTYPE_RESULTADO_ESPECIAL:
                 std::stringstream ss;
                 ss << "Llego resultado de test especial del dispositivo " << msg.idDispositivo;
