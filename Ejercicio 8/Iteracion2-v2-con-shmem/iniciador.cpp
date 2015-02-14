@@ -121,7 +121,7 @@ void createSystemProcesses() {
     // Se crea el emisor de requerimientos de shmem
     sprintf(paramIdCola, "%d", MSGQUEUE_ENVIO_TESTERS_SHMEM_PLANILLA_ASIGNACION);
     sprintf(paramId, "%d", 0); // Para que envie todos los mensajes
-    sprintf(paramSize, "%d", (int) sizeof(TRequerimientoSharedMemory));
+    sprintf(paramSize, "%d", (int) sizeof(TSharedMemoryPlanillaAsignacion));
 	if (fork() == 0) {
 		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",
 				UBICACION_SERVER,
