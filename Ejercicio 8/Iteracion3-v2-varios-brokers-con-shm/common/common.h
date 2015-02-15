@@ -23,9 +23,9 @@ const int MAX_DISPOSITIVOS_EN_SISTEMA = 100;
 const int MAX_TAREAS_ESPECIALES = 10;
 
 static int ID_DISPOSITIVO = 5;
-const int ID_TESTER_COMUN_START = ID_DISPOSITIVO + MAX_DISPOSITIVOS_EN_SISTEMA + 1;
-const int ID_TESTER_ESP_START = ID_TESTER_COMUN_START + MAX_TESTER_COMUNES + 1;
-const int ID_EQUIPO_ESPECIAL = ID_TESTER_ESP_START + MAX_TESTER_ESPECIALES + 1;
+const int ID_TESTER_COMUN_START = ID_DISPOSITIVO + MAX_DISPOSITIVOS_EN_SISTEMA;
+const int ID_TESTER_ESP_START = ID_TESTER_COMUN_START + MAX_TESTER_COMUNES;
+const int ID_EQUIPO_ESPECIAL = ID_TESTER_ESP_START + MAX_TESTER_ESPECIALES;
 
 // IDs de los IPC
 const int SEM_PLANILLA_GENERAL = 1;
@@ -180,9 +180,9 @@ typedef struct message {
 } TMessageAtendedor;
 
 typedef struct TTablaBrokerTestersRegistrados {
-    bool registrados[MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES];
-    bool disponible[MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES];
-    int brokerAsignado[MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES]; // Especifica el ID del broker de cada ID
+    bool registrados[MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES + 1];
+    bool disponible[MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES + 1];
+    int brokerAsignado[MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES + 1]; // Especifica el ID del broker de cada ID
     int ultimoTesterElegido;
 } TTablaBrokerTestersRegistrados;
 
@@ -198,7 +198,7 @@ typedef struct TTablaIdTestersEspecialesDisponibles {
 /*******BROKERS CONFIG!********/
 const int MASTER_BROKER = 1;
 const int ID_BROKER_START = 1;
-const int CANT_BROKERS = 2;
+const int CANT_BROKERS = 1;
 const int ID_BROKER = 1;
 const int ID_BROKER_SIGUIENTE = (ID_BROKER == CANT_BROKERS) ? ID_BROKER_START : ID_BROKER + 1;
 // LAS IPS DE LOS BROKERS ESTA EN EL ARCHIVO BROKER.CPP

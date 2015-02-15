@@ -50,25 +50,11 @@ PlanillaAsignacionEquipoEspecial::PlanillaAsignacionEquipoEspecial() {
         Logger::error("Log luego de execlp tcpclient_receptor. Error!", __FILE__);
 		exit(1);
 	}
-/*
-    sprintf(paramIdCola, "%d", MSGQUEUE_ENVIO_TESTERS_SHMEM_PLANILLA_ASIGNACION);
-    sprintf(paramId, "%d", 0); // Para que envie todos los mensajes
-    this->pidEmisor = fork();
-	if (this->pidEmisor == 0) {
-		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",
-				UBICACION_SERVER,
-				PUERTO_SERVER_RECEPCION_SHM_PLANILLA_ASIGNACION,
-				paramId, paramIdCola, paramSize,
-				(char*) 0);
-        Logger::error("Log luego de execlp tcpclient_emisor. Error!", __FILE__);
-		exit(1);
-	}
-*/
 }
 
 PlanillaAsignacionEquipoEspecial::~PlanillaAsignacionEquipoEspecial() {
 }
-
+/*
 void PlanillaAsignacionEquipoEspecial::registrarTareaEspecialFinalizada(int idDispositivo) {
     this->obtenerMemoriaCompartida();
     this->memoria.cantTareasEspecialesAsignadas[idDispositivo].cantTareasEspecialesTerminadas += 1;
@@ -84,6 +70,23 @@ bool PlanillaAsignacionEquipoEspecial::terminoTesteoEspecial(int posDispositivo,
     ss << "Para dispositivo " << idDispositivo << " con posicion " << posDispositivo << ". Cant Tareas pendientes: " << cantTareasPendientes << " y cant testers pendientes: " << cantTestersPendientes;
     Logger::warn(ss.str(), __FILE__);
     return ((cantTareasPendientes == 0) && (cantTestersPendientes == 0));
+}
+*/
+void PlanillaAsignacionEquipoEspecial::registrarTareaEspecialFinalizada(int posDispositivo, int idDispositivo) {
+
+    this->obtenerMemoriaCompartida();
+    this->memoria.cantTareasEspecialesAsignadas[posDispositivo].cantTareasEspecialesTerminadas += 1;
+    int cantTareasPendientes = this->memoria.cantTareasEspecialesAsignadas[posDispositivo].cantTareasEspecialesTotal - this->memoria.cantTareasEspecialesAsignadas[posDispositivo].cantTareasEspecialesTerminadas;
+    int cantTestersPendientes = this->memoria.cantTestersEspecialesAsignados[posDispositivo].cantTestersEspecialesTotal - this->memoria.cantTestersEspecialesAsignados[posDispositivo].cantTestersEspecialesTerminados;
+    this->devolverMemoriaCompartida();
+    std::stringstream ss;
+    ss << "Para dispositivo " << idDispositivo << " con posicion " << posDispositivo << ". Cant Tareas pendientes: " << cantTareasPendientes << " y cant testers pendientes: " << cantTestersPendientes;
+    Logger::warn(ss.str(), __FILE__);
+    this->dispositivoTermino = ((cantTareasPendientes == 0) && (cantTestersPendientes == 0));
+}
+
+bool PlanillaAsignacionEquipoEspecial::terminoTesteoEspecial(){
+    return this->dispositivoTermino;
 }
 
 void PlanillaAsignacionEquipoEspecial::reiniciarContadoresTesteoEspecial(int idDispositivo) {

@@ -10,7 +10,8 @@
 #include "../ipc/Semaphore.h"
 #include "../logger/Logger.h"
 
-const char* IP_BROKERS[CANT_BROKERS] = {"127.0.0.1", "192.168.2.3"};
+//const char* IP_BROKERS[CANT_BROKERS] = {"127.0.0.1", "192.168.2.3"};
+const char* IP_BROKERS[CANT_BROKERS] = {"127.0.0.1"};
 
 void crearIpc() {
     
@@ -138,7 +139,7 @@ void crearServers(){
 	Logger::notice("Creo el servidor emisor de mensajes a testers comunes", __FILE__);
 	sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_EMISOR);
 	if (fork() == 0){
-		execlp("./tcp/tcpserver_emisor", "tcpserver_emisor", PUERTO_SERVER_EMISOR , paramMsgQueue, (char*)0);
+		execlp("./tcp/tcpserver_emisor", "tcpserver_emisor", PUERTO_SERVER_EMISOR , paramMsgQueue, paramSizeMsg, (char*)0);
         exit(1);
 	}
 
@@ -153,7 +154,7 @@ void crearServers(){
 	sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_EMISOR_DISPOSITIVOS);
 	Logger::notice("Creo el servidor emisor de mensajes a dispositivos", __FILE__);
 	if (fork() == 0){
-		execlp("./tcp/tcpserver_emisor", "tcpserver_emisor", PUERTO_SERVER_EMISOR_DISPOSITIVOS , paramMsgQueue,(char*) 0);
+		execlp("./tcp/tcpserver_emisor", "tcpserver_emisor", PUERTO_SERVER_EMISOR_DISPOSITIVOS , paramMsgQueue, paramSizeMsg,(char*) 0);
         exit(1);
 	}
     
@@ -287,7 +288,7 @@ void lanzarTareasMaster() {
     TMessageShMemInterBroker msgShmemInterBroker;
     msgShmemInterBroker.mtype = ID_BROKER;
 
-    for (int i = 0; i < MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES; i++) {
+    for (int i = 0; i < MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES + 1; i++) {
         msgShmemInterBroker.memoria.registrados[i] = false;
         msgShmemInterBroker.memoria.brokerAsignado[i] = TESTER_ESPECIAL_NO_ASIGNADO;
         msgShmemInterBroker.memoria.disponible[i] = false;

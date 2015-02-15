@@ -62,11 +62,11 @@ int main(int argc, char** argv) {
         // Almaceno el tester que testea al dispositivo
         controlador[resultado.posicionDispositivo].insert(resultado.tester);
         // Registro que termino una tarea especial
-        planillaAsignacion.registrarTareaEspecialFinalizada(resultado.posicionDispositivo);
+        planillaAsignacion.registrarTareaEspecialFinalizada(resultado.posicionDispositivo, resultado.idDispositivo);
         ss << "Se registra tarea especial del dispositivo " << resultado.idDispositivo << ", posicion " << resultado.posicionDispositivo << " enviada por tester especial " << resultado.tester << " con exito";
         Logger::debug(ss.str(), __FILE__); ss.str(""); ss.clear();
         
-        if (planillaAsignacion.terminoTesteoEspecial(resultado.posicionDispositivo, resultado.idDispositivo)) {
+        if (planillaAsignacion.terminoTesteoEspecial()) {
             ss << "Termino el testeo especial del dispositivo " << resultado.idDispositivo << ". Se verificara si hay que rehacerlo";
             Logger::notice(ss.str(), __FILE__);
             ss.str("");

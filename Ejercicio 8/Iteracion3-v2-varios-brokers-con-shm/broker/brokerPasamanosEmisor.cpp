@@ -1,9 +1,14 @@
 #include <iostream>
+#include <cerrno>
+#include <cstring>
 #include <sys/msg.h>
+#include <sys/shm.h>
 #include <cstdlib>
 #include <unistd.h>
 #include "common/common.h"
 #include "logger/Logger.h"
+#include "ipc/Semaphore.h"
+#include "ipc/DistributedSharedMemory.h"
 
 int main(int argc, char* argv[]) {
 
@@ -21,6 +26,22 @@ int main(int argc, char* argv[]) {
     // Queue hacia donde se envian mensajes de otros brokers
     key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_HACIA_BROKER);
 	int msgQueueHaciaBrokers = msgget(key, IPC_CREAT | 0660);
+    
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_INTERNAL_BROKER_SHM);
+	int msgQueueShm = msgget(key, 0660);
+    
+    key = ftok(ipcFileName.c_str(), SHM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM);
+    int shMemCantReqBrokerShmemId = shmget(key, sizeof(int), IPC_CREAT | 0660);
+    int* shMemCantReqBrokerShmem = (int*) shmat(shMemCantReqBrokerShmemId, (void*) NULL, 0);
+    
+    Semaphore semCantReqBrokerShmem(SEM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM);
+    semCantReqBrokerShmem.getSem();
+    
+    TMessageShMemInterBroker* shmDistrTablaTesters = NULL;
+    TMessageRequerimientoBrokerShm reqMsg;
+    reqMsg.mtype = MTYPE_REQUERIMIENTO_SHM_BROKER;
+    reqMsg.idSubBroker = ID_SUB_BROKER_PASAMANOS_RECEPTOR;
+    int brokerEquipoEspecial = -1;
 	
 	TMessageAtendedor msg;
     int ret = 0;
@@ -116,26 +137,51 @@ int main(int argc, char* argv[]) {
                 ss.str("");
                 ss.clear();
                 
-                ss << "El resultado especial debe ser enviado al broker " << msg.idBroker << " y estoy en el broker " << ID_BROKER;
-                Logger::notice(ss.str(), __FILE__); ss.str(""); ss.clear();
+                if(fork() == 0) {
+                    // Tengo que ver en que broker está el tester especial (si es que ya no lo guarde)
+                    if(brokerEquipoEspecial == -1) {
+                        // Busco el broker donde se registro el equipo especial
+                        // Pido la shmem y vuelvo a poner al tester disponible
+                        shmDistrTablaTesters = (TMessageShMemInterBroker*) obtenerDistributedSharedMemory(msgQueueShm, &reqMsg, sizeof(TMessageRequerimientoBrokerShm), shMemCantReqBrokerShmem, &semCantReqBrokerShmem, msgQueueShm, sizeof(TMessageShMemInterBroker), ID_SUB_BROKER_PASAMANOS_RECEPTOR);
+                        if (shmDistrTablaTesters == NULL) {
+                            std::stringstream ss;
+                            ss << "Error intentando obtener la memoria compartida distribuida para el broker " << ID_BROKER << " y sub-broker " << ID_SUB_BROKER_REGISTRO_TESTER << ". Errno: " << strerror(errno);
+                            Logger::error(ss.str(), __FILE__);
+                            exit(1);
+                        }
+                        
+                        brokerEquipoEspecial = shmDistrTablaTesters->memoria.brokerAsignado[ID_EQUIPO_ESPECIAL - ID_TESTER_ESP_START + MAX_TESTER_COMUNES];
+                        ss << "El broker donde esta registrado el equipo especial es el broker " << brokerEquipoEspecial;
+                        Logger::debug(ss.str(), __FILE__); ss.str(""); ss.clear();
 
-                if (msg.idBroker == ID_BROKER) {
-                    msg.mtype = ID_EQUIPO_ESPECIAL;
-                    int ret = msgsnd(msgQueueTestYEq, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
-                    if(ret == -1) {
-                        Logger::error("Error al enviar el resultado especial a la cola de envio a testers y equipo especial", __FILE__);
-                        exit(1);
+                        shmDistrTablaTesters->mtype = MTYPE_DEVOLUCION_SHM_BROKER;
+                        devolverDistributedSharedMemory(msgQueueShm, shmDistrTablaTesters, sizeof(TMessageShMemInterBroker));
+                        shmDistrTablaTesters = NULL;
                     }
-                } else {
-                    ss << "Envío resultado especial hacia el broker " << msg.idBroker;
+                    
+                    msg.idBroker = brokerEquipoEspecial;
+
+                    ss << "El resultado especial debe ser enviado al broker " << msg.idBroker << " y estoy en el broker " << ID_BROKER;
                     Logger::notice(ss.str(), __FILE__); ss.str(""); ss.clear();
-                    // El mensaje es para tester en otro broker
-                    msg.mtype = msg.idBroker;
-                    msg.mtypeMensajeBroker = MTYPE_HACIA_EQUIPO_ESPECIAL;
-                    ret = msgsnd(msgQueueHaciaBrokers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
-                    if(ret == -1) {
-                        Logger::error("Error al enviar el resultado especial a la cola de envio hacia brokers", __FILE__);
-                        exit(1);
+
+                    if (msg.idBroker == ID_BROKER) {
+                        msg.mtype = ID_EQUIPO_ESPECIAL;
+                        int ret = msgsnd(msgQueueTestYEq, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+                        if(ret == -1) {
+                            Logger::error("Error al enviar el resultado especial a la cola de envio a testers y equipo especial", __FILE__);
+                            exit(1);
+                        }
+                    } else {
+                        ss << "Envío resultado especial hacia el broker " << msg.idBroker;
+                        Logger::notice(ss.str(), __FILE__); ss.str(""); ss.clear();
+                        // El mensaje es para tester en otro broker
+                        msg.mtype = msg.idBroker;
+                        msg.mtypeMensajeBroker = MTYPE_HACIA_EQUIPO_ESPECIAL;
+                        ret = msgsnd(msgQueueHaciaBrokers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+                        if(ret == -1) {
+                            Logger::error("Error al enviar el resultado especial a la cola de envio hacia brokers", __FILE__);
+                            exit(1);
+                        }
                     }
                 }
                 break;

@@ -44,6 +44,26 @@ int main(int argc, char** argv) {
     semTablaCom.getSem();
     semTablaCom.eliSem();
     
+    key = ftok(ipcFileName.c_str(), SHM_CANTIDAD_REQUERIMIENTOS_PLANILLAS_SHM);
+    if (key == -1) {
+        std::stringstream ss;
+        ss << "Error obteniendo la key del IPC " << SHM_CANTIDAD_REQUERIMIENTOS_PLANILLAS_SHM << ". Error: " << strerror(errno);
+        Logger::error(ss.str(), __FILE__);
+        exit(1);
+    }
+    int shmCantReqPlanillas = shmget(key, sizeof(int), 0660);
+    if (shmCantReqPlanillas == -1) {
+        std::stringstream ss;
+        ss << "Error obteniendo el ID del IPC " << SHM_CANTIDAD_REQUERIMIENTOS_PLANILLAS_SHM << ". Error: " << strerror(errno);
+        Logger::error(ss.str(), __FILE__);
+        exit(1);
+    }
+    shmctl(shmCantReqPlanillas, IPC_RMID, NULL);
+
+    Semaphore semReqPlanillas(SEM_CANTIDAD_REQUERIMIENTOS_PLANILLAS_SHM);
+    semReqPlanillas.getSem();
+    semReqPlanillas.eliSem();
+
     //Destruccion de colas
     for (int q = MSGQUEUE_BROKER_RECEPTOR_DISPOSITIVOS; q <= MSGQUEUE_BROKER_EMISOR; q++) {
         key = ftok(ipcFileName.c_str(), q);

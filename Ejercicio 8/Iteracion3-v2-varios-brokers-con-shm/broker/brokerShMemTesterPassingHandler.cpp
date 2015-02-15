@@ -126,8 +126,8 @@ int main(int argc, char** argv) {
             semBrokerCantShmemReq.v();
 
             // Pequeño sleep para no matar al CPU si hay pocos brokers
-            if (CANT_BROKERS <= 4) {
-                sleep(4 - CANT_BROKERS);
+            if (CANT_BROKERS <= 3) {
+                sleep(3 - CANT_BROKERS);
             } else {
                 usleep(10000);
             }
@@ -225,13 +225,7 @@ int main(int argc, char** argv) {
             cantReqPlanillasShm->cantRequerimientosShmemPlanillaAsignacion = cantReqPlanillasShm->cantRequerimientosShmemPlanillaAsignacion - cantTotalRequerimientos;
             semBrokerCantShmemReq.v();
 
-            // Pequeño sleep para no matar al CPU si hay pocos brokers
-            if (CANT_BROKERS <= 4) {
-                sleep(4 - CANT_BROKERS);
-            } else {
-                usleep(10000);
-            }
-
+            usleep(100000); // sleepeo un toque para no agitar al procesador
             if (CANT_BROKERS == 1) {
                 // Soy el unico. Me la envio a mi mismo
                 msg.mtype = ID_BROKER;

@@ -22,8 +22,8 @@ public:
     PlanillaAsignacionEquipoEspecial();
     virtual ~PlanillaAsignacionEquipoEspecial();
     
-    void registrarTareaEspecialFinalizada(int idDispositivo);
-    bool terminoTesteoEspecial(int posDispositivo, int idDispositivo);
+    void registrarTareaEspecialFinalizada(int posDispositivoint, int idDispositivo);
+    bool terminoTesteoEspecial();
     void reiniciarContadoresTesteoEspecial(int idDispositivo);
     void limpiarContadoresFinTesteo(int idDispositivo);
         
@@ -31,6 +31,7 @@ private:
     int shmemMsgqueueEmisor, shmemMsgqueueReceptor, shmemMsgqueueReq;
     pid_t pidEmisor, pidReceptor;
     TSharedMemoryPlanillaAsignacion memoria;
+    bool dispositivoTermino;
     
     void obtenerMemoriaCompartida();
     void devolverMemoriaCompartida();
