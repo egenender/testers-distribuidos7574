@@ -28,6 +28,9 @@ int main(int argc, char* argv[]) {
 	key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_RECEPTOR);
 	int msgQueueReceptor = msgget(key, 0660);
 
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_EMISOR);
+	int msgQueueEmisor = msgget(key, 0660);
+
 	key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_EMISOR_DISPOSITIVOS);
 	int msgQueueDisp = msgget(key, 0660);
 
@@ -92,6 +95,60 @@ int main(int argc, char* argv[]) {
                 if(ret == -1) {
                     Logger::error("Error al enviar el mensaje a la cola de registros de testers");
                     exit(1);
+                }
+                break;
+
+            case MTYPE_HAY_QUE_REINICIAR:
+                ss << "Llego un mensaje para reiniciar (o no) para el tester especial " << msg.tester;
+                Logger::notice(ss.str(), __FILE__);
+                ss.str("");
+                ss.clear();
+                
+                // En un proceso aparte, consulto que broker es este tester y envio
+                if (fork() == 0) {
+                    // Pido la shmem y me fijo el broker en el que esta registrado
+                    shmDistrTablaTesters = (TMessageShMemInterBroker*) obtenerDistributedSharedMemory(msgQueueShm, &reqMsg, sizeof(TMessageRequerimientoBrokerShm), shMemCantReqBrokerShmem, &semCantReqBrokerShmem, msgQueueShm, sizeof(TMessageShMemInterBroker), ID_SUB_BROKER_PASAMANOS_RECEPTOR);
+                    if (shmDistrTablaTesters == NULL) {
+                        std::stringstream ss;
+                        ss << "Error intentando obtener la memoria compartida distribuida para el broker " << ID_BROKER << " y sub-broker " << ID_SUB_BROKER_REGISTRO_TESTER << ". Errno: " << strerror(errno);
+                        Logger::error(ss.str(), __FILE__);
+                        exit(1);
+                    }
+                    
+                    int brokerAsignado = shmDistrTablaTesters->memoria.brokerAsignado[msg.tester - ID_TESTER_ESP_START + MAX_TESTER_COMUNES] = true;
+                    
+                    shmDistrTablaTesters->mtype = MTYPE_DEVOLUCION_SHM_BROKER;
+                    devolverDistributedSharedMemory(msgQueueShm, shmDistrTablaTesters, sizeof(TMessageShMemInterBroker));
+                    shmDistrTablaTesters = NULL;
+                    
+                    ss << "El tester especial esta registrado en el broker " << brokerAsignado << " y yo estoy en el broker " << ID_BROKER;
+                    Logger::notice(ss.str(), __FILE__);
+                    ss.str("");
+                    ss.clear();
+                    
+                    msg.idBroker = brokerAsignado;
+                    // Envio al broker correspondiente
+                    if(brokerAsignado == ID_BROKER) {
+                        msg.mtype = msg.tester;
+                        ret = msgsnd(msgQueueEmisor, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+                        if(ret == -1) {
+                            Logger::error("Error al enviar el mensaje a la cola de envio a testers", __FILE__);
+                            exit(1);
+                        }
+                    } else {
+                        ss << "Envío el aviso de reinicio al broker correspondiente de ID " << msg.idBroker;
+                        Logger::debug(ss.str(), __FILE__); ss.str(""); ss.clear();
+                        // Envio el mensaje al broker correspondiente
+                        msg.mtype = msg.idBroker;
+                        msg.mtypeMensajeBroker = MTYPE_HACIA_TESTER;
+                        ret = msgsnd(msgQueueHaciaBrokers, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+                        if(ret == -1) {
+                            Logger::error("Error al enviar el mensaje a la cola de envio a otros brokers", __FILE__);
+                            exit(1);
+                        }
+                    }
+                    
+                    exit(0);
                 }
                 break;
 

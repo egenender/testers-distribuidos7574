@@ -31,17 +31,18 @@ AtendedorTesters::AtendedorTesters(int idTester): idTester(idTester) {
     sprintf(paramId, "%d", this->idTester);
     char paramCola[10];
     sprintf(paramCola, "%d", MSGQUEUE_RECEPCIONES_TESTER_COMUN);
+    sprintf(paramSizeMsg, "%d", (int) sizeof(TMessageAtendedor));
     this->pidReceptor = fork();
     if (this->pidReceptor == 0){
 		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",
 				UBICACION_SERVER,
 				PUERTO_SERVER_EMISOR,
-				paramId, paramCola,(char*)0);
+				paramId, paramCola, paramSizeMsg, 
+                (char*)0);
         exit(1);
 	}
 
 	sprintf(paramCola, "%d", MSGQUEUE_ENVIO_TESTER_COMUN);
-    sprintf(paramSizeMsg, "%d", (int) sizeof(TMessageAtendedor));
 
 	if (fork() == 0){
 		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",

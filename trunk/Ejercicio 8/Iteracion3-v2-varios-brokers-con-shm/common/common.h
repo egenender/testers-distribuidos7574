@@ -47,6 +47,9 @@ const int SEM_IDENTIFICADOR = 13;
 const int SHM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM = 18;
 const int SEM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM = 19;
 
+const int SHM_CANTIDAD_REQUERIMIENTOS_PLANILLAS_SHM = 20;
+const int SEM_CANTIDAD_REQUERIMIENTOS_PLANILLAS_SHM = 21;
+
 const int MSGQUEUE_ENVIO_DISP = 20;
 const int MSGQUEUE_RECEPCIONES_DISP = 21;
 const int MSGQUEUE_BROKER_RECEPTOR_DISPOSITIVOS = 22;
@@ -62,21 +65,39 @@ const int MSGQUEUE_RECEPCIONES_TESTER_ESPECIAL = 31;
 const int MSGQUEUE_RECEPCIONES_EQUIPO_ESPECIAL = 32;
 const int MSGQUEUE_ENVIO_EQUIPO_ESPECIAL = 33;
 const int MSGQUEUE_DESPACHADOR = 34;
-const int MSGQUEUE_REINICIO_TESTEO = 35;
-const int MSGQUEUE_BROKER_REQUERIMIENTOS_DISPOSITIVOS = 36;
-const int MSGQUEUE_BROKER_REQUERIMIENTOS_TESTER_ESPECIAL = 37;
-const int MSGQUEUE_BROKER_REGISTRO_TESTERS = 38;
+const int MSGQUEUE_ENVIO_TESTERS_SHMEM_PLANILLA_GENERAL = 35;
+const int MSGQUEUE_RECEPCION_TESTERS_SHMEM_PLANILLA_GENERAL = 36;
+const int MSGQUEUE_ENVIO_TESTERS_SHMEM_PLANILLA_ASIGNACION = 37;
+const int MSGQUEUE_RECEPCION_TESTERS_SHMEM_PLANILLA_ASIGNACION = 38;
+const int MSGQUEUE_REQ_TESTERS_SHMEM_PLANILLAS = 39;
+const int MSGQUEUE_BROKER_REQUERIMIENTOS_DISPOSITIVOS = 40;
+const int MSGQUEUE_BROKER_REQUERIMIENTOS_TESTER_ESPECIAL = 41;
+const int MSGQUEUE_BROKER_REGISTRO_TESTERS = 42;
 
 /* NUEVOS IPCS PARA MSG-INTER-BROKERS*/
-const int MSGQUEUE_BROKER_HACIA_BROKER = 39;
-const int MSGQUEUE_BROKER_DESDE_BROKER = 40;
+const int MSGQUEUE_BROKER_HACIA_BROKER = 43;
+const int MSGQUEUE_BROKER_DESDE_BROKER = 44;
 
 /* MSGQUEUE PARA LA SHMEM INTER-BROKER (TESTERS DISPONIBLES)*/
-const int MSGQUEUE_INTERNAL_BROKER_SHM = 41;
-const int MSGQUEUE_ENVIO_BROKER_SHM = 42; // Envio de la shm inter-broker a otros brokers
-const int MSGQUEUE_RECEPCION_BROKER_SHM = 43; // Recepcion de la shm inter-broker desde otros brokers
+const int MSGQUEUE_INTERNAL_BROKER_SHM = 45;
+const int MSGQUEUE_ENVIO_BROKER_SHM = 46; // Envio de la shm inter-broker a otros brokers
+const int MSGQUEUE_RECEPCION_BROKER_SHM = 47; // Recepcion de la shm inter-broker desde otros brokers
 
-const int LAST_ID_IPC = MSGQUEUE_RECEPCION_BROKER_SHM + 1;
+/* MSGQUEUE PARA LAS SHMEMS PLANILLAS ENTRE-BROKERS*/
+const int MSGQUEUE_RECEPCION_BROKER_SHM_PLANILLA_GENERAL = 48;
+const int MSGQUEUE_RECEPCION_BROKER_SHM_PLANILLA_ASIGNACION = 49;
+const int MSGQUEUE_ENVIO_BROKER_SHM_PLANILLA_GENERAL = 50;
+const int MSGQUEUE_ENVIO_BROKER_SHM_PLANILLA_ASIGNACION = 51;
+
+/* MSGQUEUE PARA LAS SHMEMS PLANILLAS HACIA TESTER/EQUIPO*/
+const int MSGQUEUE_BROKER_RECEPCION_SHMEM_HANDLER = 52;
+const int MSGQUEUE_BROKER_ENVIO_SHMEM_HANDLER = 53;
+const int MSGQUEUE_BROKER_REQUERIMIENTO_SHMEM_HANDLER = 54;
+
+/* MSGQUEUE PARA USO INTERNO DEL BROKER CONTADOR DE REQUERIMIENTOS DE SHMEM DE PLANILLAS*/
+const int MSGQUEUE_BROKER_INTERNAL_REQUERIMIENTO_PLANILLAS_HANDLER = 55;
+
+const int LAST_ID_IPC = MSGQUEUE_BROKER_INTERNAL_REQUERIMIENTO_PLANILLAS_HANDLER + 1;
 
 // mtypes desde el dispositivo
 const int MTYPE_REQUERIMIENTO_DISPOSITIVO = 1;
@@ -91,6 +112,7 @@ const int MTYPE_TAREA_ESPECIAL = 1;
 const int MTYPE_AVISAR_DISPONIBILIDAD = 6;
 // mtypes desde equipo especial
 const int MTYPE_ORDEN = 1;
+const int MTYPE_HAY_QUE_REINICIAR = 3;
 const int MTYPE_FIN_TEST_ESPECIAL = 5;
 
 const int ORDEN_APAGADO = 0;
@@ -148,6 +170,7 @@ typedef struct message {
     int idDispositivo;
     int tester;
     bool esTesterEspecial;
+    bool hayQueReiniciar; // Se usa para avisarle al tester especial si debe reiniciar o no
     int idBroker;
     int idBrokerOrigen;
     int value; // Este parametro posee el valor del programa, del resultado y de la orden
@@ -181,6 +204,8 @@ const int ID_BROKER_SIGUIENTE = (ID_BROKER == CANT_BROKERS) ? ID_BROKER_START : 
 // LAS IPS DE LOS BROKERS ESTA EN EL ARCHIVO BROKER.CPP
 const char PUERTO_CONTRA_BROKERS[] = "40000";
 const char PUERTO_CONTRA_BROKERS_SHMEM_BROKERS[] = "40005";
+const char PUERTO_CONTRA_BROKERS_SHMEM_PLANILLA_GENERAL[] = "40010";
+const char PUERTO_CONTRA_BROKERS_SHMEM_PLANILLA_ASIGNACION[] = "40015";
 
 // Para el mtypeMessageBroker del InterBroker-Message-Handler
 const int MTYPE_HACIA_DISPOSITIVO = 1;
@@ -199,6 +224,43 @@ const char UBICACION_SERVER[] = "127.0.0.1";
 //const char UBICACION_SERVER_IDENTIFICADOR[] = "192.168.2.7";
 const char UBICACION_SERVER_IDENTIFICADOR[] = "192.168.2.10";
 
+/*********CONFIG PEDIDO SHARED MEMORY TESTERS**********/
+typedef struct TSharedMemoryPlanillaAsignacion {
+    long mtype;
+    TContadorTesterEspecial cantTestersEspecialesAsignados[MAX_DISPOSITIVOS_EN_SISTEMA];
+    TContadorTareaEspecial cantTareasEspecialesAsignadas[MAX_DISPOSITIVOS_EN_SISTEMA];
+} TSharedMemoryPlanillaAsignacion;
+
+const int MTYPE_REQ_SHMEM_PLANILLA_ASIGNACION = 1;
+const int MTYPE_DEVOLUCION_SHMEM_PLANILLA_ASIGNACION = 2;
+const char PUERTO_SERVER_RECEPCION_SHM_PLANILLA_ASIGNACION[] = "60011";
+const char PUERTO_SERVER_ENVIO_SHM_PLANILLA_ASIGNACION[] = "60012";
+
+typedef struct TSharedMemoryPlanillaGeneral {
+    long mtype;
+    int cantDispositivosSiendoTesteados;
+    bool idsPrivadosDispositivos[MAX_DISPOSITIVOS_EN_SISTEMA];
+} TSharedMemoryPlanillaGeneral;
+
+const int MTYPE_REQ_SHMEM_PLANILLA_GENERAL = 3;
+const int MTYPE_DEVOLUCION_SHMEM_PLANILLA_GENERAL = 4;
+const int INIT_MTYPE_SHMEM_PLANILLA_GENERAL = ID_EQUIPO_ESPECIAL + 1;
+const char PUERTO_SERVER_RECEPCION_SHM_PLANILLA_GENERAL[] = "60013";
+const char PUERTO_SERVER_ENVIO_SHM_PLANILLA_GENERAL[] = "60014";
+
+typedef struct TRequerimientoSharedMemory {
+    long mtype;
+    int idSolicitante;
+    int idDevolucion;
+} TRequerimientoSharedMemory;
+const char PUERTO_SERVER_RECEPCION_REQ_PLANILLAS[] = "60015";
+
+typedef struct TShmemCantRequerimientos {
+    int cantRequerimientosShmemPlanillaGeneral;
+    int cantRequerimientosShmemPlanillaAsignacion;
+} TShmemCantRequerimientos;
+/*******FIN PEDIDO SHARED MEMORY TESTERS***********/
+
 /*******SUB-BROKERS-CONFIG********/
 const int MTYPE_DEVOLUCION_SHM_BROKER = 1;
 const int MTYPE_REQUERIMIENTO_SHM_BROKER = 2; // Procurar que el ID de los subbrokers superen esto
@@ -216,6 +278,7 @@ typedef struct TMessageRequerimientoBrokerShm {
     long mtype;
     int idSubBroker;
 } TMessageRequerimientoBrokerShm;
+/*******FIN SUB-BROKERS CONFIG*********/
 
 #endif	/* COMMON_H */
 

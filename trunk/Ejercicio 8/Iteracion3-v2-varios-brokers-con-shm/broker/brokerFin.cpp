@@ -63,7 +63,7 @@ int main(int argc, char** argv) {
         msgctl(cola ,IPC_RMID, NULL);
     }
 
-    for (int q = MSGQUEUE_BROKER_REQUERIMIENTOS_DISPOSITIVOS; q <= MSGQUEUE_RECEPCION_BROKER_SHM; q++) {
+    for (int q = MSGQUEUE_BROKER_REQUERIMIENTOS_DISPOSITIVOS; q <= MSGQUEUE_BROKER_INTERNAL_REQUERIMIENTO_PLANILLAS_HANDLER; q++) {
         key = ftok(ipcFileName.c_str(), q);
         if (key == -1) {
             std::stringstream ss;

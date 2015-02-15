@@ -18,15 +18,14 @@
 int main(int argc, char *argv[]) {
     
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
-    if(argc != 3) {
-        printf("Uso: %s <puerto> <idMsgQueue> \n", argv[0]);
+    if(argc != 4) {
+        printf("Uso: %s <puerto> <idMsgQueue> <sizeMsg> \n", argv[0]);
         Logger::error("Bad arguments!", __FILE__);
         return -1;
     }
 	
     int idMsgQueue = atoi(argv[2]);
-	
-    size_t size = sizeof(TMessageAtendedor);
+    size_t size = atoi(argv[3]);
    
     int fd = tcpOpenPasivo(atoi(argv[1]));
     if(fd < 0) {
@@ -53,7 +52,7 @@ int main(int argc, char *argv[]) {
         //cant_atendidos++;
 
         if (fork() == 0) {
-            TMessageAtendedor* buffer = (TMessageAtendedor*) malloc(size);
+            void* buffer = malloc(size);
 
             //Espero Primer mensaje, que me dice el identificador del cliente
             TFirstMessage firstMsg;
@@ -80,14 +79,8 @@ int main(int argc, char *argv[]) {
                     close(clientFd);
                     exit(1);
                 }
-                //Si el mensaje era de finalizacion, entonces 'mato' al receptor y termino mi labor
-                /*if (buffer->finalizar_conexion) {
-                    kill(receptor, SIGHUP);
-                    free(buffer);
-                    close(clientFd);
-                    exit(0);
-                }*/				
-                enviar(clientFd, buffer, sizeof(TMessageAtendedor));
+
+                enviar(clientFd, buffer, size);
             }			
         }
         close(clientFd);

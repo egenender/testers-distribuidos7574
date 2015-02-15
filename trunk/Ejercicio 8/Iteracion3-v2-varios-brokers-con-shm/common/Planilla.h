@@ -10,35 +10,32 @@
 #ifndef PLANILLA_H
 #define	PLANILLA_H
 
-#include "ipc/Semaphore.h"
 #include <sys/ipc.h>
-#include <sys/shm.h>
+#include <sys/msg.h>
 #include <errno.h>
 #include <cstring>
+#include <cstdlib>
+
+#include "common/common.h"
 
 class Planilla {
 private:
-    Semaphore semShMem;
-    key_t shMemKey, shMemPosicionesKey;
-    int shMemId, shMemPosicionesId;
-    int* cantDispositivosSiendoTesteados;
-    bool* idsPrivadosDispositivos;
-    
-    int cantProcesosUsandoPlanilla();
+    int shmemMsgqueueEmisor, shmemMsgqueueReceptor, shmemMsgqueueReq;
+    int idTester;
+    pid_t pidEmisor, pidReceptor;
+    TSharedMemoryPlanillaGeneral memoria;
+
+    void obtenerSharedMemory();
+    void devolverSharedMemory();
     
 public:
     
-    Planilla();
+    Planilla(int idTester);
     Planilla(const Planilla& orig);
     virtual ~Planilla();
     
     int hayLugar();    // Si hay menos de 100 -> incrementa en 1 al contador y devuelve la posicion en las memorias privadas del sistema
     void eliminarDispositivo(int posicionDispositivo); // Simplemente decrementa en 1 el contador en la shmem
-
-    bool destruirMemoria();
-    bool destruirSemaforo();
-    
-    void initPlanilla();
 
 };
 

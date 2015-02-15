@@ -15,15 +15,7 @@ AtendedorEquipoEspecial::AtendedorEquipoEspecial() {
         Logger::error(err, __FILE__);
         exit(1);
     }
-/*
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_REINICIO_TESTEO);
-    this->colaReinicioTestEsp = msgget(key, 0666);
-    if(this->colaReinicioTestEsp == -1) {
-        std::string err = std::string("Error al obtener la cola para avisar reinicio de testeo especial. Errno: ") + std::string(strerror(errno));
-        Logger::error(err, __FILE__);
-        exit(1);
-    }
-*/
+
     key = ftok(ipcFileName.c_str(), MSGQUEUE_ENVIO_EQUIPO_ESPECIAL);
     this->colaEnvios = msgget(key, 0666);
     if(this->colaEnvios == -1) {
@@ -38,19 +30,19 @@ AtendedorEquipoEspecial::AtendedorEquipoEspecial() {
 
 	sprintf(paramIdCola, "%d", MSGQUEUE_RECEPCIONES_EQUIPO_ESPECIAL);
     sprintf(paramId, "%d", ID_EQUIPO_ESPECIAL);
+    sprintf(paramSizeMsg, "%d", (int) sizeof(TMessageAtendedor));
 
 	this->pidReceptor = fork();
 	if (this->pidReceptor == 0) {
 		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",
 				UBICACION_SERVER, PUERTO_SERVER_EMISOR,
-                paramId, paramIdCola,
+                paramId, paramIdCola, paramSizeMsg, 
 				(char*) 0);
         Logger::error("Log luego de execlp tcpclient_receptor. Error!", __FILE__);
 		exit(1);
 	}
 
 	sprintf(paramIdCola, "%d", MSGQUEUE_ENVIO_EQUIPO_ESPECIAL);
-    sprintf(paramSizeMsg, "%d", (int) sizeof(TMessageAtendedor));
 
 	if (fork() == 0) {
 		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",

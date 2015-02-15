@@ -41,8 +41,8 @@ int main(int argc, char** argv) {
     // Obtengo comunicacion con los tecnicos
     DespachadorTesters despachador;
     // Obtengo planilla general de sync con otros tester
-    Planilla planilla;
-    PlanillaAsignacionTesterComun planillaAsignacion;
+    Planilla planilla(id);
+    PlanillaAsignacionTesterComun planillaAsignacion(id);
     
     srand(time(NULL));
     
