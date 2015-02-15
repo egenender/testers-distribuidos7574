@@ -5,7 +5,7 @@ LDFLAGS=
 BINF=../bin/tcp
 HEADER_DIR=..
 
-SHARED_SOURCES := $(shell find ../*/ -name '[Logger|Lock]*.cpp')
+SHARED_SOURCES := $(shell find ../logger/ ../lock/ ../sync/ -name '*.cpp')
 SHARED_OBJ=$(SHARED_SOURCES:.cpp=.o)
 
 TCP_SERVER_EMISOR_SOURCES=tcpserver_emisor.cpp
