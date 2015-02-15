@@ -139,7 +139,7 @@ int main(int argc, char** argv) {
 	if (fork() == 0) {
 		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",
 				UBICACION_SERVER,
-				PUERTO_SERVER_RECEPCION_REQ_SHM,
+				PUERTO_SERVER_RECEPCION_REQ_PLANILLAS,
 				paramId, paramIdCola, paramSize,
 				(char*) 0);
         Logger::error("Log luego de execlp tcpclient_emisor. Error!", __FILE__);
