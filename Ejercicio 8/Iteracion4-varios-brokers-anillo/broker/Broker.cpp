@@ -384,6 +384,7 @@ void armarAnillo() {
     std::stringstream ringProgram, program;
     ringProgram << "./anillo/";
     if (ID_BROKER == MASTER_BROKER) {
+        sleep(5); // Espero un poco para que arranquen todos los listener
         program << "sender";
     } else {
         program << "listener";

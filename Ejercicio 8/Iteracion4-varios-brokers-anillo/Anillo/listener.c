@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     int portUdp;
     
     
-    FILE * fdConfig = fopen("config", "r");
+    FILE * fdConfig = fopen("../../Anillo/config", "r");
     if(fdConfig==NULL){
         perror("fopen");
         exit(1);
@@ -268,7 +268,8 @@ int main(int argc, char *argv[])
 
              sprintf(mostrar,"[ENVIADO] --> %s\t%s\n",inet_ntoa(addrMulticast.sin_addr),imprimirCodigo(CERRAR));
             write(fileno(stdout),mostrar,strlen(mostrar));
-            strcpy(ipBrokerSiguiente, inet_ntoa(addr.sin_addr));              
+            strcpy(ipBrokerSiguiente, inet_ntoa(addr.sin_addr));
+            informarBrokerSiguiente(ipBrokerSiguiente);
           }        
         } else {
 			sprintf(mostrar,"kill -9 %d",childpid);

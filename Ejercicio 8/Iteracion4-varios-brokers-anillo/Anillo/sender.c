@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     char puertoUdp[50];
     int portUdp;
     
-    FILE * fdConfig = fopen("config", "r");
+    FILE * fdConfig = fopen("../../Anillo/config", "r");
     if(fdConfig==NULL){
         perror("fopen");
         exit(1);
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
        
        //Guardo la direccion del que me contesto primero. Es mi siguiente.
        strcpy(ipBrokerSiguiente,inet_ntoa(addr.sin_addr));
-       informarBrokerSiguiente(ipBrokerSiguiente);
+       //informarBrokerSiguiente(ipBrokerSiguiente);
        sprintf(mostrar,"[MASTER] --> Ip del Broker Siguiente: %s\n",ipBrokerSiguiente);
        write(fileno(stdout),mostrar,strlen(mostrar));
        
@@ -256,7 +256,7 @@ int main(int argc, char *argv[])
            }
        }while((msgLider.estado != LIDER) && (msgLider.estado!=FIN));
        
-       informarLider(msgLider.idBroker == id);
+       //informarLider(msgLider.idBroker == id);
        sprintf(mostrar, "[MASTER] --> ID LIDER ENCONTRADO: %d\t%s\n", msgLider.idBroker, imprimirCodigo(msgLider.estado));
        write(fileno(stdout), mostrar, strlen(mostrar));
        
