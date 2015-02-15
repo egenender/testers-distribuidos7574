@@ -10,8 +10,8 @@
 #include "../ipc/Semaphore.h"
 #include "../logger/Logger.h"
 
-//const char* IP_BROKERS[CANT_BROKERS] = {"127.0.0.1", "192.168.2.3"};
-const char* IP_BROKERS[CANT_BROKERS] = {"127.0.0.1"};
+const char* IP_BROKERS[CANT_BROKERS] = {"127.0.0.1", "192.168.2.3"};
+//const char* IP_BROKERS[CANT_BROKERS] = {"127.0.0.1"};
 
 void crearIpc() {
     
