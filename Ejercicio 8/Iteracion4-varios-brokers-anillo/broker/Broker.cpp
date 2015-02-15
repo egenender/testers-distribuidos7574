@@ -5,13 +5,12 @@
 #include <sys/shm.h>
 #include <cstdlib>
 #include <unistd.h>
+#include <sys/wait.h>
 
 #include "../common/common.h"
 #include "../ipc/Semaphore.h"
 #include "../logger/Logger.h"
-
-const char* IP_BROKERS[CANT_BROKERS] = {"127.0.0.1", "192.168.2.3"};
-//const char* IP_BROKERS[CANT_BROKERS] = {"127.0.0.1"};
+#include "brokersInfo.h"
 
 void crearIpc() {
     
@@ -53,6 +52,26 @@ void crearIpc() {
     Semaphore semReqPlanillasShm(SEM_CANTIDAD_REQUERIMIENTOS_PLANILLAS_SHM);
     semReqPlanillasShm.creaSem();
     semReqPlanillasShm.iniSem(1);
+    
+    /* INFO proveniente del algoritmo del anillo*/
+    key = ftok(ipcFileName.c_str(), SHM_BROKER_ES_LIDER);
+    int shmIdSoyLider = shmget(key, sizeof(bool), IPC_CREAT | 0660);
+    bool* soyLider = (bool*) shmat(shmIdSoyLider, NULL, 0);
+    *soyLider = false;
+
+    Semaphore semSoyLider(SEM_BROKER_ES_LIDER);
+    semSoyLider.creaSem();
+    semSoyLider.iniSem(1);
+    
+    key = ftok(ipcFileName.c_str(), SHM_BROKER_SIGUIENTE);
+    int shmIdBrokerSiguiente = shmget(key, sizeof(int), IPC_CREAT | 0660);
+    int* idBrokerSiguiente = (int*) shmat(shmIdBrokerSiguiente, NULL, 0);
+    *idBrokerSiguiente = 0;
+
+    Semaphore semIdBrokerSiguiente(SEM_BROKER_SIGUIENTE);
+    semIdBrokerSiguiente.creaSem();
+    semIdBrokerSiguiente.iniSem(1);
+    
 }
 
 void crearModulosBroker() {
@@ -235,8 +254,16 @@ void crearServers(){
 	}
 
     // Para dar tiempo a que todos los broker esten arriba
-	sleep(5);
-
+	sleep(10);
+    // Obtengo el ID del siguiente broker
+    key_t key = ftok(ipcFileName.c_str(), SHM_BROKER_SIGUIENTE);
+    int shmIdBrokerSiguiente = shmget(key, sizeof(int), IPC_CREAT | 0660);
+    int* idBrokerSiguiente = (int*) shmat(shmIdBrokerSiguiente, NULL, 0);
+    Semaphore semIdBrokerSiguiente(SEM_BROKER_SIGUIENTE);
+    semIdBrokerSiguiente.getSem();
+    semIdBrokerSiguiente.p();
+    int brokerSiguiente = *idBrokerSiguiente;
+    semIdBrokerSiguiente.v();
     // Comunicacion cliente con brokers para mensajes generales
     sprintf(paramSizeMsg, "%d", (int) sizeof(TMessageAtendedor));
     sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_HACIA_BROKER);
@@ -245,7 +272,7 @@ void crearServers(){
         sprintf(paramIdBroker, "%d", i + ID_BROKER_START);
         Logger::notice("Creo el cliente emisor de mensajes generales a brokers", __FILE__);
         if (fork() == 0){
-            execlp("./tcp/tcpclient_emisor", "tcpclient_emisor", IP_BROKERS[i], PUERTO_CONTRA_BROKERS , paramIdBroker, paramMsgQueue, paramSizeMsg, (char*) 0);
+            execlp("./tcp/tcpclient_emisor", "tcpclient_emisor", IP_BROKERS[i].ipBroker, PUERTO_CONTRA_BROKERS , paramIdBroker, paramMsgQueue, paramSizeMsg, (char*) 0);
             exit(1);
         }
     }
@@ -256,17 +283,17 @@ void crearServers(){
     sprintf(paramIdBroker, "%d", 0); // La conexion es solo con el sgte broker por lo que agarra todo lo que esta en la MsgQueue
     Logger::notice("Creo el cliente emisor de memoria compartida a brokers", __FILE__);
     if (fork() == 0){
-        execlp("./tcp/tcpclient_emisor", "tcpclient_emisor", IP_BROKERS[ID_BROKER_SIGUIENTE - ID_BROKER_START], PUERTO_CONTRA_BROKERS_SHMEM_BROKERS , paramIdBroker, paramMsgQueue, paramSizeMsg, (char*) 0);
+        execlp("./tcp/tcpclient_emisor", "tcpclient_emisor", IP_BROKERS[brokerSiguiente - ID_BROKER_START].ipBroker, PUERTO_CONTRA_BROKERS_SHMEM_BROKERS , paramIdBroker, paramMsgQueue, paramSizeMsg, (char*) 0);
         exit(1);
     }
-    
+
     // Comunicacion cliente con brokers para memoria compartida de planilla general
     sprintf(paramMsgQueue, "%d", MSGQUEUE_ENVIO_BROKER_SHM_PLANILLA_GENERAL);
     sprintf(paramSizeMsg, "%d", (int) sizeof(TSharedMemoryPlanillaGeneral));
     sprintf(paramIdBroker, "%d", 0); // La conexion es solo con el sgte broker por lo que agarra todo lo que esta en la MsgQueue
     Logger::notice("Creo el cliente emisor de memoria compartida a brokers", __FILE__);
     if (fork() == 0){
-        execlp("./tcp/tcpclient_emisor", "tcpclient_emisor", IP_BROKERS[ID_BROKER_SIGUIENTE - ID_BROKER_START],  PUERTO_CONTRA_BROKERS_SHMEM_PLANILLA_GENERAL, paramIdBroker, paramMsgQueue, paramSizeMsg, (char*) 0);
+        execlp("./tcp/tcpclient_emisor", "tcpclient_emisor", IP_BROKERS[brokerSiguiente - ID_BROKER_START].ipBroker,  PUERTO_CONTRA_BROKERS_SHMEM_PLANILLA_GENERAL, paramIdBroker, paramMsgQueue, paramSizeMsg, (char*) 0);
         exit(1);
     }
     
@@ -276,77 +303,112 @@ void crearServers(){
     sprintf(paramIdBroker, "%d", 0); // La conexion es solo con el sgte broker por lo que agarra todo lo que esta en la MsgQueue
     Logger::notice("Creo el cliente emisor de memoria compartida a brokers", __FILE__);
     if (fork() == 0){
-        execlp("./tcp/tcpclient_emisor", "tcpclient_emisor", IP_BROKERS[ID_BROKER_SIGUIENTE - ID_BROKER_START],  PUERTO_CONTRA_BROKERS_SHMEM_PLANILLA_ASIGNACION, paramIdBroker, paramMsgQueue, paramSizeMsg, (char*) 0);
+        execlp("./tcp/tcpclient_emisor", "tcpclient_emisor", IP_BROKERS[brokerSiguiente - ID_BROKER_START].ipBroker,  PUERTO_CONTRA_BROKERS_SHMEM_PLANILLA_ASIGNACION, paramIdBroker, paramMsgQueue, paramSizeMsg, (char*) 0);
         exit(1);
     }
     
 }
 
 void lanzarTareasMaster() {
-
-    // Tengo que inicializar y lanzar la memoria compartida entre brokers
-    TMessageShMemInterBroker msgShmemInterBroker;
-    msgShmemInterBroker.mtype = ID_BROKER;
-
-    for (int i = 0; i < MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES + 1; i++) {
-        msgShmemInterBroker.memoria.registrados[i] = false;
-        msgShmemInterBroker.memoria.brokerAsignado[i] = TESTER_ESPECIAL_NO_ASIGNADO;
-        msgShmemInterBroker.memoria.disponible[i] = false;
-    }
-    msgShmemInterBroker.memoria.ultimoTesterElegido = 0;
     
-    Logger::notice("Soy el MASTER y me lanzo la memoria compartida para iniciar el flujo", __FILE__);
-    key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_RECEPCION_BROKER_SHM);
-	int msgQueueRecepcionShmem = msgget(key, IPC_CREAT | 0660);
-    int okSend = msgsnd(msgQueueRecepcionShmem, &msgShmemInterBroker, sizeof(TMessageShMemInterBroker) - sizeof(long), 0);
-    if (okSend == -1) {
-        Logger::error("Error al iniciar el envio de la Shmem a mi mismo (MASTER). Abort!", __FILE__);
+    key_t key = ftok(ipcFileName.c_str(), SHM_BROKER_ES_LIDER);
+    int shmIdSoyLider = shmget(key, sizeof(bool), IPC_CREAT | 0660);
+    bool* soyLider = (bool*) shmat(shmIdSoyLider, NULL, 0);
+    *soyLider = false;
+
+    Semaphore semSoyLider(SEM_BROKER_ES_LIDER);
+    semSoyLider.getSem();
+    
+    semSoyLider.p();
+    bool lanzarTareas = *soyLider;
+    semSoyLider.v();
+
+    if(lanzarTareas) {
+        // Tengo que inicializar y lanzar la memoria compartida entre brokers
+        TMessageShMemInterBroker msgShmemInterBroker;
+        msgShmemInterBroker.mtype = ID_BROKER;
+
+        for (int i = 0; i < MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES + 1; i++) {
+            msgShmemInterBroker.memoria.registrados[i] = false;
+            msgShmemInterBroker.memoria.brokerAsignado[i] = TESTER_ESPECIAL_NO_ASIGNADO;
+            msgShmemInterBroker.memoria.disponible[i] = false;
+        }
+        msgShmemInterBroker.memoria.ultimoTesterElegido = 0;
+
+        Logger::notice("Soy el MASTER y me lanzo la memoria compartida para iniciar el flujo", __FILE__);
+        key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_RECEPCION_BROKER_SHM);
+        int msgQueueRecepcionShmem = msgget(key, IPC_CREAT | 0660);
+        int okSend = msgsnd(msgQueueRecepcionShmem, &msgShmemInterBroker, sizeof(TMessageShMemInterBroker) - sizeof(long), 0);
+        if (okSend == -1) {
+            Logger::error("Error al iniciar el envio de la Shmem a mi mismo (MASTER). Abort!", __FILE__);
+            exit(1);
+        }
+
+        // Inicializo y lanzo la planilla general
+        TSharedMemoryPlanillaGeneral planillaGeneral;
+        planillaGeneral.mtype = ID_BROKER;
+        planillaGeneral.cantDispositivosSiendoTesteados = 0;
+        for(int i = 0; i < MAX_DISPOSITIVOS_EN_SISTEMA; i++)    planillaGeneral.idsPrivadosDispositivos[i] = false;
+
+        key = ftok(ipcFileName.c_str(), MSGQUEUE_RECEPCION_BROKER_SHM_PLANILLA_GENERAL);
+        int msgQueueRecepcionPlanillaGral = msgget(key, IPC_CREAT | 0660);
+        okSend = msgsnd(msgQueueRecepcionPlanillaGral, &planillaGeneral, sizeof(TSharedMemoryPlanillaGeneral) - sizeof(long), 0);
+        if (okSend == -1) {
+            Logger::error("Error al iniciar el envio de la planilla general a mi mismo (MASTER). Abort!", __FILE__);
+            exit(1);
+        }
+
+        // Inicializo y lanzo la planilla asignacion
+        TSharedMemoryPlanillaAsignacion planillaAsignacion;
+        planillaAsignacion.mtype = ID_BROKER;
+        for(int i = 0; i < MAX_DISPOSITIVOS_EN_SISTEMA; i++) {
+            planillaAsignacion.cantTareasEspecialesAsignadas[i].cantTareasEspecialesTotal = 0;
+            planillaAsignacion.cantTareasEspecialesAsignadas[i].cantTareasEspecialesTerminadas = 0;
+            planillaAsignacion.cantTestersEspecialesAsignados[i].cantTestersEspecialesTotal = 0;
+            planillaAsignacion.cantTestersEspecialesAsignados[i].cantTestersEspecialesTerminados = 0;
+        }
+
+        key = ftok(ipcFileName.c_str(), MSGQUEUE_RECEPCION_BROKER_SHM_PLANILLA_ASIGNACION);
+        int msgQueueRecepcionPlanillaAsig = msgget(key, IPC_CREAT | 0660);
+        okSend = msgsnd(msgQueueRecepcionPlanillaAsig, &planillaAsignacion, sizeof(TSharedMemoryPlanillaAsignacion) - sizeof(long), 0);
+        if (okSend == -1) {
+            Logger::error("Error al iniciar el envio de la planilla asignacion a mi mismo (MASTER). Abort!", __FILE__);
+            exit(1);
+        }
+    }
+}
+
+void armarAnillo() {
+        /* LANZO EL PROGRAMA CORRESPONDIENTE PARA LA GENERACION DEL ANILLO*/
+    Logger::notice("Lanzo programa correspondiente para generar el anillo!", __FILE__);
+    std::stringstream ringProgram, program;
+    ringProgram << "./anillo/";
+    if (ID_BROKER == MASTER_BROKER) {
+        program << "sender";
+    } else {
+        program << "listener";
+    }
+    ringProgram << program.str();
+    char paramId[10];
+    sprintf(paramId, "%d", ID_BROKER);
+    if(fork() == 0) {
+        execlp(ringProgram.str().c_str(), program.str().c_str(), paramId, (char*) 0);
+        Logger::error("Se imprime si no se ejecuto el execlp del programa del anillo. Algo salio mal!", __FILE__);
         exit(1);
     }
-    
-    // Inicializo y lanzo la planilla general
-    TSharedMemoryPlanillaGeneral planillaGeneral;
-    planillaGeneral.mtype = ID_BROKER;
-    planillaGeneral.cantDispositivosSiendoTesteados = 0;
-    for(int i = 0; i < MAX_DISPOSITIVOS_EN_SISTEMA; i++)    planillaGeneral.idsPrivadosDispositivos[i] = false;
-
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_RECEPCION_BROKER_SHM_PLANILLA_GENERAL);
-	int msgQueueRecepcionPlanillaGral = msgget(key, IPC_CREAT | 0660);
-    okSend = msgsnd(msgQueueRecepcionPlanillaGral, &planillaGeneral, sizeof(TSharedMemoryPlanillaGeneral) - sizeof(long), 0);
-    if (okSend == -1) {
-        Logger::error("Error al iniciar el envio de la planilla general a mi mismo (MASTER). Abort!", __FILE__);
-        exit(1);
-    }
-
-    // Inicializo y lanzo la planilla asignacion
-    TSharedMemoryPlanillaAsignacion planillaAsignacion;
-    planillaAsignacion.mtype = ID_BROKER;
-    for(int i = 0; i < MAX_DISPOSITIVOS_EN_SISTEMA; i++) {
-        planillaAsignacion.cantTareasEspecialesAsignadas[i].cantTareasEspecialesTotal = 0;
-        planillaAsignacion.cantTareasEspecialesAsignadas[i].cantTareasEspecialesTerminadas = 0;
-        planillaAsignacion.cantTestersEspecialesAsignados[i].cantTestersEspecialesTotal = 0;
-        planillaAsignacion.cantTestersEspecialesAsignados[i].cantTestersEspecialesTerminados = 0;
-    }
-    
-    key = ftok(ipcFileName.c_str(), MSGQUEUE_RECEPCION_BROKER_SHM_PLANILLA_ASIGNACION);
-	int msgQueueRecepcionPlanillaAsig = msgget(key, IPC_CREAT | 0660);
-    okSend = msgsnd(msgQueueRecepcionPlanillaAsig, &planillaAsignacion, sizeof(TSharedMemoryPlanillaAsignacion) - sizeof(long), 0);
-    if (okSend == -1) {
-        Logger::error("Error al iniciar el envio de la planilla asignacion a mi mismo (MASTER). Abort!", __FILE__);
-        exit(1);
-    }
+    wait(NULL);
+    /*ANILLO SUPUESTAMENTE GENERADO*/
+    Logger::notice("Programa del anillo termina. Supuestamente generado!", __FILE__);
 }
 
 int main (int argc, char* argv[]) {
     
 	Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
-	crearIpc();
+    
+    crearIpc();
+    armarAnillo();
 	crearServers();
 	crearModulosBroker();
-    
-    if (ID_BROKER == MASTER_BROKER) {
-        lanzarTareasMaster();
-    }
     
     return 0;
 }
