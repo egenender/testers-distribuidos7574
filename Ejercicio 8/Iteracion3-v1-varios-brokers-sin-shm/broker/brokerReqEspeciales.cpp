@@ -23,6 +23,9 @@ int main (int argc, char* argv[]){
 
 	key = ftok(ipcFileName.c_str(), MSGQUEUE_INTERNAL_BROKER_SHM);
 	int msgQueueShm = msgget(key, 0660);
+    
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_HACIA_BROKER);
+	int msgQueueHaciaBroker = msgget(key, 0660);
 
     key = ftok(ipcFileName.c_str(), SHM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM);
     int shMemCantReqBrokerShmemId = shmget(key, sizeof(int), IPC_CREAT | 0660);
@@ -113,7 +116,7 @@ int main (int argc, char* argv[]){
                 msg.tester = msg.idTestersEspeciales[i];
                 msg.mtype = brokersAsignados[i];
                 msg.mtypeMensajeBroker = MTYPE_HACIA_TESTER;
-                int ret = msgsnd(msgQueueTesterEsp, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+                int ret = msgsnd(msgQueueHaciaBroker, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
                 if(ret == -1) {
                     Logger::error("Error al enviar mensaje a la msgqueue hacia otros brokers", __FILE__);
                     exit(1);
