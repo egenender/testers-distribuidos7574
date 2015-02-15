@@ -1,0 +1,65 @@
+Configuración:
+    * Nota: Por el momento no se cuenta con un módulo de lectura de archivo de configuración, por lo
+            que hay que modificar los archivos correspondientes y recompilar. Se incluirá uno para
+            la entrega del Miercoles 18/2/2015
+
+      1) Configuración General:
+            a) Carpeta common -> archivo common.h
+                * CANT_TESTERS_COMUNES -> Cantidad de testers comunes que se crearan en esta maquina
+                * CANT_TESTERS_ESPECIALES -> Cantidad de testers especiales que se crearan en esta maquina
+                * logFileName -> Archivo de loggeo
+
+      2) Configuración Broker:
+            a) Carpeta common -> archivo common.h
+                * MASTER_BROKER -> ID del broker que ejecuta el "sender" del anillo
+                * ID_BROKER -> ID del broker que se ejecutará en esta maquina
+                * UBICACION_SERVER -> Ubicación del broker a donde se conectarán los dispositivos, testers y equipo especial que corran en esta máquina
+
+            b) Carpeta broker -> archivo brokersInfo.h
+                * IP_BROKERS -> Se configurarán los IDs y las IPs de todos los brokers del sistema
+            
+      3) Configuración Servidor Identificación (RPC):
+            a) Carpeta common -> archivo common.h
+                * UBICACION_SERVER_IDENTIFICADOR -> IP del servidor de identificadores (RPC)
+
+Instalación:
+
+    Para instalar el sistema, simplemente se debe ubicar en el directorio principal donde se 
+    encuentra el archivo Makefile.
+    Por consola, ejecutar el comando "make". Se compilará y se crearán los binarios correspondientes 
+    en la carpeta "bin", "bin/tcp" y "bin/anillo" segun corresponda.
+
+Ejecución:
+
+    Respetando el orden:
+
+    * Si ésta máquina actúa como broker, se debe ejecutar el binario "initBroker".
+
+    * Si ésta máquina actúa como servidor RPC de identificadores, se debe ejecutar el binario "iniciadorIdServer"
+
+    * Si ésta máquina posee testers y testers especiales, se debe ejecutar el binario "iniciador"
+
+    * Si ésta máquina posee al Equipo Especial, se debe ejecutar el binario "iniciadorEquipoEspecial"
+
+    * Si ésta máquina posee dispositivos, se debe ejecutar el binario "iniciadorDisp <numDispositivos>"
+            donde <numDispositivos> es la cantidad de dispositivos que se ejecutarán
+
+    Nota: Para que el sistema se inicialize correctamente, todos los brokers del sistema deben
+            ejecutarse al mismo tiempo (o dentro de un tiempo razonable)
+
+Finalización:
+
+    Respetando el orden:
+
+    * Si ésta máquina posee dispositivos, se debe ejecutar el binario "terminadorDisp"
+
+    * Si ésta máquina posee testers y testers especiales, se debe ejecutar el binario "terminador"
+
+    * Si ésta máquina posee al Equipo Especial, se debe ejecutar el binario "terminadorEquipoEspecial"
+
+    * Si ésta máquina posee el servidor de identificadores, se debe ejecutar el binario "terminadorIdServer"
+
+    * Si ésta máquina posee un broker, se debe ejecutar el comando "finBroker"
+
+    Por último, para asegurar el cierre correcto de todos los procesos que actúan en ésta máquina, 
+    se puede ejecutar el script "kill_proc"

@@ -30,36 +30,17 @@ int main(int argc, char *argv[]){
     
     key_t key = ftok(ipcFileName.c_str(), idMsgQueue);
     int msgQueue = msgget(key, 0660);
-      
-    /* FIN del setup */
     
     // Envio primer mensaje, para pasarle mi id al servidor
     void* buffer = malloc(sizeMsg);
-    /*buffer->mtype = 1;
-    buffer->idDispositivo = id;
-    enviar(buffer, fd);*/
     size_t size = sizeMsg;
     while (true) {
-        //Espero mensaje de la cola
         int okRead = msgrcv(msgQueue, buffer, size - sizeof(long), id, 0);
         if (okRead == -1) {
             Logger::error("Error de lectura de la cola de mensajes", __FILE__);
             close(fd);
             exit(1);
         }
-        //Si era un mensaje de finalizacion, envio info para matar al receptor
-        // y continuo con mi labor
-        /*if (ok_read == -1 || buffer->finalizar_conexion) {
-            buffer->mtype = buffer->mtype_envio;
-            enviar(buffer, fd);
-
-            //kill(receptor, SIGHUP);
-            close(fd);
-            free(buffer);
-            exit(0);
-        }*/
-
-        //buffer->mtype = buffer->mtypeMensaje;
         enviar(fd, buffer, size);
     }
     
