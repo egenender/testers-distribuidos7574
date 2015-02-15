@@ -6,12 +6,7 @@
 #include "../common/common.h"
 #include "comunes_tcp.h"
 #include "logger/Logger.h"
-/*
-void terminar_ejecucion(int sig){
-	// ACA HAY QUE TOCAR SI DEBERIA HACER ALGO DISTINTO A SIMPLEMENTE MORIR
-	exit(0);
-}
-*/
+
 int main(int argc, char *argv[]) {
     
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
@@ -34,23 +29,16 @@ int main(int argc, char *argv[]) {
     key_t key = ftok(ipcFileName.c_str(), idMsgQueue);
     int msgQueue = msgget(key, IPC_CREAT | 0666);
 
-    //signal(SIGHUP, terminar_ejecucion);
-
-    /* FIN del setup */
-    
     // Le envio el identificador correspondiente al server emisor
     // Para que sepa IDs de quien buscar mensajes
     TFirstMessage* firstMsg = (TFirstMessage*) malloc (sizeof(TFirstMessage));
     firstMsg->identificador = id;
     enviar(fd, firstMsg, sizeof(TFirstMessage));
 
-    //Ciclo general
     void* buffer = malloc(size);
     while (true) {
-        //Espero un mensaje desde el servidor
         recibir(fd, buffer, size);
 
-        //Mando el mensaje por la cola que me indique el server
         int ok = msgsnd(msgQueue, buffer, size - sizeof(long), 0);
         if (ok == -1) {
             close(fd);
