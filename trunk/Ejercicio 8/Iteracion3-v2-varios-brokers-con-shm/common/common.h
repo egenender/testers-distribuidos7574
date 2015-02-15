@@ -18,7 +18,7 @@
 const int CANT_TESTERS_COMUNES = 5;
 const int MAX_TESTER_COMUNES = 30;
 const int CANT_TESTERS_ESPECIALES = 30;
-const int MAX_TESTER_ESPECIALES = 30;
+const int MAX_TESTER_ESPECIALES = 60;
 const int MAX_DISPOSITIVOS_EN_SISTEMA = 100;
 const int MAX_TAREAS_ESPECIALES = 10;
 
@@ -198,7 +198,7 @@ typedef struct TTablaIdTestersEspecialesDisponibles {
 /*******BROKERS CONFIG!********/
 const int MASTER_BROKER = 1;
 const int ID_BROKER_START = 1;
-const int CANT_BROKERS = 1;
+const int CANT_BROKERS = 2;
 const int ID_BROKER = 1;
 const int ID_BROKER_SIGUIENTE = (ID_BROKER == CANT_BROKERS) ? ID_BROKER_START : ID_BROKER + 1;
 // LAS IPS DE LOS BROKERS ESTA EN EL ARCHIVO BROKER.CPP
