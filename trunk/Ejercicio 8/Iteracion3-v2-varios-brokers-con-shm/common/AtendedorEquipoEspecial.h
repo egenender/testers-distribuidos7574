@@ -32,6 +32,8 @@ private:
 
     // For killing communication processes
     pid_t pidEmisor, pidReceptor;
+    
+    void registrarEquipoEspecial();
 };
 
 #endif	/* ATENDEDOREQUIPOESPECIAL_H */

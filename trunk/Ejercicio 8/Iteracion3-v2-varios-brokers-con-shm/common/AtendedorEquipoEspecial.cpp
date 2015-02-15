@@ -52,6 +52,8 @@ AtendedorEquipoEspecial::AtendedorEquipoEspecial() {
         Logger::error("Log luego de execlp tcpclient_emisor. Error!", __FILE__);
 		exit(1);
 	}
+    
+    registrarEquipoEspecial();
 }
 
 AtendedorEquipoEspecial::~AtendedorEquipoEspecial() {
@@ -105,6 +107,22 @@ void AtendedorEquipoEspecial::enviarOrden(int idDispositivo, int orden) {
         std::ostringstream ss;
         ss << "Error al enviar orden de apagado o reinicio al dispositivo " << idDispositivo << ". Error: ";
         std::string error = ss.str() + std::string(strerror(errno));
+        Logger::error(error.c_str(), __FILE__);
+        exit(0);
+    }
+}
+
+void AtendedorEquipoEspecial::registrarEquipoEspecial() {
+
+    // El primer mensaje que se envia es de registro TODO: Ver devolucion!
+    TMessageAtendedor msg;
+    msg.mtype = ID_EQUIPO_ESPECIAL;
+    msg.mtypeMensaje = MTYPE_REGISTRAR_TESTER;
+    msg.esTesterEspecial = true; // En realidad se pone true para que lo ponga al final del vector de shmem
+    msg.tester = ID_EQUIPO_ESPECIAL;
+    int ret = msgsnd(this->colaEnvios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    if(ret == -1) {
+        std::string error = std::string("Error al enviar mensaje de registro de equipo especial. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
