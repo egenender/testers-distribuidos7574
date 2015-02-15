@@ -25,6 +25,14 @@ INIT_DISP_SOURCES=iniciadorDisp.cpp
 INIT_DISP_OBJ=$(INIT_DISP_SOURCES:.cpp=.o)
 INIT_DISP_BIN=$(BINF)/iniciadorDisp
 
+INIT_EQ_ESP_SOURCES=iniciadorEquipoEspecial.cpp
+INIT_EQ_ESP_OBJ=$(INIT_EQ_ESP_SOURCES:.cpp=.o)
+INIT_EQ_ESP_BIN=$(BINF)/iniciadorEquipoEspecial
+
+FIN_EQ_ESP_SOURCES=terminadorEquipoEspecial.cpp
+FIN_EQ_ESP_OBJ=$(FIN_EQ_ESP_SOURCES:.cpp=.o)
+FIN_EQ_ESP_BIN=$(BINF)/terminadorEquipoEspecial
+
 FIN_DISP_SOURCES=terminadorDisp.cpp
 FIN_DISP_OBJ=$(FIN_DISP_SOURCES:.cpp=.o)
 FIN_DISP_BIN=$(BINF)/terminadorDisp
@@ -69,7 +77,7 @@ DISTR_MSG_TESTER_COMUN_SOURCES=DistribuidorMensajesTestersComunes.cpp
 DISTR_MSG_TESTER_COMUN_OBJ=$(DISTR_MSG_TESTER_COMUN_SOURCES:.cpp=.o)
 DISTR_MSG_TESTER_COMUN_BIN=$(BINF)/distribuidorMsgTester
 
-all: testerComun testerEspecial tecnico dispositivo equipoEspecial iniciador terminador iniciadorDisp terminadorDisp iniciadorIdServer idServer terminadorIdServer distribuidorMsgTester
+all: testerComun testerEspecial tecnico dispositivo equipoEspecial iniciador iniciadorEquipoEspecial terminadorEquipoEspecial terminador iniciadorDisp terminadorDisp iniciadorIdServer idServer terminadorIdServer distribuidorMsgTester
 
 iniciador: $(INIT_OBJ) $(SHARED_OBJ) $(SHARED_OBJ_C)
 	$(CC) $(SHARED_OBJ) $(INIT_OBJ) $(SHARED_OBJ_C) -o $(INIT_BIN) -I$(HEADER_DIR)
@@ -107,6 +115,12 @@ iniciadorDisp: $(INIT_DISP_OBJ) $(SHARED_OBJ)
 terminadorDisp: $(FIN_DISP_OBJ) $(SHARED_OBJ)
 	$(CC) $(SHARED_OBJ) $(FIN_DISP_OBJ) -o $(FIN_DISP_BIN) -I$(HEADER_DIR)
 
+iniciadorEquipoEspecial: $(INIT_EQ_ESP_OBJ) $(SHARED_OBJ)
+	$(CC) $(SHARED_OBJ) $(INIT_EQ_ESP_OBJ) -o $(INIT_EQ_ESP_BIN) -I$(HEADER_DIR)
+
+terminadorEquipoEspecial: $(FIN_EQ_ESP_OBJ) $(SHARED_OBJ)
+	$(CC) $(SHARED_OBJ) $(FIN_EQ_ESP_OBJ) -o $(FIN_EQ_ESP_BIN) -I$(HEADER_DIR)
+
 distribuidorMsgTester: $(DISTR_MSG_TESTER_COMUN_OBJ) $(SHARED_OBJ)
 	$(CC) $(SHARED_OBJ) $(DISTR_MSG_TESTER_COMUN_OBJ) -o $(DISTR_MSG_TESTER_COMUN_BIN) -I$(HEADER_DIR)
 
@@ -117,4 +131,4 @@ distribuidorMsgTester: $(DISTR_MSG_TESTER_COMUN_OBJ) $(SHARED_OBJ)
 	$(CC) $(CFLAGS) -I$(HEADER_DIR) -c $< -o $@
 
 clean:
-	$(RM) $(INIT_OBJ) $(INIT_BIN) $(DISP_OBJ) $(DISP_BIN) $(TESTERCOMUN_OBJ) $(TESTERCOMUN_BIN) $(TESTERESP_OBJ) $(TESTERESP_BIN) $(EQUIPOESP_OBJ) $(EQUIPOESP_BIN) $(TECNICO_OBJ) $(TECNICO_BIN) $(FIN_BIN) $(FIN_OBJ) $(INIT_ID_SERVER_BIN) $(INIT_ID_SERVER_OBJ) $(ID_SERVER_BIN) $(ID_SERVER_OBJ) $(FIN_ID_SERVER_BIN) $(FIN_ID_SERVER_OBJ) $(INIT_DISP_OBJ) $(INIT_DISP_BIN) $(FIN_DISP_OBJ) $(FIN_DISP_BIN) $(SHARED_OBJ) $(SHARED_OBJ_C) $(SHARED_SOURCES_SERVER_C_OBJ) $(DISTR_MSG_TESTER_COMUN_OBJ) $(DISTR_MSG_TESTER_COMUN_BIN)
+	$(RM) $(INIT_OBJ) $(INIT_BIN) $(DISP_OBJ) $(DISP_BIN) $(TESTERCOMUN_OBJ) $(TESTERCOMUN_BIN) $(TESTERESP_OBJ) $(TESTERESP_BIN) $(EQUIPOESP_OBJ) $(EQUIPOESP_BIN) $(TECNICO_OBJ) $(TECNICO_BIN) $(FIN_BIN) $(FIN_OBJ) $(INIT_ID_SERVER_BIN) $(INIT_ID_SERVER_OBJ) $(ID_SERVER_BIN) $(ID_SERVER_OBJ) $(FIN_ID_SERVER_BIN) $(FIN_ID_SERVER_OBJ) $(INIT_DISP_OBJ) $(INIT_DISP_BIN) $(FIN_DISP_OBJ) $(FIN_DISP_BIN) $(SHARED_OBJ) $(SHARED_OBJ_C) $(SHARED_SOURCES_SERVER_C_OBJ) $(DISTR_MSG_TESTER_COMUN_OBJ) $(DISTR_MSG_TESTER_COMUN_BIN) $(INIT_EQ_ESP_OBJ) $(INIT_EQ_ESP_BIN) $(FIN_EQ_ESP_OBJ) $(FIN_EQ_ESP_BIN)
