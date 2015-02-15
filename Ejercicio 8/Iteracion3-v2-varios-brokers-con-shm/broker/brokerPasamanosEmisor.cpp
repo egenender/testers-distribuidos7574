@@ -78,7 +78,7 @@ int main(int argc, char* argv[]) {
                     }
                 }
                 break;
-/* TODO: Lo necesitare para el anillo
+/* NOTE: Lo necesitare para el anillo
             case MTYPE_REQ_DISP_DESDE_BROKER:
                 std::stringstream ss;
                 ss << "Llego requerimiento desde otro broker del disp " << msg.idDispositivo;

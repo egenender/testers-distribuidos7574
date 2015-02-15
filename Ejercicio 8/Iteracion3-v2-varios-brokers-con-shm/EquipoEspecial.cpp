@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
 
     AtendedorEquipoEspecial atendedor;
     
-    Planilla planillaGeneral;
+    Planilla planillaGeneral(ID_EQUIPO_ESPECIAL);
     
     PlanillaAsignacionEquipoEspecial planillaAsignacion;
     

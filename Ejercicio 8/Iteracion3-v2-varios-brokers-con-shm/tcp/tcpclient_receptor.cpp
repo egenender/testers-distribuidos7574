@@ -7,12 +7,6 @@
 #include "comunes_tcp.h"
 #include "logger/Logger.h"
 /*
-#ifdef EJEMPLO_TEST
-#define IPCS_FILE "ipcs-prueba"
-#else
-#define IPCS_FILE "/tmp/pereira-ipcs"
-#endif
-
 void terminar_ejecucion(int sig){
 	// ACA HAY QUE TOCAR SI DEBERIA HACER ALGO DISTINTO A SIMPLEMENTE MORIR
 	exit(0);
@@ -22,12 +16,12 @@ int main(int argc, char *argv[]) {
     
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
     
-    if(argc != 5) {
+    if(argc != 6) {
         Logger::error("Bad arguments!", __FILE__);
-        printf("%s <host> <port> <id> <idMsgQueue>\n",argv[0]);
+        printf("%s <host> <port> <id> <idMsgQueue> <sizeMsg> \n",argv[0]);
         return -1;
     }
-    size_t size = sizeof(TMessageAtendedor);
+    size_t size = atoi(argv[5]);
 	
     int fd = tcpOpenActivo(argv[1], atoi(argv[2]));
     if(fd < 0) {
@@ -51,10 +45,11 @@ int main(int argc, char *argv[]) {
     enviar(fd, firstMsg, sizeof(TFirstMessage));
 
     //Ciclo general
-    TMessageAtendedor* buffer = (TMessageAtendedor*) malloc(size);
+    void* buffer = malloc(size);
     while (true) {
         //Espero un mensaje desde el servidor
         recibir(fd, buffer, size);
+
         //Mando el mensaje por la cola que me indique el server
         int ok = msgsnd(msgQueue, buffer, size - sizeof(long), 0);
         if (ok == -1) {

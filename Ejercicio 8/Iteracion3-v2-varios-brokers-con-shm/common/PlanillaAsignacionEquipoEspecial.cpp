@@ -7,100 +7,79 @@
 
 #include "PlanillaAsignacionEquipoEspecial.h"
 
-PlanillaAsignacionEquipoEspecial::PlanillaAsignacionEquipoEspecial() : semShmemCantTesters(SEM_PLANILLA_CANT_TESTER_ASIGNADOS), semShmemCantTareas(SEM_PLANILLA_CANT_TAREAS_ASIGNADAS) {
-    this->shmemCantTestersKey = ftok(ipcFileName.c_str(), SHM_PLANILLA_CANT_TESTER_ASIGNADOS);
-    if(this->shmemCantTestersKey == -1) {
-        std::string err("Error al conseguir la key de la shmem de la planilla de asignacion de testers. Error: " + std::string(strerror(errno)));
-        Logger::error(err.c_str(), __FILE__);
-        throw err;
-    }
-    this->shmemCantTestersId = shmget(this->shmemCantTestersKey, sizeof(TContadorTesterEspecial) * MAX_DISPOSITIVOS_EN_SISTEMA, IPC_CREAT | 0660);
-    if(this->shmemCantTestersId == -1) {
-        std::string err("Error al conseguir la memoria compartida de la planilla de asignacion de testers. Error: " + std::string(strerror(errno)));
-        Logger::error(err.c_str(), __FILE__);
-        throw err;
-    }
-    
-    void* tmpPtr = shmat (this->shmemCantTestersId , NULL ,0);
-    if ( tmpPtr != (void*) -1 ) {
-        this->cantTestersEspecialesAsignados = static_cast<TContadorTesterEspecial*> (tmpPtr);
-        Logger::debug("Memoria compartida de la planilla de asignacion de testers creada correctamente", __FILE__);
-    } else {
-        std::string err = std::string("Error en shmat() de planilla de asignacion de testers. Error: ") + std::string(strerror(errno));
-        Logger::error(err, __FILE__);
-        throw err;
-    }
+PlanillaAsignacionEquipoEspecial::PlanillaAsignacionEquipoEspecial() {
 
-    // Por ultimo, luego de creado, obtengo el semaforo correspondiente
-    if (!this->semShmemCantTesters.getSem()) {
-	std::string err = std::string("Error al obtener el semaforo de la planilla de asignacion de testers. Error: ") + std::string(strerror(errno));
-	Logger::error(err, __FILE__);
-	throw err;
+    // Obtengo la msgqueue de envio y recepcion de shmem
+    key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_ENVIO_TESTERS_SHMEM_PLANILLA_ASIGNACION);
+	this->shmemMsgqueueEmisor = msgget(key, IPC_CREAT | 0660);
+    if(this->shmemMsgqueueEmisor == -1) {
+        Logger::error("Error al construir la msgqueue para la gestion de la memora compartida distribuida", __FILE__);
+        exit(1);
     }
     
-    this->shmemCantTareasKey = ftok(ipcFileName.c_str(), SHM_PLANILLA_CANT_TAREAS_ASIGNADAS);
-    if(this->shmemCantTareasKey == -1) {
-        std::string err("Error al conseguir la key de la shmem de la planilla de asignacion de tareas. Error: " + std::string(strerror(errno)));
-        Logger::error(err.c_str(), __FILE__);
-        throw err;
-    }
-    this->shmemCantTareasId = shmget(this->shmemCantTareasKey, sizeof(TContadorTareaEspecial) * MAX_DISPOSITIVOS_EN_SISTEMA, IPC_CREAT | 0660);
-    if(this->shmemCantTareasId == -1) {
-        std::string err("Error al conseguir la memoria compartida de la planilla de asignacion de tareas. Error: " + std::string(strerror(errno)));
-        Logger::error(err.c_str(), __FILE__);
-        throw err;
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_RECEPCION_TESTERS_SHMEM_PLANILLA_ASIGNACION);
+	this->shmemMsgqueueReceptor = msgget(key, IPC_CREAT | 0660);
+    if(this->shmemMsgqueueReceptor == -1) {
+        Logger::error("Error al construir la msgqueue para la gestion de la memora compartida distribuida", __FILE__);
+        exit(1);
     }
     
-    tmpPtr = shmat (this->shmemCantTareasId , NULL ,0);
-    if ( tmpPtr != (void*) -1 ) {
-        this->cantTareasEspecialesAsignadas = static_cast<TContadorTareaEspecial*> (tmpPtr);
-        Logger::debug("Memoria compartida de la planilla de asignacion de tareas creada correctamente", __FILE__);
-    } else {
-        std::string err = std::string("Error en shmat() de planilla de asignacion de tareas. Error: ") + std::string(strerror(errno));
-        Logger::error(err, __FILE__);
-        throw err;
+    key = ftok(ipcFileName.c_str(), MSGQUEUE_REQ_TESTERS_SHMEM_PLANILLAS);
+	this->shmemMsgqueueReq = msgget(key, IPC_CREAT | 0660);
+    if(this->shmemMsgqueueReq == -1) {
+        Logger::error("Error al construir la msgqueue para requerimientos de la memora compartida distribuida", __FILE__);
+        exit(1);
     }
+    
+    // Creo la comunicacion al broker para la memoria compartida distribuida
+    char paramIdCola[10];
+    char paramId[10];
+    char paramSize[10];
 
-    // Por ultimo, luego de creado, obtengo el semaforo correspondiente
-    if (!this->semShmemCantTareas.getSem()) {
-	std::string err = std::string("Error al obtener el semaforo de la planilla de asignacion de tareas. Error: ") + std::string(strerror(errno));
-	Logger::error(err, __FILE__);
-	throw err;
-    }
+	sprintf(paramIdCola, "%d", MSGQUEUE_RECEPCION_TESTERS_SHMEM_PLANILLA_ASIGNACION);
+    sprintf(paramId, "%d", ID_EQUIPO_ESPECIAL);
+    sprintf(paramSize, "%d", (int) sizeof(TSharedMemoryPlanillaAsignacion));
+
+	this->pidReceptor = fork();
+	if (this->pidReceptor == 0) {
+		execlp("./tcp/tcpclient_receptor", "tcpclient_receptor",
+				UBICACION_SERVER,
+				PUERTO_SERVER_ENVIO_SHM_PLANILLA_ASIGNACION,
+                paramId, paramIdCola, paramSize,
+				(char*) 0);
+        Logger::error("Log luego de execlp tcpclient_receptor. Error!", __FILE__);
+		exit(1);
+	}
+/*
+    sprintf(paramIdCola, "%d", MSGQUEUE_ENVIO_TESTERS_SHMEM_PLANILLA_ASIGNACION);
+    sprintf(paramId, "%d", 0); // Para que envie todos los mensajes
+    this->pidEmisor = fork();
+	if (this->pidEmisor == 0) {
+		execlp("./tcp/tcpclient_emisor", "tcpclient_emisor",
+				UBICACION_SERVER,
+				PUERTO_SERVER_RECEPCION_SHM_PLANILLA_ASIGNACION,
+				paramId, paramIdCola, paramSize,
+				(char*) 0);
+        Logger::error("Log luego de execlp tcpclient_emisor. Error!", __FILE__);
+		exit(1);
+	}
+*/
 }
 
 PlanillaAsignacionEquipoEspecial::~PlanillaAsignacionEquipoEspecial() {
 }
 
-void PlanillaAsignacionEquipoEspecial::initPlanilla() {
-    this->semShmemCantTesters.p();
-    for (int i = 0; i < MAX_DISPOSITIVOS_EN_SISTEMA; i++) {
-        this->cantTestersEspecialesAsignados[i].cantTestersEspecialesTerminados = 0;
-        this->cantTestersEspecialesAsignados[i].cantTestersEspecialesTotal = 0;
-    }
-    this->semShmemCantTesters.v();
-    
-    this->semShmemCantTareas.p();
-    for (int i = 0; i < MAX_DISPOSITIVOS_EN_SISTEMA; i++) {
-        this->cantTareasEspecialesAsignadas[i].cantTareasEspecialesTerminadas = 0;
-        this->cantTareasEspecialesAsignadas[i].cantTareasEspecialesTotal = 0;
-    }
-    this->semShmemCantTareas.v();
-}
-
 void PlanillaAsignacionEquipoEspecial::registrarTareaEspecialFinalizada(int idDispositivo) {
-    this->semShmemCantTareas.p();
-    this->cantTareasEspecialesAsignadas[idDispositivo].cantTareasEspecialesTerminadas += 1;
-    this->semShmemCantTareas.v();
+    this->obtenerMemoriaCompartida();
+    this->memoria.cantTareasEspecialesAsignadas[idDispositivo].cantTareasEspecialesTerminadas += 1;
+    this->devolverMemoriaCompartida();
 }
 
 bool PlanillaAsignacionEquipoEspecial::terminoTesteoEspecial(int posDispositivo, int idDispositivo) {
-    this->semShmemCantTareas.p();
-    int cantTareasPendientes = this->cantTareasEspecialesAsignadas[posDispositivo].cantTareasEspecialesTotal - this->cantTareasEspecialesAsignadas[posDispositivo].cantTareasEspecialesTerminadas;
-    this->semShmemCantTareas.v();
-    this->semShmemCantTesters.p();
-    int cantTestersPendientes = this->cantTestersEspecialesAsignados[posDispositivo].cantTestersEspecialesTotal - this->cantTestersEspecialesAsignados[posDispositivo].cantTestersEspecialesTerminados;
-    this->semShmemCantTesters.v();
+    this->obtenerMemoriaCompartida();
+    int cantTareasPendientes = this->memoria.cantTareasEspecialesAsignadas[posDispositivo].cantTareasEspecialesTotal - this->memoria.cantTareasEspecialesAsignadas[posDispositivo].cantTareasEspecialesTerminadas;
+    int cantTestersPendientes = this->memoria.cantTestersEspecialesAsignados[posDispositivo].cantTestersEspecialesTotal - this->memoria.cantTestersEspecialesAsignados[posDispositivo].cantTestersEspecialesTerminados;
+    this->devolverMemoriaCompartida();
     std::stringstream ss;
     ss << "Para dispositivo " << idDispositivo << " con posicion " << posDispositivo << ". Cant Tareas pendientes: " << cantTareasPendientes << " y cant testers pendientes: " << cantTestersPendientes;
     Logger::warn(ss.str(), __FILE__);
@@ -108,26 +87,60 @@ bool PlanillaAsignacionEquipoEspecial::terminoTesteoEspecial(int posDispositivo,
 }
 
 void PlanillaAsignacionEquipoEspecial::reiniciarContadoresTesteoEspecial(int idDispositivo) {
-    this->semShmemCantTareas.p();
-    this->cantTareasEspecialesAsignadas[idDispositivo].cantTareasEspecialesTerminadas = 0;
-    this->cantTareasEspecialesAsignadas[idDispositivo].cantTareasEspecialesTotal = 0;
-    this->semShmemCantTareas.v();
-    this->semShmemCantTesters.p();
-    this->cantTestersEspecialesAsignados[idDispositivo].cantTestersEspecialesTerminados = 0;
-    this->semShmemCantTesters.v();
+    this->obtenerMemoriaCompartida();
+    this->memoria.cantTareasEspecialesAsignadas[idDispositivo].cantTareasEspecialesTerminadas = 0;
+    this->memoria.cantTareasEspecialesAsignadas[idDispositivo].cantTareasEspecialesTotal = 0;
+    this->memoria.cantTestersEspecialesAsignados[idDispositivo].cantTestersEspecialesTerminados = 0;
+    this->devolverMemoriaCompartida();
 }
 
 void PlanillaAsignacionEquipoEspecial::limpiarContadoresFinTesteo(int idDispositivo) {
-    this->semShmemCantTareas.p();
-    this->cantTareasEspecialesAsignadas[idDispositivo].cantTareasEspecialesTotal = 0;
-    this->cantTareasEspecialesAsignadas[idDispositivo].cantTareasEspecialesTerminadas = 0;
-    this->semShmemCantTareas.v();
-    this->semShmemCantTesters.p();
-    this->cantTestersEspecialesAsignados[idDispositivo].cantTestersEspecialesTotal = 0;
-    this->cantTestersEspecialesAsignados[idDispositivo].cantTestersEspecialesTerminados = 0;
-    this->semShmemCantTesters.v(); 
+    this->obtenerMemoriaCompartida();
+    this->memoria.cantTareasEspecialesAsignadas[idDispositivo].cantTareasEspecialesTotal = 0;
+    this->memoria.cantTareasEspecialesAsignadas[idDispositivo].cantTareasEspecialesTerminadas = 0;
+    this->memoria.cantTestersEspecialesAsignados[idDispositivo].cantTestersEspecialesTotal = 0;
+    this->memoria.cantTestersEspecialesAsignados[idDispositivo].cantTestersEspecialesTerminados = 0;
+    this->devolverMemoriaCompartida(); 
 }
 
-bool PlanillaAsignacionEquipoEspecial::destruirComunicacion() {
-    return (!((shmctl(this->shmemCantTestersId, IPC_RMID, NULL) == -1) || (shmctl(this->shmemCantTareasId, IPC_RMID, NULL) == -1)));
+void PlanillaAsignacionEquipoEspecial::obtenerMemoriaCompartida() {
+    TRequerimientoSharedMemory req;
+    req.mtype = MTYPE_REQ_SHMEM_PLANILLA_ASIGNACION;
+    req.idSolicitante = ID_EQUIPO_ESPECIAL;
+    std::stringstream log; log << "Equipo Especial " << ID_EQUIPO_ESPECIAL << " pide la shmem asignacion";
+    //Logger::debug(log.str(), __FILE__); log.str(""); log.clear();
+    int okSend = msgsnd(this->shmemMsgqueueReq, &req, sizeof(TRequerimientoSharedMemory) - sizeof(long), 0);
+    if(okSend == -1) {
+        std::stringstream ss;
+        ss << "Error pidiendo la shmem distribuida de planilla general para el equipo especial " << ID_EQUIPO_ESPECIAL;
+        Logger::error(ss.str(), __FILE__);
+        exit(1);
+    }
+    log << "Equipo Especial " << ID_EQUIPO_ESPECIAL << ". Espero la shmem asignacion";
+    //Logger::debug(log.str(), __FILE__);
+    // Espero por la shmem
+    int okRead = msgrcv(this->shmemMsgqueueReceptor, &this->memoria, sizeof(TSharedMemoryPlanillaAsignacion) - sizeof(long), ID_EQUIPO_ESPECIAL, 0);
+    if(okRead == -1) {
+        std::stringstream ss;
+        ss << "Error leyendo de la msgqueue la shmem distribuida de planilla general para el equipo especial " << ID_EQUIPO_ESPECIAL;
+        Logger::error(ss.str(), __FILE__);
+        exit(1);
+    }
+    log << "Equipo Especial " << ID_EQUIPO_ESPECIAL << ". Me llega la shmem asignacion";
+    //Logger::debug(log.str(), __FILE__);
+}
+
+void PlanillaAsignacionEquipoEspecial::devolverMemoriaCompartida() {
+    std::stringstream log; log << "Equipo Especial " << ID_EQUIPO_ESPECIAL << " devuelve la shmem asignacion";
+    //Logger::debug(log.str(), __FILE__); log.str(""); log.clear();
+    this->memoria.mtype = MTYPE_DEVOLUCION_SHMEM_PLANILLA_ASIGNACION;
+    int okSend = msgsnd(this->shmemMsgqueueEmisor, &this->memoria, sizeof(TSharedMemoryPlanillaAsignacion) - sizeof(long), 0);
+    if(okSend == -1) {
+        std::stringstream ss;
+        ss << "Error devolviendo la shmem distribuida de planilla general desde el equipo especial " << ID_EQUIPO_ESPECIAL;
+        Logger::error(ss.str(), __FILE__);
+        exit(1);
+    }
+    log << "Equipo Especial " << ID_EQUIPO_ESPECIAL << " devuelta la shmem asignacion";
+    //Logger::debug(log.str(), __FILE__); log.str(""); log.clear();
 }
