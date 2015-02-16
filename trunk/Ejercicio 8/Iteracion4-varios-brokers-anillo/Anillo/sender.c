@@ -14,6 +14,12 @@ char* imprimirCodigo(int codigo);
 
 int main(int argc, char *argv[])
 {
+
+    if (argc != 2) {
+        printf("Bad arguments!. Usage: ./sender <configFile>\n");
+        exit(1);
+    }
+    
     char mostrar[300];
     int id;
     id = atoi(argv[1]);
@@ -42,7 +48,7 @@ int main(int argc, char *argv[])
     char puertoUdp[50];
     int portUdp;
     
-    FILE * fdConfig = fopen("../../Anillo/config", "r");
+    FILE * fdConfig = fopen(argv[1], "r"); // El priemr parametro es el archivo de config a leer
     if(fdConfig==NULL){
         perror("fopen");
         exit(1);
