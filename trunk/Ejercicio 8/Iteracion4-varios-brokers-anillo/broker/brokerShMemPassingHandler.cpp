@@ -132,7 +132,7 @@ int main(int argc, char** argv) {
     Semaphore semIdBrokerSiguiente(SEM_BROKER_SIGUIENTE);
     semIdBrokerSiguiente.getSem();
     
-    // Determino el handler de la señal en caso
+    // Determino el handler de la señal en caso de timeout
     struct sigaction action;
     action.sa_handler = restoreRing;
     int sigOk = sigaction(SIGUSR1, &action, 0);

@@ -1,6 +1,36 @@
 #include "AtendedorTesters.h"
 
+static AtendedorTesters* atendedorTester;
+static pid_t emisor;
+static pid_t receptor;
+static int testerId;
+
+int desregistrarTesterComun(int id);
+
+void restartTester(int sigNum) {
+
+    // Debo killear al emisor y receptor, lanzar otro proceso dispositivo y killearme
+    kill(emisor, SIGQUIT);
+    kill(receptor, SIGQUIT);
+    // Por las dudas, desregistro el tester
+    atendedorTester->desregistrarTester(testerId);
+    desregistrarTesterComun(testerId);
+    if (fork() == 0) {
+        // Inicio el programa correspondiente
+        execlp("./testerComun", "testerComun", (char*)0);
+        Logger::error("Error al reiniciar el programa TesterComun", __FILE__);
+        exit(1);
+    }
+    exit(1);
+}
+
+AtendedorTesters::AtendedorTesters() {}
+
 AtendedorTesters::AtendedorTesters(int idTester): idTester(idTester) {
+    
+    testerId = this->idTester;
+    atendedorTester = this;
+
     key_t key;
     key = ftok(ipcFileName.c_str(), MSGQUEUE_ENVIO_TESTER_COMUN);
     this->colaEnvios = msgget(key, 0666);
@@ -53,20 +83,34 @@ AtendedorTesters::AtendedorTesters(int idTester): idTester(idTester) {
 	}
     
     registrarTester();
+    
+    // Determino el handler de la señal en caso de timeout
+    struct sigaction action;
+    action.sa_handler = restartTester;
+    int sigOk = sigaction(SIGUSR1, &action, 0);
+    if (sigOk == -1) {
+        Logger::error("Error al setear el handler de la señal!", __FILE__);
+        exit(1);
+    }
 
+    emisor = this->pidEmisor;
+    receptor = this->pidReceptor;
 }
 
 AtendedorTesters::AtendedorTesters(const AtendedorTesters& orig) {}
 
 AtendedorTesters::~AtendedorTesters() {
-    char pidToKill[10];
-    sprintf(pidToKill, "%d", this->pidReceptor);
-    if (fork() == 0) {
-        execlp("/bin/kill", "kill", pidToKill, (char*) 0);
-    }
+    kill(this->pidReceptor, SIGINT);
+    kill(this->pidEmisor, SIGINT);
+    int status;
+    waitpid(this->pidReceptor, &status, 0);
+    waitpid(this->pidEmisor, &status, 0);
 }
 
 int AtendedorTesters::recibirRequerimiento() {
+    
+    Timeout timeout;
+    timeout.runTimeout(SLEEP_TIMEOUT_TESTERS, getpid(), SIGUSR1);
 
     TMessageAtendedor msg;
     int ret = msgrcv(this->colaRecepcionesRequerimientos, &msg, sizeof(TMessageAtendedor) - sizeof(long), this->idTester, 0);
@@ -75,6 +119,9 @@ int AtendedorTesters::recibirRequerimiento() {
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
+
+    timeout.killTimeout();
+
     this->idBroker = msg.idBrokerOrigen;
     return msg.idDispositivo;
 }
@@ -100,6 +147,10 @@ void AtendedorTesters::enviarPrograma(int idDispositivo, int tester, int idProgr
 }
 
 TMessageAtendedor AtendedorTesters::recibirResultado(int idTester) {
+    
+    Timeout timeout;
+    timeout.runTimeout(SLEEP_TIMEOUT_TESTERS, getpid(), SIGUSR1);
+
 	TMessageAtendedor rsp;
     int ret = msgrcv(this->colaRecepcionesGeneral, &rsp, sizeof(TMessageAtendedor) - sizeof(long), idTester, 0);
     if(ret == -1) {
@@ -107,6 +158,9 @@ TMessageAtendedor AtendedorTesters::recibirResultado(int idTester) {
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
+
+    timeout.killTimeout();
+
     this->idBroker = rsp.idBrokerOrigen;
     return rsp;
 }
@@ -175,4 +229,44 @@ void AtendedorTesters::registrarTester() {
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
+}
+
+void AtendedorTesters::desregistrarTester(int tester) {
+
+    // El primer mensaje que se envia es de registro TODO: Ver devolucion!
+    TMessageAtendedor msg;
+    msg.mtype = tester;
+    msg.mtypeMensaje = MTYPE_DESREGISTRAR_TESTER;
+    msg.esTesterEspecial = false;
+    msg.tester = tester;
+    int ret = msgsnd(this->colaEnvios, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    if(ret == -1) {
+        std::string error = std::string("Error al enviar mensaje de desregistro de tester comun. Error: ") + std::string(strerror(errno));
+        Logger::error(error.c_str(), __FILE__);
+        exit(0);
+    }
+}
+
+int desregistrarTesterComun(int id) {
+
+    CLIENT *clnt;
+    int  *result_4;
+    int  devolveridtestercomun_1_arg = id;
+
+    clnt = clnt_create (UBICACION_SERVER_IDENTIFICADOR, IDENTIFICADORPROG, IDENTIFICADORVERS, "udp");
+    if (clnt == NULL) {
+        Logger::error("Error en la creación del cliente RPC", __FILE__);
+        clnt_pcreateerror (UBICACION_SERVER_IDENTIFICADOR);
+        exit (1);
+    }
+    
+    result_4 = devolveridtestercomun_1(&devolveridtestercomun_1_arg, clnt);
+    if (result_4 == (int *) NULL) {
+        Logger::error("Error en la llamada al RPC devolviendo el ID", __FILE__);
+        clnt_perror (clnt, "call failed");
+    }
+
+    clnt_destroy (clnt);
+    
+    return *result_4;
 }

@@ -4,11 +4,16 @@
 #include <cstring>
 #include <cstdlib>
 #include <sstream>
+#include <sys/types.h>
+#include <signal.h>
 #include <sys/msg.h>
 #include "errno.h"
+#include <signal.h>
 
 #include "../logger/Logger.h"
 #include "common.h"
+#include "sync/Timeout.h"
+#include "identificador/identificador.h"
 
 class AtendedorTesters {
 private:
@@ -25,6 +30,7 @@ private:
     void registrarTester();
     
 public:
+    AtendedorTesters();
     AtendedorTesters(int idTester);
     AtendedorTesters(const AtendedorTesters& orig);
     virtual ~AtendedorTesters();
@@ -48,6 +54,8 @@ public:
     void enviarTareaEspecial(int idDispositivo, int idTester, int tarea, int posicionDispositivo);
 
     bool destruirComunicacion();
+    
+    void desregistrarTester(int tester);
 };
 
 #endif	/* ATENDEDORTESTERS_H */
