@@ -6,6 +6,22 @@
  */
 #include "AtendedorDispositivos.h"
 
+static pid_t emisor;
+static pid_t receptor;
+
+void restartDispositivo(int sigNum) {
+
+    // Debo killear al emisor y receptor, lanzar otro proceso dispositivo y killearme
+    kill(emisor, SIGQUIT);
+    kill(receptor, SIGQUIT);
+    if (fork() == 0) {
+        execlp("./dispositivo", "dispositivo", (char*) 0);
+        Logger::error("Error al reiniciar el programa Dispositivo", __FILE__);
+        exit(1);
+    }
+    exit(1);
+}
+
 AtendedorDispositivos::AtendedorDispositivos(int idDispositivo) : idDispositivo(idDispositivo) {
 
     key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_ENVIO_DISP);
@@ -55,6 +71,18 @@ AtendedorDispositivos::AtendedorDispositivos(int idDispositivo) : idDispositivo(
         Logger::error("Log luego de execlp tcpclient_emisor. Error!", __FILE__);
 		exit(1);
 	}
+    
+    emisor = this->pidEmisor;
+    receptor = this->pidReceptor;
+    
+    // Determino el handler de la señal en caso de timeout
+    struct sigaction action;
+    action.sa_handler = restartDispositivo;
+    int sigOk = sigaction(SIGUSR1, &action, 0);
+    if (sigOk == -1) {
+        Logger::error("Error al setear el handler de la señal!", __FILE__);
+        exit(1);
+    }
 
 }
 
@@ -62,13 +90,10 @@ AtendedorDispositivos::AtendedorDispositivos(const AtendedorDispositivos& orig) 
 }
 
 AtendedorDispositivos::~AtendedorDispositivos() {
-    char pidToKill[10];
-    sprintf(pidToKill, "%d", this->pidReceptor);
-    if (fork() == 0) {
-        execlp("/bin/kill", "kill", pidToKill, (char*) 0);
-    }
+    kill(this->pidEmisor, SIGQUIT);
+    kill(this->pidReceptor, SIGQUIT);
 }
-    
+
 void AtendedorDispositivos::enviarRequerimiento(int idDispositivo) {
 
     TMessageAtendedor msg;
@@ -85,6 +110,10 @@ void AtendedorDispositivos::enviarRequerimiento(int idDispositivo) {
 }
 
 int AtendedorDispositivos::recibirPrograma(int idDispositivo) {
+
+    Timeout timeout;
+    timeout.runTimeout(SLEEP_TIMEOUT_DISPOSITIVO, getpid(), SIGUSR1);
+
     TMessageAtendedor msg;
     int ret = msgrcv(this->colaRecepciones, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
     if(ret == -1) {
@@ -92,6 +121,9 @@ int AtendedorDispositivos::recibirPrograma(int idDispositivo) {
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
+
+    timeout.killTimeout();
+
     this->idTester = msg.tester;
     this->idBroker = msg.idBrokerOrigen;
     return msg.value;
@@ -118,6 +150,9 @@ void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {
 
 int AtendedorDispositivos::recibirProgramaEspecial(int idDispositivo) {
 
+    Timeout timeout;
+    timeout.runTimeout(SLEEP_TIMEOUT_DISPOSITIVO, getpid(), SIGUSR1);
+
     TMessageAtendedor msg;
     int ret = msgrcv(this->colaRecepciones, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
     if(ret == -1) {
@@ -125,6 +160,9 @@ int AtendedorDispositivos::recibirProgramaEspecial(int idDispositivo) {
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
+
+    timeout.killTimeout();
+
     this->idTester = msg.tester;
     this->idBroker = msg.idBrokerOrigen;
     this->posicionDispositivo = msg.posicionDispositivo;
@@ -154,6 +192,9 @@ void AtendedorDispositivos::enviarResultadoEspecial(int idDispositivo, int resul
 
 int AtendedorDispositivos::recibirOrden(int idDispositivo) {
 
+    Timeout timeout;
+    timeout.runTimeout(SLEEP_TIMEOUT_DISPOSITIVO, getpid(), SIGUSR1);
+
     TMessageAtendedor msg;
     int ret = msgrcv(this->colaRecepciones, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
     if(ret == -1) {
@@ -161,6 +202,9 @@ int AtendedorDispositivos::recibirOrden(int idDispositivo) {
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
+    
+    timeout.killTimeout();
+
     return msg.value;
 
 }

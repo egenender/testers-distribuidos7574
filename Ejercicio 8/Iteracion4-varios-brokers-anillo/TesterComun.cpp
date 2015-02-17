@@ -137,27 +137,3 @@ int getIdTesterComun() {
     
     return *result_2;
 }
-
-int desregistrarTesterComun(int id) {
-
-    CLIENT *clnt;
-    int  *result_4;
-    int  devolveridtestercomun_1_arg = id;
-
-    clnt = clnt_create (UBICACION_SERVER_IDENTIFICADOR, IDENTIFICADORPROG, IDENTIFICADORVERS, "udp");
-    if (clnt == NULL) {
-        Logger::error("Error en la creación del cliente RPC", __FILE__);
-        clnt_pcreateerror (UBICACION_SERVER_IDENTIFICADOR);
-        exit (1);
-    }
-    
-    result_4 = devolveridtestercomun_1(&devolveridtestercomun_1_arg, clnt);
-    if (result_4 == (int *) NULL) {
-        Logger::error("Error en la llamada al RPC devolviendo el ID", __FILE__);
-        clnt_perror (clnt, "call failed");
-    }
-
-    clnt_destroy (clnt);
-    
-    return *result_4;
-}

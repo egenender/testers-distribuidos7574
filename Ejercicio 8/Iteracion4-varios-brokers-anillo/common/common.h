@@ -124,6 +124,8 @@ const int MSGQUEUE_BROKER_INTERNAL_REQUERIMIENTO_PLANILLAS_HANDLER = 155;
 
 const int LAST_ID_IPC = MSGQUEUE_BROKER_INTERNAL_REQUERIMIENTO_PLANILLAS_HANDLER + 1;
 
+const int SEM_ESPECIALES = LAST_ID_IPC + 1;
+
 // mtypes desde el dispositivo
 const int MTYPE_REQUERIMIENTO_DISPOSITIVO = 1;
 const int MTYPE_RESULTADO_INICIAL = 2;
@@ -131,6 +133,7 @@ const int MTYPE_RESULTADO_ESPECIAL = 3;
 // mtypes desde tester comun
 const int MTYPE_PROGRAMA_INICIAL = 1;
 const int MTYPE_REGISTRAR_TESTER = 2;
+const int MTYPE_DESREGISTRAR_TESTER = 7;
 const int MTYPE_REQUERIMIENTO_TESTER_ESPECIAL = 4;
 // mtypes desde tester especial
 const int MTYPE_TAREA_ESPECIAL = 1;
@@ -313,6 +316,8 @@ typedef struct TMessageRequerimientoBrokerShm {
 
 /******** CONFIG PARA TIMEOUT *********/
 const int SLEEP_TIMEOUT_SHMEM = 15; // Timeout para la obtencion de cualquier shmem
+const int SLEEP_TIMEOUT_DISPOSITIVO = 60;
+const int SLEEP_TIMEOUT_TESTERS = 60;
 
 #endif	/* COMMON_H */
 

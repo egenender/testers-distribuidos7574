@@ -13,10 +13,13 @@
 #include "../common/common.h"
 #include <cstdlib>
 #include <cstring>
+#include <sys/types.h>
+#include <signal.h>
 
 #include "../logger/Logger.h"
 #include "common.h"
 #include "identificador/identificador.h"
+#include "sync/Timeout.h"
 
 class AtendedorDispositivos {
 private:

@@ -26,14 +26,14 @@ int main(int argc, char** argv) {
 
     key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_BROKER_REGISTRO_TESTERS);
 	int msgQueueRegistros = msgget(key, 0660);
-    
+
     key = ftok(ipcFileName.c_str(), MSGQUEUE_INTERNAL_BROKER_SHM);
 	int msgQueueShm = msgget(key, 0660);
 
     key = ftok(ipcFileName.c_str(), SHM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM);
     int shMemCantReqBrokerShmemId = shmget(key, sizeof(int), IPC_CREAT | 0660);
     int* shMemCantReqBrokerShmem = (int*) shmat(shMemCantReqBrokerShmemId, (void*) NULL, 0);
-    
+
     Semaphore semCantReqBrokerShmem(SEM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM);
     semCantReqBrokerShmem.getSem();
 
@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
     TMessageRequerimientoBrokerShm reqMsg;
     reqMsg.mtype = MTYPE_REQUERIMIENTO_SHM_BROKER;
     reqMsg.idSubBroker = ID_SUB_BROKER_REGISTRO_TESTER;
-    
+
     while(true) {
 
         TMessageAtendedor msg;
@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
 		}
 
 		std::stringstream ss;
-		ss << "Me llego un pedido de requerimiento desde el tester " << msg.tester;
+		ss << "Me llego un pedido de registro o desregistro desde el tester " << msg.tester;
 		Logger::notice(ss.str(), __FILE__);
         if (fork() == 0)    continue;
         
@@ -70,27 +70,36 @@ int main(int argc, char** argv) {
             Logger::error(ss.str(), __FILE__);
             exit(1);
         }
-        if (!shmDistrTablaTesters->memoria.registrados[id]) {
-            shmDistrTablaTesters->memoria.registrados[id] = true;
-            shmDistrTablaTesters->memoria.disponible[id] = true;
-            shmDistrTablaTesters->memoria.brokerAsignado[id] = ID_BROKER;
-/*
-            if (msg.esTesterEspecial) {
-                // Levanto el semaforo por si hay un requerimiento especial esperando
-                Semaphore semEspecial(SEM_ESPECIALES + id - MAX_TESTER_COMUNES);
-                semEspecial.getSem();
-                semEspecial.v();
-            }
-*/
-            std::stringstream ss;
-            ss << "Se ha registrado al tester " << msg.tester << " en el espacio " << id << " de la shared memory y asignado al broker " << ID_BROKER << " con exito";
-            Logger::notice(ss.str(), __FILE__);
+        
+        if(msg.mtypeMensaje == MTYPE_REGISTRAR_TESTER) {
+            if (!shmDistrTablaTesters->memoria.registrados[id]) {
+                shmDistrTablaTesters->memoria.registrados[id] = true;
+                shmDistrTablaTesters->memoria.disponible[id] = true;
+                shmDistrTablaTesters->memoria.brokerAsignado[id] = ID_BROKER;
 
+                if (msg.esTesterEspecial) {
+                    // Levanto el semaforo por si hay un requerimiento especial esperando
+                    Semaphore semEspecial(SEM_ESPECIALES + id - MAX_TESTER_COMUNES);
+                    semEspecial.getSem();
+                    semEspecial.v();
+                }
+
+                std::stringstream ss;
+                ss << "Se ha registrado al tester " << msg.tester << " en el espacio " << id << " de la shared memory y asignado al broker " << ID_BROKER << " con exito";
+                Logger::notice(ss.str(), __FILE__);
+
+            } else {
+                std::stringstream ss;
+                ss << "El tester " << msg.tester << " ya se encontraba registrado en el sistema!";
+                Logger::error(ss.str(), __FILE__);
+                // TODO: ¿Que hacemos aca?
+            }
+        } else if(msg.mtypeMensaje == MTYPE_DESREGISTRAR_TESTER) {
+            shmDistrTablaTesters->memoria.registrados[id] = false;
+            shmDistrTablaTesters->memoria.disponible[id] = false;
+            shmDistrTablaTesters->memoria.brokerAsignado[id] = 0;
         } else {
-            std::stringstream ss;
-            ss << "El tester " << msg.tester << " ya se encontraba registrado en el sistema!";
-            Logger::error(ss.str(), __FILE__);
-            // TODO: ¿Que hacemos aca?
+            Logger::error("Llego cualquier banana al sub-broker de registro de testers", __FILE__);
         }
         shmDistrTablaTesters->mtype = MTYPE_DEVOLUCION_SHM_BROKER;
         devolverDistributedSharedMemory(msgQueueShm, shmDistrTablaTesters, sizeof(TMessageShMemInterBroker));
