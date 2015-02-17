@@ -19,12 +19,12 @@ class Configuracion;
 
 class AtendedorDispositivos {
 private:
-    int cola_requerimiento;
-    int cola_tests;
-    int cola_tests_especiales;
-    
-    int idTester;
-    int posicionDispositivo;
+    int m_ColaDispositivoConfig;
+    int m_ColaRequerimientos;
+    int m_ColaTests;
+    int m_ColaTestsEspeciales;    
+    int m_IdTester;
+    int m_PosicionDispositivo;
 //Operaciones prohibidas
     AtendedorDispositivos(const AtendedorDispositivos& orig);
     AtendedorDispositivos& operator=(const AtendedorDispositivos& rv);
@@ -32,10 +32,13 @@ public:
     AtendedorDispositivos( const Configuracion& config );
     ~AtendedorDispositivos();
         
-    void enviarRequerimiento(int idDispositivo); // Disp -> Tester
+    void enviarRequerimiento(int idDispositivo, int tipoDispositivo); // Disp -> Tester
     int recibirPrograma(int idDispositivo);
     void enviarResultado(int idDispositivo, int resultado); // Disp -> Tester: Grave o no grave
     int recibirProgramaEspecial(int idDispositivo);
     void enviarResultadoEspecial(int idDispositivo, int resultado);
     int recibirOrden(int idDispositivo);
+    
+    TMessageDispConfig recibirPedidoCambioVariable( int idDispositivo );
+    void notificarCambioDeVariableFinalizado( int idDispositivo, bool ultimoCambio );
 };

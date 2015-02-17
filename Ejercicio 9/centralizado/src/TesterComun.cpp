@@ -50,9 +50,11 @@ int main(int argc, char** argv) {
     while(true) {
         Logger::notice("Espero por un nuevo requerimiento de testeo" , nombre.str().c_str());
         // Espero un requerimiento
-        int idDispositivo = atendedor.recibirRequerimiento();
+        TMessageAtendedor msgRequerimiento = atendedor.recibirRequerimiento();
+        int idDispositivo = msgRequerimiento.idDispositivo;
+        int tipoDispositivo = msgRequerimiento.tipoDispositivo;
         stringstream ss;
-        ss << idDispositivo;
+        ss << msgRequerimiento.idDispositivo;
         string mensaje = "Recibido requerimiento desde dispositivo id ";
         Logger::notice(mensaje + ss.str() , nombre.str().c_str());
         

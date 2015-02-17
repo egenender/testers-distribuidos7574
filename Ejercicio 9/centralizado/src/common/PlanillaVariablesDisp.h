@@ -21,15 +21,13 @@ public:
     void iniciarTestEspecial();
     void finalizarTestEspecial();
     
-    void initPlanilla();
-    
     bool destruirComunicacion();
 private:
     const int           m_IdDisp;
     int                 m_KeyShmemEstadoId;
     key_t               m_KeyShmemEstado;
     Semaphore           m_MutexPlanilla;
-    Semaphore           m_SemTestEspeciales;
+    Semaphore           m_SemTestsEspeciales;
     Semaphore           m_SemCambioVars;
     TEstadoDispositivo* m_pShmEstado;
 };

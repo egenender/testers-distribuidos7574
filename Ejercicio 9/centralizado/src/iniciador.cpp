@@ -95,19 +95,19 @@ void createIPCObjects( const Configuracion& config ) {
     planillaAsignacion.initPlanilla();
     
     //Semaforos planilla variables config
-    for( int i=0; i<config.ObtenerParametroEntero( MAX_DISPOSITIVOS_EN_SISTEMA ) ){
+    for( int i=0; i<config.ObtenerParametroEntero( MAX_DISPOSITIVOS_EN_SISTEMA ); i++ ){
         Semaphore semPlanillaVarsTE( archivoIpcs, config.ObtenerParametroEntero(SEM_PLANILLA_VARS_TE_START) + i );
         semPlanillaVarsTE.creaSem();
         semPlanillaVarsTE.iniSem(1);
         Semaphore semPlanillaVarsCV( archivoIpcs, config.ObtenerParametroEntero(SEM_PLANILLA_VARS_CV_START) + i );
         semPlanillaVarsCV.creaSem();
         semPlanillaVarsCV.iniSem(1);        
-        Semaphore semMutexPlanillaVars( archivoIpcs, config.ObtenerParametroEntero(SEM_MUTEX_PLANILLA_VARS) + i );
+        Semaphore semMutexPlanillaVars( archivoIpcs, config.ObtenerParametroEntero(SEM_MUTEX_PLANILLA_VARS_START) + i );
         semMutexPlanillaVars.creaSem();
         semMutexPlanillaVars.iniSem(1);
     }
     
-    //creacion de colas
+    //Creacion de colas (una para cada dispositivo)
     int msgQueueDispositivos = config.ObtenerParametroEntero( MSGQUEUE_DISPOSITIVOS );
     int msgQueueUltimo = config.ObtenerParametroEntero( MSGQUEUE_ULTIMO );
     for (int q = msgQueueDispositivos; q <= msgQueueUltimo; q++){
@@ -115,6 +115,18 @@ void createIPCObjects( const Configuracion& config ) {
         if (msgget(key, 0660 | IPC_CREAT | IPC_EXCL) == -1){
             std::cout << "No se pudo crear una cola: " << strerror(errno)<< std::endl;
         }
+    }
+    //Creacion de cola-config (una para todos los dispositivos, reciben por mtype + id)
+    int msgQueueDispositivosConfig = config.ObtenerParametroEntero( MSGQUEUE_DISPOSITIVOS_CONFIG );
+    key_t key = ftok(archivoIpcs.c_str(), msgQueueDispositivosConfig);
+    if (msgget(key, 0660 | IPC_CREAT | IPC_EXCL) == -1){
+        std::cout << "No se pudo crear la cola de dispositivos-config: " << strerror(errno)<< std::endl;
+    }
+    //Creacion de Cola testers config
+    int msgQueueTestersConfig = config.ObtenerParametroEntero( MSGQUEUE_TESTERS_CONFIG );
+    key = ftok(archivoIpcs.c_str(), msgQueueTestersConfig);
+    if (msgget(key, 0660 | IPC_CREAT | IPC_EXCL) == -1){
+        std::cout << "No se pudo crear la cola de testers-config: " << strerror(errno)<< std::endl;
     }
 }
 
@@ -172,18 +184,21 @@ void createSystemProcesses( const Configuracion& config ) {
     const int cantDispositivos = config.ObtenerParametroEntero(CANT_DISPOSITIVOS);
     const int minLanzados = config.ObtenerParametroEntero(MINIMOS_LANZADOS);
     const int maxLanzados = config.ObtenerParametroEntero(MAXIMOS_LANZADOS);
+    const int cantTiposDispositivo = config.ObtenerParametroEntero(CANT_TIPOS_DISPOSITIVO);
     while (cantidad_lanzada < cantDispositivos){
         int cantidad_a_lanzar = minLanzados + rand() % (maxLanzados - minLanzados + 1);
         if (cantidad_a_lanzar + cantidad_lanzada > cantDispositivos)
             cantidad_a_lanzar = cantDispositivos - cantidad_lanzada;
         for (int i = 0; i < cantidad_a_lanzar; i++){
-            char param[3];
-            sprintf(param, "%d", idDispositivo);
+            char paramId[3];
+            sprintf(paramId, "%d", idDispositivo);
             idDispositivo++;
+            char paramTipo[3];
+            sprintf(paramTipo, "%d", rand() % cantTiposDispositivo );
             pid_t newPid = fork();
             if(newPid == 0) {
                 // Inicio el programa correspondiente
-                execlp("./dispositivo", "dispositivo", param, (char*)0);
+                execlp("./dispositivo", "dispositivo", paramId, paramTipo, (char*)0);
                 Logger::error("Error al ejecutar el programa dispositivo de ID" + idDispositivo, __FILE__);
                 exit(1);
             }
