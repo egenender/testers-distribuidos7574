@@ -81,7 +81,7 @@ void rearmar_anillo(int sig){
 
 int main (int argc, char** argv){
 	//srand(getpid());
-	Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
+	Logger::initialize(logFileName.c_str(), Logger::LOG_NOTICE);
 	Logger::notice("Creo los ipcs necesarias", __FILE__);
 	
 	broker_id = atoi(argv[1]);
@@ -167,6 +167,7 @@ int main (int argc, char** argv){
 			msg_envio.mtype_envio = id_tester_espera;
 			msg_envio.tester = id_tester_espera;
 			msg_envio.finalizar_conexion = 0;
+			msg_envio.es_requerimiento = 0;
 			
 			if (id_tester_espera < MAX_DISPOSITIVOS_EN_SISTEMA){ // ->Es un tester!
 				//copiarResultado(msg_envio.resultados, msg.resultados);
