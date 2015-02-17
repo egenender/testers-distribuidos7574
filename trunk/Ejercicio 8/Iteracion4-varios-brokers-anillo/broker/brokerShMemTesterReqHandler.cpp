@@ -16,9 +16,10 @@
 #include <sys/msg.h>
 #include <sys/shm.h>
 
-#include "../logger/Logger.h"
-#include "../common/common.h"
-#include "../ipc/Semaphore.h"
+#include "logger/Logger.h"
+#include "common/common.h"
+#include "ipc/Semaphore.h"
+#include "sync/Timeout.h"
 
 int main(int argc, char** argv) {
     
@@ -40,6 +41,7 @@ int main(int argc, char** argv) {
     while(true) {
     
         TRequerimientoSharedMemory req;
+        
         // Espero por un requerimiento de memoria compartida de los testers
         int okRead = msgrcv(msgQueueReqExterna, &req, sizeof(TRequerimientoSharedMemory) - sizeof(long), 0, 0);
         if (okRead == -1) {

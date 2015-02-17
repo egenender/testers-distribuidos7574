@@ -13,12 +13,12 @@
 #include "ipc/Semaphore.h"
 #include "broker/brokersInfo.h"
 
-void informarLider(bool soyLider) {
-    key_t key = ftok("/tmp/pereira-ipcs", SHM_BROKER_ES_LIDER);
+void informarLider(int shmemId, int semId, bool soyLider) {
+    key_t key = ftok(ipcFileName.c_str(), shmemId);
     int shmSoyLiderId = shmget(key, sizeof(bool) , 0660);
     bool* lider = (bool*) shmat (shmSoyLiderId, NULL, 0);
     
-    Semaphore semSoyLider(SEM_BROKER_ES_LIDER);
+    Semaphore semSoyLider(semId);
     semSoyLider.getSem();
     
     semSoyLider.p();
@@ -28,12 +28,12 @@ void informarLider(bool soyLider) {
     shmdt(lider);
 }
 
-void informarBrokerSiguiente(char* ipBrokerSiguiente) {
-    key_t key = ftok("/tmp/pereira-ipcs", SHM_BROKER_SIGUIENTE);
+void informarBrokerSiguiente(int shmemId, int semId, char* ipBrokerSiguiente) {
+    key_t key = ftok(ipcFileName.c_str(), shmemId);
     int shmIdBrokerSiguiente = shmget(key, sizeof(int) , 0660);
     int* idBrokerSiguiente = (int*) shmat (shmIdBrokerSiguiente, NULL, 0);
 
-    Semaphore semIdBrokerSiguiente(SEM_BROKER_SIGUIENTE);
+    Semaphore semIdBrokerSiguiente(semId);
     semIdBrokerSiguiente.getSem();
     
     semIdBrokerSiguiente.p();
@@ -46,6 +46,47 @@ void informarBrokerSiguiente(char* ipBrokerSiguiente) {
     semIdBrokerSiguiente.v();
 
     shmdt(idBrokerSiguiente);
+}
+
+unsigned long getVersion(int shmemId, int semId) {
+
+    key_t key = ftok(ipcFileName.c_str(), shmemId);
+    int shmIdVersionId = shmget(key, sizeof(unsigned long), 0660);
+    unsigned long* version = (unsigned long*) shmat (shmIdVersionId, NULL, 0);
+
+    Semaphore semIdVersion(semId);
+    semIdVersion.getSem();
+    
+    semIdVersion.p();
+    unsigned long value = *version;
+    shmdt(version);
+    semIdVersion.v();
+    
+    return value;
+}
+
+void setListenerEjecutandose(int shmemId, int semId, bool ejecutandose) {
+
+    key_t key = ftok(ipcFileName.c_str(), shmemId);
+    int shmIdListenerEjecutandoseId = shmget(key, sizeof(bool) , 0660);
+    bool* listenerEjecutandose = (bool*) shmat (shmIdListenerEjecutandoseId, NULL, 0);
+
+    Semaphore semListenerEjecutandose(semId);
+    semListenerEjecutandose.getSem();
+    
+    semListenerEjecutandose.p();
+    *listenerEjecutandose = ejecutandose;
+    semListenerEjecutandose.v();
+    
+    shmdt(listenerEjecutandose);
+}
+
+void informarAnilloRestaurado(int semAnilloRestaurandoseId) {
+
+    Semaphore semAnilloRestaurandose(semAnilloRestaurandoseId);
+    semAnilloRestaurandose.getSem();
+    semAnilloRestaurandose.v();
+
 }
 
 #endif	/* RINGINFO_H */

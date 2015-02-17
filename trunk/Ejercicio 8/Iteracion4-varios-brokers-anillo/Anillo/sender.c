@@ -3,6 +3,7 @@
 #include "tcpoppas.cpp"
 #include "enviar.cpp"
 #include "recibir.cpp"
+#include <stdbool.h>
 #include "ringInfo.h"
 
 extern int tcpopact(char *, int);
@@ -15,14 +16,56 @@ char* imprimirCodigo(int codigo);
 int main(int argc, char *argv[])
 {
 
-    if (argc != 2) {
-        printf("Bad arguments!. Usage: ./sender <configFile>\n");
+    if ((argc != 2)) {
+        printf("Bad arguments!\nUsage: ./listener <configFile> \n");
+        exit(1);
+    }
+    
+    int shmLiderId;
+    int semShmLiderId;
+    int shmBrokerSiguienteId;
+    int semShmBrokerSiguienteId;
+    int shmVersionId;
+    int semShmVersionId;
+    int semAnilloRestaurandose;
+    
+    // Dependiendo del configFile, se si manejo shmem inter-broker, de planilla general 
+    // o de planilla asignacion y tomo los demas parametros
+    if(strcmp(argv[1], configBrokerShmemFileName.c_str()) == 0) {
+        // Manejo el anillo de shared memory inter-broker
+        shmLiderId = SHM_BROKER_ES_LIDER;
+        semShmLiderId = SEM_BROKER_ES_LIDER;
+        shmBrokerSiguienteId = SHM_BROKER_SIGUIENTE;
+        semShmBrokerSiguienteId = SEM_BROKER_SIGUIENTE;
+        shmVersionId = SHM_BROKER_VERSION;
+        semShmVersionId = SEM_BROKER_VERSION;
+        semAnilloRestaurandose = SEM_ANILLO_BROKER_SHM_RESTAURANDOSE;
+    } else if(strcmp(argv[1], configPlanillaGeneralShmemFileName.c_str()) == 0) {
+        // Manejo el anillo de shared memory de planilla general
+        shmLiderId = SHM_PLANILLA_GENERAL_ES_LIDER;
+        semShmLiderId = SEM_PLANILLA_GENERAL_ES_LIDER;
+        shmBrokerSiguienteId = SHM_PLANILLA_GENERAL_SIGUIENTE;
+        semShmBrokerSiguienteId = SEM_PLANILLA_GENERAL_SIGUIENTE;
+        shmVersionId = SHM_PLANILLA_GENERAL_VERSION;
+        semShmVersionId = SEM_PLANILLA_GENERAL_VERSION;
+        semAnilloRestaurandose = SEM_ANILLO_PLANILLA_GENERAL_RESTAURANDOSE;
+    } else if(strcmp(argv[1], configPlanillaAsignacionShmemFileName.c_str()) == 0) {
+        // Manejo el anillo de shared memory de planilla asigacion
+        shmLiderId = SHM_PLANILLA_ASIGNACION_ES_LIDER;
+        semShmLiderId = SEM_PLANILLA_ASIGNACION_ES_LIDER;
+        shmBrokerSiguienteId = SHM_PLANILLA_ASIGNACION_SIGUIENTE;
+        semShmBrokerSiguienteId = SEM_PLANILLA_ASIGNACION_SIGUIENTE;
+        shmVersionId = SHM_PLANILLA_ASIGNACION_VERSION;
+        semShmVersionId = SEM_PLANILLA_ASIGNACION_VERSION;
+        semAnilloRestaurandose = SEM_ANILLO_PLANILLA_ASIGNACION_RESTAURANDOSE;
+    } else {
+        // Error de config file name
+        printf("Bad config file name! Leaving...\n");
         exit(1);
     }
     
     char mostrar[300];
     int id;
-    id = atoi(argv[1]);
     sprintf(mostrar,"[MASTER] --> ID: %d\t| pid: %d\n",id, getpid());
     write(fileno(stdout),mostrar,strlen(mostrar));
     
@@ -48,7 +91,7 @@ int main(int argc, char *argv[])
     char puertoUdp[50];
     int portUdp;
     
-    FILE * fdConfig = fopen(argv[1], "r"); // El priemr parametro es el archivo de config a leer
+    FILE * fdConfig = fopen(argv[2], "r"); // El segundo parametro es el archivo de config a leer
     if(fdConfig==NULL){
         perror("fopen");
         exit(1);
@@ -148,7 +191,7 @@ int main(int argc, char *argv[])
        
        //Guardo la direccion del que me contesto primero. Es mi siguiente.
        strcpy(ipBrokerSiguiente,inet_ntoa(addr.sin_addr));
-       //informarBrokerSiguiente(ipBrokerSiguiente);
+       informarBrokerSiguiente(shmBrokerSiguienteId, semShmBrokerSiguienteId, ipBrokerSiguiente);
        sprintf(mostrar,"[MASTER] --> Ip del Broker Siguiente: %s\n",ipBrokerSiguiente);
        write(fileno(stdout),mostrar,strlen(mostrar));
        
@@ -197,6 +240,7 @@ int main(int argc, char *argv[])
        
        //Comienza el algoritmo para elegir al lider
        //El master pone un mensaje en el anillo con su id y estado DESCONOCIDO (no se sabe quien es el lider)
+       id = getVersion(shmVersionId, semShmVersionId);
        msgLider.idBroker = id;
        msgLider.estado = DESCONOCIDO;
        
@@ -262,12 +306,15 @@ int main(int argc, char *argv[])
            }
        }while((msgLider.estado != LIDER) && (msgLider.estado!=FIN));
        
-       //informarLider(msgLider.idBroker == id);
+       informarLider(shmLiderId, semShmLiderId, msgLider.idBroker == id);
        sprintf(mostrar, "[MASTER] --> ID LIDER ENCONTRADO: %d\t%s\n", msgLider.idBroker, imprimirCodigo(msgLider.estado));
        write(fileno(stdout), mostrar, strlen(mostrar));
        
        sprintf(mostrar, "::::: QUEDA ESTABLECIDO EL ANILLO :::::\n", msgLider.idBroker, imprimirCodigo(msgLider.estado));
        write(fileno(stdout), mostrar, strlen(mostrar));
+       
+        // Levanto el semaforo para que siga corriendo el proceso del broker que genero esto
+        informarAnilloRestaurado(semAnilloRestaurandose);
      
        return 0;
 }
