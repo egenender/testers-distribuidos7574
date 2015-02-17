@@ -93,7 +93,20 @@ int main(int argc, char* argv[]) {
 
                 ret = msgsnd(msgQueueRegistroTesters, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
                 if(ret == -1) {
-                    Logger::error("Error al enviar el mensaje a la cola de registros de testers");
+                    Logger::error("Error al enviar el mensaje a la cola de registros de testers", __FILE__);
+                    exit(1);
+                }
+                break;
+
+            case MTYPE_DESREGISTRAR_TESTER:
+                ss << "Llego un pedido de desregistro del tester " << msg.tester;
+                Logger::notice(ss.str(), __FILE__);
+                ss.str("");
+                ss.clear();
+
+                ret = msgsnd(msgQueueRegistroTesters, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+                if(ret == -1) {
+                    Logger::error("Error al enviar el mensaje a la cola de registros/desregistros de testers", __FILE__);
                     exit(1);
                 }
                 break;
