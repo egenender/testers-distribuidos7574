@@ -3,6 +3,7 @@
 #include "tcpoppas.cpp"
 #include "enviar.cpp"
 #include "recibir.cpp"
+#include <stdbool.h>
 
 #include "ringInfo.h"
 
@@ -18,15 +19,85 @@ extern int recibir (int, void*, size_t);
 int main(int argc, char *argv[])
 {
     
-    if (argc != 2) {
-        printf("Bad arguments!. Usage: ./listener <configFile>\n");
+    bool firstTime = false;
+    
+    if ((argc != 2) || (argc != 3)) {
+        printf("Bad arguments!\nUsage: ./listener <configFile> [firstTime] \n");
         exit(1);
     }
+    
+    if(argc == 3) {
+        firstTime = true;
+    }
+    
+    int shmLiderId;
+    int semShmLiderId;
+    int shmBrokerSiguienteId;
+    int semShmBrokerSiguienteId;
+    int shmVersionId;
+    int semShmVersionId;
+    int shmemListenerEjecutandose;
+    int semShmListenerEjecutandose;
+    int semAnilloRestaurandose;
+    int shmemListenerPid;
+    
+    // Dependiendo del configFile, se si manejo shmem inter-broker, de planilla general 
+    // o de planilla asignacion y tomo los demas parametros
+    if(strcmp(argv[1], configBrokerShmemFileName.c_str()) == 0) {
+        // Manejo el anillo de shared memory inter-broker
+        shmLiderId = SHM_BROKER_ES_LIDER;
+        semShmLiderId = SEM_BROKER_ES_LIDER;
+        shmBrokerSiguienteId = SHM_BROKER_SIGUIENTE;
+        semShmBrokerSiguienteId = SEM_BROKER_SIGUIENTE;
+        shmVersionId = SHM_BROKER_VERSION;
+        semShmVersionId = SEM_BROKER_VERSION;
+        shmemListenerEjecutandose = SHM_ANILLO_BROKER_SHM_LISTENER_EJECUTANDOSE;
+        semShmListenerEjecutandose = SEM_ANILLO_BROKER_SHM_LISTENER_EJECUTANDOSE;
+        semAnilloRestaurandose = SEM_ANILLO_BROKER_SHM_RESTAURANDOSE;
+        shmemListenerPid = SHM_LISTENER_BROKER_SHM_PID;
+    } else if(strcmp(argv[1], configPlanillaGeneralShmemFileName.c_str()) == 0) {
+        // Manejo el anillo de shared memory de planilla general
+        shmLiderId = SHM_PLANILLA_GENERAL_ES_LIDER;
+        semShmLiderId = SEM_PLANILLA_GENERAL_ES_LIDER;
+        shmBrokerSiguienteId = SHM_PLANILLA_GENERAL_SIGUIENTE;
+        semShmBrokerSiguienteId = SEM_PLANILLA_GENERAL_SIGUIENTE;
+        shmVersionId = SHM_PLANILLA_GENERAL_VERSION;
+        semShmVersionId = SEM_PLANILLA_GENERAL_VERSION;
+        shmemListenerEjecutandose = SHM_ANILLO_PLANILLA_GENERAL_LISTENER_EJECUTANDOSE;
+        semShmListenerEjecutandose = SEM_ANILLO_PLANILLA_GENERAL_LISTENER_EJECUTANDOSE;
+        semAnilloRestaurandose = SEM_ANILLO_PLANILLA_GENERAL_RESTAURANDOSE;
+        shmemListenerPid = SHM_LISTENER_PLANILLA_GENERAL_PID;
+    } else if(strcmp(argv[1], configPlanillaAsignacionShmemFileName.c_str()) == 0) {
+        // Manejo el anillo de shared memory de planilla asigacion
+        shmLiderId = SHM_PLANILLA_ASIGNACION_ES_LIDER;
+        semShmLiderId = SEM_PLANILLA_ASIGNACION_ES_LIDER;
+        shmBrokerSiguienteId = SHM_PLANILLA_ASIGNACION_SIGUIENTE;
+        semShmBrokerSiguienteId = SEM_PLANILLA_ASIGNACION_SIGUIENTE;
+        shmVersionId = SHM_PLANILLA_ASIGNACION_VERSION;
+        semShmVersionId = SEM_PLANILLA_ASIGNACION_VERSION;
+        shmemListenerEjecutandose = SHM_ANILLO_PLANILLA_ASIGNACION_LISTENER_EJECUTANDOSE;
+        semShmListenerEjecutandose = SEM_ANILLO_PLANILLA_ASIGNACION_LISTENER_EJECUTANDOSE;
+        semAnilloRestaurandose = SEM_ANILLO_PLANILLA_ASIGNACION_RESTAURANDOSE;
+        shmemListenerPid = SHM_LISTENER_PLANILLA_ASIGNACION_PID;
+    } else {
+        // Error de config file name
+        printf("Bad config file name! Leaving...\n");
+        exit(1);
+    }
+    
+    // Seteo mi pid
+    key_t key = ftok(ipcFileName.c_str(), shmemListenerPid);
+    int listenerPidId = shmget(key, sizeof(pid_t), 0660);
+    pid_t* pidListener = (pid_t*) shmat(listenerPidId, NULL, 0);
+    *pidListener = getpid();
+    shmdt(pidListener);
+    
+    // Aviso que aun no esta corriendo el listener
+    setListenerEjecutandose(shmemListenerEjecutandose, semShmListenerEjecutandose, false);
 
     int id;
     char mostrar[300];
-    id=atoi(argv[1]);
-    sprintf(mostrar, "[BROKER] --> ID: %d\t| pid: %d\n", id, getpid());
+    sprintf(mostrar, "[BROKER] --> ID: a definir por la version\t| pid: %d\n", getpid());
     write(fileno(stdout), mostrar, strlen(mostrar));
     
     struct sigaction sa; 
@@ -52,7 +123,7 @@ int main(int argc, char *argv[])
     int portUdp;
     
     
-    FILE * fdConfig = fopen(argv[1], "r"); // El priemr parametro es el archivo de config a leer
+    FILE * fdConfig = fopen(argv[1], "r"); // El segundo parametro es el archivo de config a leer
     if(fdConfig==NULL){
         perror("fopen");
         exit(1);
@@ -155,6 +226,10 @@ int main(int argc, char *argv[])
 	       perror("recvfrom");
 	       exit(1);
 	  }
+          
+          // Llego el sender -> Aviso que ya esta corriendo el listener
+        setListenerEjecutandose(shmemListenerEjecutandose, semShmListenerEjecutandose, true);
+          
           sprintf(mostrar,"[RECIBIDO] <-- %s\t%s\n",inet_ntoa(addrMulticast.sin_addr), imprimirCodigo(msgMulticast.tipo));
           write(fileno(stdout),mostrar,strlen(mostrar));
 
@@ -203,7 +278,8 @@ int main(int argc, char *argv[])
         write(fileno(stdout), mostrar, strlen(mostrar));
         
     } while(msgInvitacion.tipo!=UNIDO);
-    
+
+    // Si llega aca es porque ya se comunico con un sender
 
     
     sprintf(mostrar, "[RECIBIDO] <-- IP DEL MASTER: %s\n", msgInvitacion.direccionMaster);
@@ -275,7 +351,7 @@ int main(int argc, char *argv[])
              sprintf(mostrar,"[ENVIADO] --> %s\t%s\n",inet_ntoa(addrMulticast.sin_addr),imprimirCodigo(CERRAR));
             write(fileno(stdout),mostrar,strlen(mostrar));
             strcpy(ipBrokerSiguiente, inet_ntoa(addr.sin_addr));
-            informarBrokerSiguiente(ipBrokerSiguiente);
+            informarBrokerSiguiente(shmBrokerSiguienteId, semShmBrokerSiguienteId, ipBrokerSiguiente);
           }        
         } else {
 			sprintf(mostrar,"kill -9 %d",childpid);
@@ -319,13 +395,16 @@ int main(int argc, char *argv[])
         }
         sprintf(mostrar, "[CONEXION ESTABLECIDA] --> Broker siguiente %s\n", ipBrokerSiguiente); 
         write(fileno(stdout), mostrar, strlen(mostrar));
-        
-	    msgLider.idBroker=id; 
+
+        // Obtengo el ID actual, que seria la version de la shared memory.
+        // Al usar eso, hace que se elija como master al que tiene la ultima version!
+        id = getVersion(shmVersionId, semShmVersionId);
+        msgLider.idBroker=id; 
         msgLider.estado=DESCONOCIDO;
 
        
        do {
-		   sprintf(mostrar,"[ESPERANDO] --> Recibir mensaje de: %s\n",inet_ntoa(addr.sin_addr));
+            sprintf(mostrar,"[ESPERANDO] --> Recibir mensaje de: %s\n",inet_ntoa(addr.sin_addr));
            write(fileno(stdout), mostrar, strlen(mostrar));
            nbytes = recibir(newsockfd, &msgLider, sizeof(MsgLider_t));
 	       if(nbytes < 0){
@@ -370,13 +449,17 @@ int main(int argc, char *argv[])
            }
        } while((msgLider.estado != LIDER) && (msgLider.estado!=FIN));
        
-       informarLider(msgLider.idBroker == id);
+       informarLider(shmLiderId, semShmLiderId, msgLider.idBroker == id);
        sprintf(mostrar,"[BROKER] --> ID LIDER ENCONTRADO: %d\t%s\n",msgLider.idBroker, imprimirCodigo(msgLider.estado));
         write(fileno(stdout), mostrar, strlen(mostrar));
 
         sprintf(mostrar,"::::: QUEDA ESTABLECIDO EL ANILLO :::::\n");
         write(fileno(stdout), mostrar, strlen(mostrar));
-
+        
+        if(!firstTime) {
+            // Levanto el semaforo para que siga corriendo el proceso del broker que genero esto
+            informarAnilloRestaurado(semAnilloRestaurandose);
+        }
            return 0;
 }
 
