@@ -46,7 +46,8 @@ AtendedorEquipoEspecial::~AtendedorEquipoEspecial() {
 
 TResultadoEspecial AtendedorEquipoEspecial::recibirResultadoEspecial() {
     TResultadoEspecial resultado;
-    int ret = msgrcv(this->colaDispTesterEsp, &resultado, sizeof(TResultadoEspecial) - sizeof(long), MTYPE_RESULTADO_ESPECIAL, 0);
+    //El -MTYPE_CAMBIO_VAR es para recibir solo MTYPE_CAMBIO_VAR (4001) y MTYPE_RESULTADO_ESPECIAL (2001)
+    int ret = msgrcv(this->colaDispTesterEsp, &resultado, sizeof(TResultadoEspecial) - sizeof(long), -MTYPE_CAMBIO_VAR, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir resultado especial de algun dispositivo. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);

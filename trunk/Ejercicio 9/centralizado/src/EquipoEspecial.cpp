@@ -11,6 +11,7 @@
 #include "common/PlanillaReinicioEquipoEspecial.h"
 #include "common/DespachadorTesters.h"
 #include "common/Planilla.h"
+#include "common/PlanillaVariablesDisp.h"
 #include "common/Configuracion.h"
 #include <cstdlib>
 #include <sstream>
@@ -54,6 +55,8 @@ int main(int argc, char** argv) {
     
     std::stringstream ss;
     
+    bool testConfigCompleto = false;
+    
     while(true) {
         
         // Equipo especial recibe resultados especiales
@@ -61,18 +64,33 @@ int main(int argc, char** argv) {
         // se fija si deben reiniciarse, y sino, envia la ordena a los tecnicos
         
         TResultadoEspecial resultado = atendedor.recibirResultadoEspecial();
-        ss << "Recibi el resultado especial " << resultado.resultado << " del dispositivo " << resultado.idDispositivo << " de la tarea especial enviada por tester " << resultado.idTester;
-        Logger::debug(ss.str(), __FILE__);
-        ss.str("");
-        // Almaceno resultado del testeo especial terminado
-        resultados[resultado.posicionDispositivo] += resultado.resultado;
-        // Almaceno el tester que testea al dispositivo
-        controlador[resultado.posicionDispositivo].insert(resultado.idTester);
-        // Registro que termino una tarea especial
-        planillaAsignacion.registrarTareaEspecialFinalizada(resultado.posicionDispositivo);
-        Logger::debug("Se registra la tarea especial terminada con exito", __FILE__);
         
-        if (planillaAsignacion.terminoTesteoEspecial(resultado.posicionDispositivo)) {
+        switch( resultado.mtype ){
+            case MTYPE_CAMBIO_VAR:
+                ss << "Recibi el cambio de variable del dispositivo " << resultado.idDispositivo << " efectuado por tester " << resultado.idTester;
+                Logger::debug(ss.str(), __FILE__);
+                ss.str("");
+                testConfigCompleto = ( resultado.resultado == FIN_TEST_CONFIG );
+                break;
+            case MTYPE_RESULTADO_ESPECIAL:
+                ss << "Recibi el resultado especial " << resultado.resultado << " del dispositivo " << resultado.idDispositivo << " de la tarea especial enviada por tester " << resultado.idTester;
+                Logger::debug(ss.str(), __FILE__);
+                ss.str("");
+                // Almaceno resultado del testeo especial terminado
+                resultados[resultado.posicionDispositivo] += resultado.resultado;
+                // Almaceno el tester que testea al dispositivo
+                controlador[resultado.posicionDispositivo].insert(resultado.idTester);
+                // Registro que termino una tarea especial
+                planillaAsignacion.registrarTareaEspecialFinalizada(resultado.posicionDispositivo);
+                Logger::debug("Se registra la tarea especial terminada con exito", __FILE__);
+                break;
+            default:
+                Logger::error( "Equipo especial recibio mensaje de mtype invalido", __FILE__ );
+                exit( 0 );
+                break;
+        }
+
+        if ( planillaAsignacion.terminoTesteoEspecial(resultado.posicionDispositivo) && testConfigCompleto ) {
             ss << "Termino el testeo especial del dispositivo " << resultado.idDispositivo << ". Se verificara si hay que rehacerlo";
             Logger::notice(ss.str(), __FILE__);
             ss.str("");
@@ -117,6 +135,7 @@ int main(int argc, char** argv) {
             // Reinicio los resultados y los testers especiales asignados
             resultados[resultado.posicionDispositivo] = 0;
             controlador[resultado.posicionDispositivo].clear();
+            testConfigCompleto = false;
         }
     }
     

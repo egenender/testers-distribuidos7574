@@ -4,6 +4,8 @@
 #include "common/Configuracion.h"
 #include <cstdlib>
 
+using namespace Constantes::NombresDeParametros;
+
 int main(int argc, char** argv) {
     // El primer parametro es el id del tester
     int id = atoi(argv[1]);
@@ -21,12 +23,15 @@ int main(int argc, char** argv) {
     AtendedorTesters atendedor( config );
     
     while(true) {
-        TMessageConfigTest reqTest = atendedor.recibirReqTestConfiguracion();
-        TestConfiguracion test( reqTest.TipoDispositivo );
+        TMessageTesterConfig reqTest = atendedor.recibirReqTestConfig( id );
+        TestConfiguracion test( reqTest.tipoDispositivo );
+        const int maxValorVariableDisp = config.ObtenerParametroEntero( MAX_VALOR_VARIABLE_DISP );
         for( int i=0; i<test.CantVariables(); i++ ){
-            atendedor.enviarTestConfiguracion( reqTest.idDispositivo, test.getVariable(i) );
-            TMessageResultadoConfigTest resultado = atendedor.recibirResultadoTestConfig( reqTest.idDispositivo );
-            //TODO <NIM> Procesar resultado del test
+            int nuevoValorVar = rand() % maxValorVariableDisp;
+            atendedor.enviarCambioVariable( reqTest.idDispositivo,
+                                            test.getVariable(i),
+                                            nuevoValorVar,
+                                            i == (test.CantVariables()-1) );
         }
     }
 }

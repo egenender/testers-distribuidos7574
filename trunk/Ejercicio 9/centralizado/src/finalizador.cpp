@@ -33,10 +33,10 @@ int main(int argc, char** argv) {
         return 1;
     }
     
-    const string ipcFileName = config.ObtenerParametroString( ARCHIVO_IPCS );
+    const string archivoIpcs = config.ObtenerParametroString( ARCHIVO_IPCS );
    
     //Semaforo y Planilla General
-    key_t key = ftok( ipcFileName.c_str(),
+    key_t key = ftok( archivoIpcs.c_str(),
                       config.ObtenerParametroEntero(SHM_PLANILLA_GENERAL) );
     const int cantResultados = config.ObtenerParametroEntero(CANT_RESULTADOS);
     int shmgeneralid = shmget(key, sizeof(resultado_t) * cantResultados,  0660);
@@ -52,37 +52,45 @@ int main(int argc, char** argv) {
         Logger::warn("No se pudo destruir alguna memoria compartida de la planilla de asignacion", __FILE__);
     }
     
-    Semaphore semPlanillaGeneral( ipcFileName,
+    Semaphore semPlanillaGeneral( archivoIpcs,
                                   config.ObtenerParametroEntero(SEM_PLANILLA_GENERAL));
     semPlanillaGeneral.getSem();
     semPlanillaGeneral.eliSem();
 
-    Semaphore sem_cola_especiales( ipcFileName,
+    Semaphore sem_cola_especiales( archivoIpcs,
                                    config.ObtenerParametroEntero(SEM_COLA_ESPECIALES));
     sem_cola_especiales.getSem();
     sem_cola_especiales.eliSem();
     
-    Semaphore semPlanillaCantTestersAsignados( ipcFileName,
+    Semaphore semPlanillaCantTestersAsignados( archivoIpcs,
                                                config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TESTER_ASIGNADOS) );
     semPlanillaCantTestersAsignados.getSem();
     semPlanillaCantTestersAsignados.eliSem();
     
-    Semaphore semPlanillaCantTareasAsignadas( ipcFileName,
+    Semaphore semPlanillaCantTareasAsignadas( archivoIpcs,
                                               config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TAREAS_ASIGNADAS) );
     semPlanillaCantTareasAsignadas.getSem();
     semPlanillaCantTareasAsignadas.eliSem();
 
-    //Destruccion de colas
+    //Destruccion de colas de dispositivos
     const int msgQueueDispositivos = config.ObtenerParametroEntero(MSGQUEUE_DISPOSITIVOS);
     const int msgQueueUltimo = config.ObtenerParametroEntero(MSGQUEUE_ULTIMO);
     for (int q = msgQueueDispositivos; q <= msgQueueUltimo; q++){
-        key = ftok(ipcFileName.c_str(), q);
+        key = ftok(archivoIpcs.c_str(), q);
         int cola = msgget(key, 0660);
         msgctl(cola ,IPC_RMID, NULL);
     }
-    
+    //Cola dispositivos-config
+    key = ftok(archivoIpcs.c_str(), config.ObtenerParametroEntero(MSGQUEUE_DISPOSITIVOS_CONFIG) );
+    int cola = msgget(key, 0660);
+    msgctl(cola ,IPC_RMID, NULL);
+    //Cola testers config
+    key = ftok(archivoIpcs.c_str(), config.ObtenerParametroEntero(MSGQUEUE_TESTERS_CONFIG) );
+    cola = msgget(key, 0660);
+    msgctl(cola ,IPC_RMID, NULL);
+
     //Semaforos de planilla variables
-    for( int i=0; i<config.ObtenerParametroEntero( MAX_DISPOSITIVOS_EN_SISTEMA ) ){
+    for( int i=0; i<config.ObtenerParametroEntero( MAX_DISPOSITIVOS_EN_SISTEMA ); i++ ){
         Semaphore semPlanillaVarsTE( archivoIpcs, config.ObtenerParametroEntero(SEM_PLANILLA_VARS_TE_START) + i );
         semPlanillaVarsTE.getSem();
         semPlanillaVarsTE.eliSem();
@@ -94,7 +102,7 @@ int main(int argc, char** argv) {
         semMutexPlanillaVars.eliSem();
     }
     
-    unlink(ipcFileName.c_str());
+    unlink(archivoIpcs.c_str());
     
     return 0;
 }

@@ -13,13 +13,15 @@ class Configuracion;
 
 class AtendedorTesters {
 private:
-    const int m_CantTestersEspeciales;
-    int cola_requerimiento;
-    int cola_recibos_tests;
-    int cola_testers_especiales;
-    int cola_tareas_especiales;
-    int m_IdPrimerTesterEspecial;
-    Semaphore sem_cola_especiales;
+    const int   m_CantTestersEspeciales;
+    int         m_ColaDispositivosConfig;
+    int         m_ColaRequerimientos;
+    int         m_ColaRecibosTests;
+    int         m_ColaTestersConfig;
+    int         m_ColaTestersEspeciales;
+    int         m_ColaTareasEspeciales;
+    int         m_IdPrimerTesterEspecial;
+    Semaphore   m_SemColaEspeciales;
 //Operaciones prohibidas
     AtendedorTesters(const AtendedorTesters& orig);
     AtendedorTesters& operator=(const AtendedorTesters& rv);
@@ -27,7 +29,7 @@ public:
     AtendedorTesters( const Configuracion& config );
     ~AtendedorTesters();
     
-    int recibirRequerimiento();
+    TMessageAtendedor recibirRequerimiento();
     void enviarPrograma(int idDispositivo, int tester, int idPrograma);  // Tester -> Disp
     resultado_test_t recibirResultado(int idTester);
     void enviarOrden(int idDispositivo, int orden); // Tester -> Disp: Reinicio o apagado
@@ -36,10 +38,8 @@ public:
     void enviarTareaEspecial(int idDispositivo, int idTester, int tarea, int posicionDispositivo);
     
     void enviarReqTestConfig( int idDispositivo, int idTester, int tipoDispositivo );
-
-    TMessageConfigTest recibirReqTestConfiguracion();
-    void enviarTestConfiguracion( int idDispositivo, int idVariable );
-    TMessageResultadoConfigTest recibirResultadoTestConfig( int idDispositivo );
+    TMessageTesterConfig recibirReqTestConfig( int idTester );
+    void enviarCambioVariable( int idDispositivo, int idVariable, int nuevoValor, bool ultimo );
 
     bool destruirComunicacion();
 

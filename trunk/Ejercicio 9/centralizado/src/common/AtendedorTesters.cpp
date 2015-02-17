@@ -9,61 +9,80 @@ using std::string;
 AtendedorTesters::AtendedorTesters( const Configuracion& config ):
         m_CantTestersEspeciales( config.ObtenerParametroEntero(CANT_TESTERS_ESPECIALES) ),
         m_IdPrimerTesterEspecial( config.ObtenerParametroEntero(ID_TESTER_ESPECIAL_START) ),
-        sem_cola_especiales( config.ObtenerParametroString(ARCHIVO_IPCS),
+        m_SemColaEspeciales( config.ObtenerParametroString(ARCHIVO_IPCS),
                              config.ObtenerParametroEntero(SEM_COLA_ESPECIALES) ){
+    //Cola requerimientos
     key_t key;
     const string ipcFileName = config.ObtenerParametroString( ARCHIVO_IPCS );
     key = ftok( ipcFileName.c_str(),
                 config.ObtenerParametroEntero(MSGQUEUE_DISPOSITIVOS) );
-    this->cola_requerimiento = msgget(key, 0666);
-    if(this->cola_requerimiento == -1) {
+    m_ColaRequerimientos = msgget(key, 0666);
+    if(m_ColaRequerimientos == -1) {
         std::string err = std::string("Error al obtener la cola de requerimientos del atendedor de testers. Errno: ") + std::string(strerror(errno));
         Logger::error(err, __FILE__);
         exit(1);
     }
-    
+    //Cola testers
     key = ftok( ipcFileName.c_str(),
                 config.ObtenerParametroEntero(MSGQUEUE_TESTERS) );
-    this->cola_recibos_tests = msgget(key, 0666);
-    if(this->cola_recibos_tests == -1) {
+    m_ColaRecibosTests = msgget(key, 0666);
+    if(m_ColaRecibosTests == -1) {
         std::string err = std::string("Error al obtener la cola de lectura de resultados del atendedor de testers. Errno: ") + std::string(strerror(errno));
         Logger::error(err, __FILE__);
         exit(1);
     }
-    
+    //Cola testers especiales
     key = ftok( ipcFileName.c_str(),
                 config.ObtenerParametroEntero(MSGQUEUE_TESTERS_ESPECIALES) );
-    this->cola_testers_especiales = msgget(key, 0666);
-    if(this->cola_testers_especiales == -1) {
+    m_ColaTestersEspeciales = msgget(key, 0666);
+    if(m_ColaTestersEspeciales == -1) {
         std::string err = std::string("Error al obtener la cola para enviar a los testers especiales. Errno: ") + std::string(strerror(errno));
         Logger::error(err, __FILE__);
         exit(1);
     }
-    sem_cola_especiales.getSem();
-    
+    //Cola dispositivos-testers especiales
     key = ftok( ipcFileName.c_str(),
                 config.ObtenerParametroEntero(MSGQUEUE_DISPOSITIVOS_TESTERS_ESPECIALES) );
-    this->cola_tareas_especiales = msgget(key, 0666);
-    if(this->cola_tareas_especiales == -1) {
+    m_ColaTareasEspeciales = msgget(key, 0666);
+    if(m_ColaTareasEspeciales == -1) {
         std::string err = std::string("Error al obtener la cola para enviar tareas especiales a los dispositivos. Errno: ") + std::string(strerror(errno));
         Logger::error(err, __FILE__);
         exit(1);
     }
+    //Cola testers-testers configuracion
+    key = ftok( ipcFileName.c_str(),
+                config.ObtenerParametroEntero(MSGQUEUE_TESTERS_CONFIG) );
+    m_ColaTestersConfig = msgget(key, 0666);
+    if(m_ColaTestersConfig == -1) {
+        std::string err = std::string("Error al obtener la cola para enviar requerimientos a los testers de config. Errno: ") + std::string(strerror(errno));
+        Logger::error(err, __FILE__);
+        exit(1);
+    }
+    //Cola dispositivo-config
+    key = ftok( ipcFileName.c_str(),
+                config.ObtenerParametroEntero(MSGQUEUE_DISPOSITIVOS_CONFIG) );
+    m_ColaDispositivosConfig = msgget(key, 0666);
+    if(m_ColaTestersEspeciales == -1) {
+        std::string err = std::string("Error al obtener la cola para enviar tareas especiales a los dispositivos. Errno: ") + std::string(strerror(errno));
+        Logger::error(err, __FILE__);
+        exit(1);
+    }
+    m_SemColaEspeciales.getSem();
 }
 
 AtendedorTesters::~AtendedorTesters() {
 }
 
-int AtendedorTesters::recibirRequerimiento() {
+TMessageAtendedor AtendedorTesters::recibirRequerimiento() {
 
     TMessageAtendedor msg;
-    int ret = msgrcv(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), MTYPE_REQUERIMIENTO, 0);
+    int ret = msgrcv(m_ColaRequerimientos, &msg, sizeof(TMessageAtendedor) - sizeof(long), MTYPE_REQUERIMIENTO, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir requerimiento del atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
-    return msg.idDispositivo;
+    return msg;
 }
 
 void AtendedorTesters::enviarPrograma(int idDispositivo, int tester, int idPrograma) {
@@ -74,7 +93,7 @@ void AtendedorTesters::enviarPrograma(int idDispositivo, int tester, int idProgr
     msg.idTester = tester;
     msg.value = idPrograma;
     
-    int ret = msgsnd(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    int ret = msgsnd(m_ColaRequerimientos, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
         std::string error = std::string("Error al enviar programa al atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
@@ -85,7 +104,7 @@ void AtendedorTesters::enviarPrograma(int idDispositivo, int tester, int idProgr
 
 resultado_test_t AtendedorTesters::recibirResultado(int idTester) {
     resultado_test_t rsp;
-    int ret = msgrcv(this->cola_recibos_tests, &rsp, sizeof(resultado_test_t) - sizeof(long), idTester, 0);
+    int ret = msgrcv(m_ColaRecibosTests, &rsp, sizeof(resultado_test_t) - sizeof(long), idTester, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir resultado del atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
@@ -102,7 +121,7 @@ void AtendedorTesters::enviarOrden(int idDispositivo, int orden) {
     msg.idDispositivo = idDispositivo;
     msg.value = orden;
     
-    int ret = msgsnd(this->cola_requerimiento, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    int ret = msgsnd(m_ColaRequerimientos, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
         std::string error = std::string("Error al enviar orden al atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
@@ -118,7 +137,7 @@ void AtendedorTesters::enviarTareaEspecial(int idDispositivo, int idTester, int 
     msg.idTester = idTester;
     msg.posicionDispositivo = posicionDispositivo;
     msg.value = tarea;
-    int ret = msgsnd(this->cola_tareas_especiales, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    int ret = msgsnd(m_ColaTareasEspeciales, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
         std::stringstream ss;
         ss << "Error al enviar tarea especial " << tarea << " al dispositivo " << idDispositivo << " desde el tester " << idTester << ". Error: ";
@@ -129,7 +148,7 @@ void AtendedorTesters::enviarTareaEspecial(int idDispositivo, int idTester, int 
 }
 
 void AtendedorTesters::enviarAEspeciales(std::vector<bool> cuales, int idDispositivo, int posicionDispositivo){
-    sem_cola_especiales.p();
+    m_SemColaEspeciales.p();
     for (int i = 0; i < m_CantTestersEspeciales; i++){
             if (!cuales[i]) continue;
             TMessageAssignTE msg;
@@ -140,20 +159,20 @@ void AtendedorTesters::enviarAEspeciales(std::vector<bool> cuales, int idDisposi
             ss << "Se envia requerimiento especial a tester especial " << msg.mtype;
             Logger::debug(ss.str(), __FILE__);
             ss.str("");
-            int ret = msgsnd(this->cola_testers_especiales, &msg, sizeof(TMessageAssignTE) - sizeof(long), 0);
+            int ret = msgsnd(m_ColaTestersEspeciales, &msg, sizeof(TMessageAssignTE) - sizeof(long), 0);
             if(ret == -1) {
                 std::string error = std::string("Error al asignar dispositivos a testers especiales. Error: ") + std::string(strerror(errno));
                 Logger::error(error.c_str(), __FILE__);
                 exit(0);
             }
     }
-    sem_cola_especiales.v();
+    m_SemColaEspeciales.v();
 }
 
 TMessageAssignTE AtendedorTesters::recibirRequerimientoEspecial(int idEsp) {
 
     TMessageAssignTE msg;
-    int ret = msgrcv(this->cola_testers_especiales, &msg, sizeof(TMessageAssignTE) - sizeof(long), idEsp, 0);
+    int ret = msgrcv(m_ColaTestersEspeciales, &msg, sizeof(TMessageAssignTE) - sizeof(long), idEsp, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir requerimiento del atendedor. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
@@ -163,26 +182,47 @@ TMessageAssignTE AtendedorTesters::recibirRequerimientoEspecial(int idEsp) {
 }
 
 bool AtendedorTesters::destruirComunicacion() {
-
-    return (msgctl(this->cola_recibos_tests, IPC_RMID, (struct msqid_ds*)0) != -1 && msgctl(this->cola_requerimiento, IPC_RMID, (struct msqid_ds*)0) != -1);
+    return (msgctl(m_ColaRecibosTests, IPC_RMID, (struct msqid_ds*)0) != -1 && msgctl(m_ColaRequerimientos, IPC_RMID, (struct msqid_ds*)0) != -1);
 }
 
 void AtendedorTesters::enviarReqTestConfig( int idDispositivo, int idTester, int tipoDispositivo ){
-    //TODO <NIM>
-    throw std::runtime_error( std::string("Not implemented").c_str() );
+    TMessageTesterConfig msg;
+    msg.mtype = idTester;
+    msg.idDispositivo = idDispositivo;
+    msg.tipoDispositivo = tipoDispositivo;
+    int ret = msgsnd(m_ColaTestersConfig, &msg, sizeof(TMessageTesterConfig) - sizeof(long), 0);
+    if(ret == -1) {
+        std::stringstream ss;
+        ss << "Error al enviar test config al dispositivo " << idDispositivo << " desde el tester " << idTester << ". Error: ";
+        std::string error = ss.str() + std::string(strerror(errno));
+        Logger::error(error.c_str(), __FILE__);
+        exit(0);
+    }
 }
 
-TMessageConfigTest AtendedorTesters::recibirReqTestConfiguracion(){
-    //TODO <NIM>
-    throw std::runtime_error( std::string("Not implemented").c_str() );
+TMessageTesterConfig AtendedorTesters::recibirReqTestConfig( int idTester ){
+    TMessageTesterConfig msg;
+    int ret = msgrcv(m_ColaTestersConfig, &msg, sizeof(TMessageTesterConfig) - sizeof(long), idTester, 0);
+    if(ret == -1) {
+        std::string error = std::string("Error al recibir requerimiento de test config del atendedor. Error: ") + std::string(strerror(errno));
+        Logger::error(error.c_str(), __FILE__);
+        exit(0);
+    }
+    return msg;
 }
 
-void AtendedorTesters::enviarTestConfiguracion( int idDispositivo, int idVariable ){
-    //TODO <NIM>
-    throw std::runtime_error( std::string("Not implemented").c_str() );
-}
-
-TMessageResultadoConfigTest AtendedorTesters::recibirResultadoTestConfig( int idDispositivo ){
-    //TODO <NIM>
-    throw std::runtime_error( std::string("Not implemented").c_str() );
+void AtendedorTesters::enviarCambioVariable( int idDispositivo, int idVariable, int nuevoValor, bool ultimo ){
+    TMessageDispConfig msg;
+    msg.mtype = idDispositivo;
+    msg.idVariable = idVariable;
+    msg.nuevoValor = nuevoValor;
+    msg.ultimo = ultimo;
+    int ret = msgsnd(m_ColaDispositivosConfig, &msg, sizeof(TMessageDispConfig) - sizeof(long), 0);
+    if(ret == -1) {
+        std::stringstream ss;
+        ss << "Error al enviar cambio de variable al dispositivo " << idDispositivo << " desde tester-config. Error: ";
+        std::string error = ss.str() + std::string(strerror(errno));
+        Logger::error(error.c_str(), __FILE__);
+        exit(0);
+    }
 }
