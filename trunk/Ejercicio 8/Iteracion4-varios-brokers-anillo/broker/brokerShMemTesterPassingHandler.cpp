@@ -237,7 +237,7 @@ int main(int argc, char** argv) {
         
         // Obtengo la shmem del siguiente broker
         key = ftok(ipcFileName.c_str(), SHM_PLANILLA_GENERAL_SIGUIENTE);
-        int shmIdBrokerSiguientePlanillaGeneral = shmget(key, sizeof(int), IPC_CREAT | 0660);
+        int shmIdBrokerSiguientePlanillaGeneral = shmget(key, sizeof(int), 0660);
         int* idBrokerSiguientePlanillaGeneral = (int*) shmat(shmIdBrokerSiguientePlanillaGeneral, NULL, 0);
 
         Semaphore semIdBrokerSiguientePlanillaGeneral(SEM_PLANILLA_GENERAL_SIGUIENTE);
