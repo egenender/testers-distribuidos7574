@@ -16,8 +16,8 @@ char* imprimirCodigo(int codigo);
 int main(int argc, char *argv[])
 {
 
-    if ((argc != 2)) {
-        printf("Bad arguments!\nUsage: ./listener <configFile> \n");
+    if (argc != 2) {
+        printf("Bad arguments!\nUsage: ./sender <configFile> \n");
         exit(1);
     }
     
@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
     char mostrar[300];
     int id;
     sprintf(mostrar,"[MASTER] --> ID: %d\t| pid: %d\n",id, getpid());
-    write(fileno(stdout),mostrar,strlen(mostrar));
+    //write(fileno(stdout),mostrar,strlen(mostrar));
     
     struct sockaddr_in addrMulticast;
     int fdMulticast;
@@ -77,11 +77,11 @@ int main(int argc, char *argv[])
     int fdAnterior;
     int newsockfd;
     struct sockaddr_in addr;
-    
+
     MsgMulticast_t msgMulticast; 
     MsgInvitacion_t msgInvitacion;
     MsgLider_t msgLider;
-     
+
     char dirMaster[50];
     char puerto[50];
     int portTcp;
@@ -90,8 +90,8 @@ int main(int argc, char *argv[])
     int portMulticast;
     char puertoUdp[50];
     int portUdp;
-    
-    FILE * fdConfig = fopen(argv[2], "r"); // El segundo parametro es el archivo de config a leer
+
+    FILE * fdConfig = fopen(argv[1], "r"); // El segundo parametro es el archivo de config a leer
     if(fdConfig==NULL){
         perror("fopen");
         exit(1);

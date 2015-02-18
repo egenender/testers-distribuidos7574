@@ -519,8 +519,6 @@ void lanzarTareasMaster() {
 }
 
 void armarAnillo() {
-    pid_t ringPids[3]; // Uno por cada shared memory
-    int i = 0;
 
     /* LANZO EL PROGRAMA CORRESPONDIENTE PARA LA GENERACION DEL ANILLO*/
     Logger::notice("Lanzo programa correspondiente para generar el anillo!", __FILE__);
@@ -534,37 +532,37 @@ void armarAnillo() {
     }
     ringProgram << program.str();
 
-    char paramFirstTime[10];
-    sprintf(paramFirstTime, "%d", 1);
     // Anillo logico de la shared memory inter-broker
-    ringPids[i] = fork();
-    if(ringPids[i++] == 0) {
-        execlp(ringProgram.str().c_str(), program.str().c_str(), configBrokerShmemFileName.c_str(), paramFirstTime, (char*) 0);
+    if(fork() == 0) {
+        execlp(ringProgram.str().c_str(), program.str().c_str(), configBrokerShmemFileName.c_str(), (char*) 0);
         Logger::error("Se imprime si no se ejecuto el execlp del programa del anillo de la shmem inter-broker. Algo salio mal!", __FILE__);
         exit(1);
     }
 
     // Anillo logico de la shared memory de la planilla general
-    ringPids[i] = fork();
-    if(ringPids[i++] == 0) {
-        execlp(ringProgram.str().c_str(), program.str().c_str(), configPlanillaGeneralShmemFileName.c_str(), paramFirstTime, (char*) 0);
+    if(fork() == 0) {
+        execlp(ringProgram.str().c_str(), program.str().c_str(), configPlanillaGeneralShmemFileName.c_str(), (char*) 0);
         Logger::error("Se imprime si no se ejecuto el execlp del programa del anillo de la shmem de la planilla general. Algo salio mal!", __FILE__);
         exit(1);
     }
     
     // Anillo logico de la shared memory de la planilla asignacion
-    ringPids[i] = fork();
-    if(ringPids[i++] == 0) {
-        execlp(ringProgram.str().c_str(), program.str().c_str(), configPlanillaAsignacionShmemFileName.c_str(), paramFirstTime, (char*) 0);
+    if(fork() == 0) {
+        execlp(ringProgram.str().c_str(), program.str().c_str(), configPlanillaAsignacionShmemFileName.c_str(), (char*) 0);
         Logger::error("Se imprime si no se ejecuto el execlp del programa del anillo de la shmem de la planilla asignacion. Algo salio mal!", __FILE__);
         exit(1);
     }
 
     // Espero a que terminen los 3 procesos
-    for (int j = 0; j < 3; j++) {
-        int status;
-        waitpid(ringPids[i], &status, 0);
-    }
+    Semaphore semAnilloBrokerRestaurandose(SEM_ANILLO_BROKER_SHM_RESTAURANDOSE);
+    semAnilloBrokerRestaurandose.getSem();
+    semAnilloBrokerRestaurandose.p();
+    Semaphore semAnilloPlanillaGeneralRestaurandose(SEM_ANILLO_PLANILLA_GENERAL_RESTAURANDOSE);
+    semAnilloPlanillaGeneralRestaurandose.getSem();
+    semAnilloPlanillaGeneralRestaurandose.p();
+    Semaphore semAnilloPlanillaAsignacionRestaurandose(SEM_ANILLO_PLANILLA_ASIGNACION_RESTAURANDOSE);
+    semAnilloPlanillaAsignacionRestaurandose.getSem();
+    semAnilloPlanillaAsignacionRestaurandose.p();
     /*ANILLOS SUPUESTAMENTE GENERADOS*/
     Logger::notice("Anillos generados! Dejo corriendo los listeners para los rearmados...", __FILE__);
     // Listener para el anillo de la shmem inter-broker

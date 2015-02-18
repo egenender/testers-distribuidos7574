@@ -19,15 +19,9 @@ extern int recibir (int, void*, size_t);
 int main(int argc, char *argv[])
 {
     
-    bool firstTime = false;
-    
-    if ((argc != 2) || (argc != 3)) {
-        printf("Bad arguments!\nUsage: ./listener <configFile> [firstTime] \n");
+    if (argc != 2) {
+        printf("Bad arguments!\nUsage: ./listener <configFile> \n");
         exit(1);
-    }
-    
-    if(argc == 3) {
-        firstTime = true;
     }
     
     int shmLiderId;
@@ -254,7 +248,7 @@ int main(int argc, char *argv[])
         if(childpid<0) {
             perror("Error en el fork\n");
         } else if (childpid==0) {
-            execlp("./timeout", "timeout", s_pid, (char*)0);
+            execlp("./anillo/timeout", "timeout", s_pid, (char*)0);
             perror("Error al lanzar el proceso timeout");
             exit(1);
         }
@@ -328,7 +322,7 @@ int main(int argc, char *argv[])
         if(childpid<0) {
             perror("Error en el fork\n");
         } else if (childpid==0) {
-            execlp("./timeout", "timeout", s_pid, (char*)0);
+            execlp("./anillo/timeout", "timeout", s_pid, (char*)0);
             perror("Error al lanzar el proceso timeout");
             exit(1);
         }
@@ -456,11 +450,9 @@ int main(int argc, char *argv[])
         sprintf(mostrar,"::::: QUEDA ESTABLECIDO EL ANILLO :::::\n");
         write(fileno(stdout), mostrar, strlen(mostrar));
         
-        if(!firstTime) {
-            // Levanto el semaforo para que siga corriendo el proceso del broker que genero esto
-            informarAnilloRestaurado(semAnilloRestaurandose);
-        }
-           return 0;
+        informarAnilloRestaurado(semAnilloRestaurandose);
+
+        return 0;
 }
 
 void sig_handler(int sig) {
