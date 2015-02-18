@@ -3,6 +3,7 @@ CC=g++
 CFLAGS=-Wall -pedantic -pedantic-errors -g -ggdb -DDEBUG
 LDFLAGS=
 BINF=bin
+BINF_TCP=bin/tcp
 HEADER_DIR=.
 
 SHARED_SOURCES := $(shell find ./*/ -name '[^br|Br|identificador]*.cpp')
@@ -145,19 +146,19 @@ RING_TIMEOUT_BIN=$(BINF)/anillo/timeout
 ############## TCP ####################
 TCP_SERVER_EMISOR_SOURCES=tcp/tcpserver_emisor.cpp
 TCP_SERVER_EMISOR_OBJ=$(TCP_SERVER_EMISOR_SOURCES:.cpp=.o)
-TCP_SERVER_EMISOR_BIN=$(BINF)/tcpserver_emisor
+TCP_SERVER_EMISOR_BIN=$(BINF_TCP)/tcpserver_emisor
 
 TCP_SERVER_RECEPTOR_SOURCES=tcp/tcpserver_receptor.cpp
 TCP_SERVER_RECEPTOR_OBJ=$(TCP_SERVER_RECEPTOR_SOURCES:.cpp=.o)
-TCP_SERVER_RECEPTOR_BIN=$(BINF)/tcpserver_receptor
+TCP_SERVER_RECEPTOR_BIN=$(BINF_TCP)/tcpserver_receptor
 
 TCP_CLIENT_EMISOR_SOURCES=tcp/tcpclient_emisor.cpp
 TCP_CLIENT_EMISOR_OBJ=$(TCP_CLIENT_EMISOR_SOURCES:.cpp=.o)
-TCP_CLIENT_EMISOR_BIN=$(BINF)/tcpclient_emisor
+TCP_CLIENT_EMISOR_BIN=$(BINF_TCP)/tcpclient_emisor
 
 TCP_CLIENT_RECEPTOR_SOURCES=tcp/tcpclient_receptor.cpp
 TCP_CLIENT_RECEPTOR_OBJ=$(TCP_CLIENT_RECEPTOR_SOURCES:.cpp=.o)
-TCP_CLIENT_RECEPTOR_BIN=$(BINF)/tcpclient_receptor
+TCP_CLIENT_RECEPTOR_BIN=$(BINF_TCP)/tcpclient_receptor
 ####################################################
 
 all: testerComun testerEspecial tecnico dispositivo equipoEspecial iniciador iniciadorEquipoEspecial terminadorEquipoEspecial terminador iniciadorDisp terminadorDisp iniciadorIdServer idServer terminadorIdServer distribuidorMsgTester initBroker brokerPasamanosEmisor brokerPasamanosReceptor brokerRequerimientosDisp brokerReqTestEsp brokerRegTesters interBrokerMsgHandler brokerShmemPassingHandler brokerShmemTesterPassingHandler brokerShMemTesterReqHandler finBroker anillo tcpServerEmisor tcpServerReceptor tcpClientEmisor tcpClientReceptor
