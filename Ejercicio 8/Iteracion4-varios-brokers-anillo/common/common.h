@@ -261,6 +261,7 @@ const char UBICACION_SERVER_IDENTIFICADOR[] = "192.168.2.10";
 /*********CONFIG PEDIDO SHARED MEMORY TESTERS**********/
 typedef struct TSharedMemoryPlanillaAsignacion {
     long mtype;
+    unsigned long version;
     TContadorTesterEspecial cantTestersEspecialesAsignados[MAX_DISPOSITIVOS_EN_SISTEMA];
     TContadorTareaEspecial cantTareasEspecialesAsignadas[MAX_DISPOSITIVOS_EN_SISTEMA];
 } TSharedMemoryPlanillaAsignacion;
@@ -272,6 +273,7 @@ const char PUERTO_SERVER_ENVIO_SHM_PLANILLA_ASIGNACION[] = "60012";
 
 typedef struct TSharedMemoryPlanillaGeneral {
     long mtype;
+    unsigned long version;
     int cantDispositivosSiendoTesteados;
     bool idsPrivadosDispositivos[MAX_DISPOSITIVOS_EN_SISTEMA];
 } TSharedMemoryPlanillaGeneral;
@@ -305,6 +307,7 @@ const int ID_SUB_BROKER_PASAMANOS_RECEPTOR = 8;
 
 typedef struct TMessageShMemInterBroker {
     long mtype;
+    unsigned long version;
     TTablaBrokerTestersRegistrados memoria;
 } TMessageShMemInterBroker;
 

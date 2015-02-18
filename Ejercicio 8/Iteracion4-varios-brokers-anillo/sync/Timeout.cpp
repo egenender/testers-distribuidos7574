@@ -27,6 +27,5 @@ void Timeout::runTimeout(int timeInSecs, pid_t processToKill, int signal) {
 
 void Timeout::killTimeout() {
     kill(this->timeoutPid, SIGQUIT);
-    int status;
-    waitpid(this->timeoutPid, &status, 0);
+    wait(NULL);
 }

@@ -14,6 +14,8 @@ void restartDispositivo(int sigNum) {
     // Debo killear al emisor y receptor, lanzar otro proceso dispositivo y killearme
     kill(emisor, SIGQUIT);
     kill(receptor, SIGQUIT);
+    wait(NULL); // Espero que muera el emisor
+    wait(NULL); // Espero que muera el receptor
     if (fork() == 0) {
         execlp("./dispositivo", "dispositivo", (char*) 0);
         Logger::error("Error al reiniciar el programa Dispositivo", __FILE__);
@@ -92,6 +94,8 @@ AtendedorDispositivos::AtendedorDispositivos(const AtendedorDispositivos& orig) 
 AtendedorDispositivos::~AtendedorDispositivos() {
     kill(this->pidEmisor, SIGQUIT);
     kill(this->pidReceptor, SIGQUIT);
+    wait(NULL);
+    wait(NULL);
 }
 
 void AtendedorDispositivos::enviarRequerimiento(int idDispositivo) {

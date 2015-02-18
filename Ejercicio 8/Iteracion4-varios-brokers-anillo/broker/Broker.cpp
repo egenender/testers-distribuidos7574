@@ -500,6 +500,7 @@ void lanzarTareasMaster() {
             msgShmemInterBroker.memoria.registrados[i] = false;
             msgShmemInterBroker.memoria.brokerAsignado[i] = TESTER_ESPECIAL_NO_ASIGNADO;
             msgShmemInterBroker.memoria.disponible[i] = false;
+            msgShmemInterBroker.version = ID_BROKER;
         }
         msgShmemInterBroker.memoria.ultimoTesterElegido = 0;
 
@@ -512,6 +513,7 @@ void lanzarTareasMaster() {
         // Inicializo y lanzo la planilla general
         TSharedMemoryPlanillaGeneral planillaGeneral;
         planillaGeneral.mtype = ID_BROKER;
+        planillaGeneral.version = ID_BROKER;
         planillaGeneral.cantDispositivosSiendoTesteados = 0;
         for(int i = 0; i < MAX_DISPOSITIVOS_EN_SISTEMA; i++)    planillaGeneral.idsPrivadosDispositivos[i] = false;
 
@@ -524,6 +526,7 @@ void lanzarTareasMaster() {
         // Inicializo y lanzo la planilla asignacion
         TSharedMemoryPlanillaAsignacion planillaAsignacion;
         planillaAsignacion.mtype = ID_BROKER;
+        planillaAsignacion.version = ID_BROKER;
         for(int i = 0; i < MAX_DISPOSITIVOS_EN_SISTEMA; i++) {
             planillaAsignacion.cantTareasEspecialesAsignadas[i].cantTareasEspecialesTotal = 0;
             planillaAsignacion.cantTareasEspecialesAsignadas[i].cantTareasEspecialesTerminadas = 0;
