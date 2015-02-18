@@ -24,7 +24,7 @@ public:
     bool destruirComunicacion();
 private:
     const int           m_IdDisp;
-    int                 m_KeyShmemEstadoId;
+    int                 m_ShmemEstadoId;
     key_t               m_KeyShmemEstado;
     Semaphore           m_MutexPlanilla;
     Semaphore           m_SemTestsEspeciales;

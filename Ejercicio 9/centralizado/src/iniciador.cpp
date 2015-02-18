@@ -24,8 +24,8 @@
 
 using namespace Constantes::NombresDeParametros;
 
-void createIPCObjects( const Configuracion& config );
-void createSystemProcesses( const Configuracion& config );
+void crearObjetosIPC( const Configuracion& config );
+void lanzarProcesosSistema( const Configuracion& config );
 
 int main(int argc, char** argv) {
     
@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
     }
 
     try {
-        createIPCObjects( config );
+        crearObjetosIPC( config );
     } catch(std::string err) {
         Logger::error("Error al crear los objetos activos...", __FILE__);
         Logger::destroy();
@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
     }
     Logger::debug("Objetos IPC inicializados correctamente. Iniciando procesos...", __FILE__);
     
-    createSystemProcesses( config );
+    lanzarProcesosSistema( config );
     Logger::debug("Procesos iniciados correctamente...", __FILE__);
     
     Logger::notice("Sistema inicializado correctamente...", __FILE__);
@@ -57,8 +57,13 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-void createIPCObjects( const Configuracion& config ) {
+void CrearSemaforo( const std::string& archivoIpcs, int idSemaforo, int valorInicial ){
+    Semaphore sem( archivoIpcs, idSemaforo );
+    sem.creaSem();
+    sem.iniSem( valorInicial );
+}
 
+void crearObjetosIPC( const Configuracion& config ) {
     const std::string archivoIpcs = config.ObtenerParametroString(
         Constantes::NombresDeParametros::ARCHIVO_IPCS.c_str() );
 
@@ -71,23 +76,13 @@ void createIPCObjects( const Configuracion& config ) {
         throw err;
     }
     ipcFile.close();
+    
+    CrearSemaforo( archivoIpcs, config.ObtenerParametroEntero(SEM_PLANILLA_GENERAL), 1 );
+    CrearSemaforo( archivoIpcs, config.ObtenerParametroEntero(SEM_COLA_ESPECIALES), 1 );
+    CrearSemaforo( archivoIpcs, config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TESTER_ASIGNADOS), 1 );
+    CrearSemaforo( archivoIpcs, config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TAREAS_ASIGNADAS), 1 );
+    
 
-    // Creo semaforo para la shmem de la planilla
-    Semaphore semPlanillaGeneral( archivoIpcs, config.ObtenerParametroEntero(SEM_PLANILLA_GENERAL) );
-    semPlanillaGeneral.creaSem();
-    semPlanillaGeneral.iniSem(1); // Inicializa el semaforo en 1
-
-    Semaphore sem_cola_especiales( archivoIpcs, config.ObtenerParametroEntero(SEM_COLA_ESPECIALES) );
-    sem_cola_especiales.creaSem();
-    sem_cola_especiales.iniSem(1);
-
-    Semaphore semPlanillaCantTestersAsignados( archivoIpcs, config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TESTER_ASIGNADOS) );
-    semPlanillaCantTestersAsignados.creaSem();
-    semPlanillaCantTestersAsignados.iniSem(1);
-
-    Semaphore semPlanillaCantTareasAsignadas( archivoIpcs, config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TAREAS_ASIGNADAS) );
-    semPlanillaCantTareasAsignadas.creaSem();
-    semPlanillaCantTareasAsignadas.iniSem(1);
 
     Planilla planillaGeneral( config );
     planillaGeneral.initPlanilla();
@@ -128,9 +123,11 @@ void createIPCObjects( const Configuracion& config ) {
     if (msgget(key, 0660 | IPC_CREAT | IPC_EXCL) == -1){
         std::cout << "No se pudo crear la cola de testers-config: " << strerror(errno)<< std::endl;
     }
+    //Shared memories dispositivo-config
+    
 }
 
-void createSystemProcesses( const Configuracion& config ) {
+void lanzarProcesosSistema( const Configuracion& config ) {
    
     // Creo testers
     const int cantTestersComunes = config.ObtenerParametroEntero( CANT_TESTERS_COMUNES );
@@ -147,6 +144,7 @@ void createSystemProcesses( const Configuracion& config ) {
             exit(1);
         }
     }
+    //Testers especiales
     const int cantTestersEspeciales = config.ObtenerParametroEntero( CANT_TESTERS_ESPECIALES );
     for(int i = 0; i < cantTestersEspeciales; i++, idTester++) {
         char param[3];
@@ -160,6 +158,19 @@ void createSystemProcesses( const Configuracion& config ) {
             exit(1);
         }
     }
+    //Testers config
+    for(int i = 0; i < cantTestersEspeciales; i++, idTester++) {
+        char param[3];
+        sprintf(param, "%d", idTester);
+        usleep(10);
+        pid_t newPid = fork();
+        if(newPid == 0) {
+            // Inicio el programa correspondiente
+            execlp("./testerConfig", "testerConfig", param, (char*)0);
+            Logger::error("Error al ejecutar el programa TesterConfig de ID" + idTester, __FILE__);
+            exit(1);
+        }
+    }    
     
     // Creo equipo especial
     pid_t eqEspPid = fork();
@@ -177,7 +188,7 @@ void createSystemProcesses( const Configuracion& config ) {
         exit(1);
     }
 
-    //Creo dispositivos
+    //Creo dispositivos y procesos dispositivos-config
     sleep(1);
     int idDispositivo = config.ObtenerParametroEntero(ID_DISPOSITIVO_START);
     int cantidad_lanzada = 0;
@@ -202,7 +213,21 @@ void createSystemProcesses( const Configuracion& config ) {
                 Logger::error("Error al ejecutar el programa dispositivo de ID" + idDispositivo, __FILE__);
                 exit(1);
             }
-        }
+        }        
+        for (int i = 0; i < cantidad_a_lanzar; i++){
+            char paramId[3];
+            sprintf(paramId, "%d", idDispositivo);
+            idDispositivo++;
+            char paramTipo[3];
+            sprintf(paramTipo, "%d", rand() % cantTiposDispositivo );
+            pid_t newPid = fork();
+            if(newPid == 0) {
+                // Inicio el programa correspondiente
+                execlp("./dispositivoConfig", "dispositivoConfig", paramId, paramTipo, (char*)0);
+                Logger::error("Error al ejecutar el programa dispositivo-Config de ID" + idDispositivo, __FILE__);
+                exit(1);
+            }
+        }        
         cantidad_lanzada += cantidad_a_lanzar;
         usleep(1000);
     }
