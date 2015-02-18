@@ -70,7 +70,7 @@ int main(int argc, char** argv) {
     }
     ss << "El dispositivo-config " << id << " ha terminado";
     Logger::notice(ss.str().c_str(), __FILE__);    
-    Logger::destroy();    
+    Logger::destroy();
     return 0;
 }
 

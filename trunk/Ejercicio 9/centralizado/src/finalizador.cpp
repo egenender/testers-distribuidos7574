@@ -17,6 +17,7 @@
 #include "ipc/Semaphore.h"
 #include "common/Planilla.h"
 #include "common/PlanillaAsignacionEquipoEspecial.h"
+#include "common/PlanillaVariablesDisp.h"
 #include "common/Configuracion.h"
 
 using namespace Constantes::NombresDeParametros;
@@ -89,8 +90,9 @@ int main(int argc, char** argv) {
     cola = msgget(key, 0660);
     msgctl(cola ,IPC_RMID, NULL);
 
-    //Semaforos de planilla variables
+    //IPCs de planillas de variables
     for( int i=0; i<config.ObtenerParametroEntero( MAX_DISPOSITIVOS_EN_SISTEMA ); i++ ){
+        //Semaforos de planilla variables
         Semaphore semPlanillaVarsTE( archivoIpcs, config.ObtenerParametroEntero(SEM_PLANILLA_VARS_TE_START) + i );
         semPlanillaVarsTE.getSem();
         semPlanillaVarsTE.eliSem();
@@ -100,6 +102,9 @@ int main(int argc, char** argv) {
         Semaphore semMutexPlanillaVars( archivoIpcs, config.ObtenerParametroEntero(SEM_MUTEX_PLANILLA_VARS_START) + i );
         semMutexPlanillaVars.getSem();
         semMutexPlanillaVars.eliSem();
+        //Shared memory
+        PlanillaVariablesDisp planillaVars( config, i+1 );
+        planillaVars.destruirComunicacion();
     }
     
     unlink(archivoIpcs.c_str());

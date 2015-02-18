@@ -22,13 +22,13 @@ PlanillaVariablesDisp::PlanillaVariablesDisp( const Configuracion& config, int i
         Logger::error(err.c_str(), __FILE__);
         throw err;
     }
-    m_KeyShmemEstadoId = shmget(m_KeyShmemEstado, sizeof(TEstadoDispositivo), IPC_CREAT | 0660);
-    if(m_KeyShmemEstadoId == -1) {
+    m_ShmemEstadoId = shmget(m_KeyShmemEstado, sizeof(TEstadoDispositivo), IPC_CREAT | 0660);
+    if(m_ShmemEstadoId == -1) {
         std::string err("Error al conseguir la memoria compartida de la planilla de variables. Error: " + std::string(strerror(errno)));
         Logger::error(err.c_str(), __FILE__);
         throw err;
     }    
-    void* tmpPtr = shmat(m_KeyShmemEstadoId, NULL ,0);
+    void* tmpPtr = shmat(m_ShmemEstadoId, NULL ,0);
     if ( tmpPtr != (void*) -1 ) {
         m_pShmEstado = static_cast<TEstadoDispositivo*> (tmpPtr);
         Logger::debug("Memoria compartida de la planilla de variables creada correctamente", __FILE__);
@@ -130,4 +130,8 @@ void PlanillaVariablesDisp::finalizarCambioDeVariable( int idVar ){
     }
     m_MutexPlanilla.v();
     m_SemCambioVars.v();    
+}
+
+bool PlanillaVariablesDisp::destruirComunicacion(){
+    return ( shmctl(this->m_ShmemEstadoId, IPC_RMID, NULL) != -1 );
 }
