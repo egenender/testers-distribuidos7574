@@ -43,7 +43,7 @@ void informarBrokerSiguiente(int shmemId, int semId, char* ipBrokerSiguiente) {
     for (int i = 0; i < CANT_BROKERS && *idBrokerSiguiente == 0; i++) {
         if (strcmp(ipBrokerSiguiente, IP_BROKERS[i].ipBroker) == 0) {
             printf("\n\n\nHay un nuevo id broker siguiente!\n\n\n");
-                *idBrokerSiguiente = IP_BROKERS[i].idBroker + ID_BROKER_START;
+                *idBrokerSiguiente = IP_BROKERS[i].idBroker;
         }
     }
     semIdBrokerSiguiente.v();
