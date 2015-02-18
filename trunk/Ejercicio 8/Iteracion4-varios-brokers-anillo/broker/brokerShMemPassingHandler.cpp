@@ -112,7 +112,7 @@ int main(int argc, char** argv) {
 	int msgQueueInternaBrokerShmem = msgget(key, IPC_CREAT | 0660);
 
     key = ftok(ipcFileName.c_str(), SHM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM);
-    int shmCantReqBrokerShMem = shmget(key, sizeof(int), IPC_CREAT | 0660);
+    int shmCantReqBrokerShMem = shmget(key, sizeof(int), 0660);
     int* cantReqBrokerShm = (int*) shmat(shmCantReqBrokerShMem, NULL, 0);
 
     Semaphore semBrokerCantShmemReq(SEM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM);

@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
     int shmCantReqPlanillasShMem = shmget(key, sizeof(int), IPC_CREAT | 0660);
     TShmemCantRequerimientos* cantReqPlanillasShm = (TShmemCantRequerimientos*) shmat(shmCantReqPlanillasShMem, NULL, 0);
 
-    Semaphore semBrokerCantShmemReq(SEM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM);
+    Semaphore semBrokerCantShmemReq(SEM_CANTIDAD_REQUERIMIENTOS_PLANILLAS_SHM);
     semBrokerCantShmemReq.getSem();
     
     while(true) {
@@ -54,11 +54,11 @@ int main(int argc, char** argv) {
         // Sumo el requerimiento en la shmem y luego lo inserto en la msgqueue
         if(req.mtype == MTYPE_REQ_SHMEM_PLANILLA_GENERAL) {
             semBrokerCantShmemReq.p();
-            cantReqPlanillasShm->cantRequerimientosShmemPlanillaGeneral++;
+            cantReqPlanillasShm->cantRequerimientosShmemPlanillaGeneral += 1;
             semBrokerCantShmemReq.v();
-        } else {
+        } else if(req.mtype == MTYPE_REQ_SHMEM_PLANILLA_ASIGNACION) {
             semBrokerCantShmemReq.p();
-            cantReqPlanillasShm->cantRequerimientosShmemPlanillaAsignacion++;
+            cantReqPlanillasShm->cantRequerimientosShmemPlanillaAsignacion += 1;
             semBrokerCantShmemReq.v();
         }
         

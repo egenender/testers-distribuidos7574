@@ -40,7 +40,7 @@ void informarBrokerSiguiente(int shmemId, int semId, char* ipBrokerSiguiente) {
     *idBrokerSiguiente = 0;
     for (int i = 0; i < CANT_BROKERS && *idBrokerSiguiente == 0; i++){
         if (strcmp(ipBrokerSiguiente, IP_BROKERS[i].ipBroker) == 0){
-                *idBrokerSiguiente = IP_BROKERS[i].idBroker;
+                *idBrokerSiguiente = IP_BROKERS[i].idBroker + ID_BROKER_START;
         }
     }
     semIdBrokerSiguiente.v();
