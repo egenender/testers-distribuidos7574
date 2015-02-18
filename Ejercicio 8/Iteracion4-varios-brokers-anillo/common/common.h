@@ -51,29 +51,29 @@ const int SEM_PLANILLA_ASIGNACION_VERSION = 18;
 const int SEM_ANILLO_BROKER_SHM_RESTAURANDOSE = 19;
 const int SHM_ANILLO_BROKER_SHM_LISTENER_EJECUTANDOSE = 20;
 const int SEM_ANILLO_BROKER_SHM_LISTENER_EJECUTANDOSE = 21;
-const int SEM_ANILLO_PLANILLA_GENERAL_RESTAURANDOSE = 19;
-const int SHM_ANILLO_PLANILLA_GENERAL_LISTENER_EJECUTANDOSE = 20;
-const int SEM_ANILLO_PLANILLA_GENERAL_LISTENER_EJECUTANDOSE = 21;
-const int SEM_ANILLO_PLANILLA_ASIGNACION_RESTAURANDOSE = 19;
-const int SHM_ANILLO_PLANILLA_ASIGNACION_LISTENER_EJECUTANDOSE = 20;
-const int SEM_ANILLO_PLANILLA_ASIGNACION_LISTENER_EJECUTANDOSE = 21;
-const int SHM_LISTENER_BROKER_SHM_PID = 22;
-const int SHM_LISTENER_PLANILLA_GENERAL_PID = 23;
-const int SHM_LISTENER_PLANILLA_ASIGNACION_PID = 24;
+const int SEM_ANILLO_PLANILLA_GENERAL_RESTAURANDOSE = 22;
+const int SHM_ANILLO_PLANILLA_GENERAL_LISTENER_EJECUTANDOSE = 23;
+const int SEM_ANILLO_PLANILLA_GENERAL_LISTENER_EJECUTANDOSE = 24;
+const int SEM_ANILLO_PLANILLA_ASIGNACION_RESTAURANDOSE = 25;
+const int SHM_ANILLO_PLANILLA_ASIGNACION_LISTENER_EJECUTANDOSE = 26;
+const int SEM_ANILLO_PLANILLA_ASIGNACION_LISTENER_EJECUTANDOSE = 27;
+const int SHM_LISTENER_BROKER_SHM_PID = 28;
+const int SHM_LISTENER_PLANILLA_GENERAL_PID = 29;
+const int SHM_LISTENER_PLANILLA_ASIGNACION_PID = 30;
 
-const int SHM_TESTERS_COMUNES_DISPONIBLES = 19;
-const int SHM_TESTERS_ESPECIALES_DISPONIBLES = 20;
+const int SHM_TESTERS_COMUNES_DISPONIBLES = 31;
+const int SHM_TESTERS_ESPECIALES_DISPONIBLES = 32;
 
-const int SEM_TABLA_TESTERS_COMUNES_DISPONIBLES = 21;
-const int SEM_TABLA_TESTERS_ESPECIALES_DISPONIBLES = 22;
+const int SEM_TABLA_TESTERS_COMUNES_DISPONIBLES = 33;
+const int SEM_TABLA_TESTERS_ESPECIALES_DISPONIBLES = 34;
 
-const int SEM_IDENTIFICADOR = 23;
+const int SEM_IDENTIFICADOR = 35;
 
-const int SHM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM = 24;
-const int SEM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM = 25;
+const int SHM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM = 36;
+const int SEM_CANTIDAD_REQUERIMIENTOS_BROKER_SHM = 37;
 
-const int SHM_CANTIDAD_REQUERIMIENTOS_PLANILLAS_SHM = 26;
-const int SEM_CANTIDAD_REQUERIMIENTOS_PLANILLAS_SHM = 27;
+const int SHM_CANTIDAD_REQUERIMIENTOS_PLANILLAS_SHM = 38;
+const int SEM_CANTIDAD_REQUERIMIENTOS_PLANILLAS_SHM = 39;
 
 const int MSGQUEUE_ENVIO_DISP = 120;
 const int MSGQUEUE_RECEPCIONES_DISP = 121;
@@ -164,11 +164,11 @@ const std::string ipcFileName = "/tmp/pereira-ipcs";
 
 const std::string logFileName = "log.txt";
 
-const std::string configBrokerShmemFileName = "../../Anillo/configBrokerShm"; // Relativo a ./bin/anillo/
+const std::string configBrokerShmemFileName = "/home/ferno/ferno/FIUBA/Distribuidos/Practicas/testers-distribuidos7574/Ejercicio 8/Iteracion4-varios-brokers-anillo/Anillo/configBrokerShm"; // Relativo a ./bin/anillo/
 
-const std::string configPlanillaGeneralShmemFileName = "../../Anillo/configPlanillaGeneralShmem"; // Relativo a ./bin/anillo/
+const std::string configPlanillaGeneralShmemFileName = "/home/ferno/ferno/FIUBA/Distribuidos/Practicas/testers-distribuidos7574/Ejercicio 8/Iteracion4-varios-brokers-anillo/Anillo/configPlanillaGeneralShmem"; // Relativo a ./bin/anillo/
 
-const std::string configPlanillaAsignacionShmemFileName = "../../Anillo/configPlanillaAsignacionShmem"; // Relativo a ./bin/anillo/
+const std::string configPlanillaAsignacionShmemFileName = "/home/ferno/ferno/FIUBA/Distribuidos/Practicas/testers-distribuidos7574/Ejercicio 8/Iteracion4-varios-brokers-anillo/Anillo/configPlanillaAsignacionShmem"; // Relativo a ./bin/anillo/
 
 //Estructuras communes:
 typedef struct resultado{

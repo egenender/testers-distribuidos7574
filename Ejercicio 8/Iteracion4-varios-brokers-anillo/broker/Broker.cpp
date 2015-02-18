@@ -423,7 +423,7 @@ void crearServers(){
             Logger::notice("Error al crear cliente emisor de mensajes generales. Algo salio mal!", __FILE__);
             exit(1);
         }
-        
+
         // Comunicacion de memoria compartida inter-brokers
         sprintf(paramMsgQueue, "%d", MSGQUEUE_ENVIO_BROKER_SHM);
         sprintf(paramSizeMsg, "%d", (int) sizeof(TMessageShMemInterBroker));

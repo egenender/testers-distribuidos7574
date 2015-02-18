@@ -126,7 +126,7 @@ int main(int argc, char** argv) {
     semIdBrokerVersion.getSem();
     
     key = ftok(ipcFileName.c_str(), SHM_BROKER_SIGUIENTE);
-    int shmIdBrokerSiguiente = shmget(key, sizeof(int), IPC_CREAT | 0660);
+    int shmIdBrokerSiguiente = shmget(key, sizeof(int), 0660);
     int* idBrokerSiguiente = (int*) shmat(shmIdBrokerSiguiente, NULL, 0);
 
     Semaphore semIdBrokerSiguiente(SEM_BROKER_SIGUIENTE);
@@ -209,7 +209,7 @@ int main(int argc, char** argv) {
             Logger::debug(log.str(), nombre.str().c_str()); log.str(""); log.clear();
             cantRequerimientos--;
         }
-        log << "No hay mas requerimientos de shared memory. Se la mando al siguiente broker de ID " << ID_BROKER_SIGUIENTE;
+        log << "No hay mas requerimientos de shared memory";
         Logger::debug(log.str(), nombre.str().c_str()); log.str(""); log.clear();
         
         // Aumento la version de la shmem ya actualizada
@@ -241,6 +241,8 @@ int main(int argc, char** argv) {
             semIdBrokerSiguiente.p();
             msg.mtype = *idBrokerSiguiente;
             semIdBrokerSiguiente.v();
+            log << "Le envio la shared memory al siguiente broker de ID " << msg.mtype;
+            Logger::debug(log.str(), __FILE__); log.str(""); log.clear();
             int okSend = msgsnd(msgQueueShmemHaciaBrokers, &msg, sizeof(TMessageShMemInterBroker) - sizeof(long), 0);
             if (okSend == -1) {
                 std::stringstream ss;
