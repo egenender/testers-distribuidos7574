@@ -357,6 +357,7 @@ int main(int argc, char *argv[])
             strcpy(msgInvitacion.direccionMaster, ipMaster);
              
             strcpy(ipBrokerSiguiente, inet_ntoa(addr.sin_addr));
+            informarBrokerSiguiente(shmBrokerSiguienteId, semShmBrokerSiguienteId, ipBrokerSiguiente);
             sprintf(mostrar, "[BROKER] --> Ip del Broker siguiente: %s\n", ipBrokerSiguiente);
             write(fileno(stdout), mostrar, strlen(mostrar));
             if (sendto(fd,&msgInvitacion,sizeof(MsgInvitacion_t),0,(struct sockaddr *) &addr,(socklen_t)addrlen) < 0) {
