@@ -49,7 +49,7 @@ void restoreRing(int sigNum) {
             exit(1);
         }
 
-        sleep(2); // Dejo algo de tiempo para que el sender arranque
+        sleep(CANT_BROKERS + 1); // Dejo algo de tiempo para que todos los brokers timeouteen
     }
     shmdt(listenerEjecutandose);
     
@@ -213,11 +213,12 @@ int main(int argc, char** argv) {
         Logger::debug(log.str(), nombre.str().c_str()); log.str(""); log.clear();
         
         // Aumento la version de la shmem ya actualizada
+        if(msg.version == ULONG_MAX) {
+            msg.version = 0;
+        } else 
+            msg.version += 1;
         semIdBrokerVersion.p();
-        if(*idBrokerVersion == ULONG_MAX) {
-            *idBrokerVersion = 0;
-        } else
-            *idBrokerVersion += 1;
+        *idBrokerVersion = msg.version;
         semIdBrokerVersion.v();
 
         // Borro los requerimientos saciados recien

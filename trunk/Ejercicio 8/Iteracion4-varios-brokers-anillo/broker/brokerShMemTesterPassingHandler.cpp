@@ -316,12 +316,13 @@ int main(int argc, char** argv) {
             log << "No hay mas requerimientos de planilla general. Se la mando al siguiente broker de ID " << ID_BROKER_SIGUIENTE;
             Logger::debug(log.str(), nombre.str().c_str()); log.str(""); log.clear();
             
-            // Aumento la version de la shmem
+            // Aumento la version de la shmem ya actualizada
+            if(msg.version == ULONG_MAX) {
+                msg.version = 0;
+            } else 
+                msg.version += 1;
             semPlanillaGeneralVersion.p();
-            if(*planillaGeneralVersion == ULONG_MAX) {
-                *planillaGeneralVersion = 0;
-            } else
-                *planillaGeneralVersion += 1;
+            *planillaGeneralVersion = msg.version;
             semPlanillaGeneralVersion.v();
 
             // Borro los requerimientos saciados recien
@@ -454,12 +455,13 @@ int main(int argc, char** argv) {
             log << "No hay mas requerimientos de planilla asignacion. Se la mando al siguiente broker de ID " << ID_BROKER_SIGUIENTE;
             Logger::debug(log.str(), nombre.str().c_str()); log.str(""); log.clear();
 
-            // Aumento la version de la shmem
+            // Aumento la version de la shmem ya actualizada
+            if(msg.version == ULONG_MAX) {
+                msg.version = 0;
+            } else 
+                msg.version += 1;
             semPlanillaAsignacionVersion.p();
-            if(*planillaAsignacionVersion == ULONG_MAX) {
-                *planillaAsignacionVersion = 0;
-            } else
-                *planillaAsignacionVersion += 1;
+            *planillaAsignacionVersion = msg.version;
             semPlanillaAsignacionVersion.v();
 
             // Borro los requerimientos saciados recien

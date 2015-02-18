@@ -18,7 +18,7 @@ SHARED_SOURCES_SERVER_C_OBJ := $(SHARED_SOURCES_SERVER_C:.c=.o)
 SHARED_SOURCES_ID_SERVER := $(shell find './identificador/' -name '*.cpp')
 SHARED_OBJ_ID_SERVER := $(SHARED_SOURCES_ID_SERVER:.cpp=.o)
 
-SHARED_SOURCES_TCP := $(shell find ./logger/ ./lock/ ./sync/ -name '*.cpp')
+SHARED_SOURCES_TCP := $(shell find ./logger/ ./sync/ -name '*.cpp')
 SHARED_OBJ_TCP=$(SHARED_SOURCES_TCP:.cpp=.o)
 	
 SHARED_SOURCES_BROKER := $(shell find ./logger/ ./ipc/ ./sync/ -name '*.cpp')
