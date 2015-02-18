@@ -36,10 +36,13 @@ void informarBrokerSiguiente(int shmemId, int semId, char* ipBrokerSiguiente) {
     Semaphore semIdBrokerSiguiente(semId);
     semIdBrokerSiguiente.getSem();
     
+    printf("\n\n\nEntra a informar el siguiente broker!\n\n\n");
+    
     semIdBrokerSiguiente.p();
     *idBrokerSiguiente = 0;
-    for (int i = 0; i < CANT_BROKERS && *idBrokerSiguiente == 0; i++){
-        if (strcmp(ipBrokerSiguiente, IP_BROKERS[i].ipBroker) == 0){
+    for (int i = 0; i < CANT_BROKERS && *idBrokerSiguiente == 0; i++) {
+        if (strcmp(ipBrokerSiguiente, IP_BROKERS[i].ipBroker) == 0) {
+            printf("\n\n\nHay un nuevo id broker siguiente!\n\n\n");
                 *idBrokerSiguiente = IP_BROKERS[i].idBroker + ID_BROKER_START;
         }
     }
