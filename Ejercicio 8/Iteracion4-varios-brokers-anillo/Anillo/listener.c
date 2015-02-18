@@ -330,13 +330,13 @@ int main(int argc, char *argv[])
         nbytes=recvfrom(fd,&msgInvitacion,sizeof(MsgInvitacion_t),0,(struct sockaddr *) &addr, &addrlen);
         if(nbytes<0) {
           if(errno==EINTR) {
-			    sprintf(mostrar,"[BROKER] --> Timeout expirado\n");
+                sprintf(mostrar,"[BROKER] --> Timeout expirado\n");
                 write(fileno(stdout),mostrar,strlen(mostrar));
                 sprintf(mostrar,"[BROKER] --> Cerrar Anillo\n");
                 write(fileno(stdout),mostrar,strlen(mostrar));
                 addr.sin_addr.s_addr = inet_addr(ipMaster);
                 msgInvitacion.tipo=CERRAR;
-                sleep(3);
+                sleep(5);
                 if (sendto(fd,&msgInvitacion,sizeof(MsgInvitacion_t),0,(struct sockaddr *) &addr,(socklen_t)addrlen) < 0) {
                      perror("sendto\n");
                      exit(1);
