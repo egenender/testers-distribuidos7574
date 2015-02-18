@@ -291,6 +291,7 @@ void crearServers(){
     Logger::notice("Creo el servidor receptor de mensajes de testers comunes", __FILE__);
 	if (fork() == 0){
 		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_SERVER_RECEPTOR , paramMsgQueue, paramSizeMsg, (char*)0);
+        Logger::notice("Error al crear server receptor de mensajes de testers comunes. Algo salio mal!", __FILE__);
         exit(1);
 	}
 	
@@ -298,6 +299,7 @@ void crearServers(){
 	sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_EMISOR);
 	if (fork() == 0){
 		execlp("./tcp/tcpserver_emisor", "tcpserver_emisor", PUERTO_SERVER_EMISOR , paramMsgQueue, paramSizeMsg, (char*)0);
+        Logger::notice("Error al crear server emisor de mensajes a testers comunes. Algo salio mal!", __FILE__);
         exit(1);
 	}
 
@@ -306,6 +308,7 @@ void crearServers(){
     Logger::notice("Creo el servidor receptor de mensajes de dispositivos", __FILE__);
 	if (fork() == 0){
 		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_SERVER_RECEPTOR_DISPOSITIVOS , paramMsgQueue, paramSizeMsg, (char*)0);
+        Logger::notice("Error al crear server receptor de mensajes de dispositivos. Algo salio mal!", __FILE__);
         exit(1);
 	}
 	
@@ -313,6 +316,7 @@ void crearServers(){
 	Logger::notice("Creo el servidor emisor de mensajes a dispositivos", __FILE__);
 	if (fork() == 0){
 		execlp("./tcp/tcpserver_emisor", "tcpserver_emisor", PUERTO_SERVER_EMISOR_DISPOSITIVOS , paramMsgQueue, paramSizeMsg,(char*) 0);
+        Logger::notice("Error al crear server emisor de mensajes a dispositivos. Algo salio mal!", __FILE__);
         exit(1);
 	}
     
@@ -321,6 +325,7 @@ void crearServers(){
     Logger::notice("Creo el servidor receptor de mensajes generales de brokers", __FILE__);
 	if (fork() == 0){
 		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_CONTRA_BROKERS , paramMsgQueue, paramSizeMsg, (char*) 0);
+        Logger::notice("Error al crear server receptor de mensajes generales de brokers. Algo salio mal!", __FILE__);
         exit(1);
 	}
     
@@ -330,24 +335,27 @@ void crearServers(){
     Logger::notice("Creo el servidor receptor de memoria compartida de brokers", __FILE__);
 	if (fork() == 0){
 		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_CONTRA_BROKERS_SHMEM_BROKERS , paramMsgQueue, paramSizeMsg, (char*) 0);
+        Logger::notice("Error al crear server receptor de memoria compartida inter-broker. Algo salio mal!", __FILE__);
         exit(1);
 	}
     
     // Comunicacion Servidor con brokers para memoria compartida de planilla general
     sprintf(paramMsgQueue, "%d", MSGQUEUE_RECEPCION_BROKER_SHM_PLANILLA_GENERAL);
     sprintf(paramSizeMsg, "%d", (int) sizeof(TSharedMemoryPlanillaGeneral));
-    Logger::notice("Creo el servidor receptor de memoria compartida de brokers", __FILE__);
+    Logger::notice("Creo el servidor receptor de planilla general", __FILE__);
 	if (fork() == 0){
 		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor",  PUERTO_CONTRA_BROKERS_SHMEM_PLANILLA_GENERAL, paramMsgQueue, paramSizeMsg, (char*) 0);
+        Logger::notice("Error al crear server receptor de planilla general. Algo salio mal!", __FILE__);
         exit(1);
 	}
     
     // Comunicacion Servidor con brokers para memoria compartida de planilla asignacion
     sprintf(paramMsgQueue, "%d", MSGQUEUE_RECEPCION_BROKER_SHM_PLANILLA_ASIGNACION);
     sprintf(paramSizeMsg, "%d", (int) sizeof(TSharedMemoryPlanillaAsignacion));
-    Logger::notice("Creo el servidor receptor de memoria compartida de brokers", __FILE__);
+    Logger::notice("Creo el servidor receptor de planilla asignacion", __FILE__);
 	if (fork() == 0){
 		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor",  PUERTO_CONTRA_BROKERS_SHMEM_PLANILLA_ASIGNACION, paramMsgQueue, paramSizeMsg, (char*) 0);
+        Logger::notice("Error al crear server receptor de planilla asignacion. Algo salio mal!", __FILE__);
         exit(1);
 	}
     
@@ -357,38 +365,43 @@ void crearServers(){
     Logger::notice("Creo el servidor receptor de mensajes de dispositivos", __FILE__);
 	if (fork() == 0){
 		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_SERVER_RECEPCION_SHM_PLANILLA_GENERAL, paramMsgQueue, paramSizeMsg, (char*)0);
+        Logger::notice("Error al crear server receptor de planilla general. Algo salio mal!", __FILE__);
         exit(1);
 	}
 
 	sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_ENVIO_SHMEM_HANDLER);
-	Logger::notice("Creo el servidor emisor de mensajes a dispositivos", __FILE__);
+	Logger::notice("Creo el servidor emisor de planilla general", __FILE__);
 	if (fork() == 0){
 		execlp("./tcp/tcpserver_emisor", "tcpserver_emisor", PUERTO_SERVER_ENVIO_SHM_PLANILLA_GENERAL, paramMsgQueue, paramSizeMsg, (char*)0);
+        Logger::notice("Error al crear server emisor de planilla general. Algo salio mal!", __FILE__);
         exit(1);
 	}
 
     // Comunicacion con tester/eq-esp para la shared memory de planilla asignacion
     sprintf(paramSizeMsg, "%d", (int) sizeof(TSharedMemoryPlanillaAsignacion));
     sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_RECEPCION_SHMEM_HANDLER);
-    Logger::notice("Creo el servidor receptor de mensajes de dispositivos", __FILE__);
+    Logger::notice("Creo el servidor receptor de planilla asignacion", __FILE__);
 	if (fork() == 0){
 		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_SERVER_RECEPCION_SHM_PLANILLA_ASIGNACION, paramMsgQueue, paramSizeMsg, (char*)0);
+        Logger::notice("Error al crear server receptor de planilla asignacion. Algo salio mal!", __FILE__);
         exit(1);
 	}
 
 	sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_ENVIO_SHMEM_HANDLER);
-	Logger::notice("Creo el servidor emisor de mensajes a dispositivos", __FILE__);
+	Logger::notice("Creo el servidor emisor de planilla asignacion", __FILE__);
 	if (fork() == 0){
 		execlp("./tcp/tcpserver_emisor", "tcpserver_emisor", PUERTO_SERVER_ENVIO_SHM_PLANILLA_ASIGNACION, paramMsgQueue, paramSizeMsg, (char*)0);
+        Logger::notice("Error al crear server emisor de planilla asignacion. Algo salio mal!", __FILE__);
         exit(1);
 	}
     
     // Comunicacion con tester/eq-esp para obtener requerimientos de planillas
     sprintf(paramSizeMsg, "%d", (int) sizeof(TRequerimientoSharedMemory));
     sprintf(paramMsgQueue, "%d", MSGQUEUE_BROKER_REQUERIMIENTO_SHMEM_HANDLER);
-    Logger::notice("Creo el servidor receptor de mensajes de dispositivos", __FILE__);
+    Logger::notice("Creo el servidor receptor de requerimientos de shmem", __FILE__);
 	if (fork() == 0){
 		execlp("./tcp/tcpserver_receptor", "tcpserver_receptor", PUERTO_SERVER_RECEPCION_REQ_PLANILLAS , paramMsgQueue, paramSizeMsg, (char*)0);
+        Logger::notice("Error al crear server receptor de requerimientos de shmem. Algo salio mal!", __FILE__);
         exit(1);
 	}
 
@@ -407,6 +420,7 @@ void crearServers(){
         Logger::notice("Creo el cliente emisor de mensajes generales a brokers", __FILE__);
         if (fork() == 0){
             execlp("./tcp/tcpclient_emisor", "tcpclient_emisor", IP_BROKERS[i].ipBroker, PUERTO_CONTRA_BROKERS , paramIdBroker, paramMsgQueue, paramSizeMsg, (char*) 0);
+            Logger::notice("Error al crear cliente emisor de mensajes generales. Algo salio mal!", __FILE__);
             exit(1);
         }
         
@@ -416,6 +430,7 @@ void crearServers(){
         Logger::notice("Creo el cliente emisor de memoria compartida a brokers", __FILE__);
         if (fork() == 0){
             execlp("./tcp/tcpclient_emisor", "tcpclient_emisor", IP_BROKERS[i].ipBroker, PUERTO_CONTRA_BROKERS_SHMEM_BROKERS , paramIdBroker, paramMsgQueue, paramSizeMsg, (char*) 0);
+            Logger::notice("Error al crear cliente emisor de shmem inter-broker. Algo salio mal!", __FILE__);
             exit(1);
         }
         
@@ -425,6 +440,7 @@ void crearServers(){
         Logger::notice("Creo el cliente emisor de memoria compartida a brokers", __FILE__);
         if (fork() == 0){
             execlp("./tcp/tcpclient_emisor", "tcpclient_emisor", IP_BROKERS[i].ipBroker,  PUERTO_CONTRA_BROKERS_SHMEM_PLANILLA_GENERAL, paramIdBroker, paramMsgQueue, paramSizeMsg, (char*) 0);
+            Logger::notice("Error al crear cliente emisor de planilla general. Algo salio mal!", __FILE__);
             exit(1);
         }
         
@@ -434,6 +450,7 @@ void crearServers(){
         Logger::notice("Creo el cliente emisor de memoria compartida a brokers", __FILE__);
         if (fork() == 0){
             execlp("./tcp/tcpclient_emisor", "tcpclient_emisor", IP_BROKERS[i].ipBroker,  PUERTO_CONTRA_BROKERS_SHMEM_PLANILLA_ASIGNACION, paramIdBroker, paramMsgQueue, paramSizeMsg, (char*) 0);
+            Logger::notice("Error al crear cliente emisor de planilla asignacion. Algo salio mal!", __FILE__);
             exit(1);
         }
     }
@@ -594,9 +611,9 @@ int main (int argc, char* argv[]) {
     Logger::debug("Creando IPCs...", __FILE__);
     crearIpc();
     Logger::debug("Creados todos los IPCs", __FILE__);
-	crearServers();
     armarAnillo();
     lanzarTareasMaster();
+	crearServers();
 	crearModulosBroker();
     
     return 0;
