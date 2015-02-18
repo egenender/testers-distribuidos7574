@@ -13,16 +13,10 @@
 #include "ipc/Semaphore.h"
 #include "broker/brokersInfo.h"
 
-void informarLider(int shmemId, int semId, int soyLider) {
+void informarLider(int shmemId, int semId, bool soyLider) {
     key_t key = ftok(ipcFileName.c_str(), shmemId);
-    int shmSoyLiderId = shmget(key, sizeof(int) , 0660);
-    int* lider = (int*) shmat (shmSoyLiderId, NULL, 0);
-    
-    if(soyLider) {
-        printf("Voy a poner en la shmem que soy el lider");
-    } else {
-        printf("Voy a poner en la shmem que NO soy el lider");
-    }
+    int shmSoyLiderId = shmget(key, sizeof(bool) , 0660);
+    bool* lider = (bool*) shmat (shmSoyLiderId, NULL, 0);
     
     Semaphore semSoyLider(semId);
     semSoyLider.getSem();
