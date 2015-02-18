@@ -30,6 +30,10 @@ void restoreRing(int sigNum) {
     Semaphore semListenerEjecutandose(SEM_ANILLO_BROKER_SHM_LISTENER_EJECUTANDOSE);
     semListenerEjecutandose.getSem();
     
+    key = ftok(ipcFileName.c_str(), SHM_LISTENER_BROKER_SHM_PID);
+    int shmListenerBrokerPid = shmget(key, sizeof(pid_t), IPC_CREAT | 0660);
+    pid_t* listenerBrokerPid = (pid_t*) shmat(shmListenerBrokerPid, NULL, 0);
+    
     // Si el Listener está corriendo -> ya detectaron la caida del anillo, espero restauracion
     semListenerEjecutandose.p();
     if(*listenerEjecutandose) {
@@ -38,10 +42,8 @@ void restoreRing(int sigNum) {
     } else {
         semListenerEjecutandose.v();
         // Mato al proceso listener y corro el sender para regenerar el anillo
-        key = ftok(ipcFileName.c_str(), SHM_LISTENER_BROKER_SHM_PID);
-        int shmListenerBrokerPid = shmget(key, sizeof(pid_t), IPC_CREAT | 0660);
-        pid_t* listenerBrokerPid = (pid_t*) shmat(shmListenerBrokerPid, NULL, 0);
         kill(*listenerBrokerPid, SIGINT);
+        wait(NULL);
         
         if(fork() == 0) {
             execlp("./anillo/sender", "sender", configBrokerShmemFileName.c_str(), (char*) 0);
