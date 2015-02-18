@@ -57,9 +57,9 @@ void crearIpc() {
     
     /* INFO proveniente del algoritmo del anillo para la shmem inter-broker*/
     key = ftok(ipcFileName.c_str(), SHM_BROKER_ES_LIDER);
-    int shmIdSoyLider = shmget(key, sizeof(bool), IPC_CREAT | 0660);
-    bool* soyLider = (bool*) shmat(shmIdSoyLider, NULL, 0);
-    *soyLider = false;
+    int shmIdSoyLider = shmget(key, sizeof(int), IPC_CREAT | 0660);
+    int* soyLider = (int*) shmat(shmIdSoyLider, NULL, 0);
+    *soyLider = 0;
     shmdt((void*) soyLider);
 
     Semaphore semSoyLider(SEM_BROKER_ES_LIDER);
@@ -88,9 +88,9 @@ void crearIpc() {
     
     /* INFO proveniente del algoritmo del anillo para la shmem planilla general*/
     key = ftok(ipcFileName.c_str(), SHM_PLANILLA_GENERAL_ES_LIDER);
-    int shmPlanillaGeneralIdSoyLider = shmget(key, sizeof(bool), IPC_CREAT | 0660);
-    bool* soyLiderPlanillaGeneral = (bool*) shmat(shmPlanillaGeneralIdSoyLider, NULL, 0);
-    *soyLiderPlanillaGeneral = false;
+    int shmPlanillaGeneralIdSoyLider = shmget(key, sizeof(int), IPC_CREAT | 0660);
+    int* soyLiderPlanillaGeneral = (int*) shmat(shmPlanillaGeneralIdSoyLider, NULL, 0);
+    *soyLiderPlanillaGeneral = 0;
     shmdt((void*) soyLiderPlanillaGeneral);
 
     Semaphore semSoyLiderPlanillaGeneral(SEM_PLANILLA_GENERAL_ES_LIDER);
@@ -119,9 +119,9 @@ void crearIpc() {
 
     /* INFO proveniente del algoritmo del anillo para la shmem planilla asignacion*/
     key = ftok(ipcFileName.c_str(), SHM_PLANILLA_ASIGNACION_ES_LIDER);
-    int shmPlanillaAsignacionIdSoyLider = shmget(key, sizeof(bool), IPC_CREAT | 0660);
-    bool* soyLiderPlanillaAsignacion = (bool*) shmat(shmPlanillaAsignacionIdSoyLider, NULL, 0);
-    *soyLiderPlanillaAsignacion = false;
+    int shmPlanillaAsignacionIdSoyLider = shmget(key, sizeof(int), IPC_CREAT | 0660);
+    int* soyLiderPlanillaAsignacion = (int*) shmat(shmPlanillaAsignacionIdSoyLider, NULL, 0);
+    *soyLiderPlanillaAsignacion = 0;
     shmdt((void*) soyLiderPlanillaAsignacion);
 
     Semaphore semSoyLiderPlanillaAsignacion(SEM_PLANILLA_ASIGNACION_ES_LIDER);
@@ -471,6 +471,8 @@ void lanzarShmem(int msgQueueId, void* msg, size_t sizeMsg) {
 }
 
 void lanzarTareasMaster() {
+    
+    Logger::notice("Me voy a fijar si soy el MASTER de algun anillo para lanzar las shmem", __FILE__);
 
     // Si soy lider del anillo logico de la shmem inter-broker, lanzo la shmem
     if(soyLider(SHM_BROKER_ES_LIDER, SEM_BROKER_ES_LIDER)) {
@@ -594,10 +596,9 @@ int main (int argc, char* argv[]) {
     crearIpc();
     Logger::debug("Creados todos los IPCs", __FILE__);
 	crearServers();
-	crearModulosBroker();
-    
     armarAnillo();
     lanzarTareasMaster();
+	crearModulosBroker();
     
     return 0;
 }
