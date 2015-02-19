@@ -23,6 +23,8 @@ bool anilloRestaurado;
 
 void restoreRing(int sigNum) {
     
+    Logger::notice("Se procede a restaurar el anillo...", __FILE__);
+    
     key_t key = ftok(ipcFileName.c_str(), SHM_ANILLO_BROKER_SHM_LISTENER_EJECUTANDOSE);
     bool shmListenerEjecutandose = shmget(key, sizeof(bool), IPC_CREAT | 0660);
     bool* listenerEjecutandose = (bool*) shmat(shmListenerEjecutandose, NULL, 0);
@@ -39,11 +41,14 @@ void restoreRing(int sigNum) {
     if(*listenerEjecutandose) {
         semListenerEjecutandose.v();
         // Dejo que se termine de ejecutar
+        Logger::debug("Listener ejecutandose. Alguien ya se percato de que estaba todo caido", __FILE__);
     } else {
         semListenerEjecutandose.v();
         // Mato al proceso listener y corro el sender para regenerar el anillo
         kill(*listenerBrokerPid, SIGINT);
         wait(NULL);
+        
+        Logger::debug("Listener no esta corriendo. Soy el primero que se entera. Voy a correr el sender para formar el anillo", __FILE__);
         
         if(fork() == 0) {
             execlp("./anillo/sender", "sender", configBrokerShmemFileName.c_str(), (char*) 0);
@@ -59,6 +64,8 @@ void restoreRing(int sigNum) {
     Semaphore semAnilloRestaurandose(SEM_ANILLO_BROKER_SHM_RESTAURANDOSE);
     semAnilloRestaurandose.getSem();
     semAnilloRestaurandose.p();
+    
+    Logger::debug("Termina de correr el listener/sender!", __FILE__);
 
     key = ftok(ipcFileName.c_str(), SHM_BROKER_ES_LIDER);
     int shmIdSoyLider = shmget(key, sizeof(bool), IPC_CREAT | 0660);
@@ -154,6 +161,7 @@ int main(int argc, char** argv) {
         if (okRead == -1) {
             if(anilloRestaurado) {
                 // Se ejecuto la restauracion del anillo, intento leer nuevamente
+                Logger::notice("Se ejecuto la restauracion del anillo efectivamente", __FILE__);
                 continue;
             }
             std::stringstream ss;

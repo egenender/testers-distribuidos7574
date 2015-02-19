@@ -6,6 +6,7 @@
  */
 
 #include "Timeout.h"
+#include "logger/Logger.h"
 
 Timeout::Timeout() {
 }
@@ -21,6 +22,8 @@ void Timeout::runTimeout(int timeInSecs, pid_t processToKill, int signal) {
     if(this->timeoutPid == 0) {
         sleep(timeInSecs);
         kill(processToKill, signal);
+        std::stringstream ss; ss << "Se envio la señal " << signal << " al proceso PID " << processToKill;
+        Logger::debug(ss.str(), __FILE__);
         exit(0);
     }
 }

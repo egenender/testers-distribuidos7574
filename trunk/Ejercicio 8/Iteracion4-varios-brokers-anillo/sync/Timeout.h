@@ -14,6 +14,9 @@
 #include <signal.h>
 #include <cstdlib>
 #include <unistd.h>
+#include <sstream>
+
+#include "logger/Logger.h"
 
 class Timeout {
 public:
