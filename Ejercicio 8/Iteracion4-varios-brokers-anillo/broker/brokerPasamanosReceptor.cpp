@@ -128,7 +128,7 @@ int main(int argc, char* argv[]) {
                         exit(1);
                     }
                     
-                    int brokerAsignado = shmDistrTablaTesters->memoria.brokerAsignado[msg.tester - ID_TESTER_ESP_START + MAX_TESTER_COMUNES] = true;
+                    int brokerAsignado = shmDistrTablaTesters->memoria.brokerAsignado[msg.tester - ID_TESTER_ESP_START + MAX_TESTER_COMUNES];
                     
                     shmDistrTablaTesters->mtype = MTYPE_DEVOLUCION_SHM_BROKER;
                     devolverDistributedSharedMemory(msgQueueShm, shmDistrTablaTesters, sizeof(TMessageShMemInterBroker));

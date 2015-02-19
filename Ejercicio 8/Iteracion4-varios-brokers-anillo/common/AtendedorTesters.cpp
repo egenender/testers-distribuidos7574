@@ -109,9 +109,6 @@ AtendedorTesters::~AtendedorTesters() {
 
 int AtendedorTesters::recibirRequerimiento() {
     
-    Timeout timeout;
-    timeout.runTimeout(SLEEP_TIMEOUT_TESTERS, getpid(), SIGUSR1);
-
     TMessageAtendedor msg;
     int ret = msgrcv(this->colaRecepcionesRequerimientos, &msg, sizeof(TMessageAtendedor) - sizeof(long), this->idTester, 0);
     if(ret == -1) {
@@ -119,8 +116,6 @@ int AtendedorTesters::recibirRequerimiento() {
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
-
-    timeout.killTimeout();
 
     this->idBroker = msg.idBrokerOrigen;
     return msg.idDispositivo;

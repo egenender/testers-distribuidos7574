@@ -13,5 +13,5 @@ typedef struct TBrokerInfo {
 } TBrokerInfo;
 
 //const TBrokerInfo IP_BROKERS[CANT_BROKERS] = {{1, "127.0.0.1"}, {2, "192.168.2.3"}, {3, "192.168.2.9"}};
-const TBrokerInfo IP_BROKERS[CANT_BROKERS] = {{1, "127.0.0.1"}, {2, "192.168.2.3"}};
+const TBrokerInfo IP_BROKERS[CANT_BROKERS] = {{1, "192.168.2.6"}, {2, "192.168.2.3"}, {3, "192.168.2.8"}};
 #endif	/* BROKERSINFO_H */

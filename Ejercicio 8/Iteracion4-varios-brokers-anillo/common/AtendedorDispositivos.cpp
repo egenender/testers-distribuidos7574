@@ -153,10 +153,10 @@ void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {
 }
 
 int AtendedorDispositivos::recibirProgramaEspecial(int idDispositivo) {
-
+/*
     Timeout timeout;
     timeout.runTimeout(SLEEP_TIMEOUT_DISPOSITIVO, getpid(), SIGUSR1);
-
+*/
     TMessageAtendedor msg;
     int ret = msgrcv(this->colaRecepciones, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
     if(ret == -1) {
@@ -165,7 +165,7 @@ int AtendedorDispositivos::recibirProgramaEspecial(int idDispositivo) {
         exit(0);
     }
 
-    timeout.killTimeout();
+//    timeout.killTimeout();
 
     this->idTester = msg.tester;
     this->idBroker = msg.idBrokerOrigen;

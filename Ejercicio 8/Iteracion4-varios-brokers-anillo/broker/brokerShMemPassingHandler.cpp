@@ -228,7 +228,7 @@ int main(int argc, char** argv) {
         *cantReqBrokerShm = *cantReqBrokerShm - cantTotalRequerimientos;
         semBrokerCantShmemReq.v();
         
-        usleep(100000); // sleepeo un toque para no agitar al procesador
+        usleep(1000); // sleepeo un toque para no agitar al procesador
         if (CANT_BROKERS == 1) {
             // Soy el unico. Me la envio a mi mismo
             msg.mtype = ID_BROKER;
