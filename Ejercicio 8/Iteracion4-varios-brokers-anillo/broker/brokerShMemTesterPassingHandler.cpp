@@ -56,8 +56,8 @@ void restoreRingPlanillaGeneral(int sigNum) {
             Logger::error("Log luego de execlp del sender para regenerar anillo. Algo salio mal!", __FILE__);
             exit(1);
         }
-
-        sleep(2); // Dejo algo de tiempo para que el sender arranque
+        
+        sleep(2);
     }
     shmdt(listenerEjecutandose);
     
@@ -79,13 +79,26 @@ void restoreRingPlanillaGeneral(int sigNum) {
     if(*soyLider) {
         semSoyLider.v();
         
+        // Obtengo la shmem del siguiente broker
+        key = ftok(ipcFileName.c_str(), SHM_PLANILLA_GENERAL_SIGUIENTE);
+        int shmIdBrokerSiguientePlanillaGeneral = shmget(key, sizeof(int), 0660);
+        int* idBrokerSiguientePlanillaGeneral = (int*) shmat(shmIdBrokerSiguientePlanillaGeneral, NULL, 0);
+
+        Semaphore semIdBrokerSiguientePlanillaGeneral(SEM_PLANILLA_GENERAL_SIGUIENTE);
+        semIdBrokerSiguientePlanillaGeneral.getSem();
+        
+        semIdBrokerSiguientePlanillaGeneral.p();
+        msg.mtype = *idBrokerSiguientePlanillaGeneral;
+        semIdBrokerSiguientePlanillaGeneral.v();
+        
         Logger::notice("Me convertí en el líder. Pongo a rodar la shmem planilla general", __FILE__);
         // Pongo a circular mi memoria compartida mandandomela a mi mismo primero
-        key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_RECEPCION_BROKER_SHM_PLANILLA_GENERAL);
-        int msgQueueRecepcionShmem = msgget(key, IPC_CREAT | 0660);
-        int okSend = msgsnd(msgQueueRecepcionShmem, &msg, sizeof(TSharedMemoryPlanillaGeneral) - sizeof(long), 0);
+        key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_ENVIO_BROKER_SHM_PLANILLA_GENERAL);
+        int msgQueueEnvioShmem = msgget(key, IPC_CREAT | 0660);
+        int okSend = msgsnd(msgQueueEnvioShmem, &msg, sizeof(TSharedMemoryPlanillaGeneral) - sizeof(long), 0);
         if (okSend == -1) {
-            Logger::error("Error al reenviarme la Shmem a mi mismo (MASTER) luego de regeneracion del anillo. Abort!", __FILE__);
+            std::stringstream ss; ss << "Error al enviar la planilla general luego de regeneracion del anillo. Abort!. Errno: " << strerror(errno);
+            Logger::error(ss.str(), __FILE__);
             exit(1);
         }
 
@@ -139,6 +152,8 @@ void restoreRingPlanillaAsignacion(int sigNum) {
             Logger::error("Log luego de execlp del sender para regenerar anillo. Algo salio mal!", __FILE__);
             exit(1);
         }
+        
+        sleep(2);
     }
     shmdt(listenerEjecutandose);
     
@@ -160,13 +175,26 @@ void restoreRingPlanillaAsignacion(int sigNum) {
     if(*soyLider) {
         semSoyLider.v();
         
+        // Busco al siguiente
+        key = ftok(ipcFileName.c_str(), SHM_PLANILLA_ASIGNACION_SIGUIENTE);
+        int shmIdBrokerSiguientePlanillaAsignacion = shmget(key, sizeof(int), IPC_CREAT | 0660);
+        int* idBrokerSiguientePlanillaAsignacion = (int*) shmat(shmIdBrokerSiguientePlanillaAsignacion, NULL, 0);
+
+        Semaphore semIdBrokerSiguientePlanillaAsignacion(SEM_PLANILLA_ASIGNACION_SIGUIENTE);
+        semIdBrokerSiguientePlanillaAsignacion.getSem();
+        
+        semIdBrokerSiguientePlanillaAsignacion.p();
+        msgPlanillaAsignacion.mtype = *idBrokerSiguientePlanillaAsignacion;
+        semIdBrokerSiguientePlanillaAsignacion.v();
+        
         Logger::notice("Me convertí en el líder. Pongo a rodar la shmem planilla asignacion", __FILE__);
         // Pongo a circular mi memoria compartida mandandomela a mi mismo primero
         key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_RECEPCION_BROKER_SHM_PLANILLA_ASIGNACION);
         int msgQueueRecepcionShmem = msgget(key, IPC_CREAT | 0660);
         int okSend = msgsnd(msgQueueRecepcionShmem, &msgPlanillaAsignacion, sizeof(TSharedMemoryPlanillaAsignacion) - sizeof(long), 0);
         if (okSend == -1) {
-            Logger::error("Error al reenviarme la Shmem a mi mismo (MASTER) luego de regeneracion del anillo. Abort!", __FILE__);
+            std::stringstream ss; ss << "Error al reenviar la planilla asignacion luego de regeneracion del anillo. Abort!. Errno: " << strerror(errno);
+            Logger::error(ss.str(), __FILE__);
             exit(1);
         }
 

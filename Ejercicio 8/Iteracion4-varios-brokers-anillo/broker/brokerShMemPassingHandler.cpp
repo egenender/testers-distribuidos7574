@@ -26,7 +26,7 @@ void restoreRing(int sigNum) {
     Logger::notice("Se procede a restaurar el anillo...", __FILE__);
     
     key_t key = ftok(ipcFileName.c_str(), SHM_ANILLO_BROKER_SHM_LISTENER_EJECUTANDOSE);
-    bool shmListenerEjecutandose = shmget(key, sizeof(bool), IPC_CREAT | 0660);
+    int shmListenerEjecutandose = shmget(key, sizeof(bool), IPC_CREAT | 0660);
     bool* listenerEjecutandose = (bool*) shmat(shmListenerEjecutandose, NULL, 0);
     
     Semaphore semListenerEjecutandose(SEM_ANILLO_BROKER_SHM_LISTENER_EJECUTANDOSE);
