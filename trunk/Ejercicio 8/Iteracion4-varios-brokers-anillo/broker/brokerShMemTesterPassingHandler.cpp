@@ -334,7 +334,7 @@ int main(int argc, char** argv) {
             if (CANT_BROKERS <= 3) {
                 sleep(3 - CANT_BROKERS);
             } else {
-                usleep(10000);
+                usleep(1000);
             }
 
             if (CANT_BROKERS == 1) {
@@ -469,7 +469,7 @@ int main(int argc, char** argv) {
             cantReqPlanillasShm->cantRequerimientosShmemPlanillaAsignacion = cantReqPlanillasShm->cantRequerimientosShmemPlanillaAsignacion - cantTotalRequerimientos;
             semBrokerCantShmemReq.v();
 
-            usleep(10000); // sleepeo un toque para no agitar al procesador
+            usleep(1000); // sleepeo un toque para no agitar al procesador
             if (CANT_BROKERS == 1) {
                 // Soy el unico. Me la envio a mi mismo
                 msg.mtype = ID_BROKER;
