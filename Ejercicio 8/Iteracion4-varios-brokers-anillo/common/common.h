@@ -12,6 +12,7 @@
 
 #include <string>
 #include <stddef.h>
+#include <stdint.h>
 
 // Constantes del sistema
 
@@ -172,67 +173,67 @@ const std::string configPlanillaAsignacionShmemFileName = "/home/ferno/ferno/FIU
 
 //Estructuras communes:
 typedef struct resultado{
-	int idDispositivo;
-	int resultadosPendientes;
-	int resultadosGraves;
+	int32_t idDispositivo;
+	int32_t resultadosPendientes;
+	int32_t resultadosGraves;
 }resultado_t;
 
 typedef struct TContadorTesterEspecial {
-    int cantTestersEspecialesTotal;
-    int cantTestersEspecialesTerminados;
+    int32_t cantTestersEspecialesTotal;
+    int32_t cantTestersEspecialesTerminados;
 } TContadorTesterEspecial;
 
 typedef struct TContadorTareaEspecial {
-    int cantTareasEspecialesTotal;
-    int cantTareasEspecialesTerminadas;
+    int32_t cantTareasEspecialesTotal;
+    int32_t cantTareasEspecialesTerminadas;
 } TContadorTareaEspecial;
 
 typedef struct TMessageReinicioTest {
-    long mtype;
-    bool hayQueReiniciar;
+    int64_t mtype;
+    int8_t hayQueReiniciar;
 } TMessageReinicioTest;
 
 // Primer mensaje de protocolo que cliente receptor le envia al server emisor
 typedef struct TFirstMessage {
-    int identificador;
+    int32_t identificador;
 } TFirstMessage;
 
 typedef struct message {
-    long mtype;
-    long mtypeMensaje;
-    long mtypeMensajeBroker;
-    int idDispositivo;
-    int tester;
-    bool esTesterEspecial;
-    bool hayQueReiniciar; // Se usa para avisarle al tester especial si debe reiniciar o no
-    int idBroker;
-    int idBrokerOrigen;
-    int value; // Este parametro posee el valor del programa, del resultado y de la orden
-    int posicionDispositivo;
-    int idTestersEspeciales[MAX_TESTERS_ESPECIALES_PARA_ASIGNAR];
-    int cantTestersEspecialesAsignados;
+    int64_t mtype;
+    int64_t mtypeMensaje;
+    int64_t mtypeMensajeBroker;
+    int32_t idDispositivo;
+    int32_t tester;
+    int8_t esTesterEspecial;
+    int8_t hayQueReiniciar; // Se usa para avisarle al tester especial si debe reiniciar o no
+    int32_t idBroker;
+    int32_t idBrokerOrigen;
+    int32_t value; // Este parametro posee el valor del programa, del resultado y de la orden
+    int32_t posicionDispositivo;
+    int32_t idTestersEspeciales[MAX_TESTERS_ESPECIALES_PARA_ASIGNAR];
+    int32_t cantTestersEspecialesAsignados;
 } TMessageAtendedor;
 
 typedef struct TTablaBrokerTestersRegistrados {
-    bool registrados[MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES + 1];
-    bool disponible[MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES + 1];
-    int brokerAsignado[MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES + 1]; // Especifica el ID del broker de cada ID
-    int ultimoTesterElegido;
+    int8_t registrados[MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES + 1];
+    int8_t disponible[MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES + 1];
+    int32_t brokerAsignado[MAX_TESTER_COMUNES + MAX_TESTER_ESPECIALES + 1]; // Especifica el ID del broker de cada ID
+    int32_t ultimoTesterElegido;
 } TTablaBrokerTestersRegistrados;
 
 // Para el server RPC de identificadores
 typedef struct TTablaIdTestersDisponibles {
-    bool disponibles[MAX_TESTER_COMUNES];
+    int8_t disponibles[MAX_TESTER_COMUNES];
 } TTablaIdTestersDisponibles;
 
 typedef struct TTablaIdTestersEspecialesDisponibles {
-    bool disponibles[MAX_TESTER_ESPECIALES];
+    int8_t disponibles[MAX_TESTER_ESPECIALES];
 } TTablaIdTestersEspecialesDisponibles;
 
 /*******BROKERS CONFIG!********/
 const int MASTER_BROKER = 1;
 const int ID_BROKER_START = 1;
-const int CANT_BROKERS = 2;
+const int CANT_BROKERS = 3;
 const int ID_BROKER = 1;
 const int ID_BROKER_SIGUIENTE = (ID_BROKER == CANT_BROKERS) ? ID_BROKER_START : ID_BROKER + 1;
 // LAS IPS DE LOS BROKERS ESTA EN EL ARCHIVO BROKER.CPP
@@ -256,12 +257,12 @@ const char PUERTO_SERVER_EMISOR[] = "50003";
 // Para el broker al que se conectan dispositivos y testers de esta maquina
 const char UBICACION_SERVER[] = "127.0.0.1";
 //const char UBICACION_SERVER_IDENTIFICADOR[] = "192.168.2.7";
-const char UBICACION_SERVER_IDENTIFICADOR[] = "192.168.2.10";
+const char UBICACION_SERVER_IDENTIFICADOR[] = "192.168.2.6";
 
 /*********CONFIG PEDIDO SHARED MEMORY TESTERS**********/
 typedef struct TSharedMemoryPlanillaAsignacion {
-    long mtype;
-    unsigned long version;
+    int64_t mtype;
+    uint64_t version;
     TContadorTesterEspecial cantTestersEspecialesAsignados[MAX_DISPOSITIVOS_EN_SISTEMA];
     TContadorTareaEspecial cantTareasEspecialesAsignadas[MAX_DISPOSITIVOS_EN_SISTEMA];
 } TSharedMemoryPlanillaAsignacion;
@@ -272,9 +273,9 @@ const char PUERTO_SERVER_RECEPCION_SHM_PLANILLA_ASIGNACION[] = "60011";
 const char PUERTO_SERVER_ENVIO_SHM_PLANILLA_ASIGNACION[] = "60012";
 
 typedef struct TSharedMemoryPlanillaGeneral {
-    long mtype;
-    unsigned long version;
-    int cantDispositivosSiendoTesteados;
+    int64_t mtype;
+    uint64_t version;
+    int32_t cantDispositivosSiendoTesteados;
     bool idsPrivadosDispositivos[MAX_DISPOSITIVOS_EN_SISTEMA];
 } TSharedMemoryPlanillaGeneral;
 
@@ -285,15 +286,15 @@ const char PUERTO_SERVER_RECEPCION_SHM_PLANILLA_GENERAL[] = "60013";
 const char PUERTO_SERVER_ENVIO_SHM_PLANILLA_GENERAL[] = "60014";
 
 typedef struct TRequerimientoSharedMemory {
-    long mtype;
-    int idSolicitante;
-    int idDevolucion;
+    int64_t mtype;
+    int32_t idSolicitante;
+    int32_t idDevolucion;
 } TRequerimientoSharedMemory;
 const char PUERTO_SERVER_RECEPCION_REQ_PLANILLAS[] = "60015";
 
 typedef struct TShmemCantRequerimientos {
-    int cantRequerimientosShmemPlanillaGeneral;
-    int cantRequerimientosShmemPlanillaAsignacion;
+    int32_t cantRequerimientosShmemPlanillaGeneral;
+    int32_t cantRequerimientosShmemPlanillaAsignacion;
 } TShmemCantRequerimientos;
 /*******FIN PEDIDO SHARED MEMORY TESTERS***********/
 
@@ -306,14 +307,14 @@ const int ID_SUB_BROKER_REGISTRO_TESTER = 7;
 const int ID_SUB_BROKER_PASAMANOS_RECEPTOR = 8;
 
 typedef struct TMessageShMemInterBroker {
-    long mtype;
-    unsigned long version;
+    int64_t mtype;
+    uint64_t version;
     TTablaBrokerTestersRegistrados memoria;
 } TMessageShMemInterBroker;
 
 typedef struct TMessageRequerimientoBrokerShm {
-    long mtype;
-    int idSubBroker;
+    int64_t mtype;
+    int32_t idSubBroker;
 } TMessageRequerimientoBrokerShm;
 /*******FIN SUB-BROKERS CONFIG*********/
 
