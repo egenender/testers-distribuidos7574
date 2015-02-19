@@ -80,6 +80,11 @@ int main(void){
 	int cant_te = atoi(te);
 	free(te);
 	
+	printf("\nIngrese probabilidad (0 a 10) de tener testeos especiales\n");
+	char* testing_especial = leer_linea();
+	int prob_testing = atoi(testing_especial);
+	free(testing_especial);
+	
 	printf("\nIngrese direccion default de broker\n");
 	char* ip_broker_default = leer_linea();
 	
@@ -150,6 +155,13 @@ int main(void){
 	
 	free(ip_broker_default);
 	free(ip_rpc);
+	
+	/* Probabilidad de testeos */
+	printf("Configurando probabilidad de testeos especiales\n");
+	system("cp Dispositivo.cpp Dispositivo.cpp.tmp");
+	sprintf(sed, "sed 's/if (resul >= .*)/if (resul >= %d)/' Dispositivo.cpp.tmp > Dispositivo.cpp", 10 - prob_testing);
+	system(sed);
+	system("rm Dispositivo.cpp.tmp");
 	
 	/* Compilando el logger */
 	printf("Compilando el logger\n");
