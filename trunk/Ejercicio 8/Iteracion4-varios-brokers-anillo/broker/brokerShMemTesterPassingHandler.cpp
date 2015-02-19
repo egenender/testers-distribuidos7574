@@ -313,7 +313,7 @@ int main(int argc, char** argv) {
                 Logger::debug(log.str(), nombre.str().c_str()); log.str(""); log.clear();
                 cantRequerimientos--;
             }
-            log << "No hay mas requerimientos de planilla general. Se la mando al siguiente broker de ID " << ID_BROKER_SIGUIENTE;
+            log << "No hay mas requerimientos de planilla general en el broker " << ID_BROKER;
             Logger::debug(log.str(), nombre.str().c_str()); log.str(""); log.clear();
             
             // Aumento la version de la shmem ya actualizada
