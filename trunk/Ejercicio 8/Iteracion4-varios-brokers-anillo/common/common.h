@@ -319,9 +319,9 @@ typedef struct TMessageRequerimientoBrokerShm {
 /*******FIN SUB-BROKERS CONFIG*********/
 
 /******** CONFIG PARA TIMEOUT *********/
-const int SLEEP_TIMEOUT_SHMEM = 15; // Timeout para la obtencion de cualquier shmem
-const int SLEEP_TIMEOUT_DISPOSITIVO = 60;
-const int SLEEP_TIMEOUT_TESTERS = 60;
+const int SLEEP_TIMEOUT_SHMEM = 20; // Timeout para la obtencion de cualquier shmem
+const int SLEEP_TIMEOUT_DISPOSITIVO = 120;
+const int SLEEP_TIMEOUT_TESTERS = 120;
 
 #endif	/* COMMON_H */
 
