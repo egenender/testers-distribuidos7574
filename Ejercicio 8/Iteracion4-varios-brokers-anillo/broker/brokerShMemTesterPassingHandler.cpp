@@ -24,6 +24,8 @@ bool anilloPlanillaAsignacionRestaurado;
 
 void restoreRingPlanillaGeneral(int sigNum) {
     
+    Logger::notice("Se procede a restaurar el anillo...", __FILE__);
+    
     key_t key = ftok(ipcFileName.c_str(), SHM_ANILLO_PLANILLA_GENERAL_LISTENER_EJECUTANDOSE);
     bool shmListenerEjecutandose = shmget(key, sizeof(bool), IPC_CREAT | 0660);
     bool* listenerEjecutandose = (bool*) shmat(shmListenerEjecutandose, NULL, 0);
@@ -36,6 +38,7 @@ void restoreRingPlanillaGeneral(int sigNum) {
     if(*listenerEjecutandose) {
         semListenerEjecutandose.v();
         // Dejo que se termine de ejecutar
+        Logger::debug("Listener ejecutandose. Alguien ya se percato de que estaba todo caido", __FILE__);
     } else {
         semListenerEjecutandose.v();
         // Mato al proceso listener y corro el sender para regenerar el anillo
@@ -43,6 +46,9 @@ void restoreRingPlanillaGeneral(int sigNum) {
         int shmListenerPid = shmget(key, sizeof(pid_t), IPC_CREAT | 0660);
         pid_t* listenerPid = (pid_t*) shmat(shmListenerPid, NULL, 0);
         kill(*listenerPid, SIGINT);
+        wait(NULL);
+        
+        Logger::debug("Listener no esta corriendo. Soy el primero que se entera. Voy a correr el sender para formar el anillo", __FILE__);
         
         if(fork() == 0) {
             execlp("./anillo/sender", "sender", configPlanillaGeneralShmemFileName.c_str(), (char*) 0);
@@ -58,6 +64,8 @@ void restoreRingPlanillaGeneral(int sigNum) {
     Semaphore semAnilloRestaurandose(SEM_ANILLO_PLANILLA_GENERAL_RESTAURANDOSE);
     semAnilloRestaurandose.getSem();
     semAnilloRestaurandose.p();
+    
+    Logger::debug("Termina de correr el listener/sender!", __FILE__);
 
     key = ftok(ipcFileName.c_str(), SHM_PLANILLA_GENERAL_ES_LIDER);
     int shmIdSoyLider = shmget(key, sizeof(bool), IPC_CREAT | 0660);
@@ -98,6 +106,8 @@ void restoreRingPlanillaGeneral(int sigNum) {
 }
 
 void restoreRingPlanillaAsignacion(int sigNum) {
+    
+    Logger::notice("Se procede a restaurar el anillo...", __FILE__);
 
     key_t key = ftok(ipcFileName.c_str(), SHM_ANILLO_PLANILLA_ASIGNACION_LISTENER_EJECUTANDOSE);
     bool shmListenerEjecutandose = shmget(key, sizeof(bool), IPC_CREAT | 0660);
@@ -111,6 +121,7 @@ void restoreRingPlanillaAsignacion(int sigNum) {
     if(*listenerEjecutandose) {
         semListenerEjecutandose.v();
         // Dejo que se termine de ejecutar
+        Logger::debug("Listener ejecutandose. Alguien ya se percato de que estaba todo caido", __FILE__);
     } else {
         semListenerEjecutandose.v();
         // Mato al proceso listener y corro el sender para regenerar el anillo
@@ -118,6 +129,8 @@ void restoreRingPlanillaAsignacion(int sigNum) {
         int shmListenerPid = shmget(key, sizeof(pid_t), IPC_CREAT | 0660);
         pid_t* listenerPid = (pid_t*) shmat(shmListenerPid, NULL, 0);
         kill(*listenerPid, SIGINT);
+        
+        Logger::debug("Listener no esta corriendo. Soy el primero que se entera. Voy a correr el sender para formar el anillo", __FILE__);
         
         if(fork() == 0) {
             execlp("./anillo/sender", "sender", configPlanillaAsignacionShmemFileName.c_str(), (char*) 0);
@@ -133,6 +146,8 @@ void restoreRingPlanillaAsignacion(int sigNum) {
     Semaphore semAnilloRestaurandose(SEM_ANILLO_PLANILLA_ASIGNACION_RESTAURANDOSE);
     semAnilloRestaurandose.getSem();
     semAnilloRestaurandose.p();
+    
+    Logger::debug("Termina de correr el listener/sender!", __FILE__);
 
     key = ftok(ipcFileName.c_str(), SHM_PLANILLA_ASIGNACION_ES_LIDER);
     int shmIdSoyLider = shmget(key, sizeof(bool), IPC_CREAT | 0660);
