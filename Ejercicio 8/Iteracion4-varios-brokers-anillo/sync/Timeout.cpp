@@ -6,7 +6,6 @@
  */
 
 #include "Timeout.h"
-#include "logger/Logger.h"
 
 Timeout::Timeout() {
 }

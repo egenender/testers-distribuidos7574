@@ -44,12 +44,13 @@ void restoreRing(int sigNum) {
         Logger::debug("Listener ejecutandose. Alguien ya se percato de que estaba todo caido", __FILE__);
     } else {
         semListenerEjecutandose.v();
+        Logger::debug("Listener no esta corriendo. Soy el primero que se entera. Voy a correr el sender para formar el anillo", __FILE__);
         // Mato al proceso listener y corro el sender para regenerar el anillo
         kill(*listenerBrokerPid, SIGINT);
         wait(NULL);
         
-        Logger::debug("Listener no esta corriendo. Soy el primero que se entera. Voy a correr el sender para formar el anillo", __FILE__);
-        
+        Logger::debug("A punto de ejecutar el sender", __FILE__);
+                
         if(fork() == 0) {
             execlp("./anillo/sender", "sender", configBrokerShmemFileName.c_str(), (char*) 0);
             Logger::error("Log luego de execlp del sender para regenerar anillo. Algo salio mal!", __FILE__);
@@ -149,7 +150,7 @@ int main(int argc, char** argv) {
         Logger::error("Error al setear el handler de la señal!", __FILE__);
         exit(1);
     }
-
+    
     while(true) {
         
         // Comienza el timeout

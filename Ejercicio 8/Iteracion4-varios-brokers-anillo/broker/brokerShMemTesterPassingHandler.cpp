@@ -25,11 +25,11 @@ bool anilloPlanillaAsignacionRestaurado;
 void restoreRingPlanillaGeneral(int sigNum) {
     
     Logger::notice("Se procede a restaurar el anillo...", __FILE__);
-    
+            
     key_t key = ftok(ipcFileName.c_str(), SHM_ANILLO_PLANILLA_GENERAL_LISTENER_EJECUTANDOSE);
-    bool shmListenerEjecutandose = shmget(key, sizeof(bool), IPC_CREAT | 0660);
+    int shmListenerEjecutandose = shmget(key, sizeof(bool), IPC_CREAT | 0660);
     bool* listenerEjecutandose = (bool*) shmat(shmListenerEjecutandose, NULL, 0);
-    
+
     Semaphore semListenerEjecutandose(SEM_ANILLO_PLANILLA_GENERAL_LISTENER_EJECUTANDOSE);
     semListenerEjecutandose.getSem();
     
@@ -41,15 +41,16 @@ void restoreRingPlanillaGeneral(int sigNum) {
         Logger::debug("Listener ejecutandose. Alguien ya se percato de que estaba todo caido", __FILE__);
     } else {
         semListenerEjecutandose.v();
+        Logger::debug("Listener no esta corriendo. Soy el primero que se entera. Voy a correr el sender para formar el anillo", __FILE__);
         // Mato al proceso listener y corro el sender para regenerar el anillo
-        key = ftok(ipcFileName.c_str(), SHM_LISTENER_PLANILLA_GENERAL_PID);
+        key_t key = ftok(ipcFileName.c_str(), SHM_LISTENER_PLANILLA_GENERAL_PID);
         int shmListenerPid = shmget(key, sizeof(pid_t), IPC_CREAT | 0660);
         pid_t* listenerPid = (pid_t*) shmat(shmListenerPid, NULL, 0);
         kill(*listenerPid, SIGINT);
         wait(NULL);
         
-        Logger::debug("Listener no esta corriendo. Soy el primero que se entera. Voy a correr el sender para formar el anillo", __FILE__);
-        
+        Logger::debug("Estoy por ejecutar el sender...", __FILE__);
+                
         if(fork() == 0) {
             execlp("./anillo/sender", "sender", configPlanillaGeneralShmemFileName.c_str(), (char*) 0);
             Logger::error("Log luego de execlp del sender para regenerar anillo. Algo salio mal!", __FILE__);
@@ -108,9 +109,9 @@ void restoreRingPlanillaGeneral(int sigNum) {
 void restoreRingPlanillaAsignacion(int sigNum) {
     
     Logger::notice("Se procede a restaurar el anillo...", __FILE__);
-
+    
     key_t key = ftok(ipcFileName.c_str(), SHM_ANILLO_PLANILLA_ASIGNACION_LISTENER_EJECUTANDOSE);
-    bool shmListenerEjecutandose = shmget(key, sizeof(bool), IPC_CREAT | 0660);
+    int shmListenerEjecutandose = shmget(key, sizeof(bool), IPC_CREAT | 0660);
     bool* listenerEjecutandose = (bool*) shmat(shmListenerEjecutandose, NULL, 0);
     
     Semaphore semListenerEjecutandose(SEM_ANILLO_PLANILLA_ASIGNACION_LISTENER_EJECUTANDOSE);
@@ -124,14 +125,15 @@ void restoreRingPlanillaAsignacion(int sigNum) {
         Logger::debug("Listener ejecutandose. Alguien ya se percato de que estaba todo caido", __FILE__);
     } else {
         semListenerEjecutandose.v();
+        Logger::debug("Listener no esta corriendo. Soy el primero que se entera. Voy a correr el sender para formar el anillo", __FILE__);
         // Mato al proceso listener y corro el sender para regenerar el anillo
-        key = ftok(ipcFileName.c_str(), SHM_LISTENER_PLANILLA_ASIGNACION_PID);
+        key_t key = ftok(ipcFileName.c_str(), SHM_LISTENER_PLANILLA_ASIGNACION_PID);
         int shmListenerPid = shmget(key, sizeof(pid_t), IPC_CREAT | 0660);
         pid_t* listenerPid = (pid_t*) shmat(shmListenerPid, NULL, 0);
         kill(*listenerPid, SIGINT);
         
-        Logger::debug("Listener no esta corriendo. Soy el primero que se entera. Voy a correr el sender para formar el anillo", __FILE__);
-        
+        Logger::debug("Estoy por ejecutar el sender...", __FILE__);
+                
         if(fork() == 0) {
             execlp("./anillo/sender", "sender", configPlanillaAsignacionShmemFileName.c_str(), (char*) 0);
             Logger::error("Log luego de execlp del sender para regenerar anillo. Algo salio mal!", __FILE__);
@@ -248,7 +250,7 @@ int main(int argc, char** argv) {
         if (sigOk == -1) {
             Logger::error("Error al setear el handler de la señal!", __FILE__);
             exit(1);
-        }
+        }    
         
         // Obtengo la shmem del siguiente broker
         key = ftok(ipcFileName.c_str(), SHM_PLANILLA_GENERAL_SIGUIENTE);
