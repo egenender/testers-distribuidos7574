@@ -42,6 +42,8 @@ int tcpoppas(int puerto)
  /*
   * 		Vincular el socket con la direccion local 
   */
+         int yes = 1;
+    setsockopt(sockfd,SOL_SOCKET,SO_REUSEADDR, &yes, sizeof(int));
  if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
 	{
  	 return (-1); /* error: no se puede hacer el bind */
