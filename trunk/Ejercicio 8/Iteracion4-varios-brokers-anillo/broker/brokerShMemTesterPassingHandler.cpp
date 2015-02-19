@@ -81,7 +81,7 @@ void restoreRingPlanillaGeneral(int sigNum) {
         
         Logger::notice("Me convertí en el líder. Pongo a rodar la shmem planilla general", __FILE__);
         // Pongo a circular mi memoria compartida mandandomela a mi mismo primero
-        key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_RECEPCION_TESTERS_SHMEM_PLANILLA_GENERAL);
+        key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_RECEPCION_BROKER_SHM_PLANILLA_GENERAL);
         int msgQueueRecepcionShmem = msgget(key, IPC_CREAT | 0660);
         int okSend = msgsnd(msgQueueRecepcionShmem, &msg, sizeof(TSharedMemoryPlanillaGeneral) - sizeof(long), 0);
         if (okSend == -1) {
@@ -139,8 +139,6 @@ void restoreRingPlanillaAsignacion(int sigNum) {
             Logger::error("Log luego de execlp del sender para regenerar anillo. Algo salio mal!", __FILE__);
             exit(1);
         }
-
-        sleep(2); // Dejo algo de tiempo para que el sender arranque
     }
     shmdt(listenerEjecutandose);
     
@@ -164,7 +162,7 @@ void restoreRingPlanillaAsignacion(int sigNum) {
         
         Logger::notice("Me convertí en el líder. Pongo a rodar la shmem planilla asignacion", __FILE__);
         // Pongo a circular mi memoria compartida mandandomela a mi mismo primero
-        key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_RECEPCION_TESTERS_SHMEM_PLANILLA_ASIGNACION);
+        key_t key = ftok(ipcFileName.c_str(), MSGQUEUE_RECEPCION_BROKER_SHM_PLANILLA_ASIGNACION);
         int msgQueueRecepcionShmem = msgget(key, IPC_CREAT | 0660);
         int okSend = msgsnd(msgQueueRecepcionShmem, &msgPlanillaAsignacion, sizeof(TSharedMemoryPlanillaAsignacion) - sizeof(long), 0);
         if (okSend == -1) {
