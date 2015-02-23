@@ -44,7 +44,7 @@ AtendedorDispositivos::AtendedorDispositivos( const Configuracion& config ) {
     key = ftok( ipcFileName.c_str(),
                 config.ObtenerParametroEntero(MSGQUEUE_DISPOSITIVOS_CONFIG) );
     m_ColaDispositivoConfig = msgget(key, 0666);
-    if(m_ColaTestsEspeciales == -1) {
+    if(m_ColaDispositivoConfig == -1) {
         std::string err = std::string("Error al obtener la cola para enviar tareas especiales a los dispositivos. Errno: ") + std::string(strerror(errno));
         Logger::error(err, __FILE__);
         exit(1);

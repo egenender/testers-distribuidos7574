@@ -22,7 +22,7 @@ private:
     int m_ColaDispositivoConfig;
     int m_ColaRequerimientos;
     int m_ColaTests;
-    int m_ColaTestsEspeciales;    
+    int m_ColaTestsEspeciales;
     int m_IdTester;
     int m_PosicionDispositivo;
 //Operaciones prohibidas

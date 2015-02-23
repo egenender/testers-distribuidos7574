@@ -41,6 +41,4 @@ public:
     TMessageTesterConfig recibirReqTestConfig( int idTester );
     void enviarCambioVariable( int idDispositivo, int idVariable, int nuevoValor, bool ultimo );
 
-    bool destruirComunicacion();
-
 };

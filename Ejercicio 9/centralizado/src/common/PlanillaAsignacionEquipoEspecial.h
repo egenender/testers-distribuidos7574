@@ -1,6 +1,6 @@
 /* 
  * File:   PlanillaAsignacionEquipoEspecial.h
- * Author: ferno
+ * Author: knoppix
  *
  * Created on November 16, 2014, 7:56 PM
  */
@@ -28,14 +28,13 @@ public:
     void limpiarContadoresFinTesteo(int idDispositivo);
     
     void initPlanilla();
-    
-    bool destruirComunicacion();
 private:
     const int m_MaxDispositivosEnSistema;
-    Semaphore semShmemCantTesters, semShmemCantTareas;
-    key_t shmemCantTestersKey, shmemCantTareasKey;
-    int shmemCantTestersId, shmemCantTareasId;
-    TContadorTesterEspecial* cantTestersEspecialesAsignados;
-    TContadorTareaEspecial* cantTareasEspecialesAsignadas;
+    Semaphore                   m_SemShmemCantTesters;
+    Semaphore                   m_SemShmemCantTareas;
+    int                         m_ShmemCantTestersId;
+    int                         m_ShmemCantTareasId;
+    TContadorTesterEspecial*    m_pCantTestersEspecialesAsignados;
+    TContadorTareaEspecial*     m_pCantTareasEspecialesAsignadas;
 
 };

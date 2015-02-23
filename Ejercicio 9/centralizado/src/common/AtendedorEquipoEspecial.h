@@ -1,6 +1,6 @@
 /* 
  * File:   AtendedorEquipoEspecial.h
- * Author: ferno
+ * Author: knoppix
  *
  * Created on November 17, 2014, 12:59 AM
  */
@@ -27,7 +27,8 @@ public:
     void enviarFinTestEspecialADispositivo(int idDispositivo);
     void enviarOrden(int idDispositivo, int orden);
 private:
-    int colaDispTesterEsp, colaReinicioTestEsp, colaOrdenDispositivos;
+    int m_ColaDispTesterEsp;
+    int m_ColaOrdenDispositivos;
 //Operaciones prohibidas
     AtendedorEquipoEspecial( const AtendedorEquipoEspecial& orig );
     AtendedorEquipoEspecial& operator=( const AtendedorEquipoEspecial& rv );

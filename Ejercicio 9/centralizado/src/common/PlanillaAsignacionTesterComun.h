@@ -1,6 +1,6 @@
 /* 
  * File:   PlanillaAsignacionTesterComun.h
- * Author: ferno
+ * Author: knoppix
  *
  * Created on November 16, 2014, 7:56 PM
  */
@@ -21,16 +21,11 @@ class PlanillaAsignacionTesterComun {
 public:
     PlanillaAsignacionTesterComun( const Configuracion& config );
     virtual ~PlanillaAsignacionTesterComun();
-    
-    void asignarCantTestersEspeciales(int posicionDispositivo, int cantTestersEspeciales);
-    
-    bool destruirComunicacion();
-    
-private:
-    Semaphore semShmemCantTesters, semShmemCantTareas;
-    key_t shmemCantTestersKey, shmemCantTareasKey;
-    int shmemCantTestersId, shmemCantTareasId;
-    TContadorTesterEspecial* cantTestersEspecialesAsignados;
-    TContadorTareaEspecial* cantTareasEspecialesAsignadas;
 
+    void asignarCantTestersEspeciales(int posicionDispositivo, int cantTestersEspeciales);
+
+private:
+    Semaphore                   m_SemShmemCantTesters;
+    int                         m_ShmemCantTestersId;
+    TContadorTesterEspecial*    m_pCantTestersEspecialesAsignados;
 };

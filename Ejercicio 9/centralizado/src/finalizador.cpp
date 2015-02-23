@@ -15,7 +15,6 @@
 #include <sys/msg.h>
 #include "logger/Logger.h"
 #include "ipc/Semaphore.h"
-#include "common/Planilla.h"
 #include "common/PlanillaAsignacionEquipoEspecial.h"
 #include "common/PlanillaVariablesDisp.h"
 #include "common/Configuracion.h"
@@ -23,72 +22,103 @@
 using namespace Constantes::NombresDeParametros;
 using std::string;
 
+void destruirObjetosIPCsPlanillaGeneral( const std::string& archivoIpcs, const Configuracion& config ){
+    //Semaforo
+    Semaphore semPlanillaGeneral( archivoIpcs,
+                                  config.ObtenerParametroEntero(SEM_PLANILLA_GENERAL));
+    semPlanillaGeneral.getSem();
+    semPlanillaGeneral.eliSem();
+    //Shm planilla
+    key_t key = ftok( archivoIpcs.c_str(),
+                      config.ObtenerParametroEntero(SHM_PLANILLA_GENERAL) );
+    int shmId = shmget( key, sizeof(int), 0660 );
+    shmctl( shmId, IPC_RMID, NULL );
+    //Shm posiciones
+    key = ftok( archivoIpcs.c_str(),
+                config.ObtenerParametroEntero(SHM_PLANILLA_GENERAL_POSICIONES) );
+    int maxDispositivosEnSistema = config.ObtenerParametroEntero(MAX_DISPOSITIVOS_EN_SISTEMA);
+    shmId = shmget( key, sizeof(bool) * maxDispositivosEnSistema, 0660 );
+    shmctl( shmId, IPC_RMID, NULL );
+}
+
+void destruirSemaforo( const std::string& archivoIpcs, int id ){
+    Semaphore sem( archivoIpcs, id );
+    sem.getSem();
+    sem.eliSem();
+}
+
 int main(int argc, char** argv) {
-    
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
     Logger::error("Logger inicializado. Destruyendo IPCs...", __FILE__);
-    
     Configuracion config;
     if( !config.LeerDeArchivo() ){
         Logger::error("Archivo de configuracion no encontrado", __FILE__);
         return 1;
     }
+    //Planilla general
+    const string archivoIpcs = config.ObtenerParametroString( ARCHIVO_IPCS );    
+    destruirObjetosIPCsPlanillaGeneral( archivoIpcs, config );
     
-    const string archivoIpcs = config.ObtenerParametroString( ARCHIVO_IPCS );
-   
-    //Semaforo y Planilla General
-    key_t key = ftok( archivoIpcs.c_str(),
-                      config.ObtenerParametroEntero(SHM_PLANILLA_GENERAL) );
-    const int cantResultados = config.ObtenerParametroEntero(CANT_RESULTADOS);
-    int shmgeneralid = shmget(key, sizeof(resultado_t) * cantResultados,  0660);
-    shmctl(shmgeneralid, IPC_RMID, NULL);
-    
-    Planilla planillaGeneral( config );
-    if (!planillaGeneral.destruirMemoria()) {
-        Logger::warn("No se pudo destruir la memoria compartida de la planilla general", __FILE__);
-    }
-    
-    PlanillaAsignacionEquipoEspecial planillaAsignacion( config );
-    if (!planillaAsignacion.destruirComunicacion()) {
-        Logger::warn("No se pudo destruir alguna memoria compartida de la planilla de asignacion", __FILE__);
-    }
-    
-    Semaphore semPlanillaGeneral( archivoIpcs,
-                                  config.ObtenerParametroEntero(SEM_PLANILLA_GENERAL));
-    semPlanillaGeneral.getSem();
-    semPlanillaGeneral.eliSem();
+    //Usado por PlanillaAsignacionTesterComun, PlanillaAsignacionTesterEspecial
+    //y PlanillaAsignacionEquipoEspecial
+    destruirSemaforo( archivoIpcs, config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TESTER_ASIGNADOS) );
 
-    Semaphore sem_cola_especiales( archivoIpcs,
-                                   config.ObtenerParametroEntero(SEM_COLA_ESPECIALES));
-    sem_cola_especiales.getSem();
-    sem_cola_especiales.eliSem();
-    
-    Semaphore semPlanillaCantTestersAsignados( archivoIpcs,
-                                               config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TESTER_ASIGNADOS) );
-    semPlanillaCantTestersAsignados.getSem();
-    semPlanillaCantTestersAsignados.eliSem();
-    
-    Semaphore semPlanillaCantTareasAsignadas( archivoIpcs,
-                                              config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TAREAS_ASIGNADAS) );
-    semPlanillaCantTareasAsignadas.getSem();
-    semPlanillaCantTareasAsignadas.eliSem();
-
-    //Destruccion de colas de dispositivos
+    //Cola de dispositivos
     const int msgQueueDispositivos = config.ObtenerParametroEntero(MSGQUEUE_DISPOSITIVOS);
-    const int msgQueueUltimo = config.ObtenerParametroEntero(MSGQUEUE_ULTIMO);
-    for (int q = msgQueueDispositivos; q <= msgQueueUltimo; q++){
-        key = ftok(archivoIpcs.c_str(), q);
-        int cola = msgget(key, 0660);
-        msgctl(cola ,IPC_RMID, NULL);
-    }
+    key_t key = ftok(archivoIpcs.c_str(), msgQueueDispositivos);
+    int cola = msgget(key, 0660);
+    msgctl(cola ,IPC_RMID, NULL);
+    //Cola de testers
+    const int msgQueueTesters = config.ObtenerParametroEntero(MSGQUEUE_TESTERS);
+    key = ftok(archivoIpcs.c_str(), msgQueueTesters);
+    cola = msgget(key, 0660);
+    msgctl(cola ,IPC_RMID, NULL);
+    //Cola de testers-dispEspeciales
+    const int msgQueueDispTestersEsp = config.ObtenerParametroEntero(MSGQUEUE_DISPOSITIVOS_TESTERS_ESPECIALES);
+    key = ftok(archivoIpcs.c_str(), msgQueueDispTestersEsp);
+    cola = msgget(key, 0660);
+    msgctl(cola ,IPC_RMID, NULL);
     //Cola dispositivos-config
     key = ftok(archivoIpcs.c_str(), config.ObtenerParametroEntero(MSGQUEUE_DISPOSITIVOS_CONFIG) );
-    int cola = msgget(key, 0660);
+    cola = msgget(key, 0660);
     msgctl(cola ,IPC_RMID, NULL);
     //Cola testers config
     key = ftok(archivoIpcs.c_str(), config.ObtenerParametroEntero(MSGQUEUE_TESTERS_CONFIG) );
     cola = msgget(key, 0660);
     msgctl(cola ,IPC_RMID, NULL);
+    //Cola testers especiales
+    key = ftok(archivoIpcs.c_str(), config.ObtenerParametroEntero(MSGQUEUE_TESTERS_ESPECIALES) );
+    cola = msgget(key, 0660);
+    msgctl(cola ,IPC_RMID, NULL);
+    //Cola testers especiales
+    key = ftok(archivoIpcs.c_str(), config.ObtenerParametroEntero(MSGQUEUE_DESPACHADOR) );
+    cola = msgget(key, 0660);
+    msgctl(cola ,IPC_RMID, NULL);
+    //Sem cola testers especiales
+    destruirSemaforo( archivoIpcs, config.ObtenerParametroEntero(SEM_COLA_ESPECIALES));
+    //Sem tareas asignadas
+    destruirSemaforo( archivoIpcs, config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TAREAS_ASIGNADAS) );
+
+    //Shm planilla cant testers asignados
+    key = ftok( archivoIpcs.c_str(),
+                config.ObtenerParametroEntero( SHM_PLANILLA_CANT_TESTER_ASIGNADOS) );
+    int maxDispositivosEnSistema = config.ObtenerParametroEntero( MAX_DISPOSITIVOS_EN_SISTEMA );
+    shmId = shmget( key, sizeof(TContadorTesterEspecial) * maxDispositivosEnSistema, 0660 );
+    shmctl( shmId, IPC_RMID, NULL );
+
+    
+
+
+
+
+
+
+    PlanillaAsignacionEquipoEspecial planillaAsignacion( config );
+    if (!planillaAsignacion.destruirComunicacion()) {
+        Logger::warn("No se pudo destruir alguna memoria compartida de la planilla de asignacion", __FILE__);
+    }
+
+    
 
     //IPCs de planillas de variables
     for( int i=0; i<config.ObtenerParametroEntero( MAX_DISPOSITIVOS_EN_SISTEMA ); i++ ){
