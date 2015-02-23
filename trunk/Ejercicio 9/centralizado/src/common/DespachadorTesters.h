@@ -5,8 +5,7 @@
  * Created on October 4, 2014, 10:30 PM
  */
 
-#ifndef DESPACHADORTESTERS_H
-#define	DESPACHADORTESTERS_H
+#pragma once
 
 #include <string>
 #include <cstring>
@@ -20,8 +19,7 @@ class Configuracion;
 
 class DespachadorTesters {
 private:
-    int msgQueueId;
-    key_t key;
+    int m_MsgQueueId;
     
     typedef struct message {
         long mtype;
@@ -33,10 +31,7 @@ public:
     DespachadorTesters( const Configuracion& config );
     DespachadorTesters(const DespachadorTesters& orig);
     virtual ~DespachadorTesters();
-    
+
     void enviarOrden(int idDispositivo);
 
 };
-
-#endif	/* DESPACHADORTESTERS_H */
-

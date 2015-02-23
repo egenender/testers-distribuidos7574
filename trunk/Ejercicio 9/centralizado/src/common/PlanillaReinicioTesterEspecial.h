@@ -1,6 +1,6 @@
 /* 
  * File:   PlanillaReinicioTesterEspecial.h
- * Author: ferno
+ * Author: knoppix
  *
  * Created on November 17, 2014, 12:19 AM
  */

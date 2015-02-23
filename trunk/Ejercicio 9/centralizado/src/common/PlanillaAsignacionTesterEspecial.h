@@ -1,6 +1,6 @@
 /* 
  * File:   PlanillaAsignacionTesterEspecial.h
- * Author: ferno
+ * Author: knoppix
  *
  * Created on November 16, 2014, 7:56 PM
  */
@@ -24,14 +24,14 @@ public:
     
     void asignarCantTareasEspeciales(int idDispositivo, int cantTareas);
     void avisarFinEnvioTareas(int idDispositivo);
-    
-    bool destruirComunicacion();
+
 private:
-    Semaphore semShmemCantTesters, semShmemCantTareas;
-    key_t shmemCantTestersKey, shmemCantTareasKey;
-    int shmemCantTestersId, shmemCantTareasId;
-    TContadorTesterEspecial* cantTestersEspecialesAsignados;
-    TContadorTareaEspecial* cantTareasEspecialesAsignadas;
+    Semaphore                   m_SemShmemCantTesters;
+    Semaphore                   m_SemShmemCantTareas;
+    int                         m_ShmemCantTestersId;
+    int                         m_ShmemCantTareasId;
+    TContadorTesterEspecial*    m_pCantTestersEspecialesAsignados;
+    TContadorTareaEspecial*     m_pCantTareasEspecialesAsignadas;
 //Operaciones prohibidas
     PlanillaAsignacionTesterEspecial( const PlanillaAsignacionTesterEspecial& orig );
     PlanillaAsignacionTesterEspecial& operator=( const PlanillaAsignacionTesterEspecial& rv );

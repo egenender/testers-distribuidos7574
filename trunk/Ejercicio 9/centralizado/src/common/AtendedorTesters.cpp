@@ -62,7 +62,7 @@ AtendedorTesters::AtendedorTesters( const Configuracion& config ):
     key = ftok( ipcFileName.c_str(),
                 config.ObtenerParametroEntero(MSGQUEUE_DISPOSITIVOS_CONFIG) );
     m_ColaDispositivosConfig = msgget(key, 0666);
-    if(m_ColaTestersEspeciales == -1) {
+    if(m_ColaDispositivosConfig == -1) {
         std::string err = std::string("Error al obtener la cola para enviar tareas especiales a los dispositivos. Errno: ") + std::string(strerror(errno));
         Logger::error(err, __FILE__);
         exit(1);
@@ -179,10 +179,6 @@ TMessageAssignTE AtendedorTesters::recibirRequerimientoEspecial(int idEsp) {
         exit(0);
     }
     return msg;
-}
-
-bool AtendedorTesters::destruirComunicacion() {
-    return (msgctl(m_ColaRecibosTests, IPC_RMID, (struct msqid_ds*)0) != -1 && msgctl(m_ColaRequerimientos, IPC_RMID, (struct msqid_ds*)0) != -1);
 }
 
 void AtendedorTesters::enviarReqTestConfig( int idDispositivo, int idTester, int tipoDispositivo ){

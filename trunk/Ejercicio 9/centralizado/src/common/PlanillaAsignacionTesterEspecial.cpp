@@ -1,6 +1,6 @@
 /* 
  * File:   PlanillaAsignacionTesterEspecial.cpp
- * Author: ferno
+ * Author: knoppix
  * 
  * Created on November 16, 2014, 7:56 PM
  */
@@ -12,29 +12,29 @@ using namespace Constantes::NombresDeParametros;
 using std::string;
 
 PlanillaAsignacionTesterEspecial::PlanillaAsignacionTesterEspecial( const Configuracion& config ) :
-        semShmemCantTesters( config.ObtenerParametroString(ARCHIVO_IPCS),
-                             config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TESTER_ASIGNADOS) ),
-        semShmemCantTareas( config.ObtenerParametroString(ARCHIVO_IPCS),
-                            config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TAREAS_ASIGNADAS) ) {
+        m_SemShmemCantTesters( config.ObtenerParametroString(ARCHIVO_IPCS),
+                               config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TESTER_ASIGNADOS) ),
+        m_SemShmemCantTareas( config.ObtenerParametroString(ARCHIVO_IPCS),
+                              config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TAREAS_ASIGNADAS) ) {
     const string ipcFileName = config.ObtenerParametroString( ARCHIVO_IPCS );
-    this->shmemCantTestersKey = ftok( ipcFileName.c_str(),
-                                      config.ObtenerParametroEntero(SHM_PLANILLA_CANT_TESTER_ASIGNADOS) );
-    if(this->shmemCantTestersKey == -1) {
+    key_t key = ftok( ipcFileName.c_str(),
+                      config.ObtenerParametroEntero(SHM_PLANILLA_CANT_TESTER_ASIGNADOS) );
+    if( key == -1 ) {
         std::string err("Error al conseguir la key de la shmem de la planilla de asignacion de testers. Error: " + std::string(strerror(errno)));
         Logger::error(err.c_str(), __FILE__);
         throw err;
     }
-    this->shmemCantTestersId = shmget( this->shmemCantTestersKey, sizeof(TContadorTesterEspecial) * config.ObtenerParametroEntero(MAX_DISPOSITIVOS_EN_SISTEMA),
-                                       IPC_CREAT | 0660);
-    if(this->shmemCantTestersId == -1) {
+    m_ShmemCantTestersId = shmget( key, sizeof(TContadorTesterEspecial) * config.ObtenerParametroEntero(MAX_DISPOSITIVOS_EN_SISTEMA),
+                                   0660);
+    if( m_ShmemCantTestersId == -1 ) {
         std::string err("Error al conseguir la memoria compartida de la planilla de asignacion de testers. Error: " + std::string(strerror(errno)));
         Logger::error(err.c_str(), __FILE__);
         throw err;
     }
     
-    void* tmpPtr = shmat (this->shmemCantTestersId , NULL ,0);
+    void* tmpPtr = shmat( m_ShmemCantTestersId, NULL, 0 );
     if ( tmpPtr != (void*) -1 ) {
-        this->cantTestersEspecialesAsignados = static_cast<TContadorTesterEspecial*> (tmpPtr);
+        m_pCantTestersEspecialesAsignados = static_cast<TContadorTesterEspecial*> (tmpPtr);
         Logger::debug("Memoria compartida de la planilla de asignacion de testers creada correctamente", __FILE__);
     } else {
         std::string err = std::string("Error en shmat() de planilla de asignacion de testers. Error: ") + std::string(strerror(errno));
@@ -43,28 +43,28 @@ PlanillaAsignacionTesterEspecial::PlanillaAsignacionTesterEspecial( const Config
     }
 
     // Por ultimo, luego de creado, obtengo el semaforo correspondiente
-    if (!this->semShmemCantTesters.getSem()) {
-	std::string err = std::string("Error al obtener el semaforo de la planilla de asignacion de testers. Error: ") + std::string(strerror(errno));
-	Logger::error(err, __FILE__);
-	throw err;
+    if ( !m_SemShmemCantTesters.getSem() ) {
+        std::string err = std::string("Error al obtener el semaforo de la planilla de asignacion de testers. Error: ") + std::string(strerror(errno));
+        Logger::error(err, __FILE__);
+        throw err;
     }
     
-    this->shmemCantTareasKey = ftok(ipcFileName.c_str(), config.ObtenerParametroEntero(SHM_PLANILLA_CANT_TAREAS_ASIGNADAS) );
-    if(this->shmemCantTareasKey == -1) {
+    key = ftok(ipcFileName.c_str(), config.ObtenerParametroEntero(SHM_PLANILLA_CANT_TAREAS_ASIGNADAS) );
+    if( key == -1 ) {
         std::string err("Error al conseguir la key de la shmem de la planilla de asignacion de tareas. Error: " + std::string(strerror(errno)));
         Logger::error(err.c_str(), __FILE__);
         throw err;
     }
-    this->shmemCantTareasId = shmget(this->shmemCantTareasKey, sizeof(TContadorTareaEspecial) * config.ObtenerParametroEntero(MAX_DISPOSITIVOS_EN_SISTEMA), IPC_CREAT | 0660);
-    if(this->shmemCantTareasId == -1) {
+    m_ShmemCantTareasId = shmget( key, sizeof(TContadorTareaEspecial) * config.ObtenerParametroEntero(MAX_DISPOSITIVOS_EN_SISTEMA), 0660 );
+    if( m_ShmemCantTareasId == -1) {
         std::string err("Error al conseguir la memoria compartida de la planilla de asignacion de tareas. Error: " + std::string(strerror(errno)));
         Logger::error(err.c_str(), __FILE__);
         throw err;
     }
     
-    tmpPtr = shmat (this->shmemCantTareasId , NULL ,0);
+    tmpPtr = shmat( m_ShmemCantTareasId, NULL, 0 );
     if ( tmpPtr != (void*) -1 ) {
-        this->cantTareasEspecialesAsignadas = static_cast<TContadorTareaEspecial*> (tmpPtr);
+        m_pCantTareasEspecialesAsignadas = static_cast<TContadorTareaEspecial*> (tmpPtr);
         Logger::debug("Memoria compartida de la planilla de asignacion de tareas creada correctamente", __FILE__);
     } else {
         std::string err = std::string("Error en shmat() de planilla de asignacion de tareas. Error: ") + std::string(strerror(errno));
@@ -73,27 +73,23 @@ PlanillaAsignacionTesterEspecial::PlanillaAsignacionTesterEspecial( const Config
     }
 
     // Por ultimo, luego de creado, obtengo el semaforo correspondiente
-    if (!this->semShmemCantTareas.getSem()) {
-	std::string err = std::string("Error al obtener el semaforo de la planilla de asignacion de tareas. Error: ") + std::string(strerror(errno));
-	Logger::error(err, __FILE__);
-	throw err;
+    if ( !m_SemShmemCantTareas.getSem() ) {
+        std::string err = std::string("Error al obtener el semaforo de la planilla de asignacion de tareas. Error: ") + std::string(strerror(errno));
+        Logger::error(err, __FILE__);
+        throw err;
     }
 }
 
 void PlanillaAsignacionTesterEspecial::asignarCantTareasEspeciales(int idDispositivo, int cantTareas) {
-    this->semShmemCantTareas.p();
-    this->cantTareasEspecialesAsignadas[idDispositivo].cantTareasEspecialesTotal += cantTareas;
-    this->semShmemCantTareas.v();
+    m_SemShmemCantTareas.p();
+    m_pCantTareasEspecialesAsignadas[idDispositivo].cantTareasEspecialesTotal += cantTareas;
+    m_SemShmemCantTareas.v();
 }
 void PlanillaAsignacionTesterEspecial::avisarFinEnvioTareas(int idDispositivo) {
-    this->semShmemCantTesters.p();
-    this->cantTestersEspecialesAsignados[idDispositivo].cantTestersEspecialesTerminados += 1;
-    this->semShmemCantTesters.v();
+    m_SemShmemCantTesters.p();
+    m_pCantTestersEspecialesAsignados[idDispositivo].cantTestersEspecialesTerminados += 1;
+    m_SemShmemCantTesters.v();
 }
 
 PlanillaAsignacionTesterEspecial::~PlanillaAsignacionTesterEspecial() {
-}
-
-bool PlanillaAsignacionTesterEspecial::destruirComunicacion() {
-    return (!((shmctl(this->shmemCantTestersId, IPC_RMID, NULL) != -1) || (shmctl(this->shmemCantTareasId, IPC_RMID, NULL) != -1)));
 }

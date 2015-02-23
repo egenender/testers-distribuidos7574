@@ -57,16 +57,69 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-void CrearSemaforo( const std::string& archivoIpcs, int idSemaforo, int valorInicial ){
+void crearSemaforo( const std::string& archivoIpcs, int idSemaforo, int valorInicial ){
     Semaphore sem( archivoIpcs, idSemaforo );
     sem.creaSem();
     sem.iniSem( valorInicial );
 }
 
+template<typename T>
+T* crearSharedMemory( const std::string& archivoIpcs,
+                                           int id,
+                                           const std::string& duenio,
+                                           size_t tamanio ){
+    key_t shMemKey = ftok( archivoIpcs.c_str(), id );
+    if(shMemKey == -1) {
+        std::string err("Error al conseguir la key de la shmem de " + duenio +". Error: " + std::string(strerror(errno)));
+        Logger::error(err.c_str(), __FILE__);
+        throw err;
+    }
+    int shMemId = shmget( shMemKey, tamanio, IPC_CREAT | IPC_EXCL | 0660);
+    if( shMemId == -1 ) {
+        std::string err("Error al conseguir la memoria compartida de " + duenio + ". Error: " + std::string(strerror(errno)));
+        Logger::error(err.c_str(), __FILE__);
+        throw err;
+    }
+    void* tmpPtr = shmat( shMemId, NULL, 0 );
+    T* pContenido = NULL;
+    if ( tmpPtr != (void*) -1 ) {
+        pContenido = static_cast<T*> (tmpPtr);
+        Logger::debug("Memoria compartida de " + duenio + " creada correctamente", __FILE__);
+    } else {
+        std::string err = std::string("Error en shmat() de " + duenio + ". Error: ") + std::string(strerror(errno));
+        Logger::error(err, __FILE__);
+        throw err;
+    }
+    return pContenido;
+}
+
+void crearObjetosIPCPlanillaGeneral( const std::string& archivoIpcs, const Configuracion& config ) {
+    //Mutex
+    crearSemaforo( archivoIpcs, config.ObtenerParametroEntero(SEM_PLANILLA_GENERAL), 1 );    
+    //Shm planilla
+    int* pCantDispositivosSiendoTesteados = crearSharedMemory<int>(
+        archivoIpcs, config.ObtenerParametroEntero(SHM_PLANILLA_GENERAL), "planilla general", sizeof(int)
+    );
+    *(pCantDispositivosSiendoTesteados) = 0;
+    //Shm posiciones
+    const int maxDispositivosEnSistema = config.ObtenerParametroEntero(MAX_DISPOSITIVOS_EN_SISTEMA);
+    bool* pIdsPrivadosDispositivos = crearSharedMemory<bool>(
+        archivoIpcs, config.ObtenerParametroEntero(SHM_PLANILLA_GENERAL_POSICIONES),
+        "planilla general-posiciones", sizeof(bool) * maxDispositivosEnSistema
+    ); 
+    for (int i = 0; i < maxDispositivosEnSistema; i++)
+        pIdsPrivadosDispositivos[i] = false;
+}
+
+void crearObjetosIPCPlanillaAsignacionTesterComun( const std::string& archivoIpcs, const Configuracion& config ){
+    int maxDispositivos = config.ObtenerParametroEntero(MAX_DISPOSITIVOS_EN_SISTEMA);
+    crearSharedMemory<TContadorTesterEspecial>( archivoIpcs, config.ObtenerParametroEntero(SHM_PLANILLA_CANT_TESTER_ASIGNADOS),
+                                                "planilla asignacion testers", sizeof(TContadorTesterEspecial) * maxDispositivos );
+}
+
 void crearObjetosIPC( const Configuracion& config ) {
     const std::string archivoIpcs = config.ObtenerParametroString(
         Constantes::NombresDeParametros::ARCHIVO_IPCS.c_str() );
-
     // Creo el archivo que se usara para obtener las keys
     std::fstream ipcFile(archivoIpcs.c_str(), std::ios::out);
     if (ipcFile.bad() || ipcFile.fail()) {
@@ -77,15 +130,71 @@ void crearObjetosIPC( const Configuracion& config ) {
     }
     ipcFile.close();
     
-    CrearSemaforo( archivoIpcs, config.ObtenerParametroEntero(SEM_PLANILLA_GENERAL), 1 );
-    CrearSemaforo( archivoIpcs, config.ObtenerParametroEntero(SEM_COLA_ESPECIALES), 1 );
-    CrearSemaforo( archivoIpcs, config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TESTER_ASIGNADOS), 1 );
-    CrearSemaforo( archivoIpcs, config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TAREAS_ASIGNADAS), 1 );
+    //Otros ipcs
+    crearObjetosIPCPlanillaGeneral( archivoIpcs, config );
+    
+    crearObjetosIPCPlanillaAsignacionTesterComun( archivoIpcs, config );
+
+    //Usado por PlanillaAsignacionTesterComun, PlanillaAsignacionTesterEspecial
+    //y PlanillaAsignacionEquipoEspecial
+    crearSemaforo( archivoIpcs, config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TESTER_ASIGNADOS), 1 );
+
+    //Creacion de cola dispositivos (AtendedorDispositivos, AtendedorTesters, AtendedorEquipoEspecial)
+    int msgQueueDispositivos = config.ObtenerParametroEntero( MSGQUEUE_DISPOSITIVOS );
+    key_t key = ftok(archivoIpcs.c_str(), msgQueueDispositivos);
+    if (msgget(key, 0660 | IPC_CREAT | IPC_EXCL) == -1){
+        std::cout << "No se pudo crear la cola de dispositivos: " << strerror(errno)<< std::endl;
+    }
+    //Creacion de cola testers (AtendedorDispositivos, AtendedorTesters)
+    int msgQueueTesters = config.ObtenerParametroEntero( MSGQUEUE_TESTERS );
+    key = ftok(archivoIpcs.c_str(), msgQueueTesters);
+    if (msgget(key, 0660 | IPC_CREAT | IPC_EXCL) == -1){
+        std::cout << "No se pudo crear la cola de testers: " << strerror(errno)<< std::endl;
+    }
+    //Creacion de cola dispositivos-testersEspeciales (AtendedorDispositivos, AtendedorTesters, AtendedorEquipoEspecial)
+    int msgQueueTestersDispEsp = config.ObtenerParametroEntero( MSGQUEUE_DISPOSITIVOS_TESTERS_ESPECIALES );
+    key = ftok(archivoIpcs.c_str(), msgQueueTestersDispEsp);
+    if (msgget(key, 0660 | IPC_CREAT | IPC_EXCL) == -1){
+        std::cout << "No se pudo crear la cola de testers-dispEspeciales: " << strerror(errno)<< std::endl;
+    }
+    //Creacion de cola dispositivo-config (una para todos los dispositivos, reciben por mtype + id)
+    //(AtendedorDispositivos, AtendedorTesters)
+    int msgQueueDispositivosConfig = config.ObtenerParametroEntero( MSGQUEUE_DISPOSITIVOS_CONFIG );
+    key = ftok(archivoIpcs.c_str(), msgQueueDispositivosConfig);
+    if (msgget(key, 0660 | IPC_CREAT | IPC_EXCL) == -1){
+        std::cout << "No se pudo crear la cola de dispositivos-config: " << strerror(errno)<< std::endl;
+    }
+    //Creacion de Cola testers config (AtendedorTesters)
+    int msgQueueTestersConfig = config.ObtenerParametroEntero( MSGQUEUE_TESTERS_CONFIG );
+    key = ftok(archivoIpcs.c_str(), msgQueueTestersConfig);
+    if (msgget(key, 0660 | IPC_CREAT | IPC_EXCL) == -1){
+        std::cout << "No se pudo crear la cola de testers-config: " << strerror(errno)<< std::endl;
+    }
+    //Creacion de Cola testers especiales (AtendedorTesters)
+    int msgQueueTestersEspeciales = config.ObtenerParametroEntero( MSGQUEUE_TESTERS_ESPECIALES );
+    key = ftok(archivoIpcs.c_str(), msgQueueTestersEspeciales);
+    if (msgget(key, 0660 | IPC_CREAT | IPC_EXCL) == -1){
+        std::cout << "No se pudo crear la cola de testers especiales: " << strerror(errno)<< std::endl;
+    }
+    //Creacion de Cola despachador tecnicos (DespachadorTecnicos)
+    int msgQueueDespachador = config.ObtenerParametroEntero( MSGQUEUE_DESPACHADOR );
+    key = ftok(archivoIpcs.c_str(), msgQueueDespachador);
+    if (msgget(key, 0660 | IPC_CREAT | IPC_EXCL) == -1){
+        std::cout << "No se pudo crear la cola de despachador de tecnicos: " << strerror(errno)<< std::endl;
+    }
+    //Sem cola especiales (AtendedorTesters)
+    crearSemaforo( archivoIpcs, config.ObtenerParametroEntero(SEM_COLA_ESPECIALES), 1 );
+    //Sem tareas asignadas ()
+    crearSemaforo( archivoIpcs, config.ObtenerParametroEntero(SEM_PLANILLA_CANT_TAREAS_ASIGNADAS), 1 );
     
 
 
-    Planilla planillaGeneral( config );
-    planillaGeneral.initPlanilla();
+
+
+    
+    
+    
+    
     PlanillaAsignacionEquipoEspecial planillaAsignacion( config );
     planillaAsignacion.initPlanilla();
     
@@ -101,28 +210,8 @@ void crearObjetosIPC( const Configuracion& config ) {
         semMutexPlanillaVars.creaSem();
         semMutexPlanillaVars.iniSem(1);
     }
+
     
-    //Creacion de colas (una para cada dispositivo)
-    int msgQueueDispositivos = config.ObtenerParametroEntero( MSGQUEUE_DISPOSITIVOS );
-    int msgQueueUltimo = config.ObtenerParametroEntero( MSGQUEUE_ULTIMO );
-    for (int q = msgQueueDispositivos; q <= msgQueueUltimo; q++){
-        key_t key = ftok(archivoIpcs.c_str(), q);
-        if (msgget(key, 0660 | IPC_CREAT | IPC_EXCL) == -1){
-            std::cout << "No se pudo crear una cola: " << strerror(errno)<< std::endl;
-        }
-    }
-    //Creacion de cola-config (una para todos los dispositivos, reciben por mtype + id)
-    int msgQueueDispositivosConfig = config.ObtenerParametroEntero( MSGQUEUE_DISPOSITIVOS_CONFIG );
-    key_t key = ftok(archivoIpcs.c_str(), msgQueueDispositivosConfig);
-    if (msgget(key, 0660 | IPC_CREAT | IPC_EXCL) == -1){
-        std::cout << "No se pudo crear la cola de dispositivos-config: " << strerror(errno)<< std::endl;
-    }
-    //Creacion de Cola testers config
-    int msgQueueTestersConfig = config.ObtenerParametroEntero( MSGQUEUE_TESTERS_CONFIG );
-    key = ftok(archivoIpcs.c_str(), msgQueueTestersConfig);
-    if (msgget(key, 0660 | IPC_CREAT | IPC_EXCL) == -1){
-        std::cout << "No se pudo crear la cola de testers-config: " << strerror(errno)<< std::endl;
-    }
     //Shared memories dispositivo-config
     
 }

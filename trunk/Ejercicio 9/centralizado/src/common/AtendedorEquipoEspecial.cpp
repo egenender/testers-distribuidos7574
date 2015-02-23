@@ -15,26 +15,17 @@ AtendedorEquipoEspecial::AtendedorEquipoEspecial( const Configuracion& config ) 
     const string ipcFileName = config.ObtenerParametroString( ARCHIVO_IPCS );
     key_t key = ftok( ipcFileName.c_str(),
                       config.ObtenerParametroEntero(MSGQUEUE_DISPOSITIVOS_TESTERS_ESPECIALES) );
-    this->colaDispTesterEsp = msgget(key, 0666);
-    if(this->colaDispTesterEsp == -1) {
+    m_ColaDispTesterEsp = msgget(key, 0666);
+    if(m_ColaDispTesterEsp == -1) {
         std::string err = std::string("Error al obtener la cola para enviar fin de tareas especiales a los dispositivos. Errno: ") + std::string(strerror(errno));
         Logger::error(err, __FILE__);
         exit(1);
     }
-    
-    key = ftok( ipcFileName.c_str(),
-                config.ObtenerParametroEntero(MSGQUEUE_REINICIO_TESTEO) );
-    this->colaReinicioTestEsp = msgget(key, 0666);
-    if(this->colaReinicioTestEsp == -1) {
-        std::string err = std::string("Error al obtener la cola para avisar reinicio de testeo especial. Errno: ") + std::string(strerror(errno));
-        Logger::error(err, __FILE__);
-        exit(1);
-    }
-    
+
     key = ftok( ipcFileName.c_str(),
                 config.ObtenerParametroEntero(MSGQUEUE_DISPOSITIVOS) );
-    this->colaOrdenDispositivos = msgget(key, 0666);
-    if(this->colaOrdenDispositivos == -1) {
+    m_ColaOrdenDispositivos = msgget(key, 0666);
+    if(m_ColaOrdenDispositivos == -1) {
         std::string err = std::string("Error al obtener la cola para enviar orden de apagado o reinicio a dispositivos. Errno: ") + std::string(strerror(errno));
         Logger::error(err, __FILE__);
         exit(1);
@@ -47,7 +38,7 @@ AtendedorEquipoEspecial::~AtendedorEquipoEspecial() {
 TResultadoEspecial AtendedorEquipoEspecial::recibirResultadoEspecial() {
     TResultadoEspecial resultado;
     //El -MTYPE_CAMBIO_VAR es para recibir solo MTYPE_CAMBIO_VAR (4001) y MTYPE_RESULTADO_ESPECIAL (2001)
-    int ret = msgrcv(this->colaDispTesterEsp, &resultado, sizeof(TResultadoEspecial) - sizeof(long), -MTYPE_CAMBIO_VAR, 0);
+    int ret = msgrcv(m_ColaDispTesterEsp, &resultado, sizeof(TResultadoEspecial) - sizeof(long), -MTYPE_CAMBIO_VAR, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir resultado especial de algun dispositivo. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
@@ -61,7 +52,7 @@ void AtendedorEquipoEspecial::enviarFinTestEspecialADispositivo(int idDispositiv
     msg.mtype = idDispositivo;
     msg.idDispositivo = idDispositivo;
     msg.value = FIN_TEST_ESPECIAL;
-    int ret = msgsnd(this->colaDispTesterEsp, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    int ret = msgsnd(m_ColaDispTesterEsp, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
         std::ostringstream ss;
         ss << "Error al enviar fin de testeo especial al dispositivo " << idDispositivo << ". Error: ";
@@ -77,7 +68,7 @@ void AtendedorEquipoEspecial::enviarOrden(int idDispositivo, int orden) {
     msg.idDispositivo = idDispositivo;
     msg.idTester = -1;
     msg.value = orden;
-    int ret = msgsnd(this->colaOrdenDispositivos, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
+    int ret = msgsnd(m_ColaOrdenDispositivos, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
         std::ostringstream ss;
         ss << "Error al enviar orden de apagado o reinicio al dispositivo " << idDispositivo << ". Error: ";

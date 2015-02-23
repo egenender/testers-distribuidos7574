@@ -18,8 +18,7 @@ class Configuracion;
 
 class DespachadorTecnicos {
 private:
-    int msgQueueId;
-    key_t key;
+    int     m_MsgQueueId;
     
     typedef struct message {
         long mtype;
@@ -35,6 +34,4 @@ public:
     ~DespachadorTecnicos();
     
     int recibirOrden();
-
-    bool destruirComunicacion();
 };
