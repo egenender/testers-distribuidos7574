@@ -21,15 +21,14 @@ class PlanillaAsignacionEquipoEspecial {
 public:
     PlanillaAsignacionEquipoEspecial( const Configuracion& config );
     ~PlanillaAsignacionEquipoEspecial();
-    
+
     void registrarTareaEspecialFinalizada(int idDispositivo);
     bool terminoTesteoEspecial(int idDispositivo);
     void reiniciarContadoresTesteoEspecial(int idDispositivo);
     void limpiarContadoresFinTesteo(int idDispositivo);
-    
-    void initPlanilla();
+
 private:
-    const int m_MaxDispositivosEnSistema;
+    const int                   m_MaxDispositivosEnSistema;
     Semaphore                   m_SemShmemCantTesters;
     Semaphore                   m_SemShmemCantTareas;
     int                         m_ShmemCantTestersId;

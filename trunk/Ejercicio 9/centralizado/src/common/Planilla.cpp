@@ -24,19 +24,19 @@ Planilla::Planilla( const Configuracion& config ) :
         throw err;
     }
     //Shm planilla
-    m_ShMemKey = ftok( archivoIpcs.c_str(),
-                       config.ObtenerParametroEntero(SHM_PLANILLA_GENERAL) );
-    if( m_ShMemKey == -1 ) {
+    key_t key = ftok( archivoIpcs.c_str(),
+                      config.ObtenerParametroEntero(SHM_PLANILLA_GENERAL) );
+    if( key == -1 ) {
         std::string err("Error al conseguir la key de la shmem de la planilla general. Error: " + std::string(strerror(errno)));
         Logger::error(err.c_str(), __FILE__);
         throw err;
     }
-    m_ShMemId = shmget( m_ShMemKey, sizeof(int), 0660 );
+    m_ShMemId = shmget( key, sizeof(int), 0660 );
     if( m_ShMemId == -1 ) {
         std::string err("Error al conseguir la memoria compartida de la planilla general. Error: " + std::string(strerror(errno)));
         Logger::error(err.c_str(), __FILE__);
         throw err;
-    }    
+    }
     void* tmpPtr = shmat( m_ShMemId, NULL, 0 );
     if ( tmpPtr != (void*) -1 ) {
         m_pCantDispositivosSiendoTesteados = static_cast<int*> (tmpPtr);
@@ -46,16 +46,16 @@ Planilla::Planilla( const Configuracion& config ) :
         Logger::error(err, __FILE__);
         throw err;
     }
-    //Shm posiciones    
-    m_ShMemPosicionesKey = ftok( archivoIpcs.c_str(),
-                                 config.ObtenerParametroEntero(SHM_PLANILLA_GENERAL_POSICIONES) );
-    if( m_ShMemKey == -1 ) {
+    //Shm posiciones
+    key = ftok( archivoIpcs.c_str(),
+                config.ObtenerParametroEntero(SHM_PLANILLA_GENERAL_POSICIONES) );
+    if( key == -1 ) {
         std::string err("Error al conseguir la key de la shmem de posiciones de la planilla general. Error: " + std::string(strerror(errno)));
         Logger::error(err.c_str(), __FILE__);
         throw err;
     }
-    m_ShMemPosicionesId = shmget( m_ShMemPosicionesKey, sizeof(bool) * config.ObtenerParametroEntero(MAX_DISPOSITIVOS_EN_SISTEMA), 0660 );
-    if( m_ShMemId == -1 ) {
+    m_ShMemPosicionesId = shmget( key, sizeof(bool) * config.ObtenerParametroEntero(MAX_DISPOSITIVOS_EN_SISTEMA), 0660 );
+    if( m_ShMemPosicionesId == -1 ) {
         std::string err("Error al conseguir la memoria compartida de posiciones de la planilla general. Error: " + std::string(strerror(errno)));
         Logger::error(err.c_str(), __FILE__);
         throw err;

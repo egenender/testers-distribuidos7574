@@ -24,7 +24,5 @@ public:
     
     bool hayQueReiniciar(int idTester);
 private:
-    key_t msgqReinicioKey;
-    int msgqReinicioId;
-
+    int m_MsgqReinicioId;
 };

@@ -14,18 +14,16 @@ class PlanillaVariablesDisp {
 public:
     PlanillaVariablesDisp( const Configuracion& config, int idDisp );
     ~PlanillaVariablesDisp();
-    
+
     void iniciarCambioDeVariable( int idVar );
     void finalizarCambioDeVariable( int idVar );
-    
+
     void iniciarTestEspecial();
     void finalizarTestEspecial();
-    
-    bool destruirComunicacion();
+
 private:
     const int           m_IdDisp;
     int                 m_ShmemEstadoId;
-    key_t               m_KeyShmemEstado;
     Semaphore           m_MutexPlanilla;
     Semaphore           m_SemTestsEspeciales;
     Semaphore           m_SemCambioVars;

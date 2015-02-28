@@ -21,8 +21,6 @@ class Planilla {
 private:
     const int       m_MaxDispositivosEnSistema;
     Semaphore       m_SemShMem;
-    key_t           m_ShMemKey;
-    key_t           m_ShMemPosicionesKey;
     int             m_ShMemId;
     int             m_ShMemPosicionesId;
     int*            m_pCantDispositivosSiendoTesteados;

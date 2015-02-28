@@ -15,14 +15,14 @@ PlanillaVariablesDisp::PlanillaVariablesDisp( const Configuracion& config, int i
                          config.ObtenerParametroEntero( SEM_PLANILLA_VARS_CV_START ) + idDisp ){
     const string ipcFileName = config.ObtenerParametroString( ARCHIVO_IPCS );
     //Shm
-    m_KeyShmemEstado = ftok( ipcFileName.c_str(),
-                             config.ObtenerParametroEntero(SHM_PLANILLA_VARS_START) + idDisp );
-    if(m_KeyShmemEstado == -1) {
+    key_t key = ftok( ipcFileName.c_str(),
+                      config.ObtenerParametroEntero(SHM_PLANILLA_VARS_START) + idDisp );
+    if( key == -1 ) {
         std::string err("Error al conseguir la key de la shmem de la planilla de variables. Error: " + std::string(strerror(errno)));
         Logger::error(err.c_str(), __FILE__);
         throw err;
     }
-    m_ShmemEstadoId = shmget(m_KeyShmemEstado, sizeof(TEstadoDispositivo), IPC_CREAT | 0660);
+    m_ShmemEstadoId = shmget( key, sizeof(TEstadoDispositivo), 0660 );
     if(m_ShmemEstadoId == -1) {
         std::string err("Error al conseguir la memoria compartida de la planilla de variables. Error: " + std::string(strerror(errno)));
         Logger::error(err.c_str(), __FILE__);
@@ -45,13 +45,13 @@ PlanillaVariablesDisp::PlanillaVariablesDisp( const Configuracion& config, int i
         Logger::error(err, __FILE__);
         throw err;
     }
-    if (!this->m_SemTestsEspeciales.getSem()) {
+    if (!m_SemTestsEspeciales.getSem()) {
         std::string err = std::string("Error al obtener el semaforo de tests especiales la planilla de variables. Error: ")
                           + std::string(strerror(errno));
         Logger::error(err, __FILE__);
         throw err;
     }
-    if (!this->m_SemCambioVars.getSem()) {
+    if (!m_SemCambioVars.getSem()) {
         std::string err = std::string("Error al obtener el semaforo de cambio de variables de la planilla de variables. Error: ")
                           + std::string(strerror(errno));
         Logger::error(err, __FILE__);
@@ -130,8 +130,4 @@ void PlanillaVariablesDisp::finalizarCambioDeVariable( int idVar ){
     }
     m_MutexPlanilla.v();
     m_SemCambioVars.v();    
-}
-
-bool PlanillaVariablesDisp::destruirComunicacion(){
-    return ( shmctl(this->m_ShmemEstadoId, IPC_RMID, NULL) != -1 );
 }
