@@ -5,8 +5,7 @@
  * Created on October 4, 2014, 10:24 PM
  */
 
-#ifndef PROGRAMA_H
-#define	PROGRAMA_H
+#pragma once
 
 #include <cstdlib>
 
@@ -19,6 +18,4 @@ public:
     static int getPrograma() {return ((rand() % 100) + 500);};
 
 };
-
-#endif	/* PROGRAMA_H */
 

@@ -1,6 +1,6 @@
 /* 
  * File:   PlanillaReinicioEquipoEspecial.h
- * Author: ferno
+ * Author: knoppix
  *
  * Created on November 17, 2014, 1:35 PM
  */
@@ -24,7 +24,5 @@ public:
     void avisarReinicio(const std::set<int>& idTesters, bool reiniciar);
     
 private:
-    key_t msgqReinicioKey;
-    int msgqReinicioId;
-
+    int m_MsgqReinicioId;
 };

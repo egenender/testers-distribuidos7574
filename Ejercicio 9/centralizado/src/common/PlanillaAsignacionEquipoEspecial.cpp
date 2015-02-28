@@ -32,7 +32,7 @@ PlanillaAsignacionEquipoEspecial::PlanillaAsignacionEquipoEspecial( const Config
         throw err;
     }
     
-    void* tmpPtr = shmat ( m_ShmemCantTestersId , NULL ,0);
+    void* tmpPtr = shmat( m_ShmemCantTestersId, NULL, 0 );
     if ( tmpPtr != (void*) -1 ) {
         m_pCantTestersEspecialesAsignados = static_cast<TContadorTesterEspecial*> (tmpPtr);
         Logger::debug("Memoria compartida de la planilla de asignacion de testers creada correctamente", __FILE__);
@@ -82,22 +82,6 @@ PlanillaAsignacionEquipoEspecial::PlanillaAsignacionEquipoEspecial( const Config
 }
 
 PlanillaAsignacionEquipoEspecial::~PlanillaAsignacionEquipoEspecial() {
-}
-
-void PlanillaAsignacionEquipoEspecial::initPlanilla() {
-    m_SemShmemCantTesters.p();
-    for (int i = 0; i < m_MaxDispositivosEnSistema; i++) {
-        m_pCantTestersEspecialesAsignados[i].cantTestersEspecialesTerminados = 0;
-        m_pCantTestersEspecialesAsignados[i].cantTestersEspecialesTotal = 0;
-    }
-    m_SemShmemCantTesters.v();
-    
-    m_SemShmemCantTareas.p();
-    for (int i = 0; i < m_MaxDispositivosEnSistema; i++) {
-        m_pCantTareasEspecialesAsignadas[i].cantTareasEspecialesTerminadas = 0;
-        m_pCantTareasEspecialesAsignadas[i].cantTareasEspecialesTotal = 0;
-    }
-    m_SemShmemCantTareas.v();
 }
 
 void PlanillaAsignacionEquipoEspecial::registrarTareaEspecialFinalizada(int idDispositivo) {

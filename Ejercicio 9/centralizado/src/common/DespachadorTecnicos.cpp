@@ -17,7 +17,7 @@ DespachadorTecnicos::DespachadorTecnicos( const Configuracion& config ) {
     const string ipcFileName = config.ObtenerParametroString(ARCHIVO_IPCS);
     key_t key = ftok( ipcFileName.c_str(),
                       config.ObtenerParametroEntero(MSGQUEUE_DESPACHADOR) );
-    m_MsgQueueId = msgget(key, 0666 | IPC_CREAT); 
+    m_MsgQueueId = msgget(key, 0666 ); 
     if(m_MsgQueueId == -1) {
         std::string error = std::string("Error creando la cola de mensajes del despachador. Errno = ") + std::string(strerror(errno));
         Logger::error(error, __FILE__);
