@@ -103,7 +103,7 @@ int main(int argc, char** argv) {
     key = ftok( archivoIpcs.c_str(),
                 config.ObtenerParametroEntero( SHM_PLANILLA_CANT_TESTER_ASIGNADOS) );
     int maxDispositivosEnSistema = config.ObtenerParametroEntero( MAX_DISPOSITIVOS_EN_SISTEMA );
-    shmId = shmget( key, sizeof(TContadorTesterEspecial) * maxDispositivosEnSistema, 0660 );
+    int shmId = shmget( key, sizeof(TContadorTesterEspecial) * maxDispositivosEnSistema, 0660 );
     shmctl( shmId, IPC_RMID, NULL );
 
     
@@ -114,9 +114,9 @@ int main(int argc, char** argv) {
 
 
     PlanillaAsignacionEquipoEspecial planillaAsignacion( config );
-    if (!planillaAsignacion.destruirComunicacion()) {
-        Logger::warn("No se pudo destruir alguna memoria compartida de la planilla de asignacion", __FILE__);
-    }
+    //if (!planillaAsignacion.destruirComunicacion()) {
+    //    Logger::warn("No se pudo destruir alguna memoria compartida de la planilla de asignacion", __FILE__);
+    //}
 
     
 
