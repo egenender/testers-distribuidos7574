@@ -265,7 +265,7 @@ void lanzarProcesosSistema( const Configuracion& config ) {
         int cantidad_a_lanzar = minLanzados + rand() % (maxLanzados - minLanzados + 1);
         if (cantidad_a_lanzar + cantidad_lanzada > cantDispositivos)
             cantidad_a_lanzar = cantDispositivos - cantidad_lanzada;
-        for (int i = 0; i < cantidad_a_lanzar; i++){
+        for (int i = 1; i <= cantidad_a_lanzar; i++){
             char paramId[3];
             sprintf(paramId, "%d", idDispositivo);
             idDispositivo++;
@@ -279,7 +279,7 @@ void lanzarProcesosSistema( const Configuracion& config ) {
                 exit(1);
             }
         }        
-        for (int i = 0; i < cantidad_a_lanzar; i++){
+        for (int i = 1; i <= cantidad_a_lanzar; i++){
             char paramId[3];
             sprintf(paramId, "%d", idDispositivo);
             idDispositivo++;

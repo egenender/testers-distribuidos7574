@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
     
     Configuracion config;
     if( !config.LeerDeArchivo() ){
-        Logger::error("Archivo de configuracion no encontrado", __FILE__);
+        Logger::error("Archivo de configuracion no encontrado", nombre.str().c_str());
         return 1;
     }
     
