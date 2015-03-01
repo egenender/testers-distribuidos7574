@@ -21,6 +21,7 @@
 #include <sys/shm.h>
 #include <sys/msg.h>
 #include <string.h>
+#include <vector>
 
 using namespace Constantes::NombresDeParametros;
 
@@ -261,16 +262,22 @@ void lanzarProcesosSistema( const Configuracion& config ) {
     const int minLanzados = config.ObtenerParametroEntero(MINIMOS_LANZADOS);
     const int maxLanzados = config.ObtenerParametroEntero(MAXIMOS_LANZADOS);
     const int cantTiposDispositivo = config.ObtenerParametroEntero(CANT_TIPOS_DISPOSITIVO);
+    std::vector<int> idsDispositivos;
+    std::vector<int> tiposDeDispositivo;
     while (cantidad_lanzada < cantDispositivos){
         int cantidad_a_lanzar = minLanzados + rand() % (maxLanzados - minLanzados + 1);
         if (cantidad_a_lanzar + cantidad_lanzada > cantDispositivos)
             cantidad_a_lanzar = cantDispositivos - cantidad_lanzada;
+        std::map<int,int> dispositivoYTipos;
         for (int i = 1; i <= cantidad_a_lanzar; i++){
             char paramId[3];
             sprintf(paramId, "%d", idDispositivo);
+            int tipoDispositivo = rand() % cantTiposDispositivo;
+            idsDispositivos.push_back(idDispositivo);
+            tiposDeDispositivo.push_back(tipoDispositivo);
             idDispositivo++;
             char paramTipo[3];
-            sprintf(paramTipo, "%d", rand() % cantTiposDispositivo );
+            sprintf(paramTipo, "%d", tiposDeDispositivo.back() );
             pid_t newPid = fork();
             if(newPid == 0) {
                 // Inicio el programa correspondiente
@@ -278,13 +285,12 @@ void lanzarProcesosSistema( const Configuracion& config ) {
                 Logger::error("Error al ejecutar el programa dispositivo de ID" + idDispositivo, __FILE__);
                 exit(1);
             }
-        }        
+        }
         for (int i = 1; i <= cantidad_a_lanzar; i++){
             char paramId[3];
-            sprintf(paramId, "%d", idDispositivo);
-            idDispositivo++;
+            sprintf(paramId, "%d", idsDispositivos[i-1]); //Obtengo el id definido en el ciclo anterior
             char paramTipo[3];
-            sprintf(paramTipo, "%d", rand() % cantTiposDispositivo );
+            sprintf(paramTipo, "%d", tiposDeDispositivo[i-1] ); //Obtengo el tipo definido en el ciclo anterior
             pid_t newPid = fork();
             if(newPid == 0) {
                 // Inicio el programa correspondiente

@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
     int id = atoi(argv[1]);
 
     std::stringstream ss;
-    ss << "El dispositivo-Config " << id << " se crea";
+    ss << "Dispositivo-Config " << id << " creado";
     Logger::debug(ss.str().c_str(), __FILE__);
     ss.str("");
     
