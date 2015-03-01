@@ -1,6 +1,6 @@
 /* 
  * File:   AtendedorEquipoEspecial.cpp
- * Author: ferno
+ * Author: knoppix
  * 
  * Created on November 17, 2014, 12:59 AM
  */

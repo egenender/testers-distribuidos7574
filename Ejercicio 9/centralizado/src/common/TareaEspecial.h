@@ -1,6 +1,6 @@
 /* 
  * File:   TareaEspecial.h
- * Author: ferno
+ * Author: knoppix
  *
  * Created on November 16, 2014, 11:53 PM
  */
