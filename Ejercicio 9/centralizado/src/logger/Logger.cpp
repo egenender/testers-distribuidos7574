@@ -15,28 +15,28 @@ const int Logger::VT100_BLANCO = 37;
 const int Logger::VT100_ROJO = 31;
 
 void Logger::log(const std::string& msg, unsigned short int logLevel) {
-    if (logLevel >= _logger->_logLevel) {
-        time_t timer;
-        time(&timer);
-        _logger->_currentTime = localtime(&timer);
-        int color = logLevel == LOG_CRITICAL? VT100_ROJO : VT100_BLANCO;
-        std::ostringstream oss;        
-        oss << INICIO_HEADER_COLOR_VT100 << color << FIN_HEADER_COLOR_VT100
-            << std::setfill('0')
-            << std::setw(2) << _logger->_currentTime->tm_mday << "/"
-            << std::setw(2) << _logger->_currentTime->tm_mon + 1 << "/"
-            << _logger->_currentTime->tm_year + 1900 << " "
-            << std::setw(2) << _logger->_currentTime->tm_hour << ":"
-            << std::setw(2) << _logger->_currentTime->tm_min << ":"
-            << std::setw(2) << _logger->_currentTime->tm_sec << " "
-            << msg << "\n"
-            << FOOTER_COLOR_VT100;
-        _logger->_output.tomarLock();
-        _logger->_output.escribir((const void*)oss.str().c_str(), (long int)oss.str().size());
-        // Comentar esto cuando haga falta
-        write(1, (const void*)oss.str().c_str(), oss.str().size());
-        _logger->_output.liberarLock();
-    }
+    if (logLevel < _logger->_logLevel)
+        return;
+    time_t timer;
+    time(&timer);
+    _logger->_currentTime = localtime(&timer);
+    int color = (logLevel == LOG_CRITICAL)? VT100_ROJO : VT100_BLANCO;
+    std::ostringstream oss;        
+    oss << INICIO_HEADER_COLOR_VT100 << color << FIN_HEADER_COLOR_VT100
+        << std::setfill('0')
+        << std::setw(2) << _logger->_currentTime->tm_mday << "/"
+        << std::setw(2) << _logger->_currentTime->tm_mon + 1 << "/"
+        << _logger->_currentTime->tm_year + 1900 << " "
+        << std::setw(2) << _logger->_currentTime->tm_hour << ":"
+        << std::setw(2) << _logger->_currentTime->tm_min << ":"
+        << std::setw(2) << _logger->_currentTime->tm_sec << " "
+        << msg << "\n"
+        << FOOTER_COLOR_VT100;
+    _logger->_output.tomarLock();
+    _logger->_output.escribir((const void*)oss.str().c_str(), (long int)oss.str().size());
+    // Comentar esto cuando haga falta
+    write(1, (const void*)oss.str().c_str(), oss.str().size());
+    _logger->_output.liberarLock();
 }
 
 std::string Logger::prependCaller(const std::string& msg, const std::string& caller) {
@@ -44,7 +44,7 @@ std::string Logger::prependCaller(const std::string& msg, const std::string& cal
 }
 
 void Logger::log(const std::string& msg, unsigned short int logLevel, const std::string& caller) {
-    log( prependCaller(msg, caller), LOG_DEBUG );
+    log( prependCaller(msg, caller), logLevel );
 }
 
 void Logger::debug(const std::string& msg) {
