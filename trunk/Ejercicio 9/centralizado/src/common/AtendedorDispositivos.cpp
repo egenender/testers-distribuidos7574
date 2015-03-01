@@ -103,7 +103,7 @@ void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {
 int AtendedorDispositivos::recibirProgramaEspecial(int idDispositivo) {
 
     TMessageAtendedor msg;
-    int ret = msgrcv(m_ColaTestsEspeciales, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
+    int ret = msgrcv(m_ColaTestsEspeciales, &msg, sizeof(TMessageAtendedor) - sizeof(long), MTYPE_BASE_TAREA_ESPECIAL + idDispositivo, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir programa especial del sistema de testeo. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
@@ -118,15 +118,16 @@ int AtendedorDispositivos::recibirProgramaEspecial(int idDispositivo) {
 // El resultado especial se envia solo al Equipo Especial, por lo que el mtype influye poco
 void AtendedorDispositivos::enviarResultadoEspecial(int idDispositivo, int resultado) {
 
-    TResultadoEspecial resultadoTestEspecial;
+    TMessageAtendedor resultadoTestEspecial;
     
     resultadoTestEspecial.mtype = MTYPE_RESULTADO_ESPECIAL;
     resultadoTestEspecial.idDispositivo = idDispositivo;
     resultadoTestEspecial.idTester = m_IdTester;
+    resultadoTestEspecial.value = resultado;
     resultadoTestEspecial.posicionDispositivo = m_PosicionDispositivo;
-    resultadoTestEspecial.resultado = resultado;
-            
-    int ret = msgsnd(m_ColaTestsEspeciales, &resultadoTestEspecial, sizeof(TResultadoEspecial) - sizeof(long), 0);
+    resultadoTestEspecial.tipoDispositivo = -1;    
+
+    int ret = msgsnd(m_ColaTestsEspeciales, &resultadoTestEspecial, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
         std::string error = std::string("Error al enviar resultado especial al sistema de testeo. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);
@@ -159,15 +160,16 @@ TMessageDispConfig AtendedorDispositivos::recibirPedidoCambioVariable( int idDis
 }
 
 void AtendedorDispositivos::notificarCambioDeVariableFinalizado( int idDispositivo, bool ultimoCambio ){
-    TResultadoEspecial resultadoTestEspecial;
+    TMessageAtendedor resultadoTestEspecial;
     
     resultadoTestEspecial.mtype = MTYPE_CAMBIO_VAR;
     resultadoTestEspecial.idDispositivo = idDispositivo;
     resultadoTestEspecial.idTester = m_IdTester;
+    resultadoTestEspecial.value = ( ultimoCambio? FIN_TEST_CONFIG : 0 );
     resultadoTestEspecial.posicionDispositivo = m_PosicionDispositivo;
-    resultadoTestEspecial.resultado = ( ultimoCambio? FIN_TEST_CONFIG : 0 );
+    resultadoTestEspecial.tipoDispositivo = -1;
             
-    int ret = msgsnd(m_ColaTestsEspeciales, &resultadoTestEspecial, sizeof(TResultadoEspecial) - sizeof(long), 0);
+    int ret = msgsnd(m_ColaTestsEspeciales, &resultadoTestEspecial, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
         std::string error = std::string("Error al enviar resultado especial al sistema de testeo. Error: ") + std::string(strerror(errno));
         Logger::error(error.c_str(), __FILE__);

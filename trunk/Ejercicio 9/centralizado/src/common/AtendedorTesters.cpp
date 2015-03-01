@@ -132,7 +132,7 @@ void AtendedorTesters::enviarOrden(int idDispositivo, int orden) {
 void AtendedorTesters::enviarTareaEspecial(int idDispositivo, int idTester, int tarea, int posicionDispositivo) {
 
     TMessageAtendedor msg;
-    msg.mtype = idDispositivo;
+    msg.mtype = MTYPE_BASE_TAREA_ESPECIAL + idDispositivo;
     msg.idDispositivo = idDispositivo;
     msg.idTester = idTester;
     msg.posicionDispositivo = posicionDispositivo;
