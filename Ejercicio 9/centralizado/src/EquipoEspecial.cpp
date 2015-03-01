@@ -63,21 +63,23 @@ int main(int argc, char** argv) {
         // Cuando detecta que terminan todos los testeos para un dispositivo
         // se fija si deben reiniciarse, y sino, envia la ordena a los tecnicos
         
-        TResultadoEspecial resultado = atendedor.recibirResultadoEspecial();
+        TMessageAtendedor resultado = atendedor.recibirResultadoEspecial();
         
         switch( resultado.mtype ){
             case MTYPE_CAMBIO_VAR:
                 ss << "Recibi el cambio de variable del dispositivo " << resultado.idDispositivo << " efectuado por tester " << resultado.idTester;
                 Logger::debug(ss.str(), __FILE__);
                 ss.str("");
-                testConfigCompleto = ( resultado.resultado == FIN_TEST_CONFIG );
+                testConfigCompleto = ( resultado.value == FIN_TEST_CONFIG );
                 break;
             case MTYPE_RESULTADO_ESPECIAL:
-                ss << "Recibi el resultado especial " << resultado.resultado << " del dispositivo " << resultado.idDispositivo << " de la tarea especial enviada por tester " << resultado.idTester;
+                ss << "Recibi el resultado especial " << resultado.value 
+                   << " del dispositivo " << resultado.idDispositivo 
+                   << " de la tarea especial enviada por tester " << resultado.idTester;
                 Logger::debug(ss.str(), __FILE__);
                 ss.str("");
                 // Almaceno resultado del testeo especial terminado
-                resultados[resultado.posicionDispositivo] += resultado.resultado;
+                resultados[resultado.posicionDispositivo] += resultado.value;
                 // Almaceno el tester que testea al dispositivo
                 controlador[resultado.posicionDispositivo].insert(resultado.idTester);
                 // Registro que termino una tarea especial
@@ -85,7 +87,9 @@ int main(int argc, char** argv) {
                 Logger::debug("Se registra la tarea especial terminada con exito", __FILE__);
                 break;
             default:
-                Logger::error( "Equipo especial recibio mensaje de mtype invalido", __FILE__ );
+                ss << "Equipo especial recibio mensaje de mtype invalido: " << resultado.mtype;
+                Logger::error( ss.str(), __FILE__ );
+                ss.str("");
                 exit( 0 );
                 break;
         }

@@ -60,6 +60,7 @@ const int MTYPE_REQUERIMIENTO = 1001;
 const int MTYPE_RESULTADO_ESPECIAL = 2001;
 const int MTYPE_ORDEN = 3001;
 const int MTYPE_CAMBIO_VAR = 4001;
+const int MTYPE_BASE_TAREA_ESPECIAL = 5000;
 
 //Otras constantes
 const int ORDEN_APAGADO = 0;
@@ -106,14 +107,6 @@ typedef struct TContadorTareaEspecial {
     int cantTareasEspecialesTotal;
     int cantTareasEspecialesTerminadas;
 } TContadorTareaEspecial;
-
-typedef struct TResultadoEspecial {
-    long mtype;
-    int idDispositivo;
-    int idTester;
-    int posicionDispositivo;
-    int resultado;
-} TResultadoEspecial;
 
 typedef struct TMessageReinicioTest {
     long mtype;
