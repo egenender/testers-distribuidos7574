@@ -22,18 +22,18 @@
 using namespace std;
 
 void realizarCambioDeVariable( int idDisp, PlanillaVariablesDisp& planillaVariables,
-                               int idVar, int nuevoValor ){
+                               int idVar, int nuevoValor, const char* nombreProceso ){
     planillaVariables.iniciarCambioDeVariable( idVar );
     usleep(rand() % 1000 + 1000);
     std::stringstream ss;
     ss << "El dispositivo-config " << idDisp << " cambiara la variable de configuracion " 
        << idVar << " al valor " << nuevoValor;
-    Logger::debug(ss.str().c_str(), __FILE__);
+    Logger::debug(ss.str().c_str(), nombreProceso);
     ss.str("");
     planillaVariables.finalizarCambioDeVariable( idVar );
     ss << "El dispositivo-config " << idDisp << " cambió exitosamente la variable de configuracion " 
        << idVar;
-    Logger::debug(ss.str().c_str(), __FILE__);
+    Logger::debug(ss.str().c_str(), nombreProceso);
     ss.str("");
 }
 
@@ -42,15 +42,18 @@ int main(int argc, char** argv) {
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
     // Por parametro se recibe el ID del dispositivo
     int id = atoi(argv[1]);
+    
+    std::stringstream nombreProceso;
+    nombreProceso << __FILE__ << " " << id;
 
     std::stringstream ss;
     ss << "Dispositivo-Config " << id << " creado";
-    Logger::debug(ss.str().c_str(), __FILE__);
+    Logger::debug(ss.str().c_str(), nombreProceso.str().c_str());
     ss.str("");
-    
+
     Configuracion config;
     if( !config.LeerDeArchivo() ){
-        Logger::error("Archivo de configuracion no encontrado", __FILE__);
+        Logger::error("Archivo de configuracion no encontrado", nombreProceso.str().c_str());
         return 1;
     }
     
@@ -61,15 +64,15 @@ int main(int argc, char** argv) {
     while(true) {
         try {
             TMessageDispConfig cambio = atendedor.recibirPedidoCambioVariable( id );
-            realizarCambioDeVariable( id, planillaVariables, cambio.idVariable, cambio.nuevoValor );
+            realizarCambioDeVariable( id, planillaVariables, cambio.idVariable, cambio.nuevoValor, nombreProceso.str().c_str() );
             atendedor.notificarCambioDeVariableFinalizado( id, cambio.ultimo );
         } catch(std::string exception) {
-            Logger::error("Error en el dispositivo...", __FILE__);
+            Logger::error("Error en el dispositivo...", nombreProceso.str().c_str());
             break;
         }
     }
     ss << "El dispositivo-config " << id << " ha terminado";
-    Logger::notice(ss.str().c_str(), __FILE__);    
+    Logger::notice(ss.str().c_str(), nombreProceso.str().c_str());
     Logger::destroy();
     return 0;
 }
