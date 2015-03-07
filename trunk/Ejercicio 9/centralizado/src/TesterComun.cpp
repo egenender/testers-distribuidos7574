@@ -54,9 +54,9 @@ int main(int argc, char** argv) {
         int idDispositivo = msgRequerimiento.idDispositivo;
         int tipoDispositivo = msgRequerimiento.tipoDispositivo;
         stringstream ss;
-        ss << msgRequerimiento.idDispositivo;
-        string mensaje = "Recibido requerimiento desde dispositivo id ";
-        Logger::notice(mensaje + ss.str() , nombre.str().c_str());
+        ss << "Recibido requerimiento desde dispositivo id " << msgRequerimiento.idDispositivo;
+        Logger::notice(ss.str() , nombre.str().c_str());
+        ss.str();
         
         int posicionDispositivo = planilla.hayLugar();
         if (posicionDispositivo == SIN_LUGAR){
@@ -85,7 +85,7 @@ int main(int argc, char** argv) {
         } else if (resul.result == SEGUIR_TESTEANDO){
             int cant_testers = 0;
             const int cantTestersEspeciales = config.ObtenerParametroEntero(CANT_TESTERS_ESPECIALES);
-            vector<bool> los_testers( cantTestersEspeciales );
+            vector<bool> los_testers( cantTestersEspeciales );            
             while (cant_testers < 2 || cant_testers > 4){ //requerimientos
                 cant_testers = 0;
                 for (int i = 0; i < cantTestersEspeciales; i++){
@@ -94,7 +94,6 @@ int main(int argc, char** argv) {
                     los_testers[i] = random;
                 }
             }
-
             Logger::notice(string("Le envio orden de seguir evaluando al dispositivo ") + ss.str(), nombre.str().c_str());
             atendedor.enviarOrden(idDispositivo, ORDEN_SEGUIR_TESTEANDO);
             ss.str("");
@@ -104,7 +103,11 @@ int main(int argc, char** argv) {
                             ss << i+idPrimerTesterEspecial << " ";
             }
             Logger::notice(ss.str() , nombre.str().c_str());
+            ss.str("");
             planillaAsignacion.asignarCantTestersEspeciales(posicionDispositivo, cant_testers);
+            ss << "Al dispositivo " << idDispositivo << " se le asignaron " << cant_testers << " testers";
+            Logger::notice(ss.str() , nombre.str().c_str());
+            ss.str("");
             atendedor.enviarAEspeciales(los_testers, idDispositivo, posicionDispositivo);
             atendedor.enviarReqTestConfig( id, idDispositivo, tipoDispositivo );
         }else{
