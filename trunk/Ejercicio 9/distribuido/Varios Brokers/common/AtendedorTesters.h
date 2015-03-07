@@ -42,7 +42,7 @@ public:
     void enviarPrograma(int idDispositivo, int tester, int idPrograma);  // Tester -> Disp
     TMessageAtendedor recibirResultado(int idTester);
     void enviarOrden(int idDispositivo, int orden); // Tester -> Disp: Reinicio o apagado
-
+    void enviarReqTestConfig( int idDispositivo, int idTester, int tipoDispositivo );
     /**
      * Interaccion con testers especiales
      */

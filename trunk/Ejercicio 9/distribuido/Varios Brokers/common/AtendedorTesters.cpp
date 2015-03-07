@@ -177,6 +177,20 @@ void AtendedorTesters::enviarOrden(int idDispositivo, int orden) {
         exit(0);
     }
 }
+void AtendedorTesters::enviarReqTestConfig( int idDispositivo, int idTester, int tipoDispositivo ){
+    TMessageTesterConfig msg;
+    msg.mtype = idTester;
+    msg.idDispositivo = idDispositivo;
+    msg.tipoDispositivo = tipoDispositivo;
+    int ret = msgsnd(m_ColaTestersConfig, &msg, sizeof(TMessageTesterConfig) - sizeof(long), 0);
+    if(ret == -1) {
+        std::stringstream ss;
+        ss << "Error al enviar test config al dispositivo " << idDispositivo << " desde el tester " << idTester << ". Error: ";
+        std::string error = ss.str() + std::string(strerror(errno));
+        Logger::error(error.c_str(), __FILE__);
+        exit(0);
+    }
+}
 
 void AtendedorTesters::enviarAEspeciales(bool cuales[], int idDispositivo, int posicionDispositivo){
     int j = 0;

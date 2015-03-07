@@ -25,6 +25,8 @@ int main(int argc, char** argv) {
 	srand(time(NULL));
     // El primer parametro es el id del tester
     int id = getIdTesterComun();
+    
+
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
     
     if (id == 0) {
@@ -102,6 +104,10 @@ int main(int argc, char** argv) {
             Logger::notice(ss.str() , nombre.str().c_str());
             planillaAsignacion.asignarCantTestersEspeciales(posicionDispositivo, cant_testers);
             atendedor.enviarAEspeciales(los_testers, idDispositivo, posicionDispositivo);
+            
+            //OJO BUSCAR EL TIPO DE DISP
+            int tipoDispositivo = idDispositivo;
+            
             atendedor.enviarReqTestConfig( id, idDispositivo, tipoDispositivo );
         } else {
             atendedor.enviarOrden(idDispositivo, ORDEN_REINICIO);
