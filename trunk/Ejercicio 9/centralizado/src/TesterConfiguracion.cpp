@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
             atendedor.enviarCambioVariable( reqTest.idDispositivo,
                                             test.getVariable(i),
                                             nuevoValorVar,
-                                            i == (test.CantVariables()-1) );
+                                            i == (test.getCantVariables()-1) );
         }
     }
 }
