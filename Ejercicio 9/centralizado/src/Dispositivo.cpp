@@ -18,6 +18,20 @@
 
 using namespace std;
 
+int correrTest( int programa ){
+     //Simulo ejecucion de programa
+    usleep( rand() % 1000 + 1000);
+    //Obtengo un resultado aleatorio
+    int resultadoAleatorio = rand() % 10;
+    if (resultadoAleatorio >= 4){
+        return SEGUIR_TESTEANDO;
+    }else if (resultadoAleatorio >= 2){
+        return RESULTADO_GRAVE;
+    }else{
+        return RESULTADO_NO_GRAVE;
+    }
+} 
+
 void correrTestEspecial( PlanillaVariablesDisp& planillaVars ){
     planillaVars.iniciarTestEspecial();
     usleep( rand() % 1000 + 1000 );
@@ -32,7 +46,7 @@ int main(int argc, char** argv) {
     int tipo = atoi(argv[2]);
 
     std::stringstream ss;
-    ss << "El dispositivo " << id << " se crea";
+    ss << "Dispositivo " << id << " de tipo " << tipo << " creado";
     Logger::debug(ss.str().c_str(), __FILE__);
     ss.str("");
     
@@ -70,22 +84,14 @@ int main(int argc, char** argv) {
         Logger::debug(ss.str().c_str(), __FILE__);
         ss.str("");
 
-        usleep( rand() % 1000 + 1000);
-
+        int resul = correrTest( program );
+        
+        // Le envio resultado del primer programa de testeo        
         ss << "El dispositivo " << id << " envia los resultados";
         Logger::debug(ss.str().c_str(), __FILE__);
         ss.str("");
+        atendedor.enviarResultado( id, resul );
 
-        // Le envio resultado del primer programa de testeo
-        int resul = rand() % 10;
-        if (resul >= 4){
-            atendedor.enviarResultado(id, SEGUIR_TESTEANDO);
-        }else if (resul >= 2){
-            atendedor.enviarResultado(id, RESULTADO_GRAVE);
-        }else{
-            atendedor.enviarResultado(id, RESULTADO_NO_GRAVE);
-        }
-        
         ss << "El dispositivo " << id << " espera la orden del sistema de testeo...";
         Logger::debug(ss.str().c_str(), __FILE__);
         ss.str("");

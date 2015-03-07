@@ -81,8 +81,9 @@ int Planilla::hayLugar() {
     if( *m_pCantDispositivosSiendoTesteados < m_MaxDispositivosEnSistema ) {
         *m_pCantDispositivosSiendoTesteados += 1;
         int i = 0;
-        for (i = 0; (i < m_MaxDispositivosEnSistema) && (m_pIdsPrivadosDispositivos[i]); i++);
-            m_pIdsPrivadosDispositivos[i] = true;
+        for (i = 0; (i < m_MaxDispositivosEnSistema) && (m_pIdsPrivadosDispositivos[i]); i++)
+            ;//Corta al encontrar el primer lugar libre
+        m_pIdsPrivadosDispositivos[i] = true;
         result = i;
     }
     m_SemShMem.v();
