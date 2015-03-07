@@ -26,7 +26,8 @@ int main(int argc, char** argv) {
         TMessageTesterConfig reqTest = atendedor.recibirReqTestConfig( id );
         TestConfiguracion test( reqTest.tipoDispositivo );
         const int maxValorVariableDisp = config.ObtenerParametroEntero( MAX_VALOR_VARIABLE_DISP );
-        for( int i=0; i<test.CantVariables(); i++ ){
+        int cantVars = test.getCantVariables();
+        for( int i=0; i<cantVars; i++ ){
             int nuevoValorVar = rand() % maxValorVariableDisp;
             atendedor.enviarCambioVariable( reqTest.idDispositivo,
                                             test.getVariable(i),
