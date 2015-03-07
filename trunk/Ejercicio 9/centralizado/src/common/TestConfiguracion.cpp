@@ -22,7 +22,7 @@ TestConfiguracion::TestConfiguracion( int tipoDispositivo ){
     }
 }
 
-int TestConfiguracion::CantVariables() const{
+int TestConfiguracion::getCantVariables() const{
     return m_Variables.size();
 }
 
