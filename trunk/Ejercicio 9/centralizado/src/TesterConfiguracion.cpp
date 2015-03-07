@@ -1,6 +1,6 @@
 #include "logger/Logger.h"
 #include "common/AtendedorTesters.h"
-#include "TestConfiguracion.h"
+#include "common/TestConfiguracion.h"
 #include "common/Configuracion.h"
 #include <cstdlib>
 

@@ -114,17 +114,17 @@ int main(int argc, char** argv) {
             Logger::notice(ss.str().c_str(), __FILE__);
             ss.str("");
 
-            bool lastSpecialTest = false;
+            bool ultimoTestEspecial = false;
             program = atendedor.recibirProgramaEspecial(id);
-            while (!lastSpecialTest){                
+            while (!ultimoTestEspecial){                
                 ss << "El dispositivo " << id << " recibe el programa especial numero " << program << ". Ejecutando test especial...";
                 correrTestEspecial( planillaVariables );
-                Logger::debug(ss.str().c_str(), __FILE__);;
+                Logger::debug(ss.str().c_str(), __FILE__);
                 ss.str("");
                 atendedor.enviarResultadoEspecial(id, rand() % 2);
                 program = atendedor.recibirProgramaEspecial(id);                
                 if (program == FIN_TEST_ESPECIAL)
-                    lastSpecialTest = true;
+                    ultimoTestEspecial = true;
             }
             orden = atendedor.recibirOrden(id);
 
