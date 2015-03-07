@@ -197,47 +197,49 @@ void lanzarProcesosSistema( const Configuracion& config ) {
    
     // Creo testers
     const int cantTestersComunes = config.ObtenerParametroEntero( CANT_TESTERS_COMUNES );
-    int idTester = config.ObtenerParametroEntero( ID_TESTER_START );
-    for(int i = 0; i < cantTestersComunes; i++, idTester++) {
+    const int offsetTestersComunes = config.ObtenerParametroEntero( ID_TESTER_START );
+    for(int i = 0; i < cantTestersComunes; i++) {
         char param[3];
-        sprintf(param, "%d", idTester);
+        sprintf(param, "%d", offsetTestersComunes + i);
         usleep(10);
         pid_t newPid = fork();
         if(newPid == 0) {
             // Inicio el programa correspondiente
             execlp("./testerComun", "testerComun", param, (char*)0);
-            Logger::error("Error al ejecutar el programa TesterComun de ID" + idTester, __FILE__);
+            Logger::error("Error al ejecutar el programa TesterComun de ID" + offsetTestersComunes + i, __FILE__);
             exit(1);
         }
     }
     //Testers especiales
     const int cantTestersEspeciales = config.ObtenerParametroEntero( CANT_TESTERS_ESPECIALES );
-    for(int i = 0; i < cantTestersEspeciales; i++, idTester++) {
+    const int offsetTestersEspeciales = config.ObtenerParametroEntero( ID_TESTER_ESPECIAL_START );
+    for(int i = 0; i < cantTestersEspeciales; i++) {
         char param[3];
-        sprintf(param, "%d", idTester);
+        sprintf(param, "%d", offsetTestersEspeciales + i);
         usleep(10);
         pid_t newPid = fork();
         if(newPid == 0) {
             // Inicio el programa correspondiente
             execlp("./testerEspecial", "testerEspecial", param, (char*)0);
-            Logger::error("Error al ejecutar el programa TesterEspecial de ID" + idTester, __FILE__);
+            Logger::error("Error al ejecutar el programa TesterEspecial de ID" + offsetTestersEspeciales + i, __FILE__);
             exit(1);
         }
     }
     //Testers config
-    for(int i = 0; i < cantTestersEspeciales; i++, idTester++) {
+    const int offsetTestersConfig = config.ObtenerParametroEntero( ID_TESTER_CONFIG_START );
+    for(int i = 0; i < cantTestersComunes; i++) {
         char param[3];
-        sprintf(param, "%d", idTester);
+        sprintf(param, "%d", offsetTestersConfig + i);
         usleep(10);
         pid_t newPid = fork();
         if(newPid == 0) {
             // Inicio el programa correspondiente
             execlp("./testerConfig", "testerConfig", param, (char*)0);
-            Logger::error("Error al ejecutar el programa TesterConfig de ID" + idTester, __FILE__);
+            Logger::error("Error al ejecutar el programa TesterConfig de ID" + offsetTestersConfig + i, __FILE__);
             exit(1);
         }
-    }    
-    
+    }
+
     // Creo equipo especial
     pid_t eqEspPid = fork();
     if (eqEspPid == 0) {

@@ -168,7 +168,7 @@ void AtendedorDispositivos::notificarCambioDeVariableFinalizado( int idDispositi
     resultadoTestEspecial.value = ( ultimoCambio? FIN_TEST_CONFIG : 0 );
     resultadoTestEspecial.posicionDispositivo = m_PosicionDispositivo;
     resultadoTestEspecial.tipoDispositivo = -1;
-            
+
     int ret = msgsnd(m_ColaTestsEspeciales, &resultadoTestEspecial, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
         std::string error = std::string("Error al enviar resultado especial al sistema de testeo. Error: ") + std::string(strerror(errno));

@@ -5,12 +5,13 @@
 #include <cstdlib>
 
 using namespace Constantes::NombresDeParametros;
+using namespace std;
 
 int main(int argc, char** argv) {
     // El primer parametro es el id del tester
     int id = atoi(argv[1]);
     Logger::initialize(logFileName.c_str(), Logger::LOG_DEBUG);
-    std::stringstream nombre;
+    stringstream nombre;
     nombre << __FILE__ << " " << id;
     Logger::notice("Inicia el procesamiento, cargo atendedor" , nombre.str().c_str());
     
@@ -21,9 +22,13 @@ int main(int argc, char** argv) {
     }
     
     AtendedorTesters atendedor( config );
-    
+
     while(true) {
         TMessageTesterConfig reqTest = atendedor.recibirReqTestConfig( id );
+        stringstream ss;
+        ss << "Requerimiento de test de configuración para disp " << reqTest.idDispositivo << " recibido";
+        Logger::notice( ss.str(), nombre.str().c_str() );
+        ss.str("");
         TestConfiguracion test( reqTest.tipoDispositivo );
         const int maxValorVariableDisp = config.ObtenerParametroEntero( MAX_VALOR_VARIABLE_DISP );
         int cantVars = test.getCantVariables();
