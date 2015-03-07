@@ -20,6 +20,7 @@ namespace Constantes{
         const std::string CANT_TESTERS_ESPECIALES = "CantTestersEspeciales";
         const std::string CANT_TIPOS_DISPOSITIVO = "CantTiposDispositivo";
         const std::string ID_DISPOSITIVO_START = "IdDispositivoStart";
+        const std::string ID_TESTER_CONFIG_START = "IdTesterConfigStart";
         const std::string ID_TESTER_ESPECIAL_START = "IdTesterEspecialStart";
         const std::string ID_TESTER_START = "IdTesterStart";
         const std::string MAX_DISPOSITIVOS_EN_SISTEMA = "MaxDispositivosEnSistema";

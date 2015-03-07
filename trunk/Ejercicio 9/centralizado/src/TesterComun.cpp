@@ -45,7 +45,9 @@ int main(int argc, char** argv) {
 
     srand(time(NULL));
     
+    const int idPrimerTesterComun = config.ObtenerParametroEntero(ID_TESTER_START);
     const int idPrimerTesterEspecial = config.ObtenerParametroEntero(ID_TESTER_ESPECIAL_START);
+    const int idPrimerTesterConfig = config.ObtenerParametroEntero(ID_TESTER_CONFIG_START);
 
     while(true) {
         Logger::notice("Espero por un nuevo requerimiento de testeo" , nombre.str().c_str());
@@ -109,7 +111,11 @@ int main(int argc, char** argv) {
             Logger::notice(ss.str() , nombre.str().c_str());
             ss.str("");
             atendedor.enviarAEspeciales(los_testers, idDispositivo, posicionDispositivo);
-            atendedor.enviarReqTestConfig( id, idDispositivo, tipoDispositivo );
+            ss << "Enviando req de test config a dispositivo " << idDispositivo;
+            Logger::notice(ss.str() , nombre.str().c_str());
+            ss.str("");
+            //El tester config al que se le destina este pedido es el que esta a igual distancia de su offset (por ej, 2003 -> 1003)
+            atendedor.enviarReqTestConfig( idDispositivo, id - idPrimerTesterComun + idPrimerTesterConfig, tipoDispositivo );
         }else{
             atendedor.enviarOrden(idDispositivo, ORDEN_REINICIO);
             planilla.eliminarDispositivo(posicionDispositivo);

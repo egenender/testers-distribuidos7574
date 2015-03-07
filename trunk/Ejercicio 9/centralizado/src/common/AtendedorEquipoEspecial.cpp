@@ -49,7 +49,7 @@ TMessageAtendedor AtendedorEquipoEspecial::recibirResultadoEspecial() {
 
 void AtendedorEquipoEspecial::enviarFinTestEspecialADispositivo(int idDispositivo) {
     TMessageAtendedor msg;
-    msg.mtype = idDispositivo;
+    msg.mtype = MTYPE_BASE_TAREA_ESPECIAL + idDispositivo;
     msg.idDispositivo = idDispositivo;
     msg.value = FIN_TEST_ESPECIAL;
     int ret = msgsnd(m_ColaDispTesterEsp, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);

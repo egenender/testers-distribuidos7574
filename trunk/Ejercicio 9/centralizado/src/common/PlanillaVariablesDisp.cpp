@@ -64,8 +64,26 @@ PlanillaVariablesDisp::PlanillaVariablesDisp( const Configuracion& config, int i
 PlanillaVariablesDisp::~PlanillaVariablesDisp() {
 }
 
+std::string EstadoProcesoDispToString( EstadoProcesoDisp edp ){
+    switch( edp ){
+        case EPD_ESPERANDO: return "EPD_ESPERANDO";
+        case EPD_OCUPADO: return "EPD_OCUPADO";
+        case EPD_LIBRE: return "EPD_LIBRE";
+        default: return "UNKNOWN";
+    }
+}
+
 void PlanillaVariablesDisp::iniciarTestEspecial(){
     m_MutexPlanilla.p();
+
+    /*std::stringstream ss;
+    ss << "DEBUG - iniciarTestEspecial - EstadoDisp: " << EstadoProcesoDispToString(m_pShmEstado->estadoDisp);
+    Logger::notice( ss.str(), __FILE__ );
+    ss.str("");
+    ss << "DEBUG - iniciarTestEspecial - EstadoDispConfig: " << EstadoProcesoDispToString(m_pShmEstado->estadoDispConfig);
+    Logger::notice( ss.str(), __FILE__ );
+    ss.str("");*/
+    
     switch( m_pShmEstado->estadoDispConfig ){
         case EPD_ESPERANDO:
             m_pShmEstado->estadoDisp = EPD_ESPERANDO;
@@ -88,6 +106,15 @@ void PlanillaVariablesDisp::iniciarTestEspecial(){
    
 void PlanillaVariablesDisp::finalizarTestEspecial(){
     m_MutexPlanilla.p();
+    
+    /*std::stringstream ss;
+    ss << "DEBUG - finalizarTestEspecial - EstadoDisp: " << EstadoProcesoDispToString(m_pShmEstado->estadoDisp);
+    Logger::notice( ss.str(), __FILE__ );
+    ss.str("");
+    ss << "DEBUG - finalizarTestEspecial - EstadoDispConfig: " << EstadoProcesoDispToString(m_pShmEstado->estadoDispConfig);
+    Logger::notice( ss.str(), __FILE__ );
+    ss.str("");*/
+    
     m_pShmEstado->estadoDisp = EPD_LIBRE;
     switch( m_pShmEstado->estadoDispConfig ){
         case EPD_ESPERANDO:
@@ -106,6 +133,15 @@ void PlanillaVariablesDisp::finalizarTestEspecial(){
 
 void PlanillaVariablesDisp::iniciarCambioDeVariable( int idVar ){
     m_MutexPlanilla.p();
+    
+    /*std::stringstream ss;
+    ss << "DEBUG - iniciarCambioDeVariable - EstadoDisp: " << EstadoProcesoDispToString(m_pShmEstado->estadoDisp);
+    Logger::notice( ss.str(), __FILE__ );
+    ss.str("");
+    ss << "DEBUG - iniciarCambioDeVariable - EstadoDispConfig: " << EstadoProcesoDispToString(m_pShmEstado->estadoDispConfig);
+    Logger::notice( ss.str(), __FILE__ );
+    ss.str("");*/
+    
     if( m_pShmEstado->estadoDisp == EPD_OCUPADO ){
         m_pShmEstado->estadoDispConfig = EPD_ESPERANDO;
         m_MutexPlanilla.v();
@@ -118,6 +154,15 @@ void PlanillaVariablesDisp::iniciarCambioDeVariable( int idVar ){
    
 void PlanillaVariablesDisp::finalizarCambioDeVariable( int idVar ){
     m_MutexPlanilla.p();
+
+    /*std::stringstream ss;
+    ss << "DEBUG - finalizarCambioDeVariable - EstadoDisp: " << EstadoProcesoDispToString(m_pShmEstado->estadoDisp);
+    Logger::notice( ss.str(), __FILE__ );
+    ss.str("");
+    ss << "DEBUG - finalizarCambioDeVariable - EstadoDispConfig: " << EstadoProcesoDispToString(m_pShmEstado->estadoDispConfig);
+    Logger::notice( ss.str(), __FILE__ );
+    ss.str("");*/
+    
     m_pShmEstado->estadoDispConfig = EPD_LIBRE;
     switch( m_pShmEstado->estadoDisp ){
         case EPD_ESPERANDO:
@@ -125,7 +170,7 @@ void PlanillaVariablesDisp::finalizarCambioDeVariable( int idVar ){
             m_SemTestsEspeciales.v();
             break;
         case EPD_OCUPADO:
-            assert( false );            
+            assert( false );
             break;
         case EPD_LIBRE:
             break;

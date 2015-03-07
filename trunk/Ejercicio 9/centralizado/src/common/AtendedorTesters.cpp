@@ -137,6 +137,7 @@ void AtendedorTesters::enviarTareaEspecial(int idDispositivo, int idTester, int 
     msg.idTester = idTester;
     msg.posicionDispositivo = posicionDispositivo;
     msg.value = tarea;
+
     int ret = msgsnd(m_ColaTareasEspeciales, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
         std::stringstream ss;
@@ -183,6 +184,7 @@ TMessageAssignTE AtendedorTesters::recibirRequerimientoEspecial(int idEsp) {
 
 void AtendedorTesters::enviarReqTestConfig( int idDispositivo, int idTester, int tipoDispositivo ){
     TMessageTesterConfig msg;
+
     msg.mtype = idTester;
     msg.idDispositivo = idDispositivo;
     msg.tipoDispositivo = tipoDispositivo;
@@ -198,6 +200,7 @@ void AtendedorTesters::enviarReqTestConfig( int idDispositivo, int idTester, int
 
 TMessageTesterConfig AtendedorTesters::recibirReqTestConfig( int idTester ){
     TMessageTesterConfig msg;
+
     int ret = msgrcv(m_ColaTestersConfig, &msg, sizeof(TMessageTesterConfig) - sizeof(long), idTester, 0);
     if(ret == -1) {
         std::string error = std::string("Error al recibir requerimiento de test config del atendedor. Error: ") + std::string(strerror(errno));
