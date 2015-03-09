@@ -39,6 +39,6 @@ public:
     
     void enviarReqTestConfig( int idDispositivo, int idTester, int tipoDispositivo );
     TMessageTesterConfig recibirReqTestConfig( int idTester );
-    void enviarCambioVariable( int idDispositivo, int idVariable, int nuevoValor, bool ultimo );
+    void enviarCambioVariable( int idDispositivo, int idTesterConfig, int idVariable, int nuevoValor, bool ultimo );
 
 };

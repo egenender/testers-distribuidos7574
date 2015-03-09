@@ -35,6 +35,7 @@ int main(int argc, char** argv) {
         for( int i=0; i<cantVars; i++ ){
             int nuevoValorVar = rand() % maxValorVariableDisp;
             atendedor.enviarCambioVariable( reqTest.idDispositivo,
+                                            id,
                                             test.getVariable(i),
                                             nuevoValorVar,
                                             i == (test.getCantVariables()-1) );

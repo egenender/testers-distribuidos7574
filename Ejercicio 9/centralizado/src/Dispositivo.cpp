@@ -73,7 +73,8 @@ int main(int argc, char** argv) {
         ss.str("");
         atendedor.enviarRequerimiento(id, tipo);
         // Recibe programa, verificando que no sea un rechazo por parte del sistema
-        int program = atendedor.recibirPrograma(id);
+        int idTesterComun = -1;
+        int program = atendedor.recibirPrograma( id, &idTesterComun );
         if (program == SIN_LUGAR) {
             ss << "El dispositivo " << id << " recibe indicacion de que no hay lugar en el sistema de testeo. Reintentara luego";
             Logger::debug(ss.str().c_str(), nombreProceso.str().c_str());
@@ -83,17 +84,17 @@ int main(int argc, char** argv) {
             continue;
         }
     
-        ss << "El dispositivo " << id << " recibe el programa numero " << program;
+        ss << "El dispositivo " << id << " recibe el programa numero " << program << " del tester " << idTesterComun;
         Logger::debug(ss.str().c_str(), nombreProceso.str().c_str());
         ss.str("");
 
         int resul = correrTest( program );
         
         // Le envio resultado del primer programa de testeo        
-        ss << "El dispositivo " << id << " envia los resultados";
+        ss << "El dispositivo " << id << " envia resultado a tester comun " << idTesterComun;
         Logger::debug(ss.str().c_str(), nombreProceso.str().c_str());
         ss.str("");
-        atendedor.enviarResultado( id, resul );
+        atendedor.enviarResultado( id, idTesterComun, resul );
 
         ss << "El dispositivo " << id << " espera la orden del sistema de testeo...";
         Logger::debug(ss.str().c_str(), nombreProceso.str().c_str());
@@ -118,14 +119,15 @@ int main(int argc, char** argv) {
             ss.str("");
 
             bool ultimoTestEspecial = false;
-            program = atendedor.recibirProgramaEspecial(id);
+            int idTesterEspecial = -1;
+            program = atendedor.recibirProgramaEspecial( id, &idTesterEspecial );
             while (!ultimoTestEspecial){                
-                ss << "El dispositivo " << id << " recibe el programa especial numero " << program << ". Ejecutando test especial...";
+                ss << "El dispositivo " << id << " recibe el programa especial numero " << program << " del tester especial " << idTesterEspecial << ". Ejecutando test especial...";
                 correrTestEspecial( planillaVariables );
                 Logger::debug(ss.str().c_str(), nombreProceso.str().c_str());
                 ss.str("");
-                atendedor.enviarResultadoEspecial(id, rand() % 2);
-                program = atendedor.recibirProgramaEspecial(id);                
+                atendedor.enviarResultadoEspecial(id, idTesterEspecial, rand() % 2);
+                program = atendedor.recibirProgramaEspecial( id, &idTesterEspecial );
                 if (program == FIN_TEST_ESPECIAL)
                     ultimoTestEspecial = true;
             }

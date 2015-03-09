@@ -118,6 +118,7 @@ resultado_test_t AtendedorTesters::recibirResultado(int idTester) {
 void AtendedorTesters::enviarOrden(int idDispositivo, int orden) {
     TMessageAtendedor msg;
     msg.mtype = idDispositivo;
+    msg.idTester = -1;
     msg.idDispositivo = idDispositivo;
     msg.value = orden;
     
@@ -210,11 +211,12 @@ TMessageTesterConfig AtendedorTesters::recibirReqTestConfig( int idTester ){
     return msg;
 }
 
-void AtendedorTesters::enviarCambioVariable( int idDispositivo, int idVariable, int nuevoValor, bool ultimo ){
+void AtendedorTesters::enviarCambioVariable( int idDispositivo, int idTesterConfig, int idVariable, int nuevoValor, bool ultimo ){
     TMessageDispConfig msg;
     msg.mtype = idDispositivo;
     msg.idVariable = idVariable;
     msg.nuevoValor = nuevoValor;
+    msg.idTesterConfig = idTesterConfig;
     msg.ultimo = ultimo;
     int ret = msgsnd(m_ColaDispositivosConfig, &msg, sizeof(TMessageDispConfig) - sizeof(long), 0);
     if(ret == -1) {

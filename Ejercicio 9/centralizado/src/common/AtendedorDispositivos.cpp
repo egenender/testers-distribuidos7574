@@ -10,7 +10,7 @@
 using namespace Constantes::NombresDeParametros;
 using std::string;
 
-AtendedorDispositivos::AtendedorDispositivos( const Configuracion& config ) { 
+AtendedorDispositivos::AtendedorDispositivos( const Configuracion& config ){ 
     const string ipcFileName = config.ObtenerParametroString( ARCHIVO_IPCS );
     //Cola requerimientos
     key_t key = ftok( ipcFileName.c_str(),
@@ -71,7 +71,7 @@ void AtendedorDispositivos::enviarRequerimiento(int idDispositivo, int tipoDispo
     }
 }
 
-int AtendedorDispositivos::recibirPrograma(int idDispositivo) {
+int AtendedorDispositivos::recibirPrograma( int idDispositivo, int* pIdTester ) {
     TMessageAtendedor msg;
     int ret = msgrcv(m_ColaRequerimientos, &msg, sizeof(TMessageAtendedor) - sizeof(long), idDispositivo, 0);
     if(ret == -1) {
@@ -79,15 +79,15 @@ int AtendedorDispositivos::recibirPrograma(int idDispositivo) {
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
-    m_IdTester = msg.idTester;
+    *pIdTester = msg.idTester;
     return msg.value;
 }
 
-void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {
+void AtendedorDispositivos::enviarResultado( int idDispositivo, int idTester, int resultado ) {
 
     resultado_test_t resultado_test;
     
-    resultado_test.mtype = m_IdTester;
+    resultado_test.mtype = idTester;
     resultado_test.idDispositivo = idDispositivo;
     resultado_test.result = resultado;
             
@@ -100,7 +100,7 @@ void AtendedorDispositivos::enviarResultado(int idDispositivo, int resultado) {
 
 }
 
-int AtendedorDispositivos::recibirProgramaEspecial(int idDispositivo) {
+int AtendedorDispositivos::recibirProgramaEspecial( int idDispositivo, int* pIdTesterEspecial ) {
 
     TMessageAtendedor msg;
     int ret = msgrcv(m_ColaTestsEspeciales, &msg, sizeof(TMessageAtendedor) - sizeof(long), MTYPE_BASE_TAREA_ESPECIAL + idDispositivo, 0);
@@ -109,23 +109,28 @@ int AtendedorDispositivos::recibirProgramaEspecial(int idDispositivo) {
         Logger::error(error.c_str(), __FILE__);
         exit(0);
     }
-    m_IdTester = msg.idTester;
+    *pIdTesterEspecial = msg.idTester;
     m_PosicionDispositivo = msg.posicionDispositivo;
     return msg.value;
 }
 
 
 // El resultado especial se envia solo al Equipo Especial, por lo que el mtype influye poco
-void AtendedorDispositivos::enviarResultadoEspecial(int idDispositivo, int resultado) {
+void AtendedorDispositivos::enviarResultadoEspecial( int idDispositivo, int idTesterEspecial, int resultado ) {
 
     TMessageAtendedor resultadoTestEspecial;
     
     resultadoTestEspecial.mtype = MTYPE_RESULTADO_ESPECIAL;
     resultadoTestEspecial.idDispositivo = idDispositivo;
-    resultadoTestEspecial.idTester = m_IdTester;
+    resultadoTestEspecial.idTester = idTesterEspecial;
     resultadoTestEspecial.value = resultado;
     resultadoTestEspecial.posicionDispositivo = m_PosicionDispositivo;
-    resultadoTestEspecial.tipoDispositivo = -1;    
+    resultadoTestEspecial.tipoDispositivo = -1;
+    
+    std::stringstream ss;
+    ss << "DEBUG Enviando resultado especial con mtype " << resultadoTestEspecial.mtype;
+    Logger::error( ss.str(), __FILE__ );
+    ss.str();
 
     int ret = msgsnd(m_ColaTestsEspeciales, &resultadoTestEspecial, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
@@ -159,12 +164,18 @@ TMessageDispConfig AtendedorDispositivos::recibirPedidoCambioVariable( int idDis
     return msg;
 }
 
-void AtendedorDispositivos::notificarCambioDeVariableFinalizado( int idDispositivo, bool ultimoCambio ){
+void AtendedorDispositivos::notificarCambioDeVariableFinalizado( int idDispositivo, int idTesterConfig, bool ultimoCambio ){
     TMessageAtendedor resultadoTestEspecial;
     
     resultadoTestEspecial.mtype = MTYPE_CAMBIO_VAR;
     resultadoTestEspecial.idDispositivo = idDispositivo;
-    resultadoTestEspecial.idTester = m_IdTester;
+    
+    /*std::stringstream ss;
+    ss << "DEBUG m_IdTester: "  << m_IdTester;
+    Logger::notice( ss.str(), __FILE__ );
+    ss.str();*/
+    
+    resultadoTestEspecial.idTester = idTesterConfig;
     resultadoTestEspecial.value = ( ultimoCambio? FIN_TEST_CONFIG : 0 );
     resultadoTestEspecial.posicionDispositivo = m_PosicionDispositivo;
     resultadoTestEspecial.tipoDispositivo = -1;

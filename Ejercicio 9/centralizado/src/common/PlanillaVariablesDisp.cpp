@@ -85,10 +85,13 @@ void PlanillaVariablesDisp::iniciarTestEspecial(){
     ss.str("");*/
     
     switch( m_pShmEstado->estadoDispConfig ){
-        case EPD_ESPERANDO:
-            m_pShmEstado->estadoDisp = EPD_ESPERANDO;
+        case EPD_ESPERANDO: //Si esta esperando, le cedo el control
+            /*m_pShmEstado->estadoDisp = EPD_ESPERANDO;
             m_pShmEstado->estadoDispConfig = EPD_OCUPADO;
             m_SemCambioVars.v();
+            m_MutexPlanilla.v();
+            m_SemTestsEspeciales.p();*/
+            m_pShmEstado->estadoDisp = EPD_ESPERANDO;
             m_MutexPlanilla.v();
             m_SemTestsEspeciales.p();
             break;
@@ -119,7 +122,7 @@ void PlanillaVariablesDisp::finalizarTestEspecial(){
     switch( m_pShmEstado->estadoDispConfig ){
         case EPD_ESPERANDO:
             m_pShmEstado->estadoDispConfig = EPD_OCUPADO;
-            m_SemCambioVars.v();            
+            m_SemCambioVars.v();       
             break;
         case EPD_OCUPADO:
             assert( false );
@@ -142,13 +145,21 @@ void PlanillaVariablesDisp::iniciarCambioDeVariable( int idVar ){
     Logger::notice( ss.str(), __FILE__ );
     ss.str("");*/
     
-    if( m_pShmEstado->estadoDisp == EPD_OCUPADO ){
-        m_pShmEstado->estadoDispConfig = EPD_ESPERANDO;
-        m_MutexPlanilla.v();
-        m_SemCambioVars.p();        
-    }else{
-        m_pShmEstado->estadoDispConfig = EPD_OCUPADO;
-        m_MutexPlanilla.v();
+    switch( m_pShmEstado->estadoDisp ){
+        case EPD_ESPERANDO:
+            m_pShmEstado->estadoDispConfig = EPD_ESPERANDO;
+            m_MutexPlanilla.v();
+            m_SemCambioVars.p();
+            break;
+        case EPD_OCUPADO:
+            m_pShmEstado->estadoDispConfig = EPD_ESPERANDO;
+            m_MutexPlanilla.v();
+            m_SemCambioVars.p();
+            break;
+        case EPD_LIBRE:
+            m_pShmEstado->estadoDispConfig = EPD_OCUPADO;
+            m_MutexPlanilla.v();
+            break;
     }
 }
    
@@ -176,5 +187,5 @@ void PlanillaVariablesDisp::finalizarCambioDeVariable( int idVar ){
             break;
     }
     m_MutexPlanilla.v();
-    m_SemCambioVars.v();    
+    m_SemCambioVars.v();
 }

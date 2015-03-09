@@ -50,6 +50,7 @@ TMessageAtendedor AtendedorEquipoEspecial::recibirResultadoEspecial() {
 void AtendedorEquipoEspecial::enviarFinTestEspecialADispositivo(int idDispositivo) {
     TMessageAtendedor msg;
     msg.mtype = MTYPE_BASE_TAREA_ESPECIAL + idDispositivo;
+    msg.idTester = -2;
     msg.idDispositivo = idDispositivo;
     msg.value = FIN_TEST_ESPECIAL;
     int ret = msgsnd(m_ColaDispTesterEsp, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
@@ -66,7 +67,7 @@ void AtendedorEquipoEspecial::enviarOrden(int idDispositivo, int orden) {
     TMessageAtendedor msg;
     msg.mtype = idDispositivo;
     msg.idDispositivo = idDispositivo;
-    msg.idTester = -1;
+    msg.idTester = -3;
     msg.value = orden;
     int ret = msgsnd(m_ColaOrdenDispositivos, &msg, sizeof(TMessageAtendedor) - sizeof(long), 0);
     if(ret == -1) {
