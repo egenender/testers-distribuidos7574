@@ -133,6 +133,7 @@ typedef struct TMessageDispConfig{
     long mtype;    
     int idVariable;
     int nuevoValor;
+    int idTesterConfig;
     bool ultimo;
 }TMessageDispConfig;
 

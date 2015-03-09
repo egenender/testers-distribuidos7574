@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
         try {
             TMessageDispConfig cambio = atendedor.recibirPedidoCambioVariable( id );
             realizarCambioDeVariable( id, planillaVariables, cambio.idVariable, cambio.nuevoValor, nombreProceso.str().c_str() );
-            atendedor.notificarCambioDeVariableFinalizado( id, cambio.ultimo );
+            atendedor.notificarCambioDeVariableFinalizado( id, cambio.idTesterConfig, cambio.ultimo );
         } catch(std::string exception) {
             Logger::error("Error en el dispositivo...", nombreProceso.str().c_str());
             break;
